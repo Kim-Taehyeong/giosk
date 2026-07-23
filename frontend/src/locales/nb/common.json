@@ -1,0 +1,518 @@
+{
+  "common": {
+    "cancel": "Kansellere",
+    "save": "Spare",
+    "close": "Lukke",
+    "back": "Tilbake",
+    "logout": "Logg ut",
+    "delete": "Slett",
+    "next": "Neste",
+    "login": "Logg inn",
+    "confirm": "Bekrefte",
+    "loading": "Laster inn...",
+    "language": "Språk",
+    "refresh": "Forfriske",
+    "korean": "한국어",
+    "english": "engelsk",
+    "optional": "valgfri",
+    "required": "nødvendig"
+  },
+  "auth": {
+    "brand": {
+      "enName": "DANKOOK UNIVERSITET",
+      "kuName": "Dankook universitet"
+    },
+    "login": {
+      "submit": "Logg inn",
+      "password": "Passord",
+      "usernameSolid": "Solid Cloud-brukernavn",
+      "domain": "Domene",
+      "tabSolid": "Solid Cloud-pålogging",
+      "submitting": "Logger på...",
+      "signupLink": "Meld deg på service",
+      "tabLocal": "Tjenestepålogging",
+      "usernameLocal": "Student ID / brukernavn",
+      "errorGeneric": "Innlogging mislyktes.",
+      "errorNetwork": "Det oppstod en nettverksfeil.",
+      "errorInvalid": "Ugyldig brukernavn eller passord.",
+      "errorPending": "Venter på administratorgodkjenning.",
+      "errorRejected": "Denne registreringsforespørselen ble avvist.",
+      "errorSuspended": "Denne kontoen er suspendert."
+    },
+    "signupPending": {
+      "submittedAt": "Sendt den",
+      "backToLogin": "Tilbake til innlogging",
+      "title": "Registreringsforespørsel sendt",
+      "body": "Du vil kunne logge på etter administratorgodkjenning. Dette kan ta litt tid."
+    },
+    "localSignup": {
+      "section": {
+        "credentials": "Konto",
+        "name": "Navn",
+        "affiliation": "Tilhørighet"
+      },
+      "field": {
+        "username": "Student ID / brukernavn",
+        "password": "Passord (minst 8 tegn)",
+        "email": "E-post",
+        "passwordConfirm": "Bekreft passord"
+      },
+      "title": "Meld deg på service",
+      "subtitle": "Fyll ut skjemaet nedenfor. Du vil kunne logge på når en administrator godkjenner forespørselen din.",
+      "errorPasswordShort": "Passordet må være på minst 8 tegn.",
+      "errorGeneric": "Registreringen mislyktes.",
+      "errorTerms": "Du må godta vilkårene for å registrere deg.",
+      "errorAdvisor": "Bachelor- og hovedfagsstudenter må gi en rådgiver.",
+      "errorRequired": "Vennligst fyll ut alle obligatoriske felt.",
+      "errorGroup": "Du må velge en organisasjon og en gruppe.",
+      "submitting": "Sender inn...",
+      "submit": "Be om påmelding",
+      "errorPasswordMismatch": "Passord stemmer ikke."
+    },
+    "signup": {
+      "section": {
+        "account": "Konto",
+        "name": "Navn",
+        "password": "Tjenestepassord (valgfritt)",
+        "affiliation": "Tilhørighet og rolle"
+      },
+      "field": {
+        "email": "E-post",
+        "name": "Navn",
+        "lastNameKo": "Etternavn (koreansk)",
+        "role": "Rolle",
+        "department": "Avdeling",
+        "namePlaceholder": "f.eks. Hong Gildong",
+        "firstNameEn": "Fornavn (engelsk)",
+        "username": "Brukernavn (student-ID)",
+        "org": "Organisasjon",
+        "group": "Gruppe",
+        "selectPh": "Velge",
+        "lastNameEn": "Etternavn (engelsk)",
+        "advisor": "Rådgiver",
+        "lab": "Lab (valgfritt)",
+        "firstNameKo": "Fornavn (koreansk)",
+        "sponsor": "Sponsor (valgfritt)",
+        "advisorPlaceholder": "Rådgivers navn",
+        "sponsorPlaceholder": "Sponsorens navn (rådgiver, teamleder, etc.)",
+        "passwordPlaceholder": "La stå tomt for kun å bruke Solid Cloud-pålogging",
+        "noJoinableGroup": "Denne organisasjonen har ingen grupper som kan delta. Kontakt organisasjonsadministratoren.",
+        "passwordHint": "Sett et passord for å logge på direkte med student-ID/brukernavn uten Solid Cloud."
+      },
+      "role": {
+        "professor": "Professor",
+        "staff": "Personale",
+        "undergrad": "Undergraduate",
+        "graduate": "Uteksaminert"
+      },
+      "title": "Registrer deg for Giosk Console",
+      "subtitle": "Solid Cloud-autentisering bekreftet. Godta vilkårene og oppgi ytterligere informasjon.",
+      "errorTerms": "Du må godta vilkårene for å registrere deg.",
+      "errorAdvisor": "Bachelor- og hovedfagsstudenter må gi en rådgiver.",
+      "errorGeneric": "Registreringen mislyktes.",
+      "termsView": "Se vilkår",
+      "submitting": "Registrerer deg...",
+      "terms": "Jeg godtar vilkårene for bruk og personvernerklæringen. (obligatorisk)",
+      "submit": "Fullfør registreringen"
+    }
+  },
+  "dashboard": {
+    "labels": {
+      "cpuCores": "CPU-kjerner",
+      "instances": "Forekomster",
+      "storageProjects": "Lagring (prosjekter)",
+      "systemMemory": "Systemminne"
+    },
+    "units": {
+      "gb": "GB",
+      "gib": "GiB",
+      "ea": "ea",
+      "cores": "Kjerner"
+    },
+    "gpuCredit": {
+      "renewal": "Månedlig fornyelse: {{date}}",
+      "perMonth": "/ {{limit}} C (måned)",
+      "title": "GPU-kredittkvote"
+    },
+    "instances": {
+      "table": {
+        "status": "Status",
+        "offering": "Tilbyr",
+        "template": "Mal",
+        "ip": "IP-adresse",
+        "name": "Forekomstnavn",
+        "action": "Handling",
+        "connection": "Forbindelse"
+      },
+      "actions": {
+        "delete": "Slett",
+        "resume": "Gjenoppta",
+        "stop": "Stopp forekomst"
+      },
+      "title": "Mine beregningsinstanser",
+      "create": "Ny instans",
+      "empty": "Fant ingen aktive forekomster.",
+      "createFirst": "Lag din første instans",
+      "loading": "Laster inn forekomster ..."
+    },
+    "status": {
+      "stopped": "Stoppet",
+      "running": "Løper",
+      "pending": "I påvente av",
+      "terminating": "Avslutter"
+    },
+    "confirmStop": {
+      "title": "Stopp forekomst",
+      "confirm": "Bekreft stopp",
+      "body": "Å stoppe frigjør GPU-ressurser. Du blir ikke fakturert før du starter den på nytt."
+    },
+    "confirmStart": {
+      "confirm": "Start",
+      "body": "Når du starter forekomsten, gjenopptas faktureringen.",
+      "title": "Start forekomst"
+    },
+    "confirmDelete": {
+      "confirm": "Slett",
+      "title": "Slett forekomst",
+      "body": "Dette er irreversibelt. Forekomsten og dens data vil bli permanent fjernet."
+    },
+    "logout": "Logg ut",
+    "console": "Cloud Console",
+    "resourceQuota": "Ressurskvote"
+  },
+  "credit": {
+    "type": {
+      "usage": "Bruk",
+      "manual_adjust": "Manuell justering",
+      "admin_grant": "Administrasjonsstipend",
+      "auto_stop": "Autostopp (ingen balanse)",
+      "monthly_reset": "Månedlig tilbakestilling",
+      "limit_increase": "Begrens økning"
+    },
+    "balance": "Balansere",
+    "loadMore": "Last inn mer",
+    "tableType": "Type",
+    "title": "GPU-kreditthistorikk",
+    "tableBalance": "Balansere",
+    "tableAmount": "Beløp",
+    "tableTime": "Tid",
+    "tableDescription": "Beskrivelse",
+    "empty": "Ingen transaksjoner.",
+    "limit": "Månedlig grense",
+    "cycleStartedAt": "Syklusen startet"
+  },
+  "notifications": {
+    "title": "Varsler",
+    "empty": "Ingen nye varsler.",
+    "unread": "{{count}} ny",
+    "viewAll": "Se all aktivitet"
+  },
+  "activity": {
+    "loadMore": "Last inn mer",
+    "title": "Aktivitet",
+    "empty": "Ingen aktivitet ennå."
+  },
+  "audit": {
+    "action": {
+      "logout": "Logg ut",
+      "login_solid": "Solid Cloud-pålogging",
+      "password_change": "Endring av passord",
+      "solid_unlink": "Solid Cloud koblet fra",
+      "signup_local": "Lokal registreringsforespørsel",
+      "login_local": "Lokal pålogging",
+      "ssh_key_delete": "SSH-nøkkel slettet",
+      "solid_link": "Solid Cloud koblet",
+      "ssh_key_add": "SSH-nøkkel lagt til",
+      "signup_solid": "Solid Cloud registreringsforespørsel",
+      "quota_override": "Kvoteoverstyring",
+      "group_quota_change": "Gruppekvote endret",
+      "status_change": "Statusendring",
+      "credit_grant": "Kreditt gitt"
+    },
+    "msg": {
+      "credit_grant": "{{actor}} ga deg {{delta}} GPU-kreditter (ny grense {{newLimit}})",
+      "quota_override": "{{actor}} justerte kvoten din",
+      "status_change": "{{actor}} endret statusen din fra {{from}} til {{to}}"
+    },
+    "actor": "Skuespiller",
+    "target": "Mål"
+  },
+  "admin": {
+    "menu": {
+      "users": "Brukere",
+      "audit": "Revisjonslogger",
+      "groupQuotas": "Gruppekvoter"
+    },
+    "quota": {
+      "cpu": "CPU-kjerner",
+      "monthlyLimit": "Månedlig grense",
+      "grant": "Stipend",
+      "save": "Spare",
+      "saved": "Lagret",
+      "effective": "Effektiv",
+      "limitIncreaseHint": "Å øke grensen legger også til differansen til gjeldende saldo",
+      "grantHint": "Bonus lagt til kun i denne syklusen (fjernes ved neste månedlige tilbakestilling)",
+      "instances": "Samtidige forekomster",
+      "storage": "Lagring (GiB)",
+      "ram": "RAM (GiB)",
+      "currentBalance": "Gjeldende saldo",
+      "gpuCredit": "GPU-kreditt",
+      "override": "Overstyr",
+      "currentUsage": "Nåværende bruk",
+      "editTitle": "Rediger kvote – {{name}}",
+      "groupDefault": "Gruppestandard",
+      "useGroupDefault": "Bruk gruppestandard",
+      "groupTitle": "{{role}} standard kvote"
+    },
+    "users": {
+      "filter": {
+        "pending": "I påvente av",
+        "all": "Alle",
+        "suspended": "Suspendert",
+        "approved": "Godkjent",
+        "rejected": "Avvist"
+      },
+      "table": {
+        "name": "Navn",
+        "role": "Rolle",
+        "department": "Avdeling",
+        "provider": "Logg inn",
+        "status": "Status",
+        "action": "Handling",
+        "createdAt": "Forespurt",
+        "username": "Brukernavn"
+      },
+      "action": {
+        "reject": "Avvis",
+        "suspend": "Henge",
+        "approve": "Vedta",
+        "editQuota": "Rediger kvote",
+        "reactivate": "Aktiver på nytt"
+      },
+      "status": {
+        "pending": "I påvente av",
+        "suspended": "Suspendert",
+        "approved": "Godkjent",
+        "rejected": "Avvist"
+      },
+      "confirm": {
+        "suspendTitle": "Suspend bruker",
+        "approveTitle": "Godkjenn bruker",
+        "reactivateBody": "Vil du aktivere denne brukeren på nytt?",
+        "rejectBody": "Avvis denne brukerens registreringsforespørsel. De vil ikke kunne logge inn.",
+        "approveBody": "Godkjenne denne brukeren? De vil kunne logge på umiddelbart.",
+        "rejectTitle": "Avvis registrering",
+        "reactivateTitle": "Aktiver bruker på nytt",
+        "suspendBody": "Suspender denne brukeren. Alle aktive økter vil bli avsluttet."
+      },
+      "title": "Brukere",
+      "empty": "Ingen brukere."
+    },
+    "console": "Administrasjonskonsoll"
+  },
+  "me": {
+    "section": {
+      "profile": "Profil",
+      "password": "Passord",
+      "activity": "Aktivitet",
+      "solid": "Solid skyforbindelse",
+      "sshKeys": "SSH-nøkler"
+    },
+    "profile": {
+      "username": "Brukernavn (student-ID)",
+      "email": "E-post",
+      "role": "Rolle",
+      "department": "Avdeling",
+      "advisor": "Rådgiver",
+      "createdAt": "Ble med",
+      "nameEn": "Navn (engelsk)",
+      "lab": "Lab",
+      "provider": "Påloggingsmetode",
+      "nameKo": "Navn (koreansk)",
+      "providerBoth": "Lokal + Solid Cloud",
+      "providerLocal": "Lokalt",
+      "providerSolid": "Solid Cloud",
+      "notSet": "(ikke satt)"
+    },
+    "solid": {
+      "account": "Konto",
+      "linked": "Koblet til Solid Cloud",
+      "linkSuccess": "Solid Cloud koblet",
+      "unlinkButton": "Fjern tilknytningen",
+      "linking": "Kobler ...",
+      "userId": "Bruker-ID",
+      "username": "Solid Cloud-brukernavn",
+      "password": "Passord",
+      "domain": "Domene",
+      "unlinkNeedsPassword": "Angi et lokalt passord før du kobler fra.",
+      "linkSubtitle": "Autentiser med Solid Cloud-legitimasjonen din for å koble til denne kontoen slik at du kan bruke begge påloggingene.",
+      "unlinkConfirm": "Fjerne koblingen til Solid Cloud? Du vil kun kunne logge på med ditt lokale passord etterpå.",
+      "linkButton": "Link Solid Cloud",
+      "domainId": "Domene-ID",
+      "unlinking": "Fjerner tilknytningen …",
+      "errorAuth": "Solid Cloud-autentisering mislyktes.",
+      "notLinked": "Ikke knyttet til Solid Cloud",
+      "errorConflict": "Denne Solid Cloud-kontoen er allerede knyttet til en annen bruker."
+    },
+    "password": {
+      "title": "Endre passord",
+      "current": "Gjeldende passord",
+      "new": "Nytt passord",
+      "errorShort": "Passordet må være på minst 8 tegn.",
+      "confirm": "Bekreft nytt passord",
+      "saving": "Lagrer...",
+      "errorMismatch": "Nye passord stemmer ikke.",
+      "noPasswordHint": "Det er ikke angitt noe lokalt passord. Angi et nytt passord vil aktivere lokal pålogging.",
+      "hint": "Minst 8 tegn",
+      "submit": "Lagre passord",
+      "success": "Passord oppdatert."
+    },
+    "ssh": {
+      "name": "Navn",
+      "subtitle": "Nøkler som er registrert her kan velges når du oppretter en ny instans.",
+      "title": "SSH offentlige nøkler",
+      "delete": "Slett",
+      "empty": "Ingen SSH-nøkler registrert.",
+      "namePlaceholder": "f.eks. personlig-bærbar datamaskin",
+      "fingerprint": "Fingeravtrykk",
+      "createdAt": "Lagt til",
+      "publicKey": "Offentlig nøkkel",
+      "errorRequired": "Navn og offentlig nøkkel kreves.",
+      "errorFormat": "Ugyldig SSH offentlig nøkkelformat.",
+      "publicKeyPlaceholder": "ssh-rsa AAAA... eller ssh-ed25519 AAAA...",
+      "adding": "Legger til ...",
+      "deleteConfirm": "Vil du slette denne SSH-nøkkelen?",
+      "add": "Legg til nøkkel"
+    },
+    "title": "Min konto",
+    "menu": "Min konto",
+    "back": "Tilbake til Dashboard"
+  },
+  "region": {
+    "loading": "Laster inn...",
+    "queue": "Kø",
+    "tip": "💡 Tips: RTX 4090 passer til lette arbeidsbelastninger; velg RTX Pro 6000 for trening i store modeller.",
+    "title": "Regiontilgjengelighet"
+  },
+  "create": {
+    "step1": {
+      "title": "1. Velg Mal / ISO",
+      "loading": "Laster inn maler ..."
+    },
+    "step2": {
+      "performance": "Ytelse",
+      "ram": "VÆR",
+      "price": "Pris",
+      "cpu": "CPU",
+      "title": "2. Velg Beregn tilbud",
+      "loading": "Laster inn tilbud...",
+      "vram": "VRAM"
+    },
+    "step3": {
+      "instanceName": "Forekomstnavn",
+      "instanceNameHint": "Unik identifikator for arbeidsområdet ditt.",
+      "manualOrGenerate": "Gå inn manuelt / Generer ny",
+      "sshKey": "SSH offentlig nøkkel",
+      "title": "3. Miljøinnstillinger",
+      "instanceNamePh": "f.eks. my-gpu-project-01",
+      "useSaved": "Bruk en lagret SSH-nøkkel",
+      "generating": "Genererer...",
+      "sshKeyHint": "Skriv inn din eksisterende offentlige nøkkel eller generer en ny.",
+      "keyLoaded": "Nøkkel lastet",
+      "generateKey": "Generer nøkkelpar",
+      "downloadNote": "Hvis du genererer et nytt nøkkelpar, vil den private nøkkelen (.pem) lastes ned automatisk. Vennligst oppbevar det trygt; det vil ikke vises igjen."
+    },
+    "footer": {
+      "back": "Tilbake",
+      "next": "Neste",
+      "launch": "Start forekomst",
+      "launching": "Lanserer..."
+    },
+    "errors": {
+      "createFailed": "Kunne ikke starte forekomsten."
+    },
+    "stepOf": "Trinn {{current}} av {{total}}",
+    "title": "Opprett ny forekomst"
+  },
+  "setup": {
+    "steps": {
+      "mode": "Modus",
+      "billing": "Fakturering",
+      "idle": "Uvirksom",
+      "review": "Gjennomgå"
+    },
+    "unit": {
+      "hour": "h",
+      "min": "min",
+      "month": "mo",
+      "credit": "C",
+      "times": "ganger",
+      "creditPerStep": "C/trinn",
+      "sessions": "økter"
+    },
+    "mode": {
+      "hybrid": "Beholder + SSH hybrid",
+      "container": "Beholdermodus",
+      "hybridDesc": "Legger til direkte SSH-tilgang til fysiske noder på toppen av containere. Best for små laboratorier eller når fysisk nodeleasing er nødvendig.",
+      "hybridNote": "Å velge hybrid muliggjør fysisk nodeleasing, SSH-kontoer og hjemmekvoter per node. (Implementert i en senere fase)",
+      "containerDesc": "Administrer GPUer via K8s-beholdere. Best for å betjene en GPU-klynge til mange brukere i stor skala."
+    },
+    "billing": {
+      "surge": "Prisøkning per tilgjengelighetsfall",
+      "pricingStatic": "Statisk – fast admin-sett pris",
+      "pricingHint": "Velg hvordan tilbudsprisene settes.",
+      "pricing": "Prispolitikk",
+      "maxLease": "Maks leie per økt",
+      "modeCredit": "Kreditt",
+      "modeFree": "Gratis",
+      "pricingDynamic": "Dynamisk - prisen stiger når tilgjengeligheten synker",
+      "modeDynamicDesc": "Bruk førstemann til mølla uten studiepoeng. Maks leasing-, nedkjølings- og samtidige øktgrenser beskytter tilgjengeligheten.",
+      "surgeHint": "Kreditt/time øker med dette beløpet hver gang ressursene blir knappe.",
+      "cooldown": "Nedkjøling før re-lease",
+      "maxConcurrent": "Maks samtidige økter",
+      "modeCreditDesc": "Betal ved å trekke fra kreditter. Kun kontrollert av kreditter, uten andre begrensninger.",
+      "modeDynamic": "Førstemann til mølla",
+      "modeFreeDesc": "Bruk fritt uten begrensninger. Ingen kreditter, leiekontrakter eller grenser for samtidige økter."
+    },
+    "idle": {
+      "containerNote": "Beholdermodus: gjenvinnes via Stopp, bevarer data.",
+      "timeoutHint": "Økter gjenvinnes automatisk når GPU-en forblir inaktiv så lenge.",
+      "sshNote": "SSH-modus: data forblir på lokal disk og kan gjenbrukes som de er.",
+      "timeout": "Inaktiv automatisk gjenopprettingstid"
+    },
+    "lease": {
+      "extHoursHint": "Maks timer en bruker kan velge per utvidelse. (kun førstemann-til-mølla-modus)",
+      "maxExtHint": "Maks antall utvidelser per økt. 0 deaktiverer utvidelse.",
+      "maxExt": "Maks utvidelser",
+      "extHours": "Maks timer per utvidelse"
+    },
+    "review": {
+      "modeLabel": "Driftsmodus",
+      "hint": "Du starter med innstillingene nedenfor. Endre dem når som helst i Admin → Systeminnstillinger.",
+      "idleLabel": "Inaktiv automatisk gjenvinning",
+      "billingLabel": "Faktureringsmodus"
+    },
+    "features": {
+      "signup": "Forespørsler om brukerregistrering",
+      "datasetFeatureHint": "Når den er av, er datasettmenyer, hurtigbufring og datasettvalg i økten skjult (mindre avhengig av sentral lagring).",
+      "datasetFeature": "Datasettfunksjon",
+      "dataset": "Datasettregistrering",
+      "signupHint": "Når den er av, er registreringslenken på påloggingssiden skjult og kontoer opprettes av administratorer.",
+      "alertsHint": "Når den er av, kan ikke brukere abonnere på GPU/node-tilgjengelighetsvarsler.",
+      "alerts": "Arbeidsmengdetilgjengelighetsvarsler",
+      "creditHint": "Når den er av, kan ikke brukere/grupper be om påfylling; administratorer gir kreditter direkte.",
+      "datasetHint": "Når den er av, kan ikke brukere registrere/be om datasett; bare administratorer registrerer dem.",
+      "groupJoin": "Forespørsler om å bli med i gruppe/organisasjon",
+      "groupJoinHint": "Når den er av, kan ikke brukere selv be om medlemskap; administratorer administrerer det.",
+      "credit": "Forespørsler om kredittpåfylling"
+    },
+    "back": "Tilbake",
+    "next": "Neste",
+    "wizardSubtitle": "Konfigurer driftsmodus og standardpolicyer. Alt kan endres senere i Admin → Systeminnstillinger.",
+    "wizardTitle": "Giosk Initial Setup",
+    "finish": "Fullfør oppsettet"
+  },
+  "topbar": {
+    "nodeBadge": "Noder {{up}}/{{total}} · GPU {{gpu}} %"
+  }
+}

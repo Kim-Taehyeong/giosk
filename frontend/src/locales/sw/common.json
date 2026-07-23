@@ -1,0 +1,518 @@
+{
+  "common": {
+    "back": "Nyuma",
+    "save": "Hifadhi",
+    "confirm": "Thibitisha",
+    "next": "Inayofuata",
+    "loading": "Inapakia...",
+    "cancel": "Ghairi",
+    "delete": "Futa",
+    "close": "Funga",
+    "login": "Ingia",
+    "language": "Lugha",
+    "english": "Kiingereza",
+    "refresh": "Onyesha upya",
+    "optional": "hiari",
+    "korean": "한국어",
+    "logout": "Ondoka",
+    "required": "inahitajika"
+  },
+  "auth": {
+    "brand": {
+      "kuName": "Chuo Kikuu cha Dankook",
+      "enName": "CHUO KIKUU CHA DANKOOK"
+    },
+    "login": {
+      "password": "Nenosiri",
+      "submit": "Ingia",
+      "submitting": "Inaingia...",
+      "tabLocal": "Kuingia kwa Huduma",
+      "usernameSolid": "Jina la Mtumiaji la Wingu Imara",
+      "errorNetwork": "Hitilafu ya mtandao imetokea.",
+      "usernameLocal": "Kitambulisho cha Mwanafunzi / Jina la mtumiaji",
+      "tabSolid": "Kuingia kwa Wingu Imara",
+      "domain": "Kikoa",
+      "errorPending": "Inasubiri idhini ya msimamizi.",
+      "errorSuspended": "Akaunti hii imesimamishwa.",
+      "errorInvalid": "Jina la mtumiaji au nenosiri batili.",
+      "errorGeneric": "Kuingia kumeshindwa.",
+      "signupLink": "Jisajili kwa huduma",
+      "errorRejected": "Ombi hili la kujisajili lilikataliwa."
+    },
+    "signupPending": {
+      "body": "Utaweza kuingia baada ya idhini ya msimamizi. Hii inaweza kuchukua muda.",
+      "title": "Ombi la kujisajili limewasilishwa",
+      "backToLogin": "Rudi kwa kuingia",
+      "submittedAt": "Imewasilishwa"
+    },
+    "localSignup": {
+      "section": {
+        "credentials": "Akaunti",
+        "name": "Jina",
+        "affiliation": "Ushirikiano"
+      },
+      "field": {
+        "username": "Kitambulisho cha Mwanafunzi / Jina la mtumiaji",
+        "email": "Barua pepe",
+        "password": "Nenosiri (angalau vibambo 8)",
+        "passwordConfirm": "Thibitisha nenosiri"
+      },
+      "title": "Jisajili kwa huduma",
+      "submitting": "Inawasilisha...",
+      "submit": "Omba kujiandikisha",
+      "subtitle": "Jaza fomu hapa chini. Utaweza kuingia mara tu msimamizi atakapoidhinisha ombi lako.",
+      "errorAdvisor": "Wanafunzi wa shahada ya kwanza na wahitimu lazima watoe mshauri.",
+      "errorPasswordShort": "Nenosiri lazima liwe na angalau vibambo 8.",
+      "errorRequired": "Tafadhali jaza sehemu zote zinazohitajika.",
+      "errorGroup": "Lazima uchague shirika na kikundi.",
+      "errorTerms": "Lazima ukubali sheria na masharti ili kujisajili.",
+      "errorGeneric": "Kujisajili kumeshindwa.",
+      "errorPasswordMismatch": "Manenosiri hayalingani."
+    },
+    "signup": {
+      "section": {
+        "account": "Akaunti",
+        "name": "Jina",
+        "affiliation": "Ushirikiano na Wajibu",
+        "password": "Nenosiri la Huduma (hiari)"
+      },
+      "field": {
+        "email": "Barua pepe",
+        "name": "Jina",
+        "username": "Jina la mtumiaji (Kitambulisho cha Mwanafunzi)",
+        "namePlaceholder": "k.m. Hong Gildong",
+        "lastNameKo": "Jina la mwisho (Kikorea)",
+        "role": "Jukumu",
+        "department": "Idara",
+        "org": "Shirika",
+        "firstNameKo": "Jina la kwanza (Kikorea)",
+        "lastNameEn": "Jina la mwisho (Kiingereza)",
+        "sponsorPlaceholder": "Jina la mfadhili (mshauri, kiongozi wa timu, n.k.)",
+        "passwordPlaceholder": "Acha tupu ili kutumia kuingia kwa Wingu Madhubuti pekee",
+        "firstNameEn": "Jina la kwanza (Kiingereza)",
+        "sponsor": "Mfadhili (si lazima)",
+        "advisor": "Mshauri",
+        "group": "Kikundi",
+        "selectPh": "Chagua",
+        "lab": "Maabara (ya hiari)",
+        "advisorPlaceholder": "Jina la mshauri",
+        "passwordHint": "Weka nenosiri ili kuingia moja kwa moja ukitumia Kitambulisho chako cha Mwanafunzi/Jina la Mtumiaji bila Wingu Imara.",
+        "noJoinableGroup": "Shirika hili halina vikundi vinavyoweza kujiunga. Wasiliana na msimamizi wa shirika."
+      },
+      "role": {
+        "undergrad": "Shahada ya kwanza",
+        "graduate": "Mhitimu",
+        "professor": "Profesa",
+        "staff": "Wafanyakazi"
+      },
+      "title": "Jisajili kwa Giosk Console",
+      "subtitle": "Uthibitishaji wa Wingu Imara umethibitishwa. Tafadhali kubali sheria na masharti na utoe maelezo ya ziada.",
+      "errorTerms": "Lazima ukubali sheria na masharti ili kujisajili.",
+      "errorAdvisor": "Wanafunzi wa shahada ya kwanza na wahitimu lazima watoe mshauri.",
+      "errorGeneric": "Kujisajili kumeshindwa.",
+      "submit": "Kamilisha kujisajili",
+      "terms": "Ninakubali Sheria na Masharti na Sera ya Faragha. (inahitajika)",
+      "submitting": "Inajisajili...",
+      "termsView": "Tazama masharti"
+    }
+  },
+  "dashboard": {
+    "labels": {
+      "storageProjects": "Hifadhi (Miradi)",
+      "systemMemory": "Kumbukumbu ya Mfumo",
+      "instances": "Matukio",
+      "cpuCores": "Viini vya CPU"
+    },
+    "units": {
+      "ea": "ea",
+      "gb": "GB",
+      "gib": "GiB",
+      "cores": "Mihimili"
+    },
+    "gpuCredit": {
+      "title": "Kiwango cha Mkopo cha GPU",
+      "renewal": "Upyaji wa kila mwezi: {{date}}",
+      "perMonth": "/ {{limit}} C (Mwezi)"
+    },
+    "instances": {
+      "table": {
+        "status": "Hali",
+        "template": "Kiolezo",
+        "connection": "Muunganisho",
+        "ip": "Anwani ya IP",
+        "name": "Jina la Mfano",
+        "offering": "Sadaka",
+        "action": "Kitendo"
+      },
+      "actions": {
+        "delete": "Futa",
+        "stop": "Kuacha Mfano",
+        "resume": "Endelea"
+      },
+      "title": "Matukio Yangu ya Kuhesabu",
+      "create": "Mfano Mpya",
+      "empty": "Hakuna matukio amilifu yaliyopatikana.",
+      "loading": "Inapakia matukio...",
+      "createFirst": "Unda mfano wako wa kwanza"
+    },
+    "status": {
+      "terminating": "Kukomesha",
+      "stopped": "Imesimamishwa",
+      "running": "Kukimbia",
+      "pending": "Inasubiri"
+    },
+    "confirmStop": {
+      "body": "Kusimamisha hutoa rasilimali za GPU. Hutatozwa hadi uanze tena.",
+      "title": "Mfano wa kuacha",
+      "confirm": "Thibitisha Acha"
+    },
+    "confirmStart": {
+      "confirm": "Anza",
+      "title": "Anza mfano",
+      "body": "Kuanzisha mfano kunaanza tena malipo."
+    },
+    "confirmDelete": {
+      "confirm": "Futa",
+      "title": "Futa mfano",
+      "body": "Hili haliwezi kutenduliwa. Mfano na data yake itaondolewa kabisa."
+    },
+    "logout": "Ondoka",
+    "console": "Cloud Console",
+    "resourceQuota": "Kiasi cha Rasilimali"
+  },
+  "credit": {
+    "type": {
+      "monthly_reset": "Rudisha kila mwezi",
+      "admin_grant": "Ruzuku ya msimamizi",
+      "usage": "Matumizi",
+      "limit_increase": "Kuongezeka kwa kikomo",
+      "manual_adjust": "Marekebisho ya mwongozo",
+      "auto_stop": "Simamisha kiotomatiki (hakuna salio)"
+    },
+    "loadMore": "Pakia zaidi",
+    "balance": "Mizani",
+    "tableBalance": "Mizani",
+    "tableAmount": "Kiasi",
+    "tableType": "Aina",
+    "tableDescription": "Maelezo",
+    "limit": "Kikomo cha kila mwezi",
+    "title": "Historia ya Mikopo ya GPU",
+    "cycleStartedAt": "Mzunguko umeanza",
+    "empty": "Hakuna shughuli.",
+    "tableTime": "Wakati"
+  },
+  "notifications": {
+    "title": "Arifa",
+    "empty": "Hakuna arifa mpya.",
+    "unread": "{{count}} mpya",
+    "viewAll": "Tazama shughuli zote"
+  },
+  "activity": {
+    "loadMore": "Pakia zaidi",
+    "empty": "Hakuna shughuli bado.",
+    "title": "Shughuli"
+  },
+  "audit": {
+    "action": {
+      "logout": "Ondoka",
+      "signup_local": "Ombi la kujisajili kwenye eneo lako",
+      "login_local": "Kuingia ndani",
+      "login_solid": "Kuingia kwa Wingu Imara",
+      "status_change": "Mabadiliko ya hali",
+      "signup_solid": "Ombi la kujisajili kwenye Wingu Imara",
+      "password_change": "Mabadiliko ya nenosiri",
+      "quota_override": "Kiasi cha kubatilisha",
+      "ssh_key_add": "Kitufe cha SSH kimeongezwa",
+      "ssh_key_delete": "Kitufe cha SSH kimefutwa",
+      "credit_grant": "Mkopo umetolewa",
+      "solid_link": "Wingu Imara limeunganishwa",
+      "solid_unlink": "Wingu Imara limetenganishwa",
+      "group_quota_change": "Kiasi cha mgao wa kikundi kimebadilishwa"
+    },
+    "msg": {
+      "credit_grant": "{{actor}} ilikupa salio la {{delta}} GPU (kikomo kipya {{newLimit}})",
+      "status_change": "{{actor}} ilibadilisha hali yako kutoka {{from}} hadi {{to}}",
+      "quota_override": "{{actor}} ilirekebisha mgao wako"
+    },
+    "actor": "Mwigizaji",
+    "target": "Lengo"
+  },
+  "admin": {
+    "menu": {
+      "audit": "Kumbukumbu za Ukaguzi",
+      "groupQuotas": "Viwango vya Kundi",
+      "users": "Watumiaji"
+    },
+    "quota": {
+      "cpu": "Viini vya CPU",
+      "monthlyLimit": "Kikomo cha kila mwezi",
+      "gpuCredit": "Mikopo ya GPU",
+      "save": "Hifadhi",
+      "storage": "Hifadhi (GiB)",
+      "instances": "Matukio Sanjari",
+      "ram": "RAM (GiB)",
+      "grant": "Ruzuku",
+      "grantHint": "Bonasi itaongezwa kwenye mzunguko huu pekee (itafutwa baada ya kuweka upya kila mwezi)",
+      "limitIncreaseHint": "Kuongeza kikomo pia huongeza tofauti kwa usawa wa sasa",
+      "currentUsage": "Matumizi ya sasa",
+      "useGroupDefault": "Tumia chaguomsingi la kikundi",
+      "currentBalance": "Usawa wa sasa",
+      "effective": "Ufanisi",
+      "override": "Batilisha",
+      "groupDefault": "Chaguo msingi la kikundi",
+      "saved": "Imehifadhiwa",
+      "editTitle": "Badilisha Kiasi - {{name}}",
+      "groupTitle": "Mgawo chaguomsingi wa {{role}}"
+    },
+    "users": {
+      "filter": {
+        "pending": "Inasubiri",
+        "all": "Wote",
+        "approved": "Imeidhinishwa",
+        "rejected": "Imekataliwa",
+        "suspended": "Imesimamishwa"
+      },
+      "table": {
+        "name": "Jina",
+        "role": "Jukumu",
+        "department": "Idara",
+        "provider": "Ingia",
+        "status": "Hali",
+        "action": "Kitendo",
+        "username": "Jina la mtumiaji",
+        "createdAt": "Umeomba"
+      },
+      "action": {
+        "approve": "Idhinisha",
+        "reject": "Kataa",
+        "suspend": "Sitisha",
+        "reactivate": "Anzisha tena",
+        "editQuota": "Badilisha Kiasi"
+      },
+      "status": {
+        "pending": "Inasubiri",
+        "approved": "Imeidhinishwa",
+        "rejected": "Imekataliwa",
+        "suspended": "Imesimamishwa"
+      },
+      "confirm": {
+        "approveTitle": "Idhinisha mtumiaji",
+        "rejectTitle": "Kataa kujisajili",
+        "approveBody": "Ungependa kuidhinisha mtumiaji huyu? Wataweza kuingia mara moja.",
+        "reactivateBody": "Je, ungependa kuwasha tena mtumiaji huyu?",
+        "reactivateTitle": "Anzisha tena mtumiaji",
+        "rejectBody": "Kataa ombi la mtumiaji huyu la kujisajili. Hawataweza kuingia.",
+        "suspendTitle": "Sitisha mtumiaji",
+        "suspendBody": "Sitisha mtumiaji huyu. Vipindi vyovyote vinavyoendelea vitakatishwa."
+      },
+      "title": "Watumiaji",
+      "empty": "Hakuna watumiaji."
+    },
+    "console": "Dashibodi ya Msimamizi"
+  },
+  "me": {
+    "section": {
+      "password": "Nenosiri",
+      "activity": "Shughuli",
+      "solid": "Muunganisho wa Wingu Imara",
+      "sshKeys": "Vifunguo vya SSH",
+      "profile": "Wasifu"
+    },
+    "profile": {
+      "username": "Jina la mtumiaji (Kitambulisho cha Mwanafunzi)",
+      "email": "Barua pepe",
+      "role": "Jukumu",
+      "department": "Idara",
+      "advisor": "Mshauri",
+      "nameKo": "Jina (Kikorea)",
+      "createdAt": "Imejiunga",
+      "lab": "Maabara",
+      "providerBoth": "Wingu la Ndani + Imara",
+      "providerSolid": "Wingu Imara",
+      "notSet": "(haijawekwa)",
+      "provider": "Mbinu ya kuingia",
+      "nameEn": "Jina (Kiingereza)",
+      "providerLocal": "Ndani"
+    },
+    "solid": {
+      "userId": "Kitambulisho cha Mtumiaji",
+      "account": "Akaunti",
+      "linkSuccess": "Wingu Imara limeunganishwa",
+      "linked": "Imeunganishwa na Wingu Imara",
+      "notLinked": "Haijaunganishwa na Wingu Imara",
+      "linkSubtitle": "Thibitisha kwa vitambulisho vyako vya Wingu Imara ili kuunganisha akaunti hii ili uweze kutumia kuingia kwenye akaunti.",
+      "username": "Jina la Mtumiaji la Wingu Imara",
+      "password": "Nenosiri",
+      "domain": "Kikoa",
+      "unlinkButton": "Tenganisha",
+      "domainId": "Kitambulisho cha kikoa",
+      "linking": "Inaunganisha...",
+      "linkButton": "Unganisha Wingu Imara",
+      "unlinking": "Inatenganisha...",
+      "unlinkNeedsPassword": "Weka nenosiri la ndani kabla ya kutenganisha.",
+      "errorAuth": "Uthibitishaji wa Wingu Imara umeshindwa.",
+      "unlinkConfirm": "Je, ungependa kutenganisha Wingu Imara? Utaweza tu kuingia na nenosiri lako la ndani baadaye.",
+      "errorConflict": "Akaunti hii ya Wingu Imara tayari imeunganishwa kwa mtumiaji mwingine."
+    },
+    "password": {
+      "errorShort": "Nenosiri lazima liwe na angalau vibambo 8.",
+      "confirm": "Thibitisha nenosiri jipya",
+      "new": "Nenosiri mpya",
+      "success": "Nenosiri limesasishwa.",
+      "hint": "Angalau herufi 8",
+      "current": "Nenosiri la sasa",
+      "title": "Badilisha Nenosiri",
+      "submit": "Hifadhi nenosiri",
+      "saving": "Inahifadhi...",
+      "errorMismatch": "Manenosiri mapya hayalingani.",
+      "noPasswordHint": "Hakuna nenosiri la ndani lililowekwa. Kuingiza nenosiri jipya kutawezesha kuingia kwa ndani."
+    },
+    "ssh": {
+      "name": "Jina",
+      "fingerprint": "Alama ya vidole",
+      "delete": "Futa",
+      "publicKey": "Ufunguo wa Umma",
+      "adding": "Inaongeza...",
+      "createdAt": "Imeongezwa",
+      "publicKeyPlaceholder": "ssh-rsa AAAA... au ssh-ed25519 AAAA...",
+      "empty": "Hakuna funguo za SSH zilizosajiliwa.",
+      "title": "Funguo za Umma za SSH",
+      "add": "Ongeza ufunguo",
+      "namePlaceholder": "k.m., kompyuta-mpakato ya kibinafsi",
+      "subtitle": "Vifunguo vilivyosajiliwa hapa vinaweza kuchaguliwa wakati wa kuunda mfano mpya.",
+      "errorFormat": "Umbizo batili la ufunguo wa umma wa SSH.",
+      "errorRequired": "Jina na ufunguo wa umma unahitajika.",
+      "deleteConfirm": "Ungependa kufuta ufunguo huu wa SSH?"
+    },
+    "title": "Akaunti Yangu",
+    "menu": "Akaunti Yangu",
+    "back": "Rudi kwenye Dashibodi"
+  },
+  "region": {
+    "loading": "Inapakia...",
+    "tip": "💡 Kidokezo: RTX 4090 inafaa mizigo ya kazi nyepesi; chagua RTX Pro 6000 kwa mafunzo ya aina kubwa.",
+    "title": "Upatikanaji wa Mkoa",
+    "queue": "Foleni"
+  },
+  "create": {
+    "step1": {
+      "loading": "Inapakia violezo...",
+      "title": "1. Chagua Kiolezo / ISO"
+    },
+    "step2": {
+      "performance": "Utendaji",
+      "price": "Bei",
+      "cpu": "CPU",
+      "loading": "Inapakia matoleo...",
+      "title": "2. Chagua Kukokotoa Sadaka",
+      "vram": "VRAM",
+      "ram": "RAM"
+    },
+    "step3": {
+      "instanceName": "Jina la Mfano",
+      "instanceNamePh": "k.m., my-gpu-project-01",
+      "sshKey": "Ufunguo wa Umma wa SSH",
+      "title": "3. Mipangilio ya Mazingira",
+      "instanceNameHint": "Kitambulisho cha kipekee cha nafasi yako ya kazi.",
+      "sshKeyHint": "Ingiza ufunguo wako uliopo wa umma au uzalishe mpya.",
+      "manualOrGenerate": "Ingiza mwenyewe / Tengeneza mpya",
+      "generating": "Inazalisha...",
+      "generateKey": "Tengeneza Jozi muhimu",
+      "downloadNote": "Ukitengeneza jozi mpya ya vitufe, ufunguo wa faragha (.pem) utapakuliwa kiotomatiki. Tafadhali weka salama; haitaonyeshwa tena.",
+      "useSaved": "Tumia kitufe cha SSH kilichohifadhiwa",
+      "keyLoaded": "Ufunguo Umepakiwa"
+    },
+    "footer": {
+      "back": "Nyuma",
+      "next": "Inayofuata",
+      "launch": "Uzinduzi wa Mfano",
+      "launching": "Inazindua..."
+    },
+    "errors": {
+      "createFailed": "Imeshindwa kuzindua mfano."
+    },
+    "stepOf": "Hatua {{current}} ya {{total}}",
+    "title": "Unda Mfano Mpya"
+  },
+  "setup": {
+    "steps": {
+      "mode": "Hali",
+      "idle": "Bila kufanya kitu",
+      "review": "Kagua",
+      "billing": "Bili"
+    },
+    "unit": {
+      "min": "min",
+      "hour": "h",
+      "credit": "C",
+      "creditPerStep": "C/hatua",
+      "month": "mo",
+      "times": "nyakati",
+      "sessions": "vikao"
+    },
+    "mode": {
+      "hybrid": "Chombo + mseto wa SSH",
+      "container": "Hali ya chombo",
+      "containerDesc": "Dhibiti GPU kupitia vyombo vya K8s. Bora zaidi kwa kuhudumia kundi la GPU kwa watumiaji wengi kwa kiwango.",
+      "hybridDesc": "Huongeza ufikiaji wa moja kwa moja wa SSH kwa nodi halisi juu ya vyombo. Bora kwa maabara ndogo au wakati ukodishaji wa nodi za kimwili unahitajika.",
+      "hybridNote": "Kuchagua mseto huwezesha ukodishaji wa nodi halisi, akaunti za SSH, na upendeleo wa nyumba kwa kila nodi. (Itatekelezwa katika awamu ya baadaye)"
+    },
+    "billing": {
+      "surge": "Ongezeko la bei kwa kila punguzo la upatikanaji",
+      "pricingDynamic": "Nguvu - bei hupanda kadri upatikanaji unavyopungua",
+      "surgeHint": "Mikopo/saa huongezeka kwa kiasi hiki kila wakati rasilimali zinapopungua.",
+      "pricingHint": "Chagua jinsi bei za ofa zinavyowekwa.",
+      "pricingStatic": "Tuli - bei iliyowekwa na msimamizi",
+      "modeCredit": "Mikopo",
+      "pricing": "Sera ya bei",
+      "maxConcurrent": "Upeo wa vipindi vinavyofanana",
+      "maxLease": "Kiwango cha juu cha kukodisha kwa kila kipindi",
+      "modeFree": "Bure",
+      "cooldown": "Tuliza kabla ya kukodisha tena",
+      "modeCreditDesc": "Lipa kwa kukata mikopo. Inadhibitiwa na mikopo pekee, bila vikomo vingine.",
+      "modeFreeDesc": "Tumia kwa uhuru bila kikomo. Hakuna mikopo, ukodishaji, au upeo wa kikao cha wakati mmoja.",
+      "modeDynamic": "Kwanza - njoo",
+      "modeDynamicDesc": "Tumia ujio wa kwanza bila mikopo. Ukodishaji wa juu zaidi, kupunguza kasi na vikomo vya kipindi cha wakati mmoja hulinda upatikanaji."
+    },
+    "idle": {
+      "sshNote": "Hali ya SSH: data hukaa kwenye diski ya ndani na inaweza kutumika tena kama ilivyo.",
+      "timeout": "Muda wa kurejesha kiotomatiki bila kufanya kitu",
+      "timeoutHint": "Vipindi hurejeshwa kiotomatiki wakati GPU inakaa bila kufanya kitu kwa muda huu.",
+      "containerNote": "Hali ya chombo: inadaiwa tena kupitia Acha, kuhifadhi data."
+    },
+    "lease": {
+      "extHours": "Upeo wa saa kwa kila kiendelezi",
+      "extHoursHint": "Masaa ya juu ambayo mtumiaji anaweza kuchagua kwa kila kiendelezi. (hali ya kuja kwanza tu)",
+      "maxExt": "Upanuzi wa juu zaidi",
+      "maxExtHint": "Idadi ya juu zaidi ya viendelezi kwa kila kipindi. 0 huzima upanuzi."
+    },
+    "review": {
+      "billingLabel": "Hali ya bili",
+      "idleLabel": "Kutofanya kazi tena kwa kurejesha otomatiki",
+      "hint": "Utaanza na mipangilio iliyo hapa chini. Zibadilishe wakati wowote katika Msimamizi → Mipangilio ya Mfumo.",
+      "modeLabel": "Hali ya uendeshaji"
+    },
+    "features": {
+      "signupHint": "Wakati imezimwa, kiungo cha kujisajili kwenye ukurasa wa kuingia hufichwa na akaunti zinaundwa na wasimamizi.",
+      "datasetFeature": "Kipengele cha seti za data",
+      "signup": "Maombi ya kujiandikisha kwa mtumiaji",
+      "alertsHint": "Ikiwa imezimwa, watumiaji hawawezi kujiandikisha kupokea arifa za upatikanaji wa GPU/nodi.",
+      "datasetHint": "Wakati imezimwa, watumiaji hawawezi kusajili/kuomba hifadhidata; wasimamizi pekee ndio wanaowasajili.",
+      "datasetFeatureHint": "Wakati imezimwa, menyu za seti ya data, akiba, na uteuzi wa seti ya data ya kikao zote hufichwa (utegemezi mdogo kwenye hifadhi kuu).",
+      "alerts": "Arifa za upatikanaji wa mzigo wa kazi",
+      "creditHint": "Wakati imezimwa, watumiaji/vikundi haviwezi kuomba nyongeza; wasimamizi hutoa mikopo moja kwa moja.",
+      "dataset": "Usajili wa seti ya data",
+      "credit": "Maombi ya kuongeza mkopo",
+      "groupJoinHint": "Ikiwa imezimwa, watumiaji hawawezi kujiombea uanachama; wasimamizi wasimamie.",
+      "groupJoin": "Maombi ya kujiunga na kikundi/org"
+    },
+    "back": "Nyuma",
+    "next": "Inayofuata",
+    "wizardTitle": "Usanidi wa Awali wa Giosk",
+    "finish": "Maliza kusanidi",
+    "wizardSubtitle": "Sanidi hali ya uendeshaji na sera chaguo-msingi. Kila kitu kinaweza kubadilishwa baadaye katika Msimamizi → Mipangilio ya Mfumo."
+  },
+  "topbar": {
+    "nodeBadge": "Nodi {{up}}/{{total}} · GPU {{gpu}}%"
+  }
+}

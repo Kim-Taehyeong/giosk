@@ -1,0 +1,28 @@
+{{- /* HAMi vGPUmonitor 를 Prometheus 가 스크레이프 — 분할(shared) 세션의 세션별 GPU 지표 소스.
+        DCGM 은 물리 카드 단위라 한 카드를 나눠 쓰면 세션별로 값이 갈리지 않는다. HAMi 는 CUDA hook 으로
+        컨테이너별 실사용을 재고 podname/podnamespace 라벨로 노출한다(= podname = Pod 이름 = instance_id).
+
+        PodMonitor 가 아니라 ServiceMonitor 를 쓴다: HAMi 의 vgpu-monitor 컨테이너는 containerPort 를
+        선언하지 않는다 → PodMonitor.portNumber 는 operator 가 "container_port_number==9394 인 것만 keep"
+        하는 relabel 을 만들어 아무 타겟도 남지 않는다(kind 실검증). HAMi 는 대신 monitor Service
+        (port 이름 monitorport → targetPort 9394)를 제공하므로 그 Service 를 잡는다.
+        실 검증: kind + 가짜 vGPUmonitor Service/exporter 로 스크레이프~쿼리까지 확인. */ -}}
+{{- if and .Values.monitoring.install .Values.monitoring.hami.scrape }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "giosk.fullname" . }}-hami
+  labels:
+    release: kps   # 번들 kube-prometheus-stack(릴리스명 kps) 의 selector 통과용
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ .Values.monitoring.hami.namespace | default .Release.Namespace }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: hami-device-plugin
+  endpoints:
+    - port: monitorport   # HAMi monitor Service 의 포트 이름(→ pod:9394)
+      path: /metrics
+      interval: 15s
+{{- end }}

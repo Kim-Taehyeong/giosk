@@ -1,0 +1,518 @@
+{
+  "common": {
+    "confirm": "Confirma",
+    "login": "Log in",
+    "next": "Următorul",
+    "delete": "Şterge",
+    "loading": "Încărcare...",
+    "save": "Salva",
+    "logout": "Deconectare",
+    "cancel": "Anula",
+    "back": "Spate",
+    "close": "Aproape",
+    "language": "Limbă",
+    "refresh": "Reîmprospăta",
+    "english": "engleză",
+    "required": "necesar",
+    "korean": "한국어",
+    "optional": "opțional"
+  },
+  "auth": {
+    "brand": {
+      "enName": "UNIVERSITATEA DANKOOK",
+      "kuName": "Universitatea Dankook"
+    },
+    "login": {
+      "submit": "Log in",
+      "password": "Parolă",
+      "domain": "Domeniu",
+      "errorGeneric": "Autentificare eșuată.",
+      "errorNetwork": "A apărut o eroare de rețea.",
+      "errorSuspended": "Acest Cont A Fost Suspendat.",
+      "tabSolid": "Conectare Solid Cloud",
+      "usernameLocal": "ID student / Nume de utilizator",
+      "tabLocal": "Conectare la serviciu",
+      "signupLink": "Înscrieți-vă pentru service",
+      "usernameSolid": "Nume de utilizator Solid Cloud",
+      "submitting": "Conectare...",
+      "errorRejected": "Această solicitare de înscriere a fost respinsă.",
+      "errorPending": "Se așteaptă aprobarea administratorului.",
+      "errorInvalid": "Nume de utilizator sau parolă nevalidă."
+    },
+    "signupPending": {
+      "backToLogin": "Înapoi la autentificare",
+      "title": "Solicitarea de înscriere a fost trimisă",
+      "submittedAt": "Trimis pe",
+      "body": "Vă veți putea autentifica după aprobarea administratorului. Acest lucru poate dura ceva timp."
+    },
+    "localSignup": {
+      "section": {
+        "credentials": "Cont",
+        "name": "Nume",
+        "affiliation": "Afiliere"
+      },
+      "field": {
+        "username": "ID student / Nume de utilizator",
+        "email": "E-mail",
+        "password": "Parola (cel putin 8 caractere)",
+        "passwordConfirm": "Confirmați parola"
+      },
+      "title": "Înscrieți-vă pentru service",
+      "errorTerms": "Trebuie să acceptați termenii pentru a vă înscrie.",
+      "submitting": "Se trimite...",
+      "submit": "Solicitați înscriere",
+      "errorAdvisor": "Studenții de licență și absolvenți trebuie să ofere un consilier.",
+      "subtitle": "Completați formularul de mai jos. Vă veți putea conecta odată ce un administrator aprobă solicitarea dvs.",
+      "errorPasswordShort": "Parola trebuie să aibă cel puțin 8 caractere.",
+      "errorRequired": "Vă rugăm să completați toate câmpurile obligatorii.",
+      "errorGroup": "Trebuie să selectați o organizație și un grup.",
+      "errorGeneric": "Înregistrarea a eșuat.",
+      "errorPasswordMismatch": "Parolele nu se potrivesc."
+    },
+    "signup": {
+      "section": {
+        "account": "Cont",
+        "name": "Nume",
+        "password": "Parola de serviciu (opțional)",
+        "affiliation": "Afiliere și rol"
+      },
+      "field": {
+        "email": "E-mail",
+        "name": "Nume",
+        "username": "Nume de utilizator (ID student)",
+        "role": "Rol",
+        "department": "Departament",
+        "namePlaceholder": "de ex. Hong Gildong",
+        "org": "Organizare",
+        "group": "Grup",
+        "selectPh": "Selecta",
+        "lastNameEn": "Nume (engleză)",
+        "lab": "Laborator (opțional)",
+        "firstNameKo": "Prenume (coreeană)",
+        "firstNameEn": "Prenume (engleză)",
+        "lastNameKo": "Nume (coreeană)",
+        "advisor": "consilier",
+        "passwordHint": "Setați o parolă pentru a vă conecta direct cu ID-ul/Numele de utilizator de student fără Solid Cloud.",
+        "advisorPlaceholder": "Numele consilierului",
+        "sponsor": "Sponsor (opțional)",
+        "sponsorPlaceholder": "Numele sponsorului (consilier, lider de echipă etc.)",
+        "noJoinableGroup": "Această organizație nu are grupuri la care să se alăture. Contactați administratorul organizației.",
+        "passwordPlaceholder": "Lăsați gol pentru a utiliza numai autentificarea Solid Cloud"
+      },
+      "role": {
+        "graduate": "Absolvent",
+        "professor": "Profesor",
+        "staff": "Personal",
+        "undergrad": "Licență"
+      },
+      "title": "Înscrieți-vă la Giosk Console",
+      "subtitle": "Autentificare Solid Cloud verificată. Vă rugăm să acceptați termenii și să furnizați informații suplimentare.",
+      "errorTerms": "Trebuie să acceptați termenii pentru a vă înscrie.",
+      "errorAdvisor": "Studenții de licență și absolvenți trebuie să ofere un consilier.",
+      "errorGeneric": "Înregistrarea a eșuat.",
+      "termsView": "Vedeți termenii",
+      "submitting": "Înregistrare...",
+      "terms": "Sunt de acord cu Termenii și Politica de confidențialitate. (necesar)",
+      "submit": "Completați înregistrarea"
+    }
+  },
+  "dashboard": {
+    "labels": {
+      "instances": "Instanțe",
+      "storageProjects": "Stocare (proiecte)",
+      "systemMemory": "Memoria de sistem",
+      "cpuCores": "Nuclee CPU"
+    },
+    "units": {
+      "ea": "ea",
+      "gb": "GB",
+      "gib": "GiB",
+      "cores": "Miezuri"
+    },
+    "gpuCredit": {
+      "title": "Cota de credit GPU",
+      "renewal": "Reînnoire lunară: {{date}}",
+      "perMonth": "/ {{limit}} C (lună)"
+    },
+    "instances": {
+      "table": {
+        "status": "Stare",
+        "template": "Șablon",
+        "ip": "adresa IP",
+        "connection": "Conexiune",
+        "action": "Acţiune",
+        "name": "Nume instanță",
+        "offering": "Ofertă"
+      },
+      "actions": {
+        "delete": "Şterge",
+        "resume": "Relua",
+        "stop": "Opriți instanța"
+      },
+      "create": "Instanță nouă",
+      "title": "Instanțele mele de calcul",
+      "empty": "Nu s-au găsit instanțe active.",
+      "loading": "Se încarcă instanțele...",
+      "createFirst": "Creați-vă prima instanță"
+    },
+    "status": {
+      "stopped": "Oprit",
+      "running": "Funcţionare",
+      "terminating": "Încheiere",
+      "pending": "În așteptare"
+    },
+    "confirmStop": {
+      "body": "Oprirea eliberează resurse GPU. Nu veți fi facturat până nu îl reporniți.",
+      "title": "Opriți instanța",
+      "confirm": "Confirmați Stop"
+    },
+    "confirmStart": {
+      "confirm": "Început",
+      "title": "Porniți instanța",
+      "body": "Pornirea instanței reia facturarea."
+    },
+    "confirmDelete": {
+      "confirm": "Şterge",
+      "title": "Ștergeți instanța",
+      "body": "Acest lucru este ireversibil. Instanța și datele acesteia vor fi eliminate definitiv."
+    },
+    "logout": "Deconectare",
+    "console": "Cloud Console",
+    "resourceQuota": "Cota de resurse"
+  },
+  "credit": {
+    "type": {
+      "usage": "Utilizare",
+      "monthly_reset": "Resetare lunară",
+      "admin_grant": "Grant administrativ",
+      "auto_stop": "Oprire automată (fără echilibru)",
+      "manual_adjust": "Reglare manuală",
+      "limit_increase": "Creșterea limită"
+    },
+    "balance": "Echilibru",
+    "empty": "Fără tranzacții.",
+    "cycleStartedAt": "Ciclul a început",
+    "tableBalance": "Echilibru",
+    "title": "Istoricul creditului GPU",
+    "tableTime": "Timp",
+    "tableDescription": "Descriere",
+    "tableType": "Tip",
+    "tableAmount": "Cantitate",
+    "loadMore": "Încărcați mai multe",
+    "limit": "Limită lunară"
+  },
+  "notifications": {
+    "title": "Notificări",
+    "unread": "{{count}} nou",
+    "empty": "Fără notificări noi.",
+    "viewAll": "Vedeți toată activitatea"
+  },
+  "activity": {
+    "loadMore": "Încărcați mai multe",
+    "title": "Activitate",
+    "empty": "Nicio activitate încă."
+  },
+  "audit": {
+    "action": {
+      "logout": "Deconectare",
+      "login_local": "Autentificare locală",
+      "solid_unlink": "Solid Cloud a fost deconectat",
+      "signup_local": "Cerere de înscriere locală",
+      "login_solid": "Conectare Solid Cloud",
+      "password_change": "Schimbarea parolei",
+      "signup_solid": "Solicitare de înscriere Solid Cloud",
+      "status_change": "Schimbare de stare",
+      "ssh_key_add": "S-a adăugat cheia SSH",
+      "solid_link": "Solid Cloud conectat",
+      "ssh_key_delete": "Cheia SSH a fost ștearsă",
+      "quota_override": "Anularea cotei",
+      "credit_grant": "Credit acordat",
+      "group_quota_change": "Cota de grup a fost modificată"
+    },
+    "msg": {
+      "credit_grant": "{{actor}} v-a acordat credite {{delta}} GPU (nouă limită {{newLimit}})",
+      "status_change": "{{actor}} ți-a schimbat starea de la {{from}} la {{to}}",
+      "quota_override": "{{actor}} v-a ajustat cota"
+    },
+    "actor": "Actor",
+    "target": "Ţintă"
+  },
+  "admin": {
+    "menu": {
+      "users": "Utilizatori",
+      "groupQuotas": "Cote de grup",
+      "audit": "Jurnalele de audit"
+    },
+    "quota": {
+      "cpu": "Nuclee CPU",
+      "instances": "Instanțe concurente",
+      "monthlyLimit": "Limită lunară",
+      "storage": "Stocare (GiB)",
+      "save": "Salva",
+      "grant": "Acorda",
+      "gpuCredit": "Credit GPU",
+      "currentBalance": "Sold curent",
+      "saved": "Salvat",
+      "ram": "RAM (GiB)",
+      "groupTitle": "Cota implicită {{role}}",
+      "editTitle": "Editați cota — {{name}}",
+      "useGroupDefault": "Folosiți grupul implicit",
+      "limitIncreaseHint": "Creșterea limitei adaugă și diferența la soldul curent",
+      "currentUsage": "Utilizare curentă",
+      "effective": "Eficient",
+      "grantHint": "Bonus adăugat numai la acest ciclu (șters la următoarea resetare lunară)",
+      "override": "Suprascriere",
+      "groupDefault": "Implicit grup"
+    },
+    "users": {
+      "filter": {
+        "all": "Toate",
+        "pending": "În așteptare",
+        "approved": "Aprobat",
+        "suspended": "Suspendat",
+        "rejected": "Respins"
+      },
+      "table": {
+        "name": "Nume",
+        "role": "Rol",
+        "department": "Departament",
+        "provider": "Log in",
+        "status": "Stare",
+        "action": "Acţiune",
+        "username": "Nume de utilizator",
+        "createdAt": "Solicitat"
+      },
+      "action": {
+        "approve": "Aproba",
+        "reject": "Respinge",
+        "suspend": "Suspenda",
+        "reactivate": "Reactiva",
+        "editQuota": "Editați cota"
+      },
+      "status": {
+        "pending": "În așteptare",
+        "approved": "Aprobat",
+        "suspended": "Suspendat",
+        "rejected": "Respins"
+      },
+      "confirm": {
+        "reactivateBody": "Reactivați acest utilizator?",
+        "rejectTitle": "Respingeți înscrierea",
+        "approveTitle": "Aprobați utilizatorul",
+        "approveBody": "Aprobați acest utilizator? Se vor putea autentifica imediat.",
+        "rejectBody": "Respinge cererea de înscriere a acestui utilizator. Nu se vor putea autentifica.",
+        "suspendBody": "Suspendați acest utilizator. Orice sesiuni active vor fi încheiate.",
+        "suspendTitle": "Suspendați utilizatorul",
+        "reactivateTitle": "Reactivați utilizatorul"
+      },
+      "title": "Utilizatori",
+      "empty": "Fără utilizatori."
+    },
+    "console": "Consola de administrare"
+  },
+  "me": {
+    "section": {
+      "profile": "Profil",
+      "password": "Parolă",
+      "activity": "Activitate",
+      "sshKeys": "Chei SSH",
+      "solid": "Conexiune solidă în cloud"
+    },
+    "profile": {
+      "username": "Nume de utilizator (ID student)",
+      "email": "E-mail",
+      "role": "Rol",
+      "department": "Departament",
+      "advisor": "consilier",
+      "createdAt": "S-a alăturat",
+      "providerLocal": "Local",
+      "providerBoth": "Local + Solid Cloud",
+      "nameEn": "Nume (engleză)",
+      "nameKo": "Nume (coreeană)",
+      "provider": "Metoda de conectare",
+      "lab": "laborator",
+      "notSet": "(nu setat)",
+      "providerSolid": "Solid Cloud"
+    },
+    "solid": {
+      "linked": "Conectat la Solid Cloud",
+      "account": "Cont",
+      "linkSuccess": "Solid Cloud conectat",
+      "userId": "ID-ul de utilizator",
+      "domainId": "ID domeniului",
+      "linking": "Se leagă...",
+      "username": "Nume de utilizator Solid Cloud",
+      "password": "Parolă",
+      "domain": "Domeniu",
+      "notLinked": "Nu este conectat la Solid Cloud",
+      "linkButton": "Link Solid Cloud",
+      "unlinking": "Se deconectează...",
+      "unlinkButton": "Deconectați",
+      "linkSubtitle": "Autentificați-vă cu acreditările Solid Cloud pentru a conecta acest cont, astfel încât să puteți utiliza oricare dintre datele de conectare.",
+      "errorConflict": "Acest cont Solid Cloud este deja conectat la un alt utilizator.",
+      "unlinkConfirm": "Deconectați Solid Cloud? După aceea, vă veți putea autentifica numai cu parola locală.",
+      "errorAuth": "Autentificarea Solid Cloud a eșuat.",
+      "unlinkNeedsPassword": "Setați o parolă locală înainte de a deconecta."
+    },
+    "password": {
+      "title": "Schimbaţi parola",
+      "current": "Parola actuală",
+      "new": "Parolă Nouă",
+      "confirm": "Confirmați noua parolă",
+      "saving": "Economisire...",
+      "errorShort": "Parola trebuie să aibă cel puțin 8 caractere.",
+      "noPasswordHint": "Nu este setată nicio parolă locală. Introducerea unei noi parole va permite conectarea locală.",
+      "success": "Parola a fost actualizată.",
+      "submit": "Salvați parola",
+      "hint": "Cel puțin 8 caractere",
+      "errorMismatch": "Parolele noi nu se potrivesc."
+    },
+    "ssh": {
+      "name": "Nume",
+      "subtitle": "Cheile înregistrate aici pot fi selectate atunci când se creează o instanță nouă.",
+      "title": "Chei publice SSH",
+      "publicKey": "Cheie publică",
+      "delete": "Şterge",
+      "createdAt": "Adăugat",
+      "empty": "Nu au fost înregistrate chei SSH.",
+      "namePlaceholder": "de exemplu, laptop-ul personal",
+      "errorFormat": "Format de cheie publică SSH nevalid.",
+      "publicKeyPlaceholder": "ssh-rsa AAAA... sau ssh-ed25519 AAAA...",
+      "adding": "Se adaugă...",
+      "fingerprint": "Amprenta",
+      "deleteConfirm": "Ștergeți această cheie SSH?",
+      "add": "Adăugați cheia",
+      "errorRequired": "Numele și cheia publică sunt necesare."
+    },
+    "title": "Contul meu",
+    "menu": "Contul meu",
+    "back": "Înapoi la Tabloul de bord"
+  },
+  "region": {
+    "loading": "Încărcare...",
+    "queue": "Coadă",
+    "tip": "💡 Sfat: RTX 4090 se potrivește sarcinilor de lucru ușoare; alege RTX Pro 6000 pentru antrenament pe modele mari.",
+    "title": "Disponibilitatea regiunii"
+  },
+  "create": {
+    "step1": {
+      "loading": "Se încarcă șabloanele...",
+      "title": "1. Selectați Template / ISO"
+    },
+    "step2": {
+      "performance": "Performanţă",
+      "cpu": "CPU",
+      "ram": "RAM",
+      "price": "Preţ",
+      "title": "2. Selectați Compute Offering",
+      "loading": "Se încarcă ofertele...",
+      "vram": "VRAM"
+    },
+    "step3": {
+      "instanceName": "Nume instanță",
+      "generating": "Se generează...",
+      "instanceNamePh": "de exemplu, my-gpu-project-01",
+      "title": "3. Setări de mediu",
+      "useSaved": "Utilizați o cheie SSH salvată",
+      "manualOrGenerate": "Introduceți manual / Generați nou",
+      "instanceNameHint": "Identificator unic pentru spațiul dvs. de lucru.",
+      "sshKey": "Cheie publică SSH",
+      "sshKeyHint": "Introduceți cheia dvs. publică existentă sau generați una nouă.",
+      "generateKey": "Generați pereche de chei",
+      "keyLoaded": "Cheie încărcată",
+      "downloadNote": "Dacă generați o nouă pereche de chei, cheia privată (.pem) va fi descărcată automat. Vă rugăm să-l păstrați în siguranță; nu va mai fi afișat."
+    },
+    "footer": {
+      "back": "Spate",
+      "next": "Următorul",
+      "launching": "Lansare...",
+      "launch": "Lansați Instanța"
+    },
+    "errors": {
+      "createFailed": "Lansarea instanței nu a reușit."
+    },
+    "title": "Creați o instanță nouă",
+    "stepOf": "Pasul {{current}} din {{total}}"
+  },
+  "setup": {
+    "steps": {
+      "mode": "Modul",
+      "billing": "Facturare",
+      "idle": "Inactiv",
+      "review": "Recenzie"
+    },
+    "unit": {
+      "hour": "h",
+      "month": "lu",
+      "credit": "C",
+      "min": "min",
+      "times": "ori",
+      "sessions": "sesiuni",
+      "creditPerStep": "C/pas"
+    },
+    "mode": {
+      "container": "Modul container",
+      "hybrid": "Container + hibrid SSH",
+      "hybridNote": "Selectarea hibridului permite închirierea nodurilor fizice, conturile SSH și cotele de acasă per nod. (Implementat într-o fază ulterioară)",
+      "containerDesc": "Gestionați GPU-urile prin containerele K8s. Cel mai bun pentru a servi un cluster GPU pentru mulți utilizatori la scară.",
+      "hybridDesc": "Adaugă acces SSH direct la nodurile fizice deasupra containerelor. Cel mai bun pentru laboratoare mici sau atunci când este necesară închirierea nodului fizic."
+    },
+    "billing": {
+      "pricing": "Politica de prețuri",
+      "pricingStatic": "Static - preț fix stabilit de administrator",
+      "pricingHint": "Alegeți cum sunt stabilite prețurile de ofertă.",
+      "modeCredit": "Credit",
+      "modeFree": "Gratuit",
+      "pricingDynamic": "Dinamic — prețul crește pe măsură ce disponibilitatea scade",
+      "surge": "Creșterea prețului pe scădere a disponibilității",
+      "surgeHint": "Creditele/oră cresc cu această sumă de fiecare dată când resursele devin rare.",
+      "modeDynamicDesc": "Utilizați primul venit fără credite. Limitele maxime de închiriere, cooldown și sesiuni simultane protejează disponibilitatea.",
+      "maxConcurrent": "Max sesiuni simultane",
+      "maxLease": "Închiriere maximă pe sesiune",
+      "modeDynamic": "Primul venit",
+      "cooldown": "Reîncărcare înainte de reînchiriere",
+      "modeFreeDesc": "Utilizați liber, fără limite. Fără credite, leasing sau limite pentru sesiuni concurente.",
+      "modeCreditDesc": "Plătiți prin deducerea creditelor. Controlat numai prin credite, fără alte limite."
+    },
+    "idle": {
+      "sshNote": "Modul SSH: datele rămân pe discul local și pot fi reutilizate așa cum sunt.",
+      "containerNote": "Modul container: revendicat prin Stop, păstrând datele.",
+      "timeoutHint": "Sesiunile sunt revendicate automat atunci când GPU-ul rămâne inactiv atât de mult.",
+      "timeout": "Timp inactiv de recuperare automată"
+    },
+    "lease": {
+      "extHours": "Ore maxime pe extensie",
+      "extHoursHint": "Numărul maxim de ore pe care un utilizator le poate alege pentru fiecare extensie. (doar modul primul venit)",
+      "maxExtHint": "Număr maxim de extensii per sesiune. 0 dezactivează extinderea.",
+      "maxExt": "Extensii maxime"
+    },
+    "review": {
+      "modeLabel": "Mod de operare",
+      "billingLabel": "Modul de facturare",
+      "hint": "Veți începe cu setările de mai jos. Schimbați-le oricând în Admin → Setări sistem.",
+      "idleLabel": "Recuperare automată inactiv"
+    },
+    "features": {
+      "groupJoin": "Solicitări de aderare la grup/organizație",
+      "datasetFeature": "Caracteristica seturi de date",
+      "dataset": "Înregistrarea setului de date",
+      "datasetFeatureHint": "Când sunt dezactivate, meniurile setului de date, memorarea în cache și selecția setului de date în cadrul sesiunii sunt toate ascunse (dependență mai mică de stocarea centrală).",
+      "signup": "Solicitări de înscriere pentru utilizatori",
+      "signupHint": "Când este dezactivat, linkul de înregistrare de pe pagina de conectare este ascuns și conturile sunt create de administratori.",
+      "datasetHint": "Când este dezactivat, utilizatorii nu pot înregistra/solicita seturi de date; doar administratorii le înregistrează.",
+      "alertsHint": "Când este dezactivat, utilizatorii nu se pot abona la alertele de disponibilitate GPU/nod.",
+      "alerts": "Alerte privind disponibilitatea volumului de muncă",
+      "groupJoinHint": "Când este dezactivat, utilizatorii nu pot solicita singuri calitatea de membru; administratorii îl gestionează.",
+      "creditHint": "Când este oprit, utilizatorii/grupurile nu pot solicita reîncărcări; administratorii acordă credite direct.",
+      "credit": "Solicitări de reîncărcare credit"
+    },
+    "back": "Spate",
+    "next": "Următorul",
+    "finish": "Finalizați configurarea",
+    "wizardTitle": "Configurare inițială Giosk",
+    "wizardSubtitle": "Configurați modul de operare și politicile implicite. Totul poate fi schimbat mai târziu în Admin → Setări sistem."
+  },
+  "topbar": {
+    "nodeBadge": "Noduri {{up}}/{{total}} · GPU {{gpu}}%"
+  }
+}

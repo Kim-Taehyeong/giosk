@@ -1,0 +1,518 @@
+{
+  "common": {
+    "confirm": "确认",
+    "back": "后退",
+    "next": "下一个",
+    "logout": "退出",
+    "cancel": "取消",
+    "login": "登录",
+    "close": "关闭",
+    "save": "节省",
+    "delete": "删除",
+    "refresh": "刷新",
+    "english": "英语",
+    "korean": "한국어",
+    "language": "语言",
+    "optional": "选修的",
+    "required": "必需的",
+    "loading": "加载中..."
+  },
+  "auth": {
+    "brand": {
+      "kuName": "檀国大学",
+      "enName": "檀国大学"
+    },
+    "login": {
+      "submit": "登录",
+      "domain": "领域",
+      "submitting": "正在登录...",
+      "password": "密码",
+      "errorGeneric": "登录失败。",
+      "errorNetwork": "发生网络错误。",
+      "errorSuspended": "此帐户已被暂停。",
+      "tabLocal": "服务登录",
+      "errorRejected": "此注册请求被拒绝。",
+      "usernameSolid": "实心云用户名",
+      "tabSolid": "稳定的云登录",
+      "signupLink": "注册服务",
+      "usernameLocal": "学生证/用户名",
+      "errorInvalid": "用户名或密码无效。",
+      "errorPending": "等待管理员批准。"
+    },
+    "signupPending": {
+      "submittedAt": "提交于",
+      "title": "注册请求已提交",
+      "backToLogin": "返回登录",
+      "body": "管理员审核通过后即可登录。这可能需要一些时间。"
+    },
+    "localSignup": {
+      "section": {
+        "credentials": "帐户",
+        "affiliation": "联系",
+        "name": "姓名"
+      },
+      "field": {
+        "username": "学生证/用户名",
+        "password": "密码（至少8个字符）",
+        "email": "电子邮件",
+        "passwordConfirm": "确认密码"
+      },
+      "title": "注册服务",
+      "errorRequired": "请填写所有必填字段。",
+      "submitting": "正在提交...",
+      "errorPasswordShort": "密码必须至少为 8 个字符。",
+      "errorGeneric": "注册失败。",
+      "subtitle": "填写下面的表格。管理员批准您的请求后，您就可以登录。",
+      "errorTerms": "您必须接受条款才能注册。",
+      "errorGroup": "您必须选择一个组织和一个组。",
+      "errorAdvisor": "本科生和研究生必须提供一名顾问。",
+      "submit": "请求注册",
+      "errorPasswordMismatch": "密码不匹配。"
+    },
+    "signup": {
+      "section": {
+        "account": "帐户",
+        "name": "姓名",
+        "password": "服务密码（可选）",
+        "affiliation": "隶属关系和角色"
+      },
+      "field": {
+        "email": "电子邮件",
+        "name": "姓名",
+        "namePlaceholder": "例如洪吉童",
+        "username": "用户名（学生证）",
+        "role": "角色",
+        "lastNameKo": "姓氏（韩语）",
+        "department": "部门",
+        "advisor": "顾问",
+        "lastNameEn": "姓氏（英文）",
+        "lab": "实验室（可选）",
+        "firstNameKo": "名字（韩语）",
+        "firstNameEn": "名字（英文）",
+        "org": "组织",
+        "selectPh": "选择",
+        "group": "团体",
+        "sponsor": "赞助商（可选）",
+        "passwordPlaceholder": "留空仅使用 Solid Cloud 登录",
+        "sponsorPlaceholder": "发起人姓名（顾问、团队负责人等）",
+        "advisorPlaceholder": "顾问姓名",
+        "passwordHint": "设置密码以直接使用您的学生 ID/用户名登录，无需 Solid Cloud。",
+        "noJoinableGroup": "该组织没有可加入的群组。联系组织管理员。"
+      },
+      "role": {
+        "undergrad": "本科生",
+        "graduate": "毕业",
+        "staff": "职员",
+        "professor": "教授"
+      },
+      "title": "注册 Giosk 控制台",
+      "subtitle": "可靠的云身份验证已验证。请接受条款并提供附加信息。",
+      "errorTerms": "您必须接受条款才能注册。",
+      "errorAdvisor": "本科生和研究生必须提供一名顾问。",
+      "errorGeneric": "注册失败。",
+      "submitting": "正在注册...",
+      "termsView": "查看条款",
+      "terms": "我同意服务条款和隐私政策。 （必需的）",
+      "submit": "完成注册"
+    }
+  },
+  "dashboard": {
+    "labels": {
+      "instances": "实例",
+      "cpuCores": "CPU核心",
+      "systemMemory": "系统内存",
+      "storageProjects": "存储（项目）"
+    },
+    "units": {
+      "ea": "乙烷",
+      "gib": "吉布",
+      "cores": "核心",
+      "gb": "国标"
+    },
+    "gpuCredit": {
+      "renewal": "每月续订：{{date}}",
+      "perMonth": "/ {{limit}} C（月）",
+      "title": "GPU 信用额度"
+    },
+    "instances": {
+      "table": {
+        "status": "地位",
+        "name": "实例名称",
+        "offering": "奉献",
+        "template": "模板",
+        "connection": "联系",
+        "action": "行动",
+        "ip": "IP地址"
+      },
+      "actions": {
+        "delete": "删除",
+        "stop": "停止实例",
+        "resume": "恢复"
+      },
+      "create": "新实例",
+      "title": "我的计算实例",
+      "createFirst": "创建您的第一个实例",
+      "loading": "正在加载实例...",
+      "empty": "未找到活动实例。"
+    },
+    "status": {
+      "running": "跑步",
+      "stopped": "已停止",
+      "terminating": "终止",
+      "pending": "待办的"
+    },
+    "confirmStop": {
+      "title": "停止实例",
+      "body": "停止会释放 GPU 资源。在您重新启动之前，我们不会向您收取费用。",
+      "confirm": "确认停止"
+    },
+    "confirmStart": {
+      "title": "启动实例",
+      "confirm": "开始",
+      "body": "启动实例将恢复计费。"
+    },
+    "confirmDelete": {
+      "confirm": "删除",
+      "title": "删除实例",
+      "body": "这是不可逆转的。该实例及其数据将被永久删除。"
+    },
+    "logout": "退出",
+    "console": "云控制台",
+    "resourceQuota": "资源配额"
+  },
+  "credit": {
+    "type": {
+      "usage": "用法",
+      "manual_adjust": "手动调节",
+      "monthly_reset": "每月重置",
+      "admin_grant": "管理补助金",
+      "limit_increase": "限制增加",
+      "auto_stop": "自动停止（无平衡）"
+    },
+    "limit": "每月限额",
+    "balance": "平衡",
+    "cycleStartedAt": "循环开始",
+    "loadMore": "加载更多",
+    "tableBalance": "平衡",
+    "empty": "没有交易。",
+    "tableType": "类型",
+    "tableAmount": "数量",
+    "tableDescription": "描述",
+    "tableTime": "时间",
+    "title": "GPU信用记录"
+  },
+  "notifications": {
+    "title": "通知",
+    "viewAll": "查看所有活动",
+    "empty": "没有新的通知。",
+    "unread": "{{count}} 新"
+  },
+  "activity": {
+    "loadMore": "加载更多",
+    "empty": "还没有活动。",
+    "title": "活动"
+  },
+  "audit": {
+    "action": {
+      "logout": "退出",
+      "password_change": "更改密码",
+      "status_change": "状态变化",
+      "signup_solid": "Solid Cloud 注册请求",
+      "login_local": "本地登录",
+      "login_solid": "稳定的云登录",
+      "signup_local": "本地注册请求",
+      "ssh_key_delete": "SSH 密钥已删除",
+      "ssh_key_add": "添加了 SSH 密钥",
+      "credit_grant": "授予信用",
+      "solid_link": "坚实的云链接",
+      "quota_override": "配额覆盖",
+      "solid_unlink": "固体云未链接",
+      "group_quota_change": "团体配额已更改"
+    },
+    "msg": {
+      "credit_grant": "{{actor}} 授予您 {{delta}} GPU 积分（新限制 {{newLimit}}）",
+      "status_change": "{{actor}} 将您的状态从 {{from}} 更改为 {{to}}",
+      "quota_override": "{{actor}} 调整了您的配额"
+    },
+    "actor": "演员",
+    "target": "目标"
+  },
+  "admin": {
+    "menu": {
+      "users": "用户",
+      "audit": "审核日志",
+      "groupQuotas": "团体名额"
+    },
+    "quota": {
+      "cpu": "CPU核心",
+      "monthlyLimit": "每月限额",
+      "currentBalance": "当前余额",
+      "save": "节省",
+      "grant": "授予",
+      "storage": "存储空间（GiB）",
+      "ram": "内存 (GiB)",
+      "saved": "已保存",
+      "instances": "并发实例数",
+      "gpuCredit": "GPU 积分",
+      "currentUsage": "目前使用情况",
+      "effective": "有效的",
+      "grantHint": "仅添加到此周期的奖金（在下个月重置时清除）",
+      "override": "覆盖",
+      "limitIncreaseHint": "增加限额也会增加当前余额的差异",
+      "editTitle": "编辑配额 — {{name}}",
+      "groupTitle": "{{role}} 默认配额",
+      "groupDefault": "组默认",
+      "useGroupDefault": "使用组默认值"
+    },
+    "users": {
+      "filter": {
+        "pending": "待办的",
+        "all": "全部",
+        "approved": "得到正式认可的",
+        "suspended": "暂停",
+        "rejected": "被拒绝"
+      },
+      "table": {
+        "name": "姓名",
+        "role": "角色",
+        "department": "部门",
+        "provider": "登录",
+        "status": "地位",
+        "action": "行动",
+        "username": "用户名",
+        "createdAt": "已请求"
+      },
+      "action": {
+        "approve": "批准",
+        "reject": "拒绝",
+        "suspend": "暂停",
+        "reactivate": "重新激活",
+        "editQuota": "编辑配额"
+      },
+      "status": {
+        "pending": "待办的",
+        "approved": "得到正式认可的",
+        "suspended": "暂停",
+        "rejected": "被拒绝"
+      },
+      "confirm": {
+        "suspendTitle": "暂停用户",
+        "rejectTitle": "拒绝注册",
+        "approveTitle": "批准用户",
+        "approveBody": "批准该用户？他们将能够立即登录。",
+        "rejectBody": "拒绝该用户的注册请求。他们将无法登录。",
+        "reactivateBody": "重新激活该用户？",
+        "reactivateTitle": "重新激活用户",
+        "suspendBody": "暂停该用户。 Any active sessions will be terminated."
+      },
+      "title": "用户",
+      "empty": "没有用户。"
+    },
+    "console": "管理控制台"
+  },
+  "me": {
+    "section": {
+      "password": "密码",
+      "activity": "活动",
+      "profile": "轮廓",
+      "sshKeys": "SSH 密钥",
+      "solid": "稳定的云连接"
+    },
+    "profile": {
+      "username": "用户名（学生证）",
+      "email": "电子邮件",
+      "role": "角色",
+      "department": "部门",
+      "advisor": "顾问",
+      "nameEn": "姓名（英文）",
+      "lab": "实验室",
+      "provider": "登录方式",
+      "createdAt": "已加入",
+      "providerLocal": "当地的",
+      "notSet": "（未设置）",
+      "nameKo": "姓名（韩语）",
+      "providerBoth": "本地+实体云",
+      "providerSolid": "固云"
+    },
+    "solid": {
+      "account": "帐户",
+      "userId": "用户身份",
+      "linkSuccess": "坚实的云链接",
+      "domainId": "域ID",
+      "unlinkButton": "取消链接",
+      "linked": "链接至固云",
+      "notLinked": "未链接至 Solid Cloud",
+      "username": "实心云用户名",
+      "password": "密码",
+      "domain": "领域",
+      "errorConflict": "此 Solid Cloud 帐户已链接到其他用户。",
+      "linkSubtitle": "使用您的 Solid Cloud 凭据进行身份验证以链接此帐户，以便您可以使用任一登录名。",
+      "linkButton": "链接固云",
+      "linking": "正在链接...",
+      "unlinkNeedsPassword": "取消链接前设置本地密码。",
+      "unlinking": "取消链接...",
+      "unlinkConfirm": "取消链接固云？之后您将只能使用本地密码登录。",
+      "errorAuth": "实体云验证失败。"
+    },
+    "password": {
+      "title": "更改密码",
+      "current": "当前密码",
+      "new": "新密码",
+      "errorShort": "密码必须至少为 8 个字符。",
+      "confirm": "确认新密码",
+      "submit": "保存密码",
+      "saving": "保存...",
+      "hint": "至少 8 个字符",
+      "errorMismatch": "新密码不匹配。",
+      "success": "密码已更新。",
+      "noPasswordHint": "没有设置本地密码。输入新密码将启用本地登录。"
+    },
+    "ssh": {
+      "name": "姓名",
+      "title": "SSH 公钥",
+      "publicKey": "公钥",
+      "fingerprint": "指纹",
+      "delete": "删除",
+      "createdAt": "额外",
+      "adding": "添加...",
+      "subtitle": "创建新实例时可以选择此处注册的密钥。",
+      "empty": "未注册 SSH 密钥。",
+      "add": "添加密钥",
+      "deleteConfirm": "删除这个 SSH 密钥吗？",
+      "namePlaceholder": "例如，个人笔记本电脑",
+      "errorRequired": "名称和公钥是必需的。",
+      "errorFormat": "SSH 公钥格式无效。",
+      "publicKeyPlaceholder": "ssh-rsa AAAA... 或 ssh-ed25519 AAAA..."
+    },
+    "title": "我的账户",
+    "menu": "我的账户",
+    "back": "返回仪表板"
+  },
+  "region": {
+    "loading": "加载中...",
+    "queue": "队列",
+    "title": "区域可用性",
+    "tip": "💡提示：RTX 4090 适合轻量工作负载；选择 RTX Pro 6000 进行大型模型训练。"
+  },
+  "create": {
+    "step1": {
+      "title": "1. 选择模板/ISO",
+      "loading": "正在加载模板..."
+    },
+    "step2": {
+      "vram": "显存",
+      "performance": "表现",
+      "cpu": "中央处理器",
+      "ram": "内存",
+      "price": "价格",
+      "loading": "正在加载产品...",
+      "title": "2. 选择计算产品"
+    },
+    "step3": {
+      "instanceName": "实例名称",
+      "sshKey": "SSH 公钥",
+      "title": "3. 环境设置",
+      "generating": "生成...",
+      "generateKey": "生成密钥对",
+      "instanceNamePh": "例如，my-gpu-project-01",
+      "useSaved": "使用保存的 SSH 密钥",
+      "instanceNameHint": "您的工作空间的唯一标识符。",
+      "sshKeyHint": "输入您现有的公钥或生成新的公钥。",
+      "manualOrGenerate": "手动输入/生成新的",
+      "keyLoaded": "按键已加载",
+      "downloadNote": "如果生成新的密钥对，将自动下载私钥 (.pem)。请妥善保管；它不会再次显示。"
+    },
+    "footer": {
+      "back": "后退",
+      "next": "下一个",
+      "launching": "发射...",
+      "launch": "启动实例"
+    },
+    "errors": {
+      "createFailed": "无法启动实例。"
+    },
+    "title": "创建新实例",
+    "stepOf": "{{total}} 的步骤 {{current}}"
+  },
+  "setup": {
+    "steps": {
+      "billing": "计费",
+      "mode": "模式",
+      "idle": "闲置的",
+      "review": "审查"
+    },
+    "unit": {
+      "hour": "小时",
+      "min": "分钟",
+      "month": "莫",
+      "sessions": "会议",
+      "credit": "C",
+      "times": "次",
+      "creditPerStep": "C/步"
+    },
+    "mode": {
+      "container": "容器模式",
+      "hybridDesc": "添加对容器顶部物理节点的直接 SSH 访问。最适合小型实验室或需要租赁物理节点时。",
+      "hybrid": "容器+SSH混合",
+      "containerDesc": "通过 K8s 容器管理 GPU。最适合大规模为许多用户提供 GPU 集群服务。",
+      "hybridNote": "选择混合可启用物理节点租赁、SSH 帐户和每节点主配额。 (Implemented in a later phase)"
+    },
+    "billing": {
+      "pricing": "定价政策",
+      "surgeHint": "每次资源稀缺时，学分/小时都会增加此数量。",
+      "modeCredit": "信用",
+      "maxConcurrent": "最大并发会话数",
+      "surge": "每次可用性下降时价格都会上涨",
+      "cooldown": "重新租赁前的冷却时间",
+      "maxLease": "每个会话的最大租期",
+      "modeFree": "自由的",
+      "modeFreeDesc": "自由使用，没有限制。无积分、租赁或并发会话上限。",
+      "modeDynamic": "先到先得",
+      "modeDynamicDesc": "使用先到先得，无需积分。最大租用、冷却时间和并发会话限制可保护可用性。",
+      "pricingHint": "选择如何设置要约价格。",
+      "pricingDynamic": "动态 — 价格随供应量下降而上涨",
+      "pricingStatic": "静态 — 固定的管理员设定价格",
+      "modeCreditDesc": "通过扣除积分来支付。仅受积分控制，没有其他限制。"
+    },
+    "idle": {
+      "timeout": "空闲自动回收时间",
+      "timeoutHint": "当 GPU 空闲这么长时间时，会话会自动回收。",
+      "containerNote": "容器模式：通过Stop回收，保留数据。",
+      "sshNote": "SSH模式：数据保留在本地磁盘，可以按原样重复使用。"
+    },
+    "lease": {
+      "extHours": "每次延期的最长时数",
+      "maxExt": "最大扩展数",
+      "maxExtHint": "每个会话的最大分机数。 0 禁用扩展。",
+      "extHoursHint": "用户可以为每个分机选择的最大小时数。 （仅限先到模式）"
+    },
+    "review": {
+      "modeLabel": "运行模式",
+      "hint": "您将从以下设置开始。随时在管理 → 系统设置中更改它们。",
+      "idleLabel": "空闲自动回收",
+      "billingLabel": "计费方式"
+    },
+    "features": {
+      "signupHint": "关闭后，登录页面上的注册链接将被隐藏，并且帐户由管理员创建。",
+      "datasetFeature": "数据集特征",
+      "signup": "用户注册请求",
+      "datasetFeatureHint": "关闭时，数据集菜单、缓存和会话中数据集选择全部隐藏（减少对中央存储的依赖）。",
+      "datasetHint": "关闭时，用户无法注册/请求数据集；只有管​​理员注册它们。",
+      "dataset": "数据集注册",
+      "groupJoin": "群组/组织加入请求",
+      "alertsHint": "关闭后，用户无法订阅 GPU/节点可用性警报。",
+      "credit": "信用充值请求",
+      "alerts": "工作负载可用性警报",
+      "creditHint": "关闭时，用户/群组无法请求充值；管理员直接授予学分。",
+      "groupJoinHint": "关闭时，用户无法自行申请会员资格；管理员管理它。"
+    },
+    "back": "后退",
+    "next": "下一个",
+    "finish": "完成设置",
+    "wizardTitle": "Giosk 初始设置",
+    "wizardSubtitle": "配置运行模式和默认策略。一切都可以稍后在管理 → 系统设置中更改。"
+  },
+  "topbar": {
+    "nodeBadge": "节点 {{up}}/{{total}} · GPU {{gpu}}%"
+  }
+}

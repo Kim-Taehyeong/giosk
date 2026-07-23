@@ -1,0 +1,112 @@
+{{- /*
+노드 디스크 정리 DaemonSet.
+
+Scratch(/scratch)와 물리 로컬 Home(<homeHostPath>/<user>)은 노드 로컬 디스크이고 사용자별 쿼터가 없다.
+(로컬 Home 쿼터 nodes.home_quota_gb 는 0032 에서 제거됐고, ~/nfs 볼륨 쿼터는 NFS 만 제한할 뿐
+ 노드 디스크와 무관하다.) 방치하면 디스크가 100% → kubelet DiskPressure → 파드 축출로 노드가 빠진다.
+
+정리 정책은 두 공간의 성격이 달라 임계도 다르다:
+  scratch : "임시"라고 계약된 공간 → 임계(기본 85%) 초과 시 atime 오래된 순으로 바로 삭제.
+  home    : 사용자가 SSH 로 작업하던 결과물 → 더 늦게(기본 92%) 개입하고,
+            minAgeDays 보다 최근에 접근한 파일은 건드리지 않는다(작업 중 파일 보호).
+            삭제 전에 알림센터의 disk_usage 규칙(기본 85%)이 먼저 관리자에게 울린다.
+
+정리할 공간이 있을 때만(scratch 또는 물리노드 활성) 배포한다.
+*/ -}}
+{{- if and .Values.nodeCleaner.enabled (or .Values.storage.scratch.enabled .Values.physicalNodes.enabled) }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "giosk.fullname" . }}-node-cleaner
+  namespace: {{ .Release.Namespace }}
+  labels: { app: giosk-node-cleaner }
+spec:
+  selector:
+    matchLabels: { app: giosk-node-cleaner }
+  template:
+    metadata:
+      labels: { app: giosk-node-cleaner }
+    spec:
+      # 정리 대상이 있는 노드에만 — scratch 노드 또는 물리 노드.
+      # nodeSelectorTerms 는 OR 이므로 둘 중 하나만 맞아도 배치된다.
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              {{- if .Values.storage.scratch.enabled }}
+              - matchExpressions:
+                  - { key: giosk.io/scratch, operator: In, values: ["true"] }
+              {{- end }}
+              {{- if .Values.physicalNodes.enabled }}
+              - matchExpressions:
+                  - { key: giosk.io/physical, operator: In, values: ["true"] }
+              {{- end }}
+      tolerations:
+        - operator: Exists          # 물리/전용 노드에도 배치
+      containers:
+        - name: cleaner
+          image: alpine:3.19
+          securityContext: { runAsUser: 0 }   # 여러 UID 의 파일을 지워야 함
+          resources:
+            requests: { cpu: 10m, memory: 16Mi }
+            limits:   { memory: 64Mi }
+          env:
+            - { name: INTERVAL,          value: {{ .Values.nodeCleaner.intervalSec | quote }} }
+            - { name: SCRATCH_DIR,       value: {{ .Values.storage.scratch.enabled | ternary "/scratch" "" | quote }} }
+            - { name: SCRATCH_THRESHOLD, value: {{ .Values.nodeCleaner.scratchThreshold | quote }} }
+            - { name: HOME_DIR,          value: {{ .Values.physicalNodes.enabled | ternary "/host-home" "" | quote }} }
+            - { name: HOME_THRESHOLD,    value: {{ .Values.nodeCleaner.homeThreshold | quote }} }
+            - { name: HOME_MIN_AGE_DAYS, value: {{ .Values.nodeCleaner.homeMinAgeDays | quote }} }
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -u
+              # 사용률(%) — 대상 경로가 속한 파일시스템 기준.
+              usage() { df -P "$1" 2>/dev/null | awk 'NR==2{gsub("%","",$5);print $5}'; }
+
+              # purge <dir> <threshold> <min_age_days>
+              #   임계 초과 시 atime 오래된 순으로 파일을 지워 임계 아래로 되돌린다.
+              #   디렉터리 구조(계정 폴더)는 보존한다 — 재대여 시 소유권/경로가 유지돼야 하므로.
+              purge() {
+                dir="$1"; th="$2"; min_age="$3"
+                [ -n "$dir" ] || return 0
+                [ -d "$dir" ] || return 0
+                u=$(usage "$dir"); [ -n "${u:-}" ] || return 0
+                [ "$u" -ge "$th" ] || return 0
+                echo "[node-cleaner] $dir ${u}% >= ${th}% — purging (atime 오래된 순, ${min_age}일 이상 미접근)"
+                # -atime +N : N일보다 오래 접근되지 않은 파일만. min_age=0 이면 전체 대상.
+                if [ "$min_age" -gt 0 ]; then
+                  find "$dir" -type f -atime +"$min_age" -printf '%A@ %p\n' 2>/dev/null
+                else
+                  find "$dir" -type f -printf '%A@ %p\n' 2>/dev/null
+                fi | sort -n | cut -d' ' -f2- | while IFS= read -r f; do
+                  cur=$(usage "$dir")
+                  [ "${cur:-0}" -lt "$th" ] && break
+                  rm -f "$f" 2>/dev/null
+                done
+                echo "[node-cleaner] $dir 정리 후 $(usage "$dir")%"
+              }
+
+              apk add --no-cache findutils >/dev/null 2>&1  # busybox find 는 -printf 미지원
+              while true; do
+                purge "${SCRATCH_DIR}" "${SCRATCH_THRESHOLD}" 0
+                purge "${HOME_DIR}" "${HOME_THRESHOLD}" "${HOME_MIN_AGE_DAYS}"
+                sleep "${INTERVAL}"
+              done
+          volumeMounts:
+            {{- if .Values.storage.scratch.enabled }}
+            - { name: scratch, mountPath: /scratch }
+            {{- end }}
+            {{- if .Values.physicalNodes.enabled }}
+            - { name: host-home, mountPath: /host-home }
+            {{- end }}
+      volumes:
+        {{- if .Values.storage.scratch.enabled }}
+        - name: scratch
+          hostPath: { path: {{ .Values.storage.scratch.hostPath | quote }}, type: DirectoryOrCreate }
+        {{- end }}
+        {{- if .Values.physicalNodes.enabled }}
+        - name: host-home
+          hostPath: { path: {{ .Values.physicalNodes.homeHostPath | quote }}, type: DirectoryOrCreate }
+        {{- end }}
+{{- end }}

@@ -1,0 +1,518 @@
+{
+  "common": {
+    "login": "Login",
+    "logout": "Logout",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "back": "Back",
+    "next": "Next",
+    "close": "Close",
+    "refresh": "Refresh",
+    "language": "Language",
+    "korean": "한국어",
+    "english": "English",
+    "required": "required",
+    "optional": "optional"
+  },
+  "auth": {
+    "brand": {
+      "kuName": "Dankook University",
+      "enName": "DANKOOK UNIVERSITY"
+    },
+    "login": {
+      "tabLocal": "Service Login",
+      "tabSolid": "Solid Cloud Login",
+      "usernameLocal": "Student ID / Username",
+      "usernameSolid": "Solid Cloud Username",
+      "password": "Password",
+      "domain": "Domain",
+      "submit": "Login",
+      "submitting": "Logging in...",
+      "signupLink": "Sign up for service",
+      "errorGeneric": "Login failed.",
+      "errorNetwork": "A network error occurred.",
+      "errorPending": "Awaiting administrator approval.",
+      "errorSuspended": "This account has been suspended.",
+      "errorRejected": "This signup request was rejected.",
+      "errorInvalid": "Invalid username or password."
+    },
+    "signupPending": {
+      "title": "Signup request submitted",
+      "body": "You will be able to log in after administrator approval. This may take some time.",
+      "submittedAt": "Submitted on",
+      "backToLogin": "Back to login"
+    },
+    "localSignup": {
+      "title": "Sign up for service",
+      "subtitle": "Fill in the form below. You'll be able to log in once an administrator approves your request.",
+      "section": {
+        "credentials": "Account",
+        "name": "Name",
+        "affiliation": "Affiliation"
+      },
+      "field": {
+        "username": "Student ID / Username",
+        "password": "Password (at least 8 characters)",
+        "email": "Email",
+        "passwordConfirm": "Confirm password"
+      },
+      "submit": "Request signup",
+      "submitting": "Submitting...",
+      "errorTerms": "You must accept the terms to sign up.",
+      "errorAdvisor": "Undergraduate and graduate students must provide an advisor.",
+      "errorRequired": "Please fill in all required fields.",
+      "errorGroup": "You must select an organization and a group.",
+      "errorPasswordShort": "Password must be at least 8 characters.",
+      "errorGeneric": "Signup failed.",
+      "errorPasswordMismatch": "Passwords do not match."
+    },
+    "signup": {
+      "title": "Sign up for Giosk Console",
+      "subtitle": "Solid Cloud authentication verified. Please accept the terms and provide additional info.",
+      "section": {
+        "account": "Account",
+        "name": "Name",
+        "affiliation": "Affiliation & Role",
+        "password": "Service Password (optional)"
+      },
+      "field": {
+        "username": "Username (Student ID)",
+        "email": "Email",
+        "name": "Name",
+        "namePlaceholder": "e.g. Hong Gildong",
+        "lastNameKo": "Last Name (Korean)",
+        "firstNameKo": "First Name (Korean)",
+        "lastNameEn": "Last Name (English)",
+        "firstNameEn": "First Name (English)",
+        "role": "Role",
+        "department": "Department",
+        "lab": "Lab (optional)",
+        "advisor": "Advisor",
+        "advisorPlaceholder": "Advisor's name",
+        "org": "Organization",
+        "group": "Group",
+        "selectPh": "Select",
+        "sponsor": "Sponsor (optional)",
+        "sponsorPlaceholder": "Sponsor's name (advisor, team lead, etc.)",
+        "passwordHint": "Set a password to login directly with your Student ID/Username without Solid Cloud.",
+        "passwordPlaceholder": "Leave empty to use Solid Cloud login only",
+        "noJoinableGroup": "This organization has no joinable groups. Contact the org admin."
+      },
+      "role": {
+        "undergrad": "Undergraduate",
+        "graduate": "Graduate",
+        "professor": "Professor",
+        "staff": "Staff"
+      },
+      "terms": "I agree to the Terms of Service and Privacy Policy. (required)",
+      "termsView": "View terms",
+      "submit": "Complete signup",
+      "submitting": "Signing up...",
+      "errorTerms": "You must accept the terms to sign up.",
+      "errorAdvisor": "Undergraduate and graduate students must provide an advisor.",
+      "errorGeneric": "Signup failed."
+    }
+  },
+  "dashboard": {
+    "console": "Cloud Console",
+    "logout": "Logout",
+    "resourceQuota": "Resource Quota",
+    "labels": {
+      "instances": "Instances",
+      "cpuCores": "CPU Cores",
+      "systemMemory": "System Memory",
+      "storageProjects": "Storage (Projects)"
+    },
+    "units": {
+      "ea": "ea",
+      "cores": "Cores",
+      "gib": "GiB",
+      "gb": "GB"
+    },
+    "gpuCredit": {
+      "title": "GPU Credit Quota",
+      "renewal": "Monthly renewal: {{date}}",
+      "perMonth": "/ {{limit}} C (Month)"
+    },
+    "instances": {
+      "title": "My Compute Instances",
+      "create": "New Instance",
+      "table": {
+        "status": "Status",
+        "name": "Instance Name",
+        "offering": "Offering",
+        "template": "Template",
+        "ip": "IP address",
+        "connection": "Connection",
+        "action": "Action"
+      },
+      "actions": {
+        "stop": "Stop Instance",
+        "resume": "Resume",
+        "delete": "Delete"
+      },
+      "empty": "No active instances found.",
+      "createFirst": "Create your first instance",
+      "loading": "Loading instances..."
+    },
+    "status": {
+      "running": "Running",
+      "stopped": "Stopped",
+      "terminating": "Terminating",
+      "pending": "Pending"
+    },
+    "confirmStop": {
+      "title": "Stop instance",
+      "body": "Stopping releases GPU resources. You won't be billed until you start it again.",
+      "confirm": "Confirm Stop"
+    },
+    "confirmStart": {
+      "title": "Start instance",
+      "body": "Starting the instance resumes billing.",
+      "confirm": "Start"
+    },
+    "confirmDelete": {
+      "title": "Delete instance",
+      "body": "This is irreversible. The instance and its data will be permanently removed.",
+      "confirm": "Delete"
+    }
+  },
+  "credit": {
+    "title": "GPU Credit History",
+    "balance": "Balance",
+    "limit": "Monthly limit",
+    "cycleStartedAt": "Cycle started",
+    "loadMore": "Load more",
+    "empty": "No transactions.",
+    "tableType": "Type",
+    "tableAmount": "Amount",
+    "tableBalance": "Balance",
+    "tableDescription": "Description",
+    "tableTime": "Time",
+    "type": {
+      "monthly_reset": "Monthly reset",
+      "admin_grant": "Admin grant",
+      "limit_increase": "Limit increase",
+      "usage": "Usage",
+      "auto_stop": "Auto stop (no balance)",
+      "manual_adjust": "Manual adjustment"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No new notifications.",
+    "viewAll": "View all activity",
+    "unread": "{{count}} new"
+  },
+  "activity": {
+    "title": "Activity",
+    "loadMore": "Load more",
+    "empty": "No activity yet."
+  },
+  "audit": {
+    "actor": "Actor",
+    "target": "Target",
+    "action": {
+      "login_local": "Local login",
+      "login_solid": "Solid Cloud login",
+      "logout": "Logout",
+      "signup_local": "Local signup request",
+      "signup_solid": "Solid Cloud signup request",
+      "password_change": "Password change",
+      "ssh_key_add": "SSH key added",
+      "ssh_key_delete": "SSH key deleted",
+      "solid_link": "Solid Cloud linked",
+      "solid_unlink": "Solid Cloud unlinked",
+      "status_change": "Status change",
+      "quota_override": "Quota override",
+      "credit_grant": "Credit granted",
+      "group_quota_change": "Group quota changed"
+    },
+    "msg": {
+      "credit_grant": "{{actor}} granted you {{delta}} GPU credits (new limit {{newLimit}})",
+      "status_change": "{{actor}} changed your status from {{from}} to {{to}}",
+      "quota_override": "{{actor}} adjusted your quota"
+    }
+  },
+  "admin": {
+    "console": "Admin Console",
+    "menu": {
+      "users": "Users",
+      "groupQuotas": "Group Quotas",
+      "audit": "Audit Logs"
+    },
+    "quota": {
+      "cpu": "CPU Cores",
+      "ram": "RAM (GiB)",
+      "storage": "Storage (GiB)",
+      "instances": "Concurrent Instances",
+      "gpuCredit": "GPU Credit",
+      "monthlyLimit": "Monthly limit",
+      "currentBalance": "Current balance",
+      "grantHint": "Bonus added to this cycle only (cleared on next monthly reset)",
+      "limitIncreaseHint": "Increasing the limit also adds the difference to the current balance",
+      "grant": "Grant",
+      "save": "Save",
+      "saved": "Saved",
+      "editTitle": "Edit Quota — {{name}}",
+      "currentUsage": "Current usage",
+      "effective": "Effective",
+      "override": "Override",
+      "groupDefault": "Group default",
+      "useGroupDefault": "Use group default",
+      "groupTitle": "{{role}} default quota"
+    },
+    "users": {
+      "title": "Users",
+      "filter": {
+        "all": "All",
+        "pending": "Pending",
+        "approved": "Approved",
+        "suspended": "Suspended",
+        "rejected": "Rejected"
+      },
+      "table": {
+        "username": "Username",
+        "name": "Name",
+        "role": "Role",
+        "department": "Department",
+        "provider": "Login",
+        "status": "Status",
+        "createdAt": "Requested",
+        "action": "Action"
+      },
+      "action": {
+        "approve": "Approve",
+        "reject": "Reject",
+        "suspend": "Suspend",
+        "reactivate": "Reactivate",
+        "editQuota": "Edit Quota"
+      },
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "suspended": "Suspended",
+        "rejected": "Rejected"
+      },
+      "empty": "No users.",
+      "confirm": {
+        "approveTitle": "Approve user",
+        "approveBody": "Approve this user? They will be able to log in immediately.",
+        "rejectTitle": "Reject signup",
+        "rejectBody": "Reject this user's signup request. They will not be able to log in.",
+        "suspendTitle": "Suspend user",
+        "suspendBody": "Suspend this user. Any active sessions will be terminated.",
+        "reactivateTitle": "Reactivate user",
+        "reactivateBody": "Reactivate this user?"
+      }
+    }
+  },
+  "me": {
+    "title": "My Account",
+    "menu": "My Account",
+    "back": "Back to Dashboard",
+    "section": {
+      "profile": "Profile",
+      "solid": "Solid Cloud Connection",
+      "password": "Password",
+      "sshKeys": "SSH Keys",
+      "activity": "Activity"
+    },
+    "profile": {
+      "username": "Username (Student ID)",
+      "email": "Email",
+      "nameKo": "Name (Korean)",
+      "nameEn": "Name (English)",
+      "role": "Role",
+      "department": "Department",
+      "lab": "Lab",
+      "advisor": "Advisor",
+      "createdAt": "Joined",
+      "provider": "Login method",
+      "providerLocal": "Local",
+      "providerSolid": "Solid Cloud",
+      "providerBoth": "Local + Solid Cloud",
+      "notSet": "(not set)"
+    },
+    "solid": {
+      "linked": "Linked to Solid Cloud",
+      "notLinked": "Not linked to Solid Cloud",
+      "userId": "User ID",
+      "domainId": "Domain ID",
+      "account": "Account",
+      "linkButton": "Link Solid Cloud",
+      "linkSubtitle": "Authenticate with your Solid Cloud credentials to link this account so you can use either login.",
+      "linking": "Linking...",
+      "linkSuccess": "Solid Cloud linked",
+      "unlinkButton": "Unlink",
+      "unlinking": "Unlinking...",
+      "unlinkConfirm": "Unlink Solid Cloud? You will only be able to log in with your local password afterwards.",
+      "unlinkNeedsPassword": "Set a local password before unlinking.",
+      "errorAuth": "Solid Cloud authentication failed.",
+      "errorConflict": "This Solid Cloud account is already linked to another user.",
+      "username": "Solid Cloud Username",
+      "password": "Password",
+      "domain": "Domain"
+    },
+    "password": {
+      "title": "Change Password",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm new password",
+      "submit": "Save password",
+      "saving": "Saving...",
+      "hint": "At least 8 characters",
+      "noPasswordHint": "No local password is set. Entering a new password will enable local login.",
+      "errorMismatch": "New passwords do not match.",
+      "errorShort": "Password must be at least 8 characters.",
+      "success": "Password updated."
+    },
+    "ssh": {
+      "title": "SSH Public Keys",
+      "subtitle": "Keys registered here can be selected when creating a new instance.",
+      "empty": "No SSH keys registered.",
+      "name": "Name",
+      "namePlaceholder": "e.g., personal-laptop",
+      "publicKey": "Public Key",
+      "publicKeyPlaceholder": "ssh-rsa AAAA... or ssh-ed25519 AAAA...",
+      "fingerprint": "Fingerprint",
+      "createdAt": "Added",
+      "add": "Add key",
+      "adding": "Adding...",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this SSH key?",
+      "errorFormat": "Invalid SSH public key format.",
+      "errorRequired": "Name and public key are required."
+    }
+  },
+  "region": {
+    "title": "Region Availability",
+    "queue": "Queue",
+    "loading": "Loading...",
+    "tip": "💡 Tip: RTX 4090 fits light workloads; pick RTX Pro 6000 for large-model training."
+  },
+  "create": {
+    "title": "Create New Instance",
+    "stepOf": "Step {{current}} of {{total}}",
+    "step1": {
+      "title": "1. Select Template / ISO",
+      "loading": "Loading templates..."
+    },
+    "step2": {
+      "title": "2. Select Compute Offering",
+      "loading": "Loading offerings...",
+      "vram": "VRAM",
+      "performance": "Performance",
+      "cpu": "CPU",
+      "ram": "RAM",
+      "price": "Price"
+    },
+    "step3": {
+      "title": "3. Environment Settings",
+      "instanceName": "Instance Name",
+      "instanceNameHint": "Unique identifier for your workspace.",
+      "instanceNamePh": "e.g., my-gpu-project-01",
+      "sshKey": "SSH Public Key",
+      "sshKeyHint": "Enter your existing public key or generate a new one.",
+      "useSaved": "Use a saved SSH key",
+      "manualOrGenerate": "Enter manually / Generate new",
+      "generating": "Generating...",
+      "generateKey": "Generate Key Pair",
+      "keyLoaded": "Key Loaded",
+      "downloadNote": "If you generate a new key pair, the private key (.pem) will be downloaded automatically. Please keep it safe; it will not be shown again."
+    },
+    "footer": {
+      "back": "Back",
+      "next": "Next",
+      "launching": "Launching...",
+      "launch": "Launch Instance"
+    },
+    "errors": {
+      "createFailed": "Failed to launch instance."
+    }
+  },
+  "setup": {
+    "wizardTitle": "Giosk Initial Setup",
+    "wizardSubtitle": "Configure the operating mode and default policies. Everything can be changed later in Admin → System Settings.",
+    "steps": {
+      "mode": "Mode",
+      "billing": "Billing",
+      "idle": "Idle",
+      "review": "Review"
+    },
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish setup",
+    "unit": {
+      "hour": "h",
+      "min": "min",
+      "month": "mo",
+      "credit": "C",
+      "creditPerStep": "C/step",
+      "sessions": "sessions",
+      "times": "times"
+    },
+    "mode": {
+      "container": "Container mode",
+      "containerDesc": "Manage GPUs via K8s containers. Best for serving a GPU cluster to many users at scale.",
+      "hybrid": "Container + SSH hybrid",
+      "hybridDesc": "Adds direct SSH access to physical nodes on top of containers. Best for small labs or when physical node leasing is needed.",
+      "hybridNote": "Selecting hybrid enables physical node leasing, SSH accounts, and per-node home quotas. (Implemented in a later phase)"
+    },
+    "billing": {
+      "pricing": "Pricing policy",
+      "pricingHint": "Choose how offering prices are set.",
+      "pricingStatic": "Static — fixed admin-set price",
+      "pricingDynamic": "Dynamic — price rises as availability drops",
+      "surge": "Price increase per availability drop",
+      "surgeHint": "Credits/hour increase by this amount each time resources get scarce.",
+      "maxLease": "Max lease per session",
+      "cooldown": "Cooldown before re-lease",
+      "maxConcurrent": "Max concurrent sessions",
+      "modeCredit": "Credit",
+      "modeCreditDesc": "Pay by deducting credits. Controlled by credits only, with no other limits.",
+      "modeDynamic": "First-come",
+      "modeDynamicDesc": "Use first-come without credits. Max lease, cooldown, and concurrent-session limits protect availability.",
+      "modeFree": "Free",
+      "modeFreeDesc": "Use freely with no limits. No credits, leases, or concurrent-session caps."
+    },
+    "idle": {
+      "timeout": "Idle auto-reclaim time",
+      "timeoutHint": "Sessions are auto-reclaimed when the GPU stays idle for this long.",
+      "containerNote": "Container mode: reclaimed via Stop, preserving data.",
+      "sshNote": "SSH mode: data stays on local disk and can be reused as-is."
+    },
+    "lease": {
+      "extHours": "Max hours per extension",
+      "extHoursHint": "Max hours a user can pick per extension. (first-come mode only)",
+      "maxExt": "Max extensions",
+      "maxExtHint": "Max number of extensions per session. 0 disables extending."
+    },
+    "review": {
+      "hint": "You will start with the settings below. Change them anytime in Admin → System Settings.",
+      "modeLabel": "Operating mode",
+      "idleLabel": "Idle auto-reclaim",
+      "billingLabel": "Billing mode"
+    },
+    "features": {
+      "signup": "User signup requests",
+      "signupHint": "When off, the signup link on the login page is hidden and accounts are created by admins.",
+      "datasetFeature": "Datasets feature",
+      "datasetFeatureHint": "When off, dataset menus, caching, and in-session dataset selection are all hidden (less dependence on central storage).",
+      "dataset": "Dataset registration",
+      "datasetHint": "When off, users cannot register/request datasets; only admins register them.",
+      "alerts": "Workload availability alerts",
+      "alertsHint": "When off, users cannot subscribe to GPU/node availability alerts.",
+      "groupJoin": "Group/org join requests",
+      "groupJoinHint": "When off, users cannot self-request membership; admins manage it.",
+      "credit": "Credit top-up requests",
+      "creditHint": "When off, users/groups cannot request top-ups; admins grant credits directly."
+    }
+  },
+  "topbar": {
+    "nodeBadge": "Nodes {{up}}/{{total}} · GPU {{gpu}}%"
+  }
+}

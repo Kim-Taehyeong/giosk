@@ -1,0 +1,518 @@
+{
+  "common": {
+    "login": "Login",
+    "delete": "Verwijderen",
+    "next": "Volgende",
+    "back": "Rug",
+    "confirm": "Bevestigen",
+    "close": "Dichtbij",
+    "cancel": "Annuleren",
+    "save": "Redden",
+    "loading": "Laden...",
+    "logout": "Uitloggen",
+    "refresh": "Vernieuwen",
+    "language": "Taal",
+    "required": "vereist",
+    "korean": "한국어",
+    "english": "Engels",
+    "optional": "optioneel"
+  },
+  "auth": {
+    "brand": {
+      "enName": "DANKOOK UNIVERSITEIT",
+      "kuName": "Dankook Universiteit"
+    },
+    "login": {
+      "submit": "Login",
+      "password": "Wachtwoord",
+      "domain": "Domein",
+      "errorNetwork": "Er is een netwerkfout opgetreden.",
+      "errorPending": "In afwachting van goedkeuring van de beheerder.",
+      "submitting": "Inloggen...",
+      "signupLink": "Meld u aan voor service",
+      "usernameLocal": "Student-ID / Gebruikersnaam",
+      "errorGeneric": "Inloggen mislukt.",
+      "tabLocal": "Dienstaanmelding",
+      "usernameSolid": "Solid Cloud-gebruikersnaam",
+      "tabSolid": "Solide cloud-login",
+      "errorInvalid": "Ongeldige gebruikersnaam of wachtwoord.",
+      "errorSuspended": "Dit account is opgeschort.",
+      "errorRejected": "Dit aanmeldingsverzoek is afgewezen."
+    },
+    "signupPending": {
+      "submittedAt": "Ingezonden op",
+      "title": "Aanmeldingsverzoek ingediend",
+      "body": "Na goedkeuring van de beheerder kunt u inloggen. Dit kan enige tijd duren.",
+      "backToLogin": "Terug naar inloggen"
+    },
+    "localSignup": {
+      "section": {
+        "credentials": "Rekening",
+        "name": "Naam",
+        "affiliation": "Aansluiting"
+      },
+      "field": {
+        "username": "Student-ID / Gebruikersnaam",
+        "email": "E-mail",
+        "password": "Wachtwoord (minimaal 8 tekens)",
+        "passwordConfirm": "Bevestig wachtwoord"
+      },
+      "title": "Meld u aan voor service",
+      "submitting": "Verzenden...",
+      "errorPasswordShort": "Wachtwoord moet minimaal 8 tekens lang zijn.",
+      "errorAdvisor": "Niet-gegradueerde en afgestudeerde studenten moeten een adviseur verstrekken.",
+      "submit": "Aanmelding aanvragen",
+      "subtitle": "Vul het onderstaande formulier in. U kunt inloggen zodra een beheerder uw verzoek heeft goedgekeurd.",
+      "errorGroup": "U moet een organisatie en een groep selecteren.",
+      "errorTerms": "Om u aan te melden, moet u de voorwaarden accepteren.",
+      "errorRequired": "Vul alle verplichte velden in.",
+      "errorGeneric": "Aanmelden mislukt.",
+      "errorPasswordMismatch": "Wachtwoorden komen niet overeen."
+    },
+    "signup": {
+      "section": {
+        "account": "Rekening",
+        "name": "Naam",
+        "password": "Servicewachtwoord (optioneel)",
+        "affiliation": "Aansluiting en rol"
+      },
+      "field": {
+        "email": "E-mail",
+        "name": "Naam",
+        "role": "Rol",
+        "department": "Afdeling",
+        "lastNameKo": "Achternaam (Koreaans)",
+        "lab": "Laboratorium (optioneel)",
+        "firstNameEn": "Voornaam (Engels)",
+        "username": "Gebruikersnaam (student-ID)",
+        "org": "Organisatie",
+        "group": "Groep",
+        "selectPh": "Selecteer",
+        "lastNameEn": "Achternaam (Engels)",
+        "namePlaceholder": "bijv. Hong Gildong",
+        "firstNameKo": "Voornaam (Koreaans)",
+        "passwordHint": "Stel een wachtwoord in om direct in te loggen met je Student ID/Gebruikersnaam zonder Solid Cloud.",
+        "passwordPlaceholder": "Laat dit leeg om alleen Solid Cloud login te gebruiken",
+        "sponsorPlaceholder": "Naam van de sponsor (adviseur, teamleider, etc.)",
+        "sponsor": "Sponsor (optioneel)",
+        "advisorPlaceholder": "Naam van adviseur",
+        "advisor": "Adviseur",
+        "noJoinableGroup": "Deze organisatie heeft geen deelbare groepen. Neem contact op met de organisatiebeheerder."
+      },
+      "role": {
+        "professor": "Professor",
+        "staff": "Personeel",
+        "graduate": "Afgestudeerd",
+        "undergrad": "Niet-gegradueerde"
+      },
+      "title": "Meld u aan voor Giosk Console",
+      "subtitle": "Solid Cloud-authenticatie geverifieerd. Accepteer de voorwaarden en geef aanvullende informatie op.",
+      "errorTerms": "Om u aan te melden, moet u de voorwaarden accepteren.",
+      "errorAdvisor": "Niet-gegradueerde en afgestudeerde studenten moeten een adviseur verstrekken.",
+      "errorGeneric": "Aanmelden mislukt.",
+      "terms": "Ik ga akkoord met de Servicevoorwaarden en het Privacybeleid. (vereist)",
+      "submit": "Volledige aanmelding",
+      "submitting": "Aanmelden...",
+      "termsView": "Bekijk de voorwaarden"
+    }
+  },
+  "dashboard": {
+    "labels": {
+      "systemMemory": "Systeemgeheugen",
+      "instances": "Instanties",
+      "cpuCores": "CPU-kernen",
+      "storageProjects": "Opslag (Projecten)"
+    },
+    "units": {
+      "ea": "e",
+      "gb": "GB",
+      "cores": "Kernen",
+      "gib": "GiB"
+    },
+    "gpuCredit": {
+      "perMonth": "/ {{limit}} C (Maand)",
+      "title": "GPU-kredietquotum",
+      "renewal": "Maandelijkse verlenging: {{date}}"
+    },
+    "instances": {
+      "table": {
+        "offering": "Aanbieden",
+        "template": "Sjabloon",
+        "status": "Status",
+        "name": "Instantienaam",
+        "connection": "Verbinding",
+        "action": "Actie",
+        "ip": "IP-adres"
+      },
+      "actions": {
+        "delete": "Verwijderen",
+        "resume": "Cv",
+        "stop": "Instantie stoppen"
+      },
+      "create": "Nieuw exemplaar",
+      "title": "Mijn rekeninstanties",
+      "empty": "Geen actieve exemplaren gevonden.",
+      "createFirst": "Maak uw eerste exemplaar",
+      "loading": "Instanties laden..."
+    },
+    "status": {
+      "running": "Rennen",
+      "pending": "In behandeling",
+      "terminating": "Beëindigt",
+      "stopped": "Gestopt"
+    },
+    "confirmStop": {
+      "body": "Als u stopt, komen GPU-bronnen vrij. Er worden pas kosten in rekening gebracht als u het opnieuw start.",
+      "title": "Stop exemplaar",
+      "confirm": "Bevestig Stop"
+    },
+    "confirmStart": {
+      "confirm": "Begin",
+      "body": "Als u het exemplaar start, wordt de facturering hervat.",
+      "title": "Start exemplaar"
+    },
+    "confirmDelete": {
+      "confirm": "Verwijderen",
+      "title": "Instantie verwijderen",
+      "body": "Dit is onomkeerbaar. Het exemplaar en de bijbehorende gegevens worden permanent verwijderd."
+    },
+    "logout": "Uitloggen",
+    "resourceQuota": "Resourcequotum",
+    "console": "Cloudconsole"
+  },
+  "credit": {
+    "type": {
+      "monthly_reset": "Maandelijkse reset",
+      "admin_grant": "Beheerderssubsidie",
+      "usage": "Gebruik",
+      "auto_stop": "Automatische stop (geen balans)",
+      "manual_adjust": "Handmatige aanpassing",
+      "limit_increase": "Beperk de verhoging"
+    },
+    "balance": "Evenwicht",
+    "loadMore": "Laad meer",
+    "tableType": "Type",
+    "tableBalance": "Evenwicht",
+    "tableAmount": "Hoeveelheid",
+    "tableDescription": "Beschrijving",
+    "tableTime": "Tijd",
+    "cycleStartedAt": "Cyclus begonnen",
+    "empty": "Geen transacties.",
+    "title": "GPU-kredietgeschiedenis",
+    "limit": "Maandelijkse limiet"
+  },
+  "notifications": {
+    "title": "Meldingen",
+    "unread": "{{count}} nieuw",
+    "empty": "Geen nieuwe meldingen.",
+    "viewAll": "Bekijk alle activiteiten"
+  },
+  "activity": {
+    "loadMore": "Laad meer",
+    "title": "Activiteit",
+    "empty": "Nog geen activiteit."
+  },
+  "audit": {
+    "action": {
+      "logout": "Uitloggen",
+      "login_solid": "Solid Cloud-login",
+      "login_local": "Lokale login",
+      "signup_local": "Lokaal aanmeldingsverzoek",
+      "status_change": "Statuswijziging",
+      "quota_override": "Quota overschrijven",
+      "group_quota_change": "Groepsquotum gewijzigd",
+      "credit_grant": "Krediet verleend",
+      "password_change": "Wachtwoord wijzigen",
+      "solid_link": "Solid Cloud gekoppeld",
+      "signup_solid": "Solid Cloud-aanmeldingsverzoek",
+      "solid_unlink": "Solid Cloud ontkoppeld",
+      "ssh_key_add": "SSH-sleutel toegevoegd",
+      "ssh_key_delete": "SSH-sleutel verwijderd"
+    },
+    "msg": {
+      "credit_grant": "{{actor}} heeft je {{delta}} GPU-credits toegekend (nieuwe limiet {{newLimit}})",
+      "status_change": "{{actor}} heeft uw status gewijzigd van {{from}} naar {{to}}",
+      "quota_override": "{{actor}} heeft je quotum aangepast"
+    },
+    "actor": "Acteur",
+    "target": "Doel"
+  },
+  "admin": {
+    "menu": {
+      "users": "Gebruikers",
+      "audit": "Auditlogboeken",
+      "groupQuotas": "Groepsquota"
+    },
+    "quota": {
+      "cpu": "CPU-kernen",
+      "monthlyLimit": "Maandelijkse limiet",
+      "storage": "Opslag (GiB)",
+      "grant": "Studiebeurs",
+      "save": "Redden",
+      "ram": "RAM (GiB)",
+      "currentBalance": "Huidig ​​saldo",
+      "instances": "Gelijktijdige exemplaren",
+      "gpuCredit": "GPU-tegoed",
+      "effective": "Effectief",
+      "limitIncreaseHint": "Als u de limiet verhoogt, wordt het verschil ook toegevoegd aan het huidige saldo",
+      "grantHint": "Bonus wordt alleen aan deze cyclus toegevoegd (wordt gewist bij de volgende maandelijkse reset)",
+      "saved": "Opgeslagen",
+      "useGroupDefault": "Gebruik groepsstandaard",
+      "currentUsage": "Huidig ​​gebruik",
+      "groupDefault": "Groep standaard",
+      "editTitle": "Quotum bewerken — {{name}}",
+      "groupTitle": "{{role}} standaardquotum",
+      "override": "Overschrijven"
+    },
+    "users": {
+      "filter": {
+        "all": "Alle",
+        "pending": "In behandeling",
+        "approved": "Goedgekeurd",
+        "suspended": "Opgeschort",
+        "rejected": "Afgewezen"
+      },
+      "table": {
+        "username": "Gebruikersnaam",
+        "name": "Naam",
+        "role": "Rol",
+        "department": "Afdeling",
+        "provider": "Login",
+        "status": "Status",
+        "createdAt": "Gevraagd",
+        "action": "Actie"
+      },
+      "action": {
+        "approve": "Goedkeuren",
+        "reject": "Afwijzen",
+        "suspend": "Opschorten",
+        "reactivate": "Opnieuw activeren",
+        "editQuota": "Quotum bewerken"
+      },
+      "status": {
+        "pending": "In behandeling",
+        "approved": "Goedgekeurd",
+        "suspended": "Opgeschort",
+        "rejected": "Afgewezen"
+      },
+      "confirm": {
+        "rejectBody": "Weiger het aanmeldingsverzoek van deze gebruiker. Zij kunnen niet inloggen.",
+        "suspendTitle": "Gebruiker opschorten",
+        "rejectTitle": "Aanmelding weigeren",
+        "approveTitle": "Gebruiker goedkeuren",
+        "suspendBody": "Deze gebruiker opschorten. Eventuele actieve sessies worden beëindigd.",
+        "reactivateTitle": "Gebruiker opnieuw activeren",
+        "reactivateBody": "Deze gebruiker opnieuw activeren?",
+        "approveBody": "Deze gebruiker goedkeuren? Zij kunnen direct inloggen."
+      },
+      "title": "Gebruikers",
+      "empty": "Geen gebruikers."
+    },
+    "console": "Beheerdersconsole"
+  },
+  "me": {
+    "section": {
+      "password": "Wachtwoord",
+      "activity": "Activiteit",
+      "profile": "Profiel",
+      "solid": "Solide cloudverbinding",
+      "sshKeys": "SSH-sleutels"
+    },
+    "profile": {
+      "username": "Gebruikersnaam (student-ID)",
+      "email": "E-mail",
+      "role": "Rol",
+      "department": "Afdeling",
+      "advisor": "Adviseur",
+      "lab": "Laboratorium",
+      "providerLocal": "Lokaal",
+      "nameEn": "Naam (Engels)",
+      "providerBoth": "Lokale + solide cloud",
+      "provider": "Inlogmethode",
+      "createdAt": "Aangesloten",
+      "notSet": "(niet ingesteld)",
+      "nameKo": "Naam (Koreaans)",
+      "providerSolid": "Stevige wolk"
+    },
+    "solid": {
+      "account": "Rekening",
+      "linkSuccess": "Solid Cloud gekoppeld",
+      "linked": "Gekoppeld aan SolidCloud",
+      "linkSubtitle": "Authenticeer met uw Solid Cloud-inloggegevens om dit account te koppelen, zodat u beide logins kunt gebruiken.",
+      "userId": "Gebruikers-ID",
+      "linkButton": "Koppel SolidCloud",
+      "username": "Solid Cloud-gebruikersnaam",
+      "password": "Wachtwoord",
+      "domain": "Domein",
+      "unlinking": "Ontkoppelen...",
+      "unlinkButton": "Ontkoppelen",
+      "domainId": "Domein-ID",
+      "notLinked": "Niet gekoppeld aan Solid Cloud",
+      "unlinkNeedsPassword": "Stel een lokaal wachtwoord in voordat u de verbinding verbreekt.",
+      "linking": "Koppelen...",
+      "unlinkConfirm": "Solid Cloud ontkoppelen? Daarna kunt u alleen nog inloggen met uw lokale wachtwoord.",
+      "errorAuth": "Solid Cloud-authenticatie mislukt.",
+      "errorConflict": "Dit Solid Cloud-account is al gekoppeld aan een andere gebruiker."
+    },
+    "password": {
+      "new": "Nieuw wachtwoord",
+      "saving": "Besparing...",
+      "errorShort": "Wachtwoord moet minimaal 8 tekens lang zijn.",
+      "noPasswordHint": "Er is geen lokaal wachtwoord ingesteld. Als u een nieuw wachtwoord invoert, wordt lokaal inloggen mogelijk.",
+      "errorMismatch": "Nieuwe wachtwoorden komen niet overeen.",
+      "current": "Huidig ​​wachtwoord",
+      "hint": "Minimaal 8 tekens",
+      "submit": "Wachtwoord opslaan",
+      "title": "Wachtwoord wijzigen",
+      "confirm": "Bevestig nieuw wachtwoord",
+      "success": "Wachtwoord bijgewerkt."
+    },
+    "ssh": {
+      "name": "Naam",
+      "title": "Openbare SSH-sleutels",
+      "delete": "Verwijderen",
+      "empty": "Geen SSH-sleutels geregistreerd.",
+      "fingerprint": "Vingerafdruk",
+      "subtitle": "Hier geregistreerde sleutels kunnen worden geselecteerd bij het maken van een nieuw exemplaar.",
+      "namePlaceholder": "bijvoorbeeld een persoonlijke laptop",
+      "errorRequired": "Naam en openbare sleutel zijn vereist.",
+      "publicKeyPlaceholder": "ssh-rsa AAAA... of ssh-ed25519 AAAA...",
+      "errorFormat": "Ongeldig SSH-formaat voor openbare sleutel.",
+      "createdAt": "Toegevoegd",
+      "publicKey": "Openbare sleutel",
+      "add": "Sleutel toevoegen",
+      "deleteConfirm": "Deze SSH-sleutel verwijderen?",
+      "adding": "Toevoegen..."
+    },
+    "title": "Mijn account",
+    "menu": "Mijn account",
+    "back": "Terug naar Dashboard"
+  },
+  "region": {
+    "queue": "Wachtrij",
+    "loading": "Laden...",
+    "title": "Beschikbaarheid regio",
+    "tip": "💡 Tip: RTX 4090 is geschikt voor lichte werklasten; kies RTX Pro 6000 voor training op grote modellen."
+  },
+  "create": {
+    "step1": {
+      "loading": "Sjablonen laden...",
+      "title": "1. Selecteer Sjabloon / ISO"
+    },
+    "step2": {
+      "performance": "Prestatie",
+      "cpu": "CPU",
+      "ram": "RAM",
+      "loading": "Aanbiedingen laden...",
+      "vram": "VRAM",
+      "price": "Prijs",
+      "title": "2. Selecteer Compute-aanbod"
+    },
+    "step3": {
+      "instanceName": "Instantienaam",
+      "instanceNamePh": "bijvoorbeeld mijn-gpu-project-01",
+      "instanceNameHint": "Unieke identificatie voor uw werkruimte.",
+      "sshKeyHint": "Voer uw bestaande openbare sleutel in of genereer een nieuwe.",
+      "manualOrGenerate": "Handmatig invoeren / Nieuw genereren",
+      "title": "3. Omgevingsinstellingen",
+      "useSaved": "Gebruik een opgeslagen SSH-sleutel",
+      "downloadNote": "Als u een nieuw sleutelpaar genereert, wordt de privésleutel (.pem) automatisch gedownload. Bewaar het alstublieft veilig; het wordt niet meer getoond.",
+      "generating": "Genereren...",
+      "generateKey": "Sleutelpaar genereren",
+      "keyLoaded": "Sleutel geladen",
+      "sshKey": "SSH-openbare sleutel"
+    },
+    "footer": {
+      "back": "Rug",
+      "next": "Volgende",
+      "launch": "Instantie starten",
+      "launching": "Lancering..."
+    },
+    "errors": {
+      "createFailed": "Kan exemplaar niet starten."
+    },
+    "title": "Nieuw exemplaar maken",
+    "stepOf": "Stap {{current}} van {{total}}"
+  },
+  "setup": {
+    "steps": {
+      "idle": "Inactief",
+      "review": "Beoordeling",
+      "billing": "Facturering",
+      "mode": "Modus"
+    },
+    "unit": {
+      "min": "min",
+      "hour": "H",
+      "month": "ma",
+      "credit": "C",
+      "times": "keer",
+      "creditPerStep": "C/stap",
+      "sessions": "sessies"
+    },
+    "mode": {
+      "hybrid": "Container + SSH-hybride",
+      "container": "Containermodus",
+      "containerDesc": "Beheer GPU's via K8s-containers. Het beste voor het bedienen van een GPU-cluster aan veel gebruikers op schaal.",
+      "hybridDesc": "Voegt directe SSH-toegang toe tot fysieke knooppunten bovenop containers. Het beste voor kleine laboratoria of wanneer fysieke knooppuntleasing nodig is.",
+      "hybridNote": "Als u hybride selecteert, zijn fysieke knooppuntleasing, SSH-accounts en thuisquota per knooppunt mogelijk. (Geïmplementeerd in een latere fase)"
+    },
+    "billing": {
+      "pricingStatic": "Statisch — vaste, door de beheerder ingestelde prijs",
+      "surge": "Prijsverhoging per beschikbaarheidsdaling",
+      "pricingHint": "Kies hoe de aanbiedingsprijzen worden ingesteld.",
+      "pricingDynamic": "Dynamisch – prijs stijgt naarmate de beschikbaarheid afneemt",
+      "pricing": "Prijsbeleid",
+      "modeCredit": "Credit",
+      "modeFree": "Vrij",
+      "cooldown": "Cooldown vóór herverhuur",
+      "maxLease": "Max. lease per sessie",
+      "maxConcurrent": "Maximaal aantal gelijktijdige sessies",
+      "surgeHint": "Credits/uur stijgen met dit bedrag elke keer dat grondstoffen schaars worden.",
+      "modeDynamic": "Wie het eerst komt",
+      "modeDynamicDesc": "Gebruik wie het eerst komt zonder credits. Maximale lease-, cooldown- en gelijktijdige sessielimieten beschermen de beschikbaarheid.",
+      "modeCreditDesc": "Betalen door credits af te trekken. Alleen beheerd door credits, zonder andere limieten.",
+      "modeFreeDesc": "Gebruik vrijelijk en zonder beperkingen. Geen kredieten, leases of limieten voor gelijktijdige sessies."
+    },
+    "idle": {
+      "timeout": "Tijd voor automatische terugwinning inactief",
+      "containerNote": "Containermodus: teruggewonnen via Stop, met behoud van gegevens.",
+      "sshNote": "SSH-modus: gegevens blijven op de lokale schijf en kunnen ongewijzigd worden hergebruikt.",
+      "timeoutHint": "Sessies worden automatisch teruggevorderd als de GPU zo lang inactief blijft."
+    },
+    "lease": {
+      "extHoursHint": "Het maximale aantal uren dat een gebruiker per extensie kan kiezen. (alleen wie het eerst komt)",
+      "extHours": "Max. uren per verlenging",
+      "maxExtHint": "Maximaal aantal extensies per sessie. 0 schakelt verlenging uit.",
+      "maxExt": "Maximale extensies"
+    },
+    "review": {
+      "modeLabel": "Bedrijfsmodus",
+      "hint": "U begint met de onderstaande instellingen. Wijzig ze op elk gewenst moment in Beheerder → Systeeminstellingen.",
+      "idleLabel": "Automatisch terugvorderen bij inactiviteit",
+      "billingLabel": "Factureringsmodus"
+    },
+    "features": {
+      "signupHint": "Indien uitgeschakeld, is de aanmeldingslink op de inlogpagina verborgen en worden accounts aangemaakt door beheerders.",
+      "datasetFeatureHint": "Als deze functie is uitgeschakeld, zijn de datasetmenu's, caching en selectie van datasets tijdens de sessie allemaal verborgen (minder afhankelijkheid van centrale opslag).",
+      "signup": "Aanmeldingsverzoeken van gebruikers",
+      "dataset": "Registratie van datasets",
+      "datasetFeature": "Gegevenssets-functie",
+      "creditHint": "Indien uitgeschakeld kunnen gebruikers/groepen geen opwaarderingen aanvragen; beheerders verlenen rechtstreeks credits.",
+      "alerts": "Waarschuwingen voor beschikbaarheid van werkbelastingen",
+      "datasetHint": "Indien uitgeschakeld kunnen gebruikers geen datasets registreren/opvragen; alleen beheerders registreren ze.",
+      "alertsHint": "Als deze optie is uitgeschakeld, kunnen gebruikers zich niet abonneren op waarschuwingen over de beschikbaarheid van GPU/knooppunten.",
+      "credit": "Aanvragen voor opwaardering van tegoed",
+      "groupJoinHint": "Als deze optie is uitgeschakeld, kunnen gebruikers niet zelf een lidmaatschap aanvragen; beheerders beheren het.",
+      "groupJoin": "Verzoeken om lid te worden van een groep/organisatie"
+    },
+    "back": "Rug",
+    "next": "Volgende",
+    "finish": "Voltooi de installatie",
+    "wizardTitle": "Eerste installatie van Giosk",
+    "wizardSubtitle": "Configureer de bedrijfsmodus en het standaardbeleid. Alles kan later worden gewijzigd in Beheerder → Systeeminstellingen."
+  },
+  "topbar": {
+    "nodeBadge": "Knooppunten {{up}}/{{total}} · GPU {{gpu}}%"
+  }
+}

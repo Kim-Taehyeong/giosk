@@ -1,0 +1,36 @@
+# ── Secrets / local config (절대 커밋 금지) ──
+.giosk-secrets.env
+*.pem
+*.key
+*.p12
+kubeconfig
+admin.conf
+**/values-*.local.yaml
+**/*.secret.yaml
+
+# ── Node / frontend ──
+node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
+frontend/.vite/
+
+# ── Go / backend ──
+backend/bin/
+*.test
+*.out
+
+# ── Helm ──
+*.tgz
+charts/**/charts/
+charts/**/Chart.lock
+
+# ── 내부 노트(레포 밖으로 분리됨) ──
+Memory.md
+
+# ── OS / editor ──
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/

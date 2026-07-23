@@ -1,0 +1,518 @@
+{
+  "common": {
+    "login": "로그인",
+    "logout": "로그아웃",
+    "loading": "처리 중...",
+    "cancel": "취소",
+    "confirm": "확인",
+    "save": "저장",
+    "delete": "삭제",
+    "back": "이전",
+    "next": "다음",
+    "close": "닫기",
+    "refresh": "새로고침",
+    "language": "언어",
+    "korean": "한국어",
+    "english": "English",
+    "required": "필수",
+    "optional": "선택"
+  },
+  "auth": {
+    "brand": {
+      "kuName": "단국대학교",
+      "enName": "DANKOOK UNIVERSITY"
+    },
+    "login": {
+      "tabLocal": "자체 서비스 로그인",
+      "tabSolid": "Solid Cloud 로그인",
+      "usernameLocal": "학번 / 사용자명",
+      "usernameSolid": "Solid Cloud Username",
+      "password": "Password",
+      "domain": "Domain",
+      "submit": "로그인",
+      "submitting": "로그인 중...",
+      "signupLink": "회원가입 신청",
+      "errorGeneric": "로그인에 실패했습니다.",
+      "errorNetwork": "서버와 통신 중 오류가 발생했습니다.",
+      "errorPending": "관리자 승인 대기 중입니다.",
+      "errorSuspended": "사용이 중단된 계정입니다.",
+      "errorRejected": "가입이 거절된 계정입니다.",
+      "errorInvalid": "아이디 또는 비밀번호가 올바르지 않습니다."
+    },
+    "signupPending": {
+      "title": "가입 신청이 접수되었습니다",
+      "body": "관리자 승인 후 로그인하실 수 있습니다. 승인까지 시간이 걸릴 수 있습니다.",
+      "submittedAt": "신청 일자",
+      "backToLogin": "로그인으로 돌아가기"
+    },
+    "localSignup": {
+      "title": "회원가입 신청",
+      "subtitle": "필요한 정보를 입력하면 관리자 승인 후 사용하실 수 있습니다.",
+      "section": {
+        "credentials": "계정",
+        "name": "이름",
+        "affiliation": "소속"
+      },
+      "field": {
+        "username": "학번 / 사용자명",
+        "password": "비밀번호 (8자 이상)",
+        "email": "이메일",
+        "passwordConfirm": "비밀번호 확인"
+      },
+      "submit": "가입 신청",
+      "submitting": "신청 중...",
+      "errorTerms": "약관에 동의해야 가입할 수 있습니다.",
+      "errorAdvisor": "학부생/대학원생은 담당 교수를 입력해야 합니다.",
+      "errorRequired": "필수 항목을 모두 입력해주세요.",
+      "errorGroup": "소속 조직과 그룹을 반드시 선택해야 합니다.",
+      "errorPasswordShort": "비밀번호는 8자 이상이어야 합니다.",
+      "errorGeneric": "가입에 실패했습니다.",
+      "errorPasswordMismatch": "비밀번호가 일치하지 않습니다."
+    },
+    "signup": {
+      "title": "Giosk Console 가입",
+      "subtitle": "Solid Cloud 인증이 확인되었습니다. 약관에 동의하고 추가 정보를 입력해주세요.",
+      "section": {
+        "account": "계정 정보",
+        "name": "이름",
+        "affiliation": "소속 및 역할",
+        "password": "자체 로그인 비밀번호 (선택)"
+      },
+      "field": {
+        "username": "사용자명 (학번)",
+        "email": "이메일",
+        "name": "이름",
+        "namePlaceholder": "예: 홍길동",
+        "lastNameKo": "성 (한글)",
+        "firstNameKo": "이름 (한글)",
+        "lastNameEn": "Last Name (English)",
+        "firstNameEn": "First Name (English)",
+        "role": "역할",
+        "department": "학과 / 소속",
+        "lab": "연구실 (선택)",
+        "advisor": "담당 교수",
+        "advisorPlaceholder": "담당 교수의 이름",
+        "org": "조직",
+        "group": "그룹",
+        "selectPh": "선택하세요",
+        "sponsor": "담당자 (선택)",
+        "sponsorPlaceholder": "담당자 이름 (지도교수·팀장 등)",
+        "passwordHint": "비밀번호를 설정하면 Solid Cloud 없이도 학번/사용자명으로 직접 로그인할 수 있습니다.",
+        "passwordPlaceholder": "비워두면 Solid Cloud 로그인만 사용",
+        "noJoinableGroup": "이 조직에는 가입 가능한 그룹이 없습니다. 조직 관리자에게 문의하세요."
+      },
+      "role": {
+        "undergrad": "학부생",
+        "graduate": "대학원생",
+        "professor": "교수",
+        "staff": "교직원"
+      },
+      "terms": "서비스 이용 약관 및 개인정보 처리방침에 동의합니다. (필수)",
+      "termsView": "약관 전문 보기",
+      "submit": "가입 완료",
+      "submitting": "가입 중...",
+      "errorTerms": "약관에 동의해야 가입할 수 있습니다.",
+      "errorAdvisor": "학부생/대학원생은 담당 교수를 입력해야 합니다.",
+      "errorGeneric": "가입에 실패했습니다."
+    }
+  },
+  "dashboard": {
+    "console": "클라우드 콘솔",
+    "logout": "로그아웃",
+    "resourceQuota": "리소스 할당량",
+    "labels": {
+      "instances": "인스턴스",
+      "cpuCores": "CPU 코어",
+      "systemMemory": "시스템 메모리",
+      "storageProjects": "스토리지 (프로젝트)"
+    },
+    "units": {
+      "ea": "개",
+      "cores": "코어",
+      "gib": "GiB",
+      "gb": "GB"
+    },
+    "gpuCredit": {
+      "title": "GPU 크레딧 할당량",
+      "renewal": "월간 갱신: {{date}}",
+      "perMonth": "/ {{limit}} C (월)"
+    },
+    "instances": {
+      "title": "내 컴퓨팅 인스턴스",
+      "create": "새 인스턴스",
+      "table": {
+        "status": "상태",
+        "name": "인스턴스 이름",
+        "offering": "오퍼링",
+        "template": "템플릿",
+        "ip": "IP 주소",
+        "connection": "연결",
+        "action": "작업"
+      },
+      "actions": {
+        "stop": "인스턴스 중지",
+        "resume": "재시작",
+        "delete": "삭제"
+      },
+      "empty": "활성 인스턴스가 없습니다.",
+      "createFirst": "첫 인스턴스 만들기",
+      "loading": "인스턴스 불러오는 중..."
+    },
+    "status": {
+      "running": "실행 중",
+      "stopped": "중지됨",
+      "terminating": "삭제 중",
+      "pending": "대기 중"
+    },
+    "confirmStop": {
+      "title": "인스턴스 중지",
+      "body": "인스턴스를 중지하면 GPU 자원이 반환됩니다. 다시 시작할 때까지 사용량이 청구되지 않습니다.",
+      "confirm": "중지 확인"
+    },
+    "confirmStart": {
+      "title": "인스턴스 시작",
+      "body": "인스턴스를 다시 시작합니다. 사용량이 다시 청구됩니다.",
+      "confirm": "시작"
+    },
+    "confirmDelete": {
+      "title": "인스턴스 삭제",
+      "body": "이 작업은 되돌릴 수 없습니다. 인스턴스와 데이터가 영구적으로 삭제됩니다.",
+      "confirm": "삭제"
+    }
+  },
+  "credit": {
+    "title": "GPU 크레딧 내역",
+    "balance": "잔액",
+    "limit": "월간 한도",
+    "cycleStartedAt": "이번 사이클 시작",
+    "loadMore": "더 보기",
+    "empty": "트랜잭션이 없습니다.",
+    "tableType": "유형",
+    "tableAmount": "금액",
+    "tableBalance": "잔액",
+    "tableDescription": "설명",
+    "tableTime": "시간",
+    "type": {
+      "monthly_reset": "월간 리셋",
+      "admin_grant": "추가 지급",
+      "limit_increase": "한도 증가분",
+      "usage": "사용",
+      "auto_stop": "잔액 부족 자동 정지",
+      "manual_adjust": "수동 조정"
+    }
+  },
+  "notifications": {
+    "title": "알림",
+    "empty": "새로운 알림이 없습니다.",
+    "viewAll": "전체 활동이력 보기",
+    "unread": "{{count}}개의 새 알림"
+  },
+  "activity": {
+    "title": "활동이력",
+    "loadMore": "더 보기",
+    "empty": "활동이력이 없습니다."
+  },
+  "audit": {
+    "actor": "행위자",
+    "target": "대상",
+    "action": {
+      "login_local": "자체 로그인",
+      "login_solid": "Solid Cloud 로그인",
+      "logout": "로그아웃",
+      "signup_local": "자체 가입 신청",
+      "signup_solid": "Solid Cloud 가입 신청",
+      "password_change": "비밀번호 변경",
+      "ssh_key_add": "SSH 키 등록",
+      "ssh_key_delete": "SSH 키 삭제",
+      "solid_link": "Solid Cloud 연결",
+      "solid_unlink": "Solid Cloud 연결 해제",
+      "status_change": "상태 변경",
+      "quota_override": "Quota 조정",
+      "credit_grant": "크레딧 부여",
+      "group_quota_change": "그룹 Quota 변경"
+    },
+    "msg": {
+      "credit_grant": "{{actor}}님이 GPU 크레딧 {{delta}}을(를) 부여했습니다 (현재 한도 {{newLimit}})",
+      "status_change": "{{actor}}님이 상태를 {{from}}에서 {{to}}(으)로 변경했습니다",
+      "quota_override": "{{actor}}님이 Quota를 조정했습니다"
+    }
+  },
+  "admin": {
+    "console": "Admin Console",
+    "menu": {
+      "users": "사용자 관리",
+      "groupQuotas": "그룹별 Quota",
+      "audit": "Audit 로그"
+    },
+    "quota": {
+      "cpu": "CPU 코어",
+      "ram": "RAM (GiB)",
+      "storage": "스토리지 (GiB)",
+      "instances": "동시 인스턴스",
+      "gpuCredit": "GPU 크레딧",
+      "monthlyLimit": "월간 한도",
+      "currentBalance": "현재 잔액",
+      "grantHint": "이번 사이클 잔액에만 추가됩니다 (다음 달 리셋되면 사라짐)",
+      "limitIncreaseHint": "한도를 늘리면 증가분만큼 잔액도 즉시 추가됩니다",
+      "grant": "추가 지급",
+      "save": "저장",
+      "saved": "저장됨",
+      "editTitle": "{{name}}의 Quota 편집",
+      "currentUsage": "현재 사용량",
+      "effective": "적용 중",
+      "override": "개별 설정",
+      "groupDefault": "그룹 기본값",
+      "useGroupDefault": "그룹 기본값 사용",
+      "groupTitle": "{{role}} 기본 Quota"
+    },
+    "users": {
+      "title": "사용자 관리",
+      "filter": {
+        "all": "전체",
+        "pending": "승인 대기",
+        "approved": "승인됨",
+        "suspended": "중단",
+        "rejected": "거절"
+      },
+      "table": {
+        "username": "사용자명",
+        "name": "이름",
+        "role": "역할",
+        "department": "소속",
+        "provider": "로그인",
+        "status": "상태",
+        "createdAt": "신청일",
+        "action": "작업"
+      },
+      "action": {
+        "approve": "승인",
+        "reject": "거절",
+        "suspend": "중단",
+        "reactivate": "재활성",
+        "editQuota": "Quota 편집"
+      },
+      "status": {
+        "pending": "승인 대기",
+        "approved": "승인됨",
+        "suspended": "사용 중단",
+        "rejected": "거절됨"
+      },
+      "empty": "사용자가 없습니다.",
+      "confirm": {
+        "approveTitle": "사용자 승인",
+        "approveBody": "이 사용자의 가입을 승인하시겠습니까? 승인 즉시 로그인이 가능해집니다.",
+        "rejectTitle": "가입 거절",
+        "rejectBody": "이 사용자의 가입 신청을 거절합니다. 이후 로그인할 수 없습니다.",
+        "suspendTitle": "사용 중단",
+        "suspendBody": "이 사용자의 사용을 중단시킵니다. 활성 세션도 모두 종료됩니다.",
+        "reactivateTitle": "재활성화",
+        "reactivateBody": "이 사용자를 다시 활성화하시겠습니까?"
+      }
+    }
+  },
+  "me": {
+    "title": "내 정보",
+    "menu": "내 정보",
+    "back": "대시보드로",
+    "section": {
+      "profile": "프로필",
+      "solid": "Solid Cloud 연결",
+      "password": "비밀번호",
+      "sshKeys": "SSH 키",
+      "activity": "활동이력"
+    },
+    "profile": {
+      "username": "사용자명 (학번)",
+      "email": "이메일",
+      "nameKo": "이름 (한글)",
+      "nameEn": "Name (English)",
+      "role": "역할",
+      "department": "학과 / 소속",
+      "lab": "연구실",
+      "advisor": "담당 교수",
+      "createdAt": "가입일",
+      "provider": "로그인 방식",
+      "providerLocal": "자체 로그인",
+      "providerSolid": "Solid Cloud",
+      "providerBoth": "자체 + Solid Cloud",
+      "notSet": "(미설정)"
+    },
+    "solid": {
+      "linked": "Solid Cloud 계정에 연결됨",
+      "notLinked": "Solid Cloud에 연결되지 않음",
+      "userId": "사용자 ID",
+      "domainId": "도메인 ID",
+      "account": "계정",
+      "linkButton": "Solid Cloud 연결",
+      "linkSubtitle": "Solid Cloud 자격증명으로 인증하면 이 계정에 연결되어 양쪽 로그인을 모두 사용할 수 있습니다.",
+      "linking": "연결 중...",
+      "linkSuccess": "Solid Cloud 연결 완료",
+      "unlinkButton": "연결 해제",
+      "unlinking": "해제 중...",
+      "unlinkConfirm": "Solid Cloud 연결을 해제하시겠습니까? 이후로는 자체 로그인만 가능합니다.",
+      "unlinkNeedsPassword": "해제하기 전에 자체 로그인 비밀번호를 먼저 설정하세요.",
+      "errorAuth": "Solid Cloud 인증에 실패했습니다.",
+      "errorConflict": "이미 다른 사용자가 이 Solid Cloud 계정에 연결되어 있습니다.",
+      "username": "Solid Cloud Username",
+      "password": "Password",
+      "domain": "Domain"
+    },
+    "password": {
+      "title": "비밀번호 변경",
+      "current": "현재 비밀번호",
+      "new": "새 비밀번호",
+      "confirm": "새 비밀번호 확인",
+      "submit": "비밀번호 저장",
+      "saving": "저장 중...",
+      "hint": "최소 8자 이상",
+      "noPasswordHint": "현재 자체 로그인 비밀번호가 설정되어 있지 않습니다. 새 비밀번호를 입력하면 자체 로그인이 활성화됩니다.",
+      "errorMismatch": "새 비밀번호가 일치하지 않습니다.",
+      "errorShort": "비밀번호는 8자 이상이어야 합니다.",
+      "success": "비밀번호가 변경되었습니다."
+    },
+    "ssh": {
+      "title": "SSH 공개 키",
+      "subtitle": "여기에 등록한 키는 새 인스턴스 생성 시 선택하여 사용할 수 있습니다.",
+      "empty": "등록된 SSH 키가 없습니다.",
+      "name": "이름",
+      "namePlaceholder": "예: 개인 노트북",
+      "publicKey": "공개 키",
+      "publicKeyPlaceholder": "ssh-rsa AAAA... 또는 ssh-ed25519 AAAA...",
+      "fingerprint": "지문",
+      "createdAt": "등록일",
+      "add": "키 추가",
+      "adding": "추가 중...",
+      "delete": "삭제",
+      "deleteConfirm": "이 SSH 키를 삭제하시겠습니까?",
+      "errorFormat": "유효한 SSH 공개 키 형식이 아닙니다.",
+      "errorRequired": "이름과 공개 키를 모두 입력해주세요."
+    }
+  },
+  "region": {
+    "title": "리전 가용성",
+    "queue": "대기열",
+    "loading": "불러오는 중...",
+    "tip": "💡 팁: 가벼운 작업은 RTX 4090, 대형 모델 학습은 RTX Pro 6000을 추천합니다."
+  },
+  "create": {
+    "title": "새 인스턴스 만들기",
+    "stepOf": "{{current}} / {{total}} 단계",
+    "step1": {
+      "title": "1. 템플릿 / ISO 선택",
+      "loading": "템플릿 불러오는 중..."
+    },
+    "step2": {
+      "title": "2. 컴퓨팅 오퍼링 선택",
+      "loading": "오퍼링 불러오는 중...",
+      "vram": "VRAM",
+      "performance": "성능",
+      "cpu": "CPU",
+      "ram": "RAM",
+      "price": "가격"
+    },
+    "step3": {
+      "title": "3. 환경 설정",
+      "instanceName": "인스턴스 이름",
+      "instanceNameHint": "워크스페이스의 고유 식별자.",
+      "instanceNamePh": "예: my-gpu-project-01",
+      "sshKey": "SSH 공개 키",
+      "sshKeyHint": "기존 공개 키를 입력하거나 새로 생성하세요.",
+      "useSaved": "등록된 SSH 키 사용",
+      "manualOrGenerate": "직접 입력 / 새로 생성",
+      "generating": "생성 중...",
+      "generateKey": "키 쌍 생성",
+      "keyLoaded": "키 적용됨",
+      "downloadNote": "새 키 쌍을 생성하면 개인 키(.pem)가 자동으로 다운로드됩니다. 안전하게 보관해주세요; 다시 표시되지 않습니다."
+    },
+    "footer": {
+      "back": "이전",
+      "next": "다음",
+      "launching": "생성 중...",
+      "launch": "인스턴스 생성"
+    },
+    "errors": {
+      "createFailed": "인스턴스 생성에 실패했습니다."
+    }
+  },
+  "setup": {
+    "wizardTitle": "GPU 클라우드 초기 설정",
+    "wizardSubtitle": "운영 모드와 정책 기본값을 설정합니다. 모든 항목은 이후 관리자 → 시스템 설정에서 변경할 수 있습니다.",
+    "steps": {
+      "mode": "운영 모드",
+      "billing": "과금",
+      "idle": "유휴",
+      "review": "검토"
+    },
+    "back": "이전",
+    "next": "다음",
+    "finish": "설정 완료",
+    "unit": {
+      "hour": "시간",
+      "min": "분",
+      "month": "개월",
+      "credit": "C",
+      "creditPerStep": "C/단계",
+      "sessions": "세션",
+      "times": "회"
+    },
+    "mode": {
+      "container": "컨테이너 모드",
+      "containerDesc": "K8s 컨테이너 기반으로 GPU를 관리합니다. 대규모·불특정 다수에게 GPU 클러스터를 제공하기에 적합합니다.",
+      "hybrid": "컨테이너 + SSH 하이브리드",
+      "hybridDesc": "컨테이너에 더해 물리 노드에 직접 SSH로 접근해 사용합니다. 소규모 연구실이나 물리 노드 대여가 필요한 경우에 적합합니다.",
+      "hybridNote": "하이브리드를 선택하면 물리 노드 대여·SSH 계정·노드별 home 용량 제한 기능이 활성화됩니다. (이후 단계에서 구현)"
+    },
+    "billing": {
+      "pricing": "가격 정책",
+      "pricingHint": "오퍼링 가격을 어떻게 책정할지 선택합니다.",
+      "pricingStatic": "정적 — 관리자가 정한 고정 가격",
+      "pricingDynamic": "동적 — 가용성이 낮을수록 가격 상승",
+      "surge": "가용성 하락 시 가격 증가폭",
+      "surgeHint": "가용 자원이 부족해질 때마다 시간당 크레딧이 이만큼 가산됩니다.",
+      "maxLease": "1회 최대 대여 시간",
+      "cooldown": "재대여 대기 시간",
+      "maxConcurrent": "최대 동시 세션",
+      "modeCredit": "크레딧",
+      "modeCreditDesc": "크레딧을 차감해 사용합니다. 다른 제한 없이 크레딧만으로 제어됩니다.",
+      "modeDynamic": "선착순",
+      "modeDynamicDesc": "크레딧 없이 선착순으로 사용합니다. 최대 대여·쿨다운·동시 세션 한도로 가용성을 보장합니다.",
+      "modeFree": "자유",
+      "modeFreeDesc": "제한 없이 자유롭게 사용합니다. 크레딧·대여·동시 세션 제한이 모두 없습니다."
+    },
+    "idle": {
+      "timeout": "유휴 자동 반환 시간",
+      "timeoutHint": "GPU가 이 시간 이상 유휴 상태면 세션을 자동 반환합니다.",
+      "containerNote": "컨테이너 모드: Stop으로 반환하여 데이터를 보존합니다.",
+      "sshNote": "SSH 모드: 데이터가 로컬에 저장되어 있어 그대로 다시 사용할 수 있습니다."
+    },
+    "lease": {
+      "extHours": "회당 최대 연장 시간",
+      "extHoursHint": "한 번 연장할 때 사용자가 고를 수 있는 최대 시간입니다. (선착순 모드 전용)",
+      "maxExt": "최대 연장 횟수",
+      "maxExtHint": "한 세션당 연장할 수 있는 최대 횟수입니다. 0이면 연장 불가."
+    },
+    "review": {
+      "hint": "아래 설정으로 시작합니다. 이후 관리자 → 시스템 설정에서 언제든 변경할 수 있습니다.",
+      "modeLabel": "운영 모드",
+      "idleLabel": "유휴 자동 반환",
+      "billingLabel": "과금 모드"
+    },
+    "features": {
+      "signup": "사용자 가입 신청",
+      "signupHint": "끄면 로그인 화면의 가입 신청이 비활성화되고, 계정은 관리자가 직접 생성합니다.",
+      "datasetFeature": "데이터셋 기능",
+      "datasetFeatureHint": "끄면 데이터셋 메뉴·캐싱·세션 내 데이터셋 선택이 모두 숨겨집니다. (중앙 스토리지 의존도가 낮아집니다)",
+      "dataset": "데이터셋 등록",
+      "datasetHint": "끄면 사용자가 데이터셋을 등록/요청할 수 없고, 관리자만 등록합니다.",
+      "alerts": "워크로드 가용성 알림",
+      "alertsHint": "끄면 사용자가 GPU/노드 가용 시 알림을 신청할 수 없습니다.",
+      "groupJoin": "타 그룹·조직 가입 신청",
+      "groupJoinHint": "끄면 사용자가 직접 가입 신청할 수 없고, 멤버십은 관리자가 관리합니다.",
+      "credit": "크레딧 충전 요청",
+      "creditHint": "끄면 사용자/그룹이 크레딧 충전을 요청할 수 없고, 충전은 관리자가 직접 처리합니다."
+    }
+  },
+  "topbar": {
+    "nodeBadge": "노드 {{up}}/{{total}} · GPU {{gpu}}%"
+  }
+}

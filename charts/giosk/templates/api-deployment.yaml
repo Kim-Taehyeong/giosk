@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "giosk.fullname" . }}-api
+  labels: { app: giosk-api }
+spec:
+  replicas: {{ .Values.api.replicas }}
+  selector:
+    matchLabels: { app: giosk-api }
+  template:
+    metadata:
+      labels: { app: giosk-api }
+      annotations:
+        # config/secret 변경 시 롤링 재시작 유도
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: {{ include "giosk.fullname" . }}-api
+      {{- include "giosk.controlPlaneScheduling" . | nindent 6 }}
+      containers:
+        - name: api
+          image: "{{ .Values.image.api.repository }}:{{ .Values.image.api.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - { name: http, containerPort: 8080 }
+          envFrom:
+            - configMapRef: { name: {{ include "giosk.fullname" . }}-config }
+          env:
+            - name: GIOSK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: {{ include "giosk.fullname" . }}-secrets, key: admin-password }
+            - name: GIOSK_AGENT_TOKEN
+              valueFrom:
+                secretKeyRef: { name: {{ include "giosk.fullname" . }}-secrets, key: agent-token }
+            - name: GIOSK_DB_PASS
+              valueFrom:
+                secretKeyRef: { name: {{ include "giosk.fullname" . }}-secrets, key: db-password }
+            - name: GIOSK_SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: {{ include "giosk.fullname" . }}-secrets, key: smtp-password }
+            {{- if .Values.gateway.enabled }}
+            # 게이트웨이 활성 시에만 주입 → API 가 토큰 URL 발급(비활성이면 gatewayOn()=false, 직접접속 폴백)
+            - name: GIOSK_GATEWAY_SECRET
+              valueFrom:
+                secretKeyRef: { name: {{ include "giosk.fullname" . }}-secrets, key: gateway-secret }
+            # 물리 세션 웹터미널: API 가 이 관리키로 노드에 SSH(노드 authorized_keys 가 게이트웨이 공개키 신뢰).
+            - name: GIOSK_GATEWAY_SSH_KEY
+              valueFrom:
+                secretKeyRef: { name: {{ include "giosk.fullname" . }}-secrets, key: gateway-ssh-key }
+            {{- end }}
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests: { cpu: 100m, memory: 128Mi }
+            limits: { cpu: "1", memory: 512Mi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "giosk.fullname" . }}-api
+  labels: { app: giosk-api }
+spec:
+  type: {{ .Values.api.service.type }}
+  selector: { app: giosk-api }
+  ports:
+    - name: http
+      port: {{ .Values.api.service.port }}
+      targetPort: http

@@ -1,0 +1,52 @@
+# Giosk 설치 예시 값 — 복사해서 실제 값으로 채운 뒤 `-f my-values.yaml` 로 넘기세요.
+#   helm install giosk deploy/helm/giosk -f my-values.yaml --set admin.password=<PW>
+#   또는  sudo ./deploy/deploy.sh   (values 파일 경로를 VALUES 환경변수로 지정)
+#
+# 필수: NFS 서버(모든 모드), (베어메탈이면) MetalLB IP 대역, admin 비밀번호.
+
+# ── 실행 모드 ──
+deployment:
+  mode: container            # container | hybrid(물리노드 SSH 임대까지)
+billing:
+  mode: credit               # credit | dynamic | free
+
+# ── 영속 스토리지 (NFS 는 어떤 모드에서도 필수 — home ~/nfs = RWX) ──
+storage:
+  persistence:
+    storageClass: nfs        # nfsProvisioner 가 만들거나(아래), 기존 RWX StorageClass 이름
+
+# ── 인프라 번들 (install:true=차트/배포기가 설치, false=기존 것 사용) ──
+metallb:
+  install: true
+  ipRange: "10.0.0.200-10.0.0.220"   # ← 사내망 유휴 IP 대역. 클라우드 LB 있으면 install:false
+nfsProvisioner:
+  install: true
+  server: "10.0.0.5"                 # ← NFS 서버 주소
+  path: "/export"                    # ← NFS export 루트
+  storageClassName: nfs              # storage.persistence.storageClass 와 일치
+monitoring:
+  install: true                      # kube-prometheus-stack 번들. 외부 Prometheus 면 install:false + prometheusURL
+  prometheusURL: ""
+  dcgm:
+    install: true                    # GPU Operator 가 DCGM 제공하면 false
+    namespace: gpu-operator
+hami:
+  install: false                     # 분할(fractional) GPU 세션 쓰면 true
+registry:
+  install: false                     # 인클러스터 레지스트리(이미지 빌드) 쓰면 true
+  external: ""                       # 외부 레지스트리 host:port
+
+# ── GPU 노드 라벨 (GFD). 없으면 CPU 전용으로만 동작 ──
+k8s:
+  gpuTypeLabel: nvidia.com/gpu.product
+  cudaLabel: nvidia.com/cuda.driver-version
+
+# ── 최초 관리자 (설치 시 --set admin.password=... 권장) ──
+admin:
+  username: admin
+  password: ""
+
+# ── (hybrid 모드) 물리 노드 ──
+# physicalNodes:
+#   enabled: true
+#   nfs: { server: "10.0.0.5", path: "/export" }

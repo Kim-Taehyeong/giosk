@@ -1,0 +1,5 @@
+# 자동 생성 비밀번호(절대 커밋 금지)
+.giosk-secrets.env
+# helm 의존성 vendor / lock
+helm/giosk/charts/
+helm/giosk/Chart.lock

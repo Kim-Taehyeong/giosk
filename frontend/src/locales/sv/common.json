@@ -1,0 +1,518 @@
+{
+  "common": {
+    "login": "Inloggning",
+    "next": "Nästa",
+    "delete": "Radera",
+    "cancel": "Avboka",
+    "confirm": "Bekräfta",
+    "loading": "Belastning...",
+    "back": "Tillbaka",
+    "logout": "Utloggning",
+    "save": "Spara",
+    "close": "Nära",
+    "language": "Språk",
+    "refresh": "Uppdatera",
+    "korean": "한국어",
+    "english": "engelska",
+    "required": "nödvändig",
+    "optional": "frivillig"
+  },
+  "auth": {
+    "brand": {
+      "enName": "DANKOOK UNIVERSITY",
+      "kuName": "Dankook universitet"
+    },
+    "login": {
+      "submit": "Inloggning",
+      "password": "Lösenord",
+      "domain": "Domän",
+      "errorGeneric": "Inloggningen misslyckades.",
+      "errorNetwork": "Ett nätverksfel uppstod.",
+      "errorPending": "Väntar på administratörsgodkännande.",
+      "tabSolid": "Solid Cloud-inloggning",
+      "tabLocal": "Serviceinloggning",
+      "submitting": "Loggar in...",
+      "usernameLocal": "Student-ID / Användarnamn",
+      "errorSuspended": "Detta konto har stängts av.",
+      "errorInvalid": "Ogiltigt användarnamn eller lösenord.",
+      "signupLink": "Anmäl dig till tjänsten",
+      "usernameSolid": "Solid Cloud Användarnamn",
+      "errorRejected": "Denna registreringsbegäran avvisades."
+    },
+    "signupPending": {
+      "title": "Registreringsförfrågan har skickats",
+      "backToLogin": "Tillbaka till inloggning",
+      "submittedAt": "Inlämnad den",
+      "body": "Du kommer att kunna logga in efter administratörens godkännande. Detta kan ta lite tid."
+    },
+    "localSignup": {
+      "section": {
+        "credentials": "Konto",
+        "name": "Namn",
+        "affiliation": "Anslutning"
+      },
+      "field": {
+        "username": "Student-ID / Användarnamn",
+        "email": "E-post",
+        "password": "Lösenord (minst 8 tecken)",
+        "passwordConfirm": "Bekräfta lösenord"
+      },
+      "title": "Anmäl dig till tjänsten",
+      "errorTerms": "Du måste acceptera villkoren för att registrera dig.",
+      "submit": "Begär registrering",
+      "submitting": "Skickar...",
+      "errorAdvisor": "Grund- och doktorander måste tillhandahålla en rådgivare.",
+      "subtitle": "Fyll i formuläret nedan. Du kommer att kunna logga in när en administratör godkänner din begäran.",
+      "errorPasswordShort": "Lösenordet måste vara minst 8 tecken.",
+      "errorGeneric": "Registreringen misslyckades.",
+      "errorGroup": "Du måste välja en organisation och en grupp.",
+      "errorRequired": "Vänligen fyll i alla obligatoriska fält.",
+      "errorPasswordMismatch": "Lösenord stämmer inte överens."
+    },
+    "signup": {
+      "section": {
+        "account": "Konto",
+        "name": "Namn",
+        "password": "Tjänstlösenord (valfritt)",
+        "affiliation": "Tillhörighet & Roll"
+      },
+      "field": {
+        "email": "E-post",
+        "name": "Namn",
+        "role": "Roll",
+        "department": "Avdelning",
+        "username": "Användarnamn (Student-ID)",
+        "firstNameEn": "Förnamn (engelska)",
+        "firstNameKo": "Förnamn (koreanska)",
+        "namePlaceholder": "till exempel Hong Gildong",
+        "lastNameEn": "Efternamn (engelska)",
+        "lab": "Lab (valfritt)",
+        "lastNameKo": "Efternamn (koreanska)",
+        "advisor": "Rådgivare",
+        "org": "Organisation",
+        "selectPh": "Välja",
+        "group": "Grupp",
+        "passwordPlaceholder": "Lämna tomt för att endast använda Solid Cloud-inloggning",
+        "sponsorPlaceholder": "Sponsorns namn (rådgivare, teamledare, etc.)",
+        "sponsor": "Sponsor (valfritt)",
+        "passwordHint": "Ställ in ett lösenord för att logga in direkt med ditt student-ID/användarnamn utan Solid Cloud.",
+        "advisorPlaceholder": "Rådgivarens namn",
+        "noJoinableGroup": "Den här organisationen har inga grupper som går att ansluta till. Kontakta organisationens administratör."
+      },
+      "role": {
+        "staff": "Personal",
+        "professor": "Professor",
+        "undergrad": "Grundutbildning",
+        "graduate": "Utexaminerad"
+      },
+      "title": "Registrera dig för Giosk Console",
+      "subtitle": "Solid Cloud-autentisering verifierad. Vänligen acceptera villkoren och ange ytterligare information.",
+      "errorTerms": "Du måste acceptera villkoren för att registrera dig.",
+      "errorAdvisor": "Grund- och doktorander måste tillhandahålla en rådgivare.",
+      "errorGeneric": "Registreringen misslyckades.",
+      "terms": "Jag godkänner användarvillkoren och sekretesspolicyn. (nödvändig)",
+      "termsView": "Visa villkor",
+      "submitting": "Registrerar dig...",
+      "submit": "Slutför registreringen"
+    }
+  },
+  "dashboard": {
+    "labels": {
+      "systemMemory": "Systemminne",
+      "instances": "Förekomster",
+      "storageProjects": "Lagring (projekt)",
+      "cpuCores": "CPU-kärnor"
+    },
+    "units": {
+      "cores": "Kärnor",
+      "gb": "GB",
+      "ea": "ea",
+      "gib": "GiB"
+    },
+    "gpuCredit": {
+      "title": "GPU-kreditkvot",
+      "renewal": "Månatlig förnyelse: {{date}}",
+      "perMonth": "/ {{limit}} C (månad)"
+    },
+    "instances": {
+      "table": {
+        "status": "Status",
+        "offering": "Erbjudande",
+        "template": "Mall",
+        "connection": "Förbindelse",
+        "action": "Handling",
+        "ip": "IP-adress",
+        "name": "Instansnamn"
+      },
+      "actions": {
+        "delete": "Radera",
+        "resume": "Resume",
+        "stop": "Stoppa instans"
+      },
+      "createFirst": "Skapa din första instans",
+      "create": "Ny instans",
+      "title": "Mina beräkningsinstanser",
+      "loading": "Läser in instanser...",
+      "empty": "Inga aktiva instanser hittades."
+    },
+    "status": {
+      "stopped": "Slutade",
+      "running": "Spring",
+      "pending": "I avvaktan på",
+      "terminating": "Avslutar"
+    },
+    "confirmStop": {
+      "confirm": "Bekräfta stopp",
+      "body": "Att stoppa släpper GPU-resurser. Du faktureras inte förrän du startar den igen.",
+      "title": "Stoppa instans"
+    },
+    "confirmStart": {
+      "confirm": "Start",
+      "title": "Starta instans",
+      "body": "När instansen startas återupptas faktureringen."
+    },
+    "confirmDelete": {
+      "confirm": "Radera",
+      "title": "Ta bort instans",
+      "body": "Detta är oåterkalleligt. Förekomsten och dess data kommer att tas bort permanent."
+    },
+    "logout": "Utloggning",
+    "resourceQuota": "Resurskvot",
+    "console": "Cloud Console"
+  },
+  "credit": {
+    "type": {
+      "usage": "Användande",
+      "auto_stop": "Autostopp (ingen balans)",
+      "monthly_reset": "Månatlig återställning",
+      "admin_grant": "Administratörsbidrag",
+      "manual_adjust": "Manuell justering",
+      "limit_increase": "Begränsa ökningen"
+    },
+    "balance": "Balans",
+    "loadMore": "Ladda mer",
+    "tableType": "Typ",
+    "tableBalance": "Balans",
+    "tableAmount": "Belopp",
+    "tableDescription": "Beskrivning",
+    "limit": "Månadsgräns",
+    "title": "GPU-kredithistorik",
+    "tableTime": "Tid",
+    "cycleStartedAt": "Cykeln startade",
+    "empty": "Inga transaktioner."
+  },
+  "notifications": {
+    "title": "Aviseringar",
+    "empty": "Inga nya aviseringar.",
+    "unread": "{{count}} ny",
+    "viewAll": "Visa all aktivitet"
+  },
+  "activity": {
+    "loadMore": "Ladda mer",
+    "title": "Aktivitet",
+    "empty": "Ingen aktivitet ännu."
+  },
+  "audit": {
+    "action": {
+      "logout": "Utloggning",
+      "signup_local": "Lokal registreringsbegäran",
+      "password_change": "Lösenordsändring",
+      "ssh_key_add": "SSH-nyckel har lagts till",
+      "solid_unlink": "Solid Cloud har tagits bort",
+      "login_local": "Lokal inloggning",
+      "login_solid": "Solid Cloud-inloggning",
+      "ssh_key_delete": "SSH-nyckel raderad",
+      "solid_link": "Solid Cloud länkad",
+      "signup_solid": "Solid Cloud registreringsbegäran",
+      "credit_grant": "Kredit beviljad",
+      "quota_override": "Åsidosättande av kvot",
+      "group_quota_change": "Gruppkvoten ändrad",
+      "status_change": "Statusändring"
+    },
+    "msg": {
+      "status_change": "{{actor}} ändrade din status från {{from}} till {{to}}",
+      "credit_grant": "{{actor}} gav dig {{delta}} GPU-krediter (ny gräns {{newLimit}})",
+      "quota_override": "{{actor}} justerade din kvot"
+    },
+    "actor": "Skådespelare",
+    "target": "Mål"
+  },
+  "admin": {
+    "menu": {
+      "users": "Användare",
+      "audit": "Revisionsloggar",
+      "groupQuotas": "Gruppkvoter"
+    },
+    "quota": {
+      "cpu": "CPU-kärnor",
+      "monthlyLimit": "Månadsgräns",
+      "ram": "RAM (GiB)",
+      "storage": "Lagring (GiB)",
+      "grant": "Bevilja",
+      "save": "Spara",
+      "effective": "Effektiv",
+      "override": "Åsidosätta",
+      "grantHint": "Bonus läggs endast till denna cykel (rensas vid nästa månatliga återställning)",
+      "limitIncreaseHint": "En höjning av gränsen lägger också till skillnaden till det aktuella saldot",
+      "gpuCredit": "GPU-kredit",
+      "groupTitle": "{{role}} standardkvot",
+      "useGroupDefault": "Använd gruppstandard",
+      "currentUsage": "Nuvarande användning",
+      "groupDefault": "Grupp standard",
+      "instances": "Samtidiga instanser",
+      "editTitle": "Redigera kvot — {{name}}",
+      "saved": "Sparad",
+      "currentBalance": "Nuvarande saldo"
+    },
+    "users": {
+      "filter": {
+        "all": "Alla",
+        "pending": "I avvaktan på",
+        "approved": "Godkänd",
+        "suspended": "Upphängd",
+        "rejected": "Avvisad"
+      },
+      "table": {
+        "name": "Namn",
+        "role": "Roll",
+        "department": "Avdelning",
+        "provider": "Inloggning",
+        "status": "Status",
+        "action": "Handling",
+        "username": "Användarnamn",
+        "createdAt": "Begärde"
+      },
+      "action": {
+        "reject": "Avvisa",
+        "suspend": "Uppskjuta",
+        "approve": "Godkänna",
+        "reactivate": "Återaktivera",
+        "editQuota": "Redigera kvot"
+      },
+      "status": {
+        "pending": "I avvaktan på",
+        "approved": "Godkänd",
+        "suspended": "Upphängd",
+        "rejected": "Avvisad"
+      },
+      "confirm": {
+        "reactivateTitle": "Återaktivera användare",
+        "approveTitle": "Godkänn användare",
+        "rejectTitle": "Avvisa registrering",
+        "approveBody": "Godkänna den här användaren? De kommer att kunna logga in direkt.",
+        "suspendTitle": "Stäng av användare",
+        "rejectBody": "Avvisa denna användares begäran om registrering. De kommer inte att kunna logga in.",
+        "suspendBody": "Stäng av denna användare. Alla aktiva sessioner kommer att avslutas.",
+        "reactivateBody": "Återaktivera denna användare?"
+      },
+      "title": "Användare",
+      "empty": "Inga användare."
+    },
+    "console": "Administratörskonsol"
+  },
+  "me": {
+    "section": {
+      "password": "Lösenord",
+      "activity": "Aktivitet",
+      "profile": "Profil",
+      "solid": "Solid molnuppkoppling",
+      "sshKeys": "SSH-nycklar"
+    },
+    "profile": {
+      "username": "Användarnamn (Student-ID)",
+      "email": "E-post",
+      "role": "Roll",
+      "department": "Avdelning",
+      "lab": "Labb",
+      "advisor": "Rådgivare",
+      "createdAt": "Anslöt sig",
+      "providerLocal": "Lokal",
+      "nameKo": "Namn (koreanska)",
+      "providerBoth": "Lokalt + Solid Cloud",
+      "provider": "Inloggningsmetod",
+      "nameEn": "Namn (engelska)",
+      "providerSolid": "Fast moln",
+      "notSet": "(ej inställd)"
+    },
+    "solid": {
+      "account": "Konto",
+      "linked": "Länkad till Solid Cloud",
+      "linkSuccess": "Solid Cloud länkad",
+      "unlinkButton": "Ta bort länken",
+      "unlinkNeedsPassword": "Ange ett lokalt lösenord innan du tar bort länken.",
+      "notLinked": "Ej kopplat till Solid Cloud",
+      "linkSubtitle": "Autentisera med dina Solid Cloud-uppgifter för att länka det här kontot så att du kan använda båda inloggningsuppgifterna.",
+      "username": "Solid Cloud Användarnamn",
+      "password": "Lösenord",
+      "domain": "Domän",
+      "userId": "Användar-ID",
+      "linking": "Länkar...",
+      "unlinking": "Tar bort länken...",
+      "domainId": "Domän-ID",
+      "linkButton": "Länka Solid Cloud",
+      "unlinkConfirm": "Ta bort länken till Solid Cloud? Du kommer bara att kunna logga in med ditt lokala lösenord efteråt.",
+      "errorAuth": "Solid Cloud-autentisering misslyckades.",
+      "errorConflict": "Detta Solid Cloud-konto är redan länkat till en annan användare."
+    },
+    "password": {
+      "new": "Nytt lösenord",
+      "current": "Aktuellt lösenord",
+      "saving": "Sparande...",
+      "title": "Ändra lösenord",
+      "errorShort": "Lösenordet måste vara minst 8 tecken.",
+      "noPasswordHint": "Inget lokalt lösenord är inställt. Om du anger ett nytt lösenord aktiveras lokal inloggning.",
+      "hint": "Minst 8 tecken",
+      "confirm": "Bekräfta nytt lösenord",
+      "submit": "Spara lösenord",
+      "success": "Lösenordet uppdaterat.",
+      "errorMismatch": "Nya lösenord matchar inte."
+    },
+    "ssh": {
+      "name": "Namn",
+      "subtitle": "Nycklar som registrerats här kan väljas när du skapar en ny instans.",
+      "namePlaceholder": "t.ex. personlig-bärbar dator",
+      "title": "Offentliga SSH-nycklar",
+      "empty": "Inga SSH-nycklar registrerade.",
+      "delete": "Radera",
+      "fingerprint": "Fingeravtryck",
+      "publicKey": "Offentlig nyckel",
+      "deleteConfirm": "Ta bort denna SSH-nyckel?",
+      "createdAt": "Tillagd",
+      "errorRequired": "Namn och offentlig nyckel krävs.",
+      "add": "Lägg till nyckel",
+      "adding": "Lägger till...",
+      "publicKeyPlaceholder": "ssh-rsa AAAA... eller ssh-ed25519 AAAA...",
+      "errorFormat": "Ogiltigt format för offentlig SSH-nyckel."
+    },
+    "title": "Mitt konto",
+    "menu": "Mitt konto",
+    "back": "Tillbaka till Dashboard"
+  },
+  "region": {
+    "loading": "Belastning...",
+    "queue": "Kö",
+    "tip": "💡 Tips: RTX 4090 passar lätta arbetsbelastningar; välj RTX Pro 6000 för träning i stora modeller.",
+    "title": "Regionens tillgänglighet"
+  },
+  "create": {
+    "step1": {
+      "title": "1. Välj Mall / ISO",
+      "loading": "Laddar mallar..."
+    },
+    "step2": {
+      "title": "2. Välj Beräkna erbjudande",
+      "performance": "Prestanda",
+      "cpu": "CPU",
+      "ram": "RAM",
+      "price": "Pris",
+      "loading": "Laddar erbjudanden...",
+      "vram": "VRAM"
+    },
+    "step3": {
+      "instanceName": "Instansnamn",
+      "instanceNamePh": "t.ex. my-gpu-project-01",
+      "sshKey": "Public SSH-nyckel",
+      "title": "3. Miljöinställningar",
+      "generating": "Alstrande...",
+      "sshKeyHint": "Ange din befintliga publika nyckel eller generera en ny.",
+      "instanceNameHint": "Unik identifierare för din arbetsyta.",
+      "manualOrGenerate": "Ange manuellt / Generera nytt",
+      "keyLoaded": "Nyckel laddad",
+      "useSaved": "Använd en sparad SSH-nyckel",
+      "generateKey": "Generera nyckelpar",
+      "downloadNote": "Om du genererar ett nytt nyckelpar kommer den privata nyckeln (.pem) att laddas ner automatiskt. Vänligen förvara det säkert; det kommer inte att visas igen."
+    },
+    "footer": {
+      "back": "Tillbaka",
+      "next": "Nästa",
+      "launching": "Sjösättning...",
+      "launch": "Starta instans"
+    },
+    "errors": {
+      "createFailed": "Det gick inte att starta instans."
+    },
+    "title": "Skapa ny instans",
+    "stepOf": "Steg {{current}} av {{total}}"
+  },
+  "setup": {
+    "steps": {
+      "billing": "Fakturering",
+      "mode": "Läge",
+      "idle": "På tomgång",
+      "review": "Recension"
+    },
+    "unit": {
+      "hour": "h",
+      "min": "min",
+      "month": "mo",
+      "credit": "C",
+      "times": "gånger",
+      "creditPerStep": "C/steg",
+      "sessions": "sessioner"
+    },
+    "mode": {
+      "container": "Behållarläge",
+      "hybrid": "Behållare + SSH hybrid",
+      "containerDesc": "Hantera GPU:er via K8s-behållare. Bäst för att servera ett GPU-kluster till många användare i stor skala.",
+      "hybridNote": "Att välja hybrid möjliggör leasing av fysisk nod, SSH-konton och hemkvoter per nod. (Implementerat i en senare fas)",
+      "hybridDesc": "Lägger till direkt SSH-åtkomst till fysiska noder ovanpå behållare. Bäst för små labb eller när fysisk nodleasing behövs."
+    },
+    "billing": {
+      "pricingHint": "Välj hur erbjudandepriserna sätts.",
+      "pricingStatic": "Statisk — fast admin-set pris",
+      "pricing": "Prispolicy",
+      "modeCredit": "Kreditera",
+      "modeFree": "Gratis",
+      "surge": "Prishöjning per tillgänglighetsfall",
+      "pricingDynamic": "Dynamiskt – priset stiger när tillgängligheten sjunker",
+      "modeFreeDesc": "Använd fritt utan begränsningar. Inga krediter, leasingavtal eller tak för samtidiga sessioner.",
+      "cooldown": "Nedkylning före återuthyrning",
+      "modeDynamic": "Först till kvarn",
+      "maxConcurrent": "Max samtidiga sessioner",
+      "maxLease": "Max hyra per session",
+      "surgeHint": "Krediter/timme ökar med detta belopp varje gång resurserna blir knappa.",
+      "modeCreditDesc": "Betala genom att dra av krediter. Kontrolleras endast av krediter, utan andra gränser.",
+      "modeDynamicDesc": "Använd först till kvarn utan krediter. Maximal leasing, nedkylning och gränser för samtidiga sessioner skyddar tillgängligheten."
+    },
+    "idle": {
+      "timeout": "Inaktiv automatisk återhämtningstid",
+      "timeoutHint": "Sessioner återvinns automatiskt när GPU:n förblir inaktiv så länge.",
+      "containerNote": "Behållarläge: återvinns via Stop, bevarar data.",
+      "sshNote": "SSH-läge: data stannar på lokal disk och kan återanvändas som de är."
+    },
+    "lease": {
+      "maxExtHint": "Max antal förlängningar per session. 0 inaktiverar förlängning.",
+      "extHoursHint": "Max timmar en användare kan välja per förlängning. (endast först till kvarn-läge)",
+      "extHours": "Max timmar per förlängning",
+      "maxExt": "Max förlängningar"
+    },
+    "review": {
+      "modeLabel": "Driftläge",
+      "billingLabel": "Faktureringsläge",
+      "idleLabel": "Inaktiv automatisk återhämtning",
+      "hint": "Du börjar med inställningarna nedan. Ändra dem när som helst i Admin → Systeminställningar."
+    },
+    "features": {
+      "signup": "Förfrågningar om användarregistrering",
+      "signupHint": "När den är avstängd döljs registreringslänken på inloggningssidan och konton skapas av administratörer.",
+      "creditHint": "När avstängd kan användare/grupper inte begära påfyllningar; administratörer beviljar krediter direkt.",
+      "alerts": "Varningar om tillgänglighet för arbetsbelastning",
+      "datasetFeatureHint": "När den är avstängd är datauppsättningsmenyer, cachning och val av datauppsättning under session alla dolda (mindre beroende av central lagring).",
+      "alertsHint": "När den är avstängd kan användare inte prenumerera på GPU/nodtillgänglighetsvarningar.",
+      "datasetHint": "När avstängd kan användare inte registrera/begära datamängder; endast administratörer registrerar dem.",
+      "dataset": "Dataset registrering",
+      "groupJoinHint": "När avstängd kan användare inte själv begära medlemskap; administratörer hanterar det.",
+      "datasetFeature": "Dataset funktion",
+      "groupJoin": "Begäran om att gå med i grupp/organisation",
+      "credit": "Begäran om kreditpåfyllning"
+    },
+    "back": "Tillbaka",
+    "next": "Nästa",
+    "wizardTitle": "Giosk Initial Setup",
+    "finish": "Slutför installationen",
+    "wizardSubtitle": "Konfigurera driftläge och standardpolicyer. Allt kan ändras senare i Admin → Systeminställningar."
+  },
+  "topbar": {
+    "nodeBadge": "Noder {{up}}/{{total}} · GPU {{gpu}}%"
+  }
+}

@@ -1,0 +1,21 @@
+{{- /* fake-gpu-operator(또는 GPU Operator)의 dcgm-exporter 를 Prometheus 가 스크레이프.
+        VRAM/GPU 사용률/온도(DCGM_FI_DEV_*)의 데이터 소스. monitoring.install(=Prometheus operator 존재) 일 때만. */ -}}
+{{- if .Values.monitoring.install }}
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: {{ include "giosk.fullname" . }}-dcgm
+  labels:
+    release: kps   # 번들 kube-prometheus-stack(릴리스명 kps) 의 selector 통과용
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ .Values.monitoring.dcgm.namespace | default "gpu-operator" }}
+  selector:
+    matchLabels:
+      app: nvidia-dcgm-exporter
+  podMetricsEndpoints:
+    - port: http            # dcgm-exporter 컨테이너 포트명(9400)
+      path: /metrics
+      interval: 15s
+{{- end }}

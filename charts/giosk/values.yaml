@@ -1,0 +1,300 @@
+# Giosk Helm values — 설치 시점/DB 스키마 영향 설정의 단일 출처.
+# 이 값들이 ConfigMap/Secret → 환경변수(GIOSK_*) → backend/internal/config 로 주입된다.
+# (런타임 토글이 아닌, 설치 시 고정되는 모드/스토리지/물리노드 설정)
+
+image:
+  api:
+    repository: giosk-api          # 노드 import 방식 → 로컬 이미지명
+    tag: latest
+  nodeAgent:
+    repository: giosk-node-agent
+    tag: latest
+  frontend:
+    repository: giosk-frontend
+    tag: latest
+  gateway:
+    repository: giosk-gateway
+    tag: latest
+  # 노드에 ctr import 한 로컬 이미지를 쓰므로 IfNotPresent(있으면 로컬 사용, 당겨오지 않음)
+  pullPolicy: IfNotPresent
+
+# ── 컨트롤플레인 상주 컴포넌트 스케줄 ───────────────────────────────
+# 웹터미널·게이트웨이 등 "제어/접속 평면" 컴포넌트는 GPU 워커노드가 아니라 컨트롤노드에 두는 게 낫다
+# (워커는 GPU 작업 전용으로 비우고, 접속/제어는 안정적인 컨트롤노드에 집중). enabled=true 면 api·gateway 를
+# 컨트롤플레인 노드에 고정(nodeSelector) + 컨트롤플레인 taint 를 tolerate 한다.
+controlPlane:
+  enabled: false
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: ""
+  tolerations:
+    - key: node-role.kubernetes.io/control-plane
+      operator: Exists
+      effect: NoSchedule
+    - key: node-role.kubernetes.io/master
+      operator: Exists
+      effect: NoSchedule
+
+# ── 실행 환경 축 (container | hybrid) ───────────────────────────────
+deployment:
+  mode: container        # hybrid 로 두면 SSH 물리노드 임대 기능 활성
+
+# ── 과금 축 (credit | dynamic | free) ──────────────────────────────
+# free = 자유 모드: 크레딧·임대·동시세션 제한이 모두 없음. 세션 생성 자유(중복 허용),
+#        hybrid 와 함께 쓰면 물리노드는 첫 SSH 사용 시 계정 생성 후 영속(삭제 안 함)·동시접속 허용.
+billing:
+  mode: credit
+  credit:
+    pricing: static      # static | dynamic(혼잡 surge)
+    surgeIncrement: 10
+    maxConcurrentSessions: 3
+  dynamic:               # 선착순
+    maxLeaseHours: 8
+    cooldownHours: 2
+    maxConcurrentSessions: 1
+    lease:
+      extensionHours: 4
+      maxExtensions: 2
+
+# ── 스토리지 전략 ──────────────────────────────────────────────────
+storage:
+  # 영속 home(~/nfs) 스토리지클래스. 사용자의 모든 세션이 공유하는 노드 무관 저장소이므로
+  # 반드시 RWX(ReadWriteMany)·노드 독립 클래스여야 한다(NFS·CephFS·Longhorn-RWX 등).
+  # ⚠️ local-path/hostPath 같은 노드 로컬 클래스는 PV 가 노드에 고정돼, 다른 GPU 타입(다른 노드)
+  #    세션이 "volume node affinity conflict"로 스케줄 불가하거나 동시 세션이 multi-attach 로 막힌다.
+  #    (deployment.mode=container/hybrid 와 무관 — home 은 항상 RWX 로 생성된다.)
+  persistence:
+    # sharedHome=true: 사용자별 영속 home(~/nfs) PVC 를 만들어 모든 세션이 공유(노드 무관). storageClass 는 RWX 필수.
+    # sharedHome=false: 영속 home 미사용 → 세션은 emptyDir 로컬 임시만(데이터 비영속, RWX 불필요). 영속이 필요하면 사용자가 볼륨을 따로 생성.
+    sharedHome: true
+    # RWX StorageClass 이름. nfsProvisioner.install=true 면 그 provisioner 가 만드는
+    # nfsProvisioner.storageClassName(기본 nfs)와 일치시킨다. 기존 RWX SC 를 쓰면 그 이름으로.
+    storageClass: nfs
+  # 데이터셋 기능: 켜면 NFS server+path 가 반드시 필요(미지정 시 설치 실패).
+  # 데이터셋은 정규경로 <path>/dataset/<이름> 에 저장되어 세션/물리노드가 직접 마운트한다.
+  # → 쓰기 가능한 NFS export 를 지정해야 한다(예: server=10.0.0.5, path=/export).
+  datasets:
+    enabled: false
+    nfs:
+      server: ""   # 데이터셋 NFS 서버 (datasets.enabled 시 필수)
+      path: ""     # 데이터셋 NFS 베이스 export 경로 (datasets.enabled 시 필수)
+    # 노드 로컬 캐시 루트(hostPath). 캐시 배치 시 NFS 데이터셋을 각 물리노드 로컬 디스크로 복사,
+    # 세션은 캐시된 노드에서 이 경로를 직접 마운트(NFS보다 빠름). 노드에 충분한 로컬 디스크 필요.
+    cacheHostPath: /dataset-cache
+  # Scratch: 노드 로컬 고속 임시 디스크. enabled=true 면 모든 세션 pod 에 /scratch(hostPath, 계정폴더)
+  # 자동 마운트(컨테이너·물리 공통). 노드에 hostPath 가 root 로 생성되므로 initContainer 가 세션 UID 로 chown.
+  scratch:
+    enabled: false
+    hostPath: /scratch
+
+# ── 노드 디스크 정리 DaemonSet ──────────────────────────────────────
+# Scratch·로컬 Home 은 노드 로컬 디스크라 사용자별 쿼터가 없다. 방치하면 노드 디스크가 100% 가 되고
+# kubelet DiskPressure 로 파드가 축출돼 노드가 통째로 빠진다. 이 DaemonSet 이 사용률이 임계를 넘으면
+# 접근(atime)이 오래된 파일부터 지워 임계 아래로 되돌린다.
+#   scratch : 임시 공간이라 계약대로 바로 정리(기본 85%).
+#   home    : 사용자 작업물이라 더 늦게(기본 92%), 그리고 minAgeDays 보다 오래된 파일만 지운다.
+#             지워지기 전에 관리자가 알도록 알림센터의 disk_usage 규칙(기본 85%)이 먼저 울린다.
+# scratch.enabled 또는 physicalNodes.enabled 일 때만 배포된다.
+nodeCleaner:
+  enabled: true
+  intervalSec: 300
+  scratchThreshold: 85
+  homeThreshold: 92
+  homeMinAgeDays: 3     # 이보다 최근에 쓴 파일은 지우지 않는다(작업 중인 파일 보호)
+
+# ── 인클러스터 이미지 레지스트리 (이미지 빌드 파이프라인) ───────────────
+# enabled=true 면 차트가 클러스터 내 registry(registry:2, Deployment+Service+PVC)를 배포하고
+# GIOSK_REGISTRY 를 <release>-giosk-registry:<port> 로 자동 설정한다.
+# 이미지 빌드(Kaniko 푸시)·세션 풀이 이 레지스트리를 사용한다.
+# 외부 레지스트리를 쓰려면 enabled=false + external 에 host:port 지정(비우면 빌드 비활성).
+registry:
+  install: false         # true=인클러스터 레지스트리 번들 설치. false=외부 레지스트리(아래 external) 사용.
+  external: ""           # install=false 일 때 사용할 외부 레지스트리(host:port)
+  image: registry:2
+  port: 5000
+  # 세션 풀은 노드 containerd 가 수행 → 클러스터 Service DNS 해석 불가.
+  # type=LoadBalancer + loadBalancerIP(MetalLB) 로 노드도달 주소를 주면 GIOSK_REGISTRY 가 그 주소를 쓰고
+  # 빌드(Kaniko)·풀 모두 동일 주소 사용(노드엔 hosts.toml insecure 필요). 기본 ClusterIP=빌드 전용.
+  service:
+    type: ClusterIP
+    loadBalancerIP: ""
+  storageClass: ""       # 비우면 클러스터 기본 StorageClass
+  storageSize: 50Gi
+  # cosign 서명: 활성 시 빌드 파이프라인이 키 Secret(없으면 in-cluster 자동 생성)으로 이미지를 서명.
+  cosign:
+    enabled: false
+    keySecret: giosk-cosign-key
+
+# ── 알림 이메일 (SMTP) ─────────────────────────────────────────────
+# 관리자 알림 규칙(gpu_util/gpu_temp/node_down)이 위반되면 이메일/웹훅으로 발송한다.
+# host 를 비우면 이메일 발송은 생략되고 웹훅만 동작한다(웹훅 URL 은 관리자 알림 설정에서 등록).
+smtp:
+  host: ""              # 예: smtp.gmail.com / 사내 메일 릴레이
+  port: 587             # 587(STARTTLS) 권장, 25(평문)도 가능
+  username: ""          # SMTP 인증 계정(비우면 무인증 릴레이)
+  password: ""          # Secret(smtp-password)로 주입
+  from: ""              # 발신 주소(비우면 username 사용)
+
+# ── 메트릭 (Prometheus + DCGM) ─────────────────────────────────────
+# 대시보드 KPI/추이의 데이터 소스. GPU 메트릭은 DCGM exporter 기반.
+monitoring:
+  install: true           # true=kube-prometheus-stack 를 별도 릴리스로 번들 설치(대시보드/알림/디스크메트릭).
+                          # false=외부 Prometheus 사용(아래 prometheusURL 지정).
+  prometheusURL: ""       # install=false 일 때 외부 Prometheus URL
+  dcgm:
+    install: true         # true=dcgm-exporter 번들(GPU 유틸/VRAM/온도). GPU Operator 가 DCGM 을 제공하면 false.
+    namespace: gpu-operator  # DCGM 파드 네임스페이스(PodMonitor 스크레이프 대상)
+  # 분할(shared) 세션의 "세션별" GPU 지표 소스. DCGM 은 물리 카드 단위라 한 카드를 나눠 쓰면
+  # 세션별로 값이 갈리지 않는다 → HAMi vGPUmonitor(컨테이너별 실사용)를 함께 스크레이프한다.
+  hami:
+    scrape: false         # HAMi 메트릭 스크레이프(분할 세션 관측). hami.install 과 함께 켠다.
+    namespace: ""         # 비우면 릴리스 네임스페이스
+
+# ── GPU 분할 스케줄러 (HAMi) ───────────────────────────────────────
+# fractional GPU(분할) 사용 시 필요. nvidia.com/gpumem·gpucores 자원 광고/스케줄.
+# 분할/vGPU 세션을 안 쓰면 불필요(전용·CPU 세션은 device-plugin 만으로 동작).
+hami:
+  install: false          # true=HAMi 스케줄러를 별도 릴리스로 번들 설치
+
+# ── 베어메탈 LoadBalancer (MetalLB) ────────────────────────────────
+# 프론트/게이트웨이/레지스트리가 type=LoadBalancer 라, 온프렘이면 IP 를 할당할 LB 공급자가 필요하다.
+# 클라우드(EKS/GKE 등)면 클라우드 LB 가 처리하므로 install=false.
+metallb:
+  install: true           # true=MetalLB 번들 설치 + 아래 ipRange 로 IPAddressPool/L2Advertisement 구성.
+  ipRange: ""             # install=true 필수. 예: 10.0.0.200-10.0.0.220 (사내망 유휴 대역)
+
+# ── 동적 RWX PV 생성기 (NFS provisioner) ───────────────────────────
+# NFS 는 container/hybrid 어떤 모드에서도 필수(영속 home ~/nfs 가 RWX). NFS "서버"는 외부 하드웨어/VM 이라
+# 항상 준비돼 있어야 하고, 그 서버에 동적으로 PV 를 만드는 provisioner 만 차트가 번들할 수 있다.
+# install=false 면 이미 있는 RWX StorageClass(storage.persistence.storageClass)를 그대로 쓴다.
+nfsProvisioner:
+  install: true           # true=nfs-subdir-external-provisioner 번들 설치 + storageClassName 생성.
+  server: ""              # NFS 서버 주소 (install=true 필수)
+  path: ""                # NFS export 루트 경로 (install=true 필수)
+  storageClassName: nfs   # 생성할 RWX StorageClass 이름(storage.persistence.storageClass 와 일치시킬 것)
+
+# ── 물리 노드 (hybrid 전용) ────────────────────────────────────────
+# 활성 시 외부 NFS 필수(대여 시 물리 마운트 대상) + node-agent DaemonSet 배포
+physicalNodes:
+  enabled: false
+  # 물리 계정 UID = uidBase + 사용자ID (전역 안정, 재사용 안 함). 시스템/LDAP UID 충돌을 피하려 높게 둔다.
+  # 같은 사용자는 모든 노드에서 동일 UID → NFS 권한 일관 + 재임대 시 스크래치/홈 소유권 회복.
+  uidBase: 100000
+  # 물리 SSH 로컬 home 루트(<root>/<user>). node-agent 의 useradd 홈이자 "로컬 Home" 특수 볼륨의 원천.
+  # 노드 로컬 디스크라 쿼터가 없다 → nodeCleaner 가 노드 디스크를 보호한다.
+  homeHostPath: /home/giosk
+  nfs:                   # 외부 NFS (server+path 필수)
+    server: ""
+    path: ""
+  nodeAgent:
+    enabled: true
+    nodeSelector:
+      giosk.io/physical: "true"
+
+# ── 런타임 기능 토글 초기값 (이후 system_config 에서 관리) ──────────
+features:
+  signupRequest: true
+  datasetRegister: true
+  workloadAlerts: true
+  groupJoinRequest: true
+  creditRequest: true
+
+# ── 세션 웹(VSCode/code-server) 노출 ────────────────────────────────
+# loadbalancer = 세션마다 LoadBalancer Service(MetalLB 가 IP 할당) → http://<IP>:8080
+# nodeport     = 워커 NodeIP:NodePort
+# portforward  = 외부 노출 없음, kubectl port-forward 안내(기본/로컬)
+# 인증은 Giosk 가 세션마다 생성하는 랜덤 비밀번호(code-server)로 강제 — 인그레스/DNS 불필요.
+session:
+  expose: portforward
+
+# ── 접속 게이트웨이 (Vast.ai 식 도메인·SSH 단일 접점) ────────────────────
+# enabled=true 면 giosk-gateway(리버스 프록시 + SSH 프록시)를 배포하고, 세션 접속을
+#   웹: https://<세션>-<채널>.<domain>/  (와일드카드 DNS *.<domain> → 게이트웨이 LB IP)
+#   SSH: ssh -p <sshPort> <1회토큰>@<host|domain>
+# 로 단일화한다. 사용자는 단기 토큰만 받고, 게이트웨이가 실제 비밀(code-server 비번/jupyter 토큰/
+# SSH 키)을 대신 주입한다. secret/sshPrivateKey/sshPublicKey 는 deploy.sh 가 생성·주입(고정)한다.
+gateway:
+  enabled: false
+  domain: gw.giosk.local     # 서브도메인 = <iid>-<ch>.<domain>. 와일드카드 DNS 필요.
+  scheme: https              # 웹 URL 스킴(테스트베드 HTTP 는 "http")
+  host: ""                   # SSH 접속 호스트(빈값=domain). 예: 게이트웨이 LB IP.
+  sshPort: 2222              # 게이트웨이 SSH 프록시 외부 포트
+  # 외부(사내망/VPN 밖) 접속용 SSH 점프 호스트(user@host). 지정하면 콘솔이 `ssh -J <이 값> …` 명령도
+  # 함께 보여준다. 게이트웨이는 MetalLB LB IP(사내망)로만 열리므로 밖에서는 이 경유가 필요.
+  sshProxyJump: ""
+  cookieTTL: 28800           # 웹 세션 쿠키 수명(초)
+  secret: ""                 # API↔게이트웨이 공유 토큰키(빈값=deploy.sh 생성 / 랜덤)
+  sshPrivateKey: ""          # 게이트웨이 SSH 관리 개인키(PEM). 백엔드로 재접속용.
+  sshPublicKey: ""           # 위 개인키의 공개키(OpenSSH). sshd 사이드카·물리계정이 신뢰.
+  # 컨테이너 SSH 사이드카 이미지(빈값=컨테이너 SSH 비활성, 물리 SSH 만). SESSION_UID/GATEWAY_PUBKEY env 계약.
+  sshdImage: ""
+  replicas: 1
+  service:
+    type: LoadBalancer       # MetalLB 가 IP 할당(80/443/sshPort)
+    loadBalancerIP: ""       # 와일드카드 DNS 가 가리킬 고정 IP(MetalLB 풀 내)
+  # TLS: 비우면 HTTP 만(테스트베드). 운영은 와일드카드 인증서 Secret 을 지정.
+  tls:
+    secretName: ""           # kubernetes.io/tls Secret(*.<domain>). 지정 시 HTTPS.
+
+idle:
+  timeoutMin: 30
+
+quota:
+  maxGpuCount: 64
+  maxVramGb: 512
+  maxConcurrentSessions: 50
+  volumeQuotaGb: 2000
+
+branding:
+  name: Giosk
+  accent: ""
+
+# ── 최초 플랫폼 관리자 (부트스트랩, 멱등 생성) ────────────────────────
+# password 는 설치 시 반드시 지정. Secret 으로 주입된다.
+admin:
+  username: admin
+  password: ""           # 예: --set admin.password=... (빈 값이면 부트스트랩 생략)
+
+# node-agent ↔ API 공유 토큰(물리노드 hybrid). 미지정 시 자동 생성.
+agentToken: ""
+
+# ── 데이터베이스 (MySQL 8) ─────────────────────────────────────────
+database:
+  bundled: true          # true=차트가 클러스터 내 MySQL 함께 배포, false=외부 DB(host 지정)
+  host: ""               # bundled=false 일 때만 사용. bundled=true 면 자동(<release>-giosk-mysql)
+  port: 3306
+  name: giosk
+  user: giosk
+  password: ""           # 번들 MySQL/접속 비밀번호. 빈 값이면 랜덤 생성(권장: 명시 지정)
+  image: mysql:8.0
+  storageClass: ""       # 비우면 클러스터 기본 StorageClass. 테스트베드=local-path
+  storageSize: 8Gi
+
+api:
+  replicas: 1
+  corsOrigins: ""        # 단일 오리진(nginx 프록시)이면 불필요. 직접 노출 시 "http://IP" 또는 "*"
+  service:
+    type: ClusterIP      # 프론트 nginx 가 프록시 → 외부 노출 불필요
+    port: 8080
+
+# ── K8s 연동 ───────────────────────────────────────────────────────
+k8s:
+  # 노드 GPU 종류 라벨. GFD/fake-gpu-operator 표준. (구 kind 개발=giosk.io/gpu-type)
+  gpuTypeLabel: nvidia.com/gpu.product
+  # 노드 CUDA(드라이버) 버전 라벨. GFD 가 부여. 없으면 콘솔에 "—" 표기.
+  cudaLabel: nvidia.com/cuda.driver-version
+
+# ── 프론트엔드 (nginx: 정적 + /api 프록시) ──────────────────────────
+frontend:
+  replicas: 1
+  domain: ""             # 콘솔 도메인(예: console.example.한국). server_name·HTTPS 리다이렉트에 사용. 비우면 아무 호스트(_)
+  # TLS: secretName 지정 시 프론트 nginx 가 443 에서 HTTPS 종단하고 80→443 리다이렉트한다.
+  # 와일드카드 인증서(*.example.한국)면 콘솔·게이트웨이 서브도메인까지 한 인증서로 커버된다.
+  # 사전에 kubernetes.io/tls Secret 을 같은 네임스페이스에 만들어 둘 것(아래 설치 안내 참고).
+  tls:
+    secretName: ""       # 예: giosk-wildcard-tls. 비우면 HTTP(80)만.
+  service:
+    type: LoadBalancer   # MetalLB 가 IP 할당. nodeport/clusterip 도 가능
+    port: 80
+    httpsPort: 443       # tls.secretName 지정 시 노출되는 HTTPS 포트
+    loadBalancerIP: ""   # 고정 IP 원하면 지정(MetalLB 풀 범위 내). 비우면 자동
+    nodePort: ""         # service.type=NodePort 일 때만

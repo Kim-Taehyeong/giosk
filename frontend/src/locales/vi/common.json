@@ -1,0 +1,518 @@
+{
+  "common": {
+    "next": "Kế tiếp",
+    "confirm": "Xác nhận",
+    "loading": "Đang tải...",
+    "close": "Đóng",
+    "login": "Đăng nhập",
+    "delete": "Xóa bỏ",
+    "save": "Cứu",
+    "cancel": "Hủy bỏ",
+    "logout": "Đăng xuất",
+    "back": "Mặt sau",
+    "refresh": "Làm cho khỏe lại",
+    "korean": "한국어",
+    "language": "Ngôn ngữ",
+    "english": "Tiếng Anh",
+    "required": "yêu cầu",
+    "optional": "không bắt buộc"
+  },
+  "auth": {
+    "brand": {
+      "enName": "ĐẠI HỌC DANKOOK",
+      "kuName": "Đại học Dankook"
+    },
+    "login": {
+      "submit": "Đăng nhập",
+      "domain": "Lãnh địa",
+      "password": "Mật khẩu",
+      "submitting": "Đang đăng nhập...",
+      "errorGeneric": "Đăng nhập không thành công.",
+      "errorSuspended": "Tài khoản này đã bị đình chỉ.",
+      "tabLocal": "Đăng nhập dịch vụ",
+      "errorInvalid": "Tên người dùng hoặc mật khẩu không hợp lệ.",
+      "usernameLocal": "Mã sinh viên/Tên người dùng",
+      "usernameSolid": "Tên người dùng đám mây rắn",
+      "errorNetwork": "Đã xảy ra lỗi mạng.",
+      "errorPending": "Đang chờ phê duyệt của quản trị viên.",
+      "tabSolid": "Đăng nhập vào đám mây rắn",
+      "signupLink": "Đăng ký dịch vụ",
+      "errorRejected": "Yêu cầu đăng ký này đã bị từ chối."
+    },
+    "signupPending": {
+      "backToLogin": "Quay lại để đăng nhập",
+      "title": "Đã gửi yêu cầu đăng ký",
+      "body": "Bạn sẽ có thể đăng nhập sau khi được quản trị viên phê duyệt. Điều này có thể mất một thời gian.",
+      "submittedAt": "Đã gửi vào"
+    },
+    "localSignup": {
+      "section": {
+        "name": "Tên",
+        "credentials": "Tài khoản",
+        "affiliation": "liên kết"
+      },
+      "field": {
+        "username": "Mã sinh viên/Tên người dùng",
+        "email": "E-mail",
+        "password": "Mật khẩu (ít nhất 8 ký tự)",
+        "passwordConfirm": "Xác nhận mật khẩu"
+      },
+      "title": "Đăng ký dịch vụ",
+      "submitting": "Đang gửi...",
+      "errorRequired": "Vui lòng điền vào tất cả các trường bắt buộc.",
+      "errorAdvisor": "Sinh viên đại học và sau đại học phải cung cấp một cố vấn.",
+      "errorGeneric": "Đăng ký không thành công.",
+      "submit": "Yêu cầu đăng ký",
+      "errorGroup": "Bạn phải chọn một tổ chức và một nhóm.",
+      "errorPasswordShort": "Mật khẩu phải có ít nhất 8 ký tự.",
+      "errorTerms": "Bạn phải chấp nhận các điều khoản để đăng ký.",
+      "subtitle": "Điền vào mẫu dưới đây. Bạn sẽ có thể đăng nhập sau khi quản trị viên phê duyệt yêu cầu của bạn.",
+      "errorPasswordMismatch": "Mật khẩu không khớp."
+    },
+    "signup": {
+      "section": {
+        "account": "Tài khoản",
+        "name": "Tên",
+        "password": "Mật khẩu dịch vụ (tùy chọn)",
+        "affiliation": "Liên kết & Vai trò"
+      },
+      "field": {
+        "email": "E-mail",
+        "name": "Tên",
+        "role": "Vai trò",
+        "department": "Phòng",
+        "firstNameEn": "Tên (tiếng Anh)",
+        "username": "Tên người dùng (Mã sinh viên)",
+        "lastNameEn": "Họ (tiếng Anh)",
+        "advisor": "cố vấn",
+        "org": "Tổ chức",
+        "selectPh": "Lựa chọn",
+        "group": "Nhóm",
+        "sponsor": "Nhà tài trợ (tùy chọn)",
+        "lab": "Phòng thí nghiệm (tùy chọn)",
+        "firstNameKo": "Tên (tiếng Hàn)",
+        "namePlaceholder": "ví dụ. Hong Gildong",
+        "lastNameKo": "Họ (tiếng Hàn)",
+        "noJoinableGroup": "Tổ chức này không có nhóm có thể tham gia. Hãy liên hệ với quản trị viên tổ chức.",
+        "passwordPlaceholder": "Để trống để chỉ sử dụng đăng nhập Solid Cloud",
+        "sponsorPlaceholder": "Tên nhà tài trợ (cố vấn, trưởng nhóm, v.v.)",
+        "passwordHint": "Đặt mật khẩu để đăng nhập trực tiếp bằng ID sinh viên/Tên người dùng của bạn mà không cần Solid Cloud.",
+        "advisorPlaceholder": "Tên cố vấn"
+      },
+      "role": {
+        "undergrad": "Đại học",
+        "graduate": "Tốt nghiệp",
+        "professor": "Giáo sư",
+        "staff": "Nhân viên"
+      },
+      "title": "Đăng ký Giosk Console",
+      "subtitle": "Xác thực Solid Cloud đã được xác minh. Vui lòng chấp nhận các điều khoản và cung cấp thông tin bổ sung.",
+      "errorTerms": "Bạn phải chấp nhận các điều khoản để đăng ký.",
+      "errorAdvisor": "Sinh viên đại học và sau đại học phải cung cấp một cố vấn.",
+      "errorGeneric": "Đăng ký không thành công.",
+      "submit": "Hoàn tất đăng ký",
+      "termsView": "Xem điều khoản",
+      "submitting": "Đang đăng ký...",
+      "terms": "Tôi đồng ý với Điều khoản dịch vụ và Chính sách quyền riêng tư. (yêu cầu)"
+    }
+  },
+  "dashboard": {
+    "labels": {
+      "instances": "trường hợp",
+      "systemMemory": "Bộ nhớ hệ thống",
+      "cpuCores": "lõi CPU",
+      "storageProjects": "Lưu trữ (Dự án)"
+    },
+    "units": {
+      "ea": "ea",
+      "cores": "lõi",
+      "gib": "GiB",
+      "gb": "GB"
+    },
+    "gpuCredit": {
+      "perMonth": "/ {{limit}} C (Tháng)",
+      "renewal": "Gia hạn hàng tháng: {{date}}",
+      "title": "Hạn mức tín dụng GPU"
+    },
+    "instances": {
+      "table": {
+        "status": "Trạng thái",
+        "connection": "Sự liên quan",
+        "offering": "cung cấp",
+        "action": "Hoạt động",
+        "template": "Bản mẫu",
+        "ip": "địa chỉ IP",
+        "name": "Tên phiên bản"
+      },
+      "actions": {
+        "delete": "Xóa bỏ",
+        "stop": "Dừng phiên bản",
+        "resume": "Bản tóm tắt"
+      },
+      "title": "Phiên bản điện toán của tôi",
+      "create": "Phiên bản mới",
+      "empty": "Không tìm thấy phiên bản hoạt động nào.",
+      "createFirst": "Tạo phiên bản đầu tiên của bạn",
+      "loading": "Đang tải phiên bản..."
+    },
+    "status": {
+      "stopped": "Đã dừng",
+      "running": "Đang chạy",
+      "terminating": "Chấm dứt",
+      "pending": "Chưa giải quyết"
+    },
+    "confirmStop": {
+      "title": "Dừng phiên bản",
+      "confirm": "Xác nhận dừng",
+      "body": "Việc dừng giải phóng tài nguyên GPU. Bạn sẽ không bị tính phí cho đến khi bạn bắt đầu lại."
+    },
+    "confirmStart": {
+      "confirm": "Bắt đầu",
+      "body": "Bắt đầu phiên bản sẽ tiếp tục thanh toán.",
+      "title": "Bắt đầu phiên bản"
+    },
+    "confirmDelete": {
+      "confirm": "Xóa bỏ",
+      "body": "Điều này là không thể đảo ngược. Phiên bản và dữ liệu của nó sẽ bị xóa vĩnh viễn.",
+      "title": "Xóa phiên bản"
+    },
+    "logout": "Đăng xuất",
+    "console": "Bảng điều khiển đám mây",
+    "resourceQuota": "Hạn ngạch tài nguyên"
+  },
+  "credit": {
+    "type": {
+      "usage": "Cách sử dụng",
+      "manual_adjust": "Điều chỉnh thủ công",
+      "limit_increase": "Tăng giới hạn",
+      "admin_grant": "Cấp quản trị viên",
+      "auto_stop": "Tự động dừng (không có cân bằng)",
+      "monthly_reset": "Đặt lại hàng tháng"
+    },
+    "balance": "Sự cân bằng",
+    "limit": "Giới hạn hàng tháng",
+    "tableBalance": "Sự cân bằng",
+    "loadMore": "Tải thêm",
+    "tableType": "Kiểu",
+    "tableAmount": "Số lượng",
+    "tableTime": "Thời gian",
+    "tableDescription": "Sự miêu tả",
+    "empty": "Không có giao dịch.",
+    "title": "Lịch sử tín dụng GPU",
+    "cycleStartedAt": "Chu kỳ bắt đầu"
+  },
+  "notifications": {
+    "title": "Thông báo",
+    "empty": "Không có thông báo mới.",
+    "viewAll": "Xem tất cả hoạt động",
+    "unread": "{{count}} mới"
+  },
+  "activity": {
+    "loadMore": "Tải thêm",
+    "title": "Hoạt động",
+    "empty": "Chưa có hoạt động nào."
+  },
+  "audit": {
+    "action": {
+      "logout": "Đăng xuất",
+      "status_change": "Thay đổi trạng thái",
+      "signup_solid": "Yêu cầu đăng ký Solid Cloud",
+      "ssh_key_delete": "Khóa SSH đã bị xóa",
+      "ssh_key_add": "Đã thêm khóa SSH",
+      "solid_link": "Đám mây vững chắc được liên kết",
+      "login_solid": "Đăng nhập vào đám mây rắn",
+      "password_change": "Thay đổi mật khẩu",
+      "login_local": "Đăng nhập cục bộ",
+      "solid_unlink": "Đám mây rắn chưa được liên kết",
+      "signup_local": "Yêu cầu đăng ký địa phương",
+      "group_quota_change": "Hạn ngạch nhóm đã thay đổi",
+      "credit_grant": "Tín dụng được cấp",
+      "quota_override": "Ghi đè hạn ngạch"
+    },
+    "msg": {
+      "status_change": "{{actor}} đã thay đổi trạng thái của bạn từ {{from}} thành {{to}}",
+      "quota_override": "{{actor}} đã điều chỉnh hạn ngạch của bạn",
+      "credit_grant": "{{actor}} đã cấp cho bạn tín dụng GPU {{delta}} (giới hạn {{newLimit}} mới)"
+    },
+    "actor": "Diễn viên",
+    "target": "Mục tiêu"
+  },
+  "admin": {
+    "menu": {
+      "users": "Người dùng",
+      "audit": "Nhật ký kiểm tra",
+      "groupQuotas": "Hạn ngạch nhóm"
+    },
+    "quota": {
+      "cpu": "lõi CPU",
+      "monthlyLimit": "Giới hạn hàng tháng",
+      "currentBalance": "Số dư hiện tại",
+      "storage": "Lưu trữ (GiB)",
+      "save": "Cứu",
+      "ram": "RAM (GiB)",
+      "grant": "Khoản trợ cấp",
+      "saved": "Đã lưu",
+      "grantHint": "Tiền thưởng chỉ được thêm vào chu kỳ này (xóa vào lần đặt lại hàng tháng tiếp theo)",
+      "currentUsage": "Cách sử dụng hiện tại",
+      "override": "ghi đè",
+      "effective": "Hiệu quả",
+      "instances": "Phiên bản đồng thời",
+      "useGroupDefault": "Sử dụng mặc định nhóm",
+      "gpuCredit": "Tín dụng GPU",
+      "groupTitle": "Hạn ngạch mặc định {{role}}",
+      "editTitle": "Chỉnh sửa hạn ngạch — {{name}}",
+      "groupDefault": "Nhóm mặc định",
+      "limitIncreaseHint": "Việc tăng hạn mức cũng làm tăng thêm chênh lệch cho số dư hiện tại"
+    },
+    "users": {
+      "filter": {
+        "pending": "Chưa giải quyết",
+        "all": "Tất cả",
+        "approved": "Tán thành",
+        "suspended": "Cấm",
+        "rejected": "Vật bị loại bỏ"
+      },
+      "table": {
+        "name": "Tên",
+        "role": "Vai trò",
+        "department": "Phòng",
+        "provider": "Đăng nhập",
+        "status": "Trạng thái",
+        "action": "Hoạt động",
+        "username": "Tên người dùng",
+        "createdAt": "Đã yêu cầu"
+      },
+      "action": {
+        "reject": "Từ chối",
+        "approve": "Chấp thuận",
+        "suspend": "Đình chỉ",
+        "editQuota": "Chỉnh sửa hạn ngạch",
+        "reactivate": "Kích hoạt lại"
+      },
+      "status": {
+        "pending": "Chưa giải quyết",
+        "approved": "Tán thành",
+        "suspended": "Cấm",
+        "rejected": "Vật bị loại bỏ"
+      },
+      "confirm": {
+        "suspendTitle": "Đình chỉ người dùng",
+        "rejectTitle": "Từ chối đăng ký",
+        "rejectBody": "Từ chối yêu cầu đăng ký của người dùng này. Họ sẽ không thể đăng nhập.",
+        "approveTitle": "Phê duyệt người dùng",
+        "reactivateTitle": "Kích hoạt lại người dùng",
+        "approveBody": "Phê duyệt người dùng này? Họ sẽ có thể đăng nhập ngay lập tức.",
+        "suspendBody": "Đình chỉ người dùng này. Mọi phiên hoạt động sẽ bị chấm dứt.",
+        "reactivateBody": "Kích hoạt lại người dùng này?"
+      },
+      "title": "Người dùng",
+      "empty": "Không có người dùng."
+    },
+    "console": "Bảng điều khiển dành cho quản trị viên"
+  },
+  "me": {
+    "section": {
+      "password": "Mật khẩu",
+      "activity": "Hoạt động",
+      "profile": "Hồ sơ",
+      "sshKeys": "Khóa SSH",
+      "solid": "Kết nối đám mây vững chắc"
+    },
+    "profile": {
+      "username": "Tên người dùng (Mã sinh viên)",
+      "email": "E-mail",
+      "role": "Vai trò",
+      "department": "Phòng",
+      "advisor": "cố vấn",
+      "nameEn": "Tên (tiếng Anh)",
+      "createdAt": "Đã tham gia",
+      "lab": "Phòng thí nghiệm",
+      "providerLocal": "Địa phương",
+      "notSet": "(chưa đặt)",
+      "nameKo": "Tên (tiếng Hàn)",
+      "provider": "Phương thức đăng nhập",
+      "providerSolid": "Đám mây rắn",
+      "providerBoth": "Đám mây cục bộ + rắn"
+    },
+    "solid": {
+      "userId": "ID người dùng",
+      "account": "Tài khoản",
+      "domainId": "Mã miền",
+      "linkSuccess": "Đám mây vững chắc được liên kết",
+      "unlinkButton": "Hủy liên kết",
+      "linked": "Được liên kết với Đám mây rắn",
+      "username": "Tên người dùng đám mây rắn",
+      "password": "Mật khẩu",
+      "domain": "Lãnh địa",
+      "notLinked": "Không được liên kết với Solid Cloud",
+      "errorAuth": "Xác thực Solid Cloud không thành công.",
+      "unlinkNeedsPassword": "Đặt mật khẩu cục bộ trước khi hủy liên kết.",
+      "linkSubtitle": "Xác thực bằng thông tin đăng nhập Solid Cloud của bạn để liên kết tài khoản này để bạn có thể sử dụng thông tin đăng nhập.",
+      "errorConflict": "Tài khoản Solid Cloud này đã được liên kết với người dùng khác.",
+      "unlinkConfirm": "Hủy liên kết đám mây rắn? Sau đó, bạn sẽ chỉ có thể đăng nhập bằng mật khẩu cục bộ của mình.",
+      "linkButton": "Liên kết đám mây rắn",
+      "linking": "Đang liên kết...",
+      "unlinking": "Đang hủy liên kết..."
+    },
+    "password": {
+      "title": "Thay đổi mật khẩu",
+      "current": "Mật khẩu hiện tại",
+      "new": "Mật khẩu mới",
+      "confirm": "Xác nhận mật khẩu mới",
+      "saving": "Đang lưu...",
+      "hint": "Ít nhất 8 ký tự",
+      "errorShort": "Mật khẩu phải có ít nhất 8 ký tự.",
+      "errorMismatch": "Mật khẩu mới không khớp.",
+      "submit": "Lưu mật khẩu",
+      "noPasswordHint": "Không có mật khẩu cục bộ được thiết lập. Nhập mật khẩu mới sẽ cho phép đăng nhập cục bộ.",
+      "success": "Đã cập nhật mật khẩu."
+    },
+    "ssh": {
+      "title": "Khóa công khai SSH",
+      "name": "Tên",
+      "publicKey": "Khóa công khai",
+      "empty": "Không có khóa SSH nào được đăng ký.",
+      "delete": "Xóa bỏ",
+      "fingerprint": "Dấu vân tay",
+      "adding": "Đang thêm...",
+      "createdAt": "Đã thêm",
+      "errorFormat": "Định dạng khóa công khai SSH không hợp lệ.",
+      "errorRequired": "Tên và khóa công khai là bắt buộc.",
+      "subtitle": "Các khóa được đăng ký ở đây có thể được chọn khi tạo một phiên bản mới.",
+      "publicKeyPlaceholder": "ssh-rsa AAAA... hoặc ssh-ed25519 AAAA...",
+      "add": "Thêm khóa",
+      "deleteConfirm": "Xóa khóa SSH này?",
+      "namePlaceholder": "ví dụ: máy tính xách tay cá nhân"
+    },
+    "title": "Tài khoản của tôi",
+    "menu": "Tài khoản của tôi",
+    "back": "Quay lại Trang tổng quan"
+  },
+  "region": {
+    "title": "Khu vực sẵn có",
+    "loading": "Đang tải...",
+    "queue": "Hàng đợi",
+    "tip": "💡 Mẹo: RTX 4090 phù hợp với khối lượng công việc nhẹ; chọn RTX Pro 6000 để đào tạo mô hình lớn."
+  },
+  "create": {
+    "step1": {
+      "loading": "Đang tải mẫu...",
+      "title": "1. Chọn Mẫu/ISO"
+    },
+    "step2": {
+      "title": "2. Chọn Ưu đãi tính toán",
+      "performance": "Hiệu suất",
+      "vram": "VRAM",
+      "ram": "ĐẬP",
+      "cpu": "CPU",
+      "price": "Giá",
+      "loading": "Đang tải dịch vụ..."
+    },
+    "step3": {
+      "instanceName": "Tên phiên bản",
+      "generating": "Đang tạo...",
+      "instanceNamePh": "ví dụ: my-gpu-project-01",
+      "sshKey": "Khóa công khai SSH",
+      "title": "3. Cài đặt môi trường",
+      "keyLoaded": "Đã tải khóa",
+      "sshKeyHint": "Nhập khóa công khai hiện có của bạn hoặc tạo khóa công khai mới.",
+      "useSaved": "Sử dụng khóa SSH đã lưu",
+      "generateKey": "Tạo cặp khóa",
+      "instanceNameHint": "Mã định danh duy nhất cho không gian làm việc của bạn.",
+      "manualOrGenerate": "Nhập thủ công/Tạo mới",
+      "downloadNote": "Nếu bạn tạo một cặp khóa mới, khóa riêng (.pem) sẽ tự động được tải xuống. Hãy giữ nó an toàn; nó sẽ không được hiển thị lại."
+    },
+    "footer": {
+      "back": "Mặt sau",
+      "next": "Kế tiếp",
+      "launching": "Đang khởi chạy...",
+      "launch": "Khởi chạy phiên bản"
+    },
+    "errors": {
+      "createFailed": "Không khởi chạy được phiên bản."
+    },
+    "title": "Tạo phiên bản mới",
+    "stepOf": "Bước {{current}} của {{total}}"
+  },
+  "setup": {
+    "steps": {
+      "mode": "Cách thức",
+      "billing": "Thanh toán",
+      "idle": "Nhàn rỗi",
+      "review": "Ôn tập"
+    },
+    "unit": {
+      "hour": "h",
+      "min": "phút",
+      "month": "mo",
+      "credit": "C",
+      "sessions": "phiên",
+      "times": "lần",
+      "creditPerStep": "C/bước"
+    },
+    "mode": {
+      "hybridNote": "Việc chọn kết hợp cho phép cho thuê nút vật lý, tài khoản SSH và hạn mức trang chủ trên mỗi nút. (Thực hiện ở giai đoạn sau)",
+      "container": "Chế độ vùng chứa",
+      "hybridDesc": "Thêm quyền truy cập SSH trực tiếp vào các nút vật lý trên đầu các vùng chứa. Tốt nhất cho các phòng thí nghiệm nhỏ hoặc khi cần thuê nút vật lý.",
+      "hybrid": "Vùng chứa + SSH lai",
+      "containerDesc": "Quản lý GPU thông qua vùng chứa K8. Tốt nhất để phục vụ cụm GPU cho nhiều người dùng trên quy mô lớn."
+    },
+    "billing": {
+      "pricing": "Chính sách giá",
+      "pricingHint": "Chọn cách đặt giá chào bán.",
+      "pricingDynamic": "Năng động - giá tăng khi tình trạng sẵn có giảm",
+      "modeCredit": "Tín dụng",
+      "pricingStatic": "Tĩnh - giá cố định do quản trị viên đặt",
+      "modeFree": "Miễn phí",
+      "surgeHint": "Tín dụng/giờ tăng theo số tiền này mỗi khi nguồn lực khan hiếm.",
+      "surge": "Tăng giá khi lượng hàng sẵn có giảm",
+      "modeFreeDesc": "Sử dụng tự do không có giới hạn. Không có tín dụng, hợp đồng thuê hoặc giới hạn phiên đồng thời.",
+      "modeCreditDesc": "Thanh toán bằng cách khấu trừ tín dụng. Chỉ được kiểm soát bằng tín dụng, không có giới hạn nào khác.",
+      "maxLease": "Thuê tối đa mỗi phiên",
+      "modeDynamicDesc": "Sử dụng đến trước mà không cần tín dụng. Giới hạn thuê tối đa, thời gian hồi chiêu và phiên đồng thời bảo vệ tính khả dụng.",
+      "maxConcurrent": "Phiên đồng thời tối đa",
+      "cooldown": "Thời gian hồi chiêu trước khi cho thuê lại",
+      "modeDynamic": "đến trước"
+    },
+    "idle": {
+      "timeout": "Thời gian tự động lấy lại khi không hoạt động",
+      "timeoutHint": "Các phiên được tự động lấy lại khi GPU không hoạt động trong thời gian dài.",
+      "containerNote": "Chế độ vùng chứa: được lấy lại thông qua Dừng, bảo toàn dữ liệu.",
+      "sshNote": "Chế độ SSH: dữ liệu vẫn còn trên đĩa cục bộ và có thể được sử dụng lại nguyên trạng."
+    },
+    "lease": {
+      "extHours": "Số giờ tối đa cho mỗi lần gia hạn",
+      "maxExt": "Tiện ích mở rộng tối đa",
+      "extHoursHint": "Số giờ tối đa mà người dùng có thể chọn cho mỗi tiện ích mở rộng. (chỉ chế độ đến trước)",
+      "maxExtHint": "Số lượng tiện ích mở rộng tối đa mỗi phiên. 0 vô hiệu hóa việc mở rộng."
+    },
+    "review": {
+      "modeLabel": "Chế độ hoạt động",
+      "billingLabel": "Chế độ thanh toán",
+      "hint": "Bạn sẽ bắt đầu với các cài đặt bên dưới. Thay đổi chúng bất cứ lúc nào trong Quản trị → Cài đặt hệ thống.",
+      "idleLabel": "Tự động lấy lại khi không hoạt động"
+    },
+    "features": {
+      "alerts": "Cảnh báo về tính khả dụng của khối lượng công việc",
+      "signupHint": "Khi tắt, liên kết đăng ký trên trang đăng nhập sẽ bị ẩn và tài khoản sẽ được quản trị viên tạo.",
+      "signup": "Yêu cầu đăng ký người dùng",
+      "dataset": "Đăng ký tập dữ liệu",
+      "alertsHint": "Khi tắt, người dùng không thể đăng ký nhận thông báo về tính khả dụng của GPU/nút.",
+      "datasetFeatureHint": "Khi tắt, các menu tập dữ liệu, bộ đệm và lựa chọn tập dữ liệu trong phiên đều bị ẩn (ít phụ thuộc hơn vào bộ nhớ trung tâm).",
+      "datasetHint": "Khi tắt, người dùng không thể đăng ký/yêu cầu bộ dữ liệu; chỉ quản trị viên mới đăng ký chúng.",
+      "credit": "Yêu cầu nạp tiền tín dụng",
+      "datasetFeature": "Tính năng bộ dữ liệu",
+      "groupJoin": "Yêu cầu tham gia nhóm/tổ chức",
+      "creditHint": "Khi tắt, người dùng/nhóm không thể yêu cầu nạp tiền; quản trị viên cấp tín dụng trực tiếp.",
+      "groupJoinHint": "Khi tắt, người dùng không thể tự yêu cầu tư cách thành viên; quản trị viên quản lý nó."
+    },
+    "back": "Mặt sau",
+    "next": "Kế tiếp",
+    "finish": "Hoàn tất thiết lập",
+    "wizardSubtitle": "Cấu hình chế độ vận hành và các chính sách mặc định. Mọi thứ có thể được thay đổi sau trong Quản trị → Cài đặt hệ thống.",
+    "wizardTitle": "Thiết lập ban đầu Giosk"
+  },
+  "topbar": {
+    "nodeBadge": "Nút {{up}}/{{total}} · GPU {{gpu}}%"
+  }
+}

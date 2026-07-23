@@ -1,0 +1,86 @@
+{{- /*
+접속 게이트웨이 — 세션 웹(서브도메인 리버스 프록시)·SSH(복붙 토큰) 단일 접점.
+stateless 데이터 플레인: DB·k8s API 불요. API 와 공유하는 토큰키(gateway-secret)로 접속 토큰을 검증하고,
+인클러스터 Service DNS(<iid>.<ns>.svc:port)로 세션 파드에 프록시한다.
+*/ -}}
+{{- if .Values.gateway.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "giosk.fullname" . }}-gateway
+  labels: { app: giosk-gateway }
+spec:
+  replicas: {{ .Values.gateway.replicas | default 1 }}
+  selector:
+    matchLabels: { app: giosk-gateway }
+  template:
+    metadata:
+      labels: { app: giosk-gateway }
+      annotations:
+        checksum/config: {{ printf "%s:%s:%v" .Values.gateway.domain .Values.gateway.scheme .Values.gateway.sshPort | sha256sum }}
+    spec:
+      {{- include "giosk.controlPlaneScheduling" . | nindent 6 }}
+      containers:
+        - name: gateway
+          image: "{{ .Values.image.gateway.repository | default "giosk-gateway" }}:{{ .Values.image.gateway.tag | default "latest" }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - { name: http, containerPort: 80 }
+            {{- if .Values.gateway.tls.secretName }}
+            - { name: https, containerPort: 443 }
+            {{- end }}
+            - { name: ssh, containerPort: {{ .Values.gateway.sshPort | default 2222 }} }
+          env:
+            - name: GIOSK_GATEWAY_DOMAIN
+              value: {{ .Values.gateway.domain | quote }}
+            - name: GIOSK_GATEWAY_SSH_PORT
+              value: {{ .Values.gateway.sshPort | default 2222 | quote }}
+            - name: GIOSK_GATEWAY_COOKIE_TTL
+              value: {{ .Values.gateway.cookieTTL | default 28800 | quote }}
+            - name: GIOSK_GATEWAY_SECRET
+              valueFrom:
+                secretKeyRef: { name: {{ include "giosk.fullname" . }}-secrets, key: gateway-secret }
+            - name: GIOSK_GATEWAY_SSH_KEY
+              valueFrom:
+                secretKeyRef: { name: {{ include "giosk.fullname" . }}-secrets, key: gateway-ssh-key }
+            {{- if .Values.gateway.tls.secretName }}
+            - name: GIOSK_GATEWAY_TLS_CERT
+              value: /tls/tls.crt
+            - name: GIOSK_GATEWAY_TLS_KEY
+              value: /tls/tls.key
+            {{- end }}
+          {{- if .Values.gateway.tls.secretName }}
+          volumeMounts:
+            - { name: tls, mountPath: /tls, readOnly: true }
+          {{- end }}
+          readinessProbe:
+            tcpSocket: { port: http }
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          resources:
+            requests: { cpu: 50m, memory: 64Mi }
+            limits: { cpu: 500m, memory: 256Mi }
+      {{- if .Values.gateway.tls.secretName }}
+      volumes:
+        - name: tls
+          secret: { secretName: {{ .Values.gateway.tls.secretName | quote }} }
+      {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "giosk.fullname" . }}-gateway
+  labels: { app: giosk-gateway }
+spec:
+  type: {{ .Values.gateway.service.type | default "LoadBalancer" }}
+  {{- if and (eq (.Values.gateway.service.type | default "LoadBalancer") "LoadBalancer") .Values.gateway.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.gateway.service.loadBalancerIP | quote }}
+  {{- end }}
+  selector: { app: giosk-gateway }
+  ports:
+    - { name: http, port: 80, targetPort: http }
+    {{- if .Values.gateway.tls.secretName }}
+    - { name: https, port: 443, targetPort: https }
+    {{- end }}
+    - { name: ssh, port: {{ .Values.gateway.sshPort | default 2222 }}, targetPort: ssh }
+{{- end }}

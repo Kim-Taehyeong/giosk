@@ -1,0 +1,11 @@
+apiVersion: v2
+name: giosk
+description: Giosk — 기관용 GPU 클라우드 콘솔 (API + node-agent)
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+
+# 인프라 의존성(Prometheus/DCGM/HAMi/MetalLB/NFS provisioner)은 이 차트의 subchart 가 아니라
+# 배포 스크립트(deploy.sh)가 각각 별도 helm 릴리스로 설치한다(앱과 수명주기 분리 = 베스트 프랙티스).
+# 번들 여부는 values 의 install 토글로 제어: monitoring.install / monitoring.dcgm.install /
+# hami.install / metallb.install / nfsProvisioner.install / registry.install.

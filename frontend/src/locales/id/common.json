@@ -1,0 +1,518 @@
+{
+  "common": {
+    "confirm": "Mengonfirmasi",
+    "cancel": "Membatalkan",
+    "login": "Login",
+    "delete": "Menghapus",
+    "back": "Kembali",
+    "next": "Berikutnya",
+    "loading": "Memuat...",
+    "logout": "Keluar",
+    "save": "Menyimpan",
+    "close": "Menutup",
+    "refresh": "Menyegarkan",
+    "language": "Bahasa",
+    "korean": "한국어",
+    "optional": "opsional",
+    "required": "diperlukan",
+    "english": "Bahasa inggris"
+  },
+  "auth": {
+    "brand": {
+      "kuName": "Universitas Dankook",
+      "enName": "UNIVERSITAS DANKOOK"
+    },
+    "login": {
+      "submit": "Login",
+      "password": "Kata sandi",
+      "domain": "Domain",
+      "submitting": "Masuk...",
+      "errorGeneric": "Gagal masuk.",
+      "errorNetwork": "Terjadi kesalahan jaringan.",
+      "errorPending": "Menunggu persetujuan administrator.",
+      "tabLocal": "Masuk Layanan",
+      "usernameLocal": "ID Pelajar / Nama Pengguna",
+      "tabSolid": "Login Cloud Padat",
+      "usernameSolid": "Nama Pengguna Cloud Padat",
+      "signupLink": "Mendaftar untuk layanan",
+      "errorSuspended": "Akun ini telah ditangguhkan.",
+      "errorRejected": "Permintaan pendaftaran ini ditolak.",
+      "errorInvalid": "Nama pengguna atau kata sandi tidak valid."
+    },
+    "signupPending": {
+      "title": "Permintaan pendaftaran dikirimkan",
+      "submittedAt": "Dikirim pada",
+      "backToLogin": "Kembali untuk masuk",
+      "body": "Anda akan dapat masuk setelah persetujuan administrator. Ini mungkin memerlukan waktu."
+    },
+    "localSignup": {
+      "section": {
+        "credentials": "Akun",
+        "name": "Nama",
+        "affiliation": "Afiliasi"
+      },
+      "field": {
+        "username": "ID Pelajar / Nama Pengguna",
+        "email": "E-mail",
+        "password": "Kata sandi (minimal 8 karakter)",
+        "passwordConfirm": "Konfirmasikan kata sandi"
+      },
+      "title": "Mendaftar untuk layanan",
+      "errorTerms": "Anda harus menerima persyaratan untuk mendaftar.",
+      "errorRequired": "Silakan isi semua bidang yang wajib diisi.",
+      "errorAdvisor": "Mahasiswa sarjana dan pascasarjana harus menyediakan penasihat.",
+      "errorPasswordShort": "Kata sandi minimal harus 8 karakter.",
+      "submit": "Minta pendaftaran",
+      "submitting": "Mengirimkan...",
+      "subtitle": "Isi formulir di bawah ini. Anda akan dapat masuk setelah administrator menyetujui permintaan Anda.",
+      "errorGeneric": "Pendaftaran gagal.",
+      "errorGroup": "Anda harus memilih organisasi dan grup.",
+      "errorPasswordMismatch": "Kata sandi tidak cocok."
+    },
+    "signup": {
+      "section": {
+        "account": "Akun",
+        "name": "Nama",
+        "affiliation": "Afiliasi & Peran",
+        "password": "Kata Sandi Layanan (opsional)"
+      },
+      "field": {
+        "email": "E-mail",
+        "name": "Nama",
+        "role": "Peran",
+        "department": "Departemen",
+        "lastNameEn": "Nama Belakang (Bahasa Inggris)",
+        "username": "Nama Pengguna (ID Siswa)",
+        "firstNameKo": "Nama Depan (Korea)",
+        "lastNameKo": "Nama Belakang (Korea)",
+        "namePlaceholder": "misalnya Hong Gildong",
+        "lab": "Lab (opsional)",
+        "firstNameEn": "Nama Depan (Bahasa Inggris)",
+        "group": "Kelompok",
+        "selectPh": "Memilih",
+        "org": "Organisasi",
+        "advisor": "Penasihat",
+        "sponsorPlaceholder": "Nama sponsor (penasihat, pemimpin tim, dll.)",
+        "sponsor": "Sponsor (opsional)",
+        "advisorPlaceholder": "Nama Penasihat",
+        "passwordHint": "Tetapkan kata sandi untuk login langsung dengan ID Pelajar/Nama Pengguna Anda tanpa Solid Cloud.",
+        "passwordPlaceholder": "Biarkan kosong untuk menggunakan login Solid Cloud saja",
+        "noJoinableGroup": "Organisasi ini tidak memiliki grup yang dapat bergabung. Hubungi admin organisasi."
+      },
+      "role": {
+        "graduate": "Lulus",
+        "undergrad": "Sarjana",
+        "professor": "Profesor",
+        "staff": "Staf"
+      },
+      "title": "Daftar ke Konsol Giosk",
+      "submitting": "Mendaftar...",
+      "errorTerms": "Anda harus menerima persyaratan untuk mendaftar.",
+      "errorAdvisor": "Mahasiswa sarjana dan pascasarjana harus menyediakan penasihat.",
+      "errorGeneric": "Pendaftaran gagal.",
+      "termsView": "Lihat persyaratan",
+      "submit": "Selesaikan pendaftaran",
+      "subtitle": "Otentikasi Solid Cloud diverifikasi. Harap setujui persyaratannya dan berikan info tambahan.",
+      "terms": "Saya menyetujui Ketentuan Layanan dan Kebijakan Privasi. (diperlukan)"
+    }
+  },
+  "dashboard": {
+    "labels": {
+      "instances": "Contoh",
+      "cpuCores": "Inti CPU",
+      "storageProjects": "Penyimpanan (Proyek)",
+      "systemMemory": "Memori Sistem"
+    },
+    "units": {
+      "ea": "ya",
+      "gb": "GB",
+      "cores": "Inti",
+      "gib": "GiB"
+    },
+    "gpuCredit": {
+      "title": "Kuota Pulsa GPU",
+      "renewal": "Perpanjangan bulanan: {{date}}",
+      "perMonth": "/ {{limit}} C (Bulan)"
+    },
+    "instances": {
+      "table": {
+        "offering": "Menawarkan",
+        "status": "Status",
+        "template": "Templat",
+        "ip": "alamat IP",
+        "action": "Tindakan",
+        "connection": "Koneksi",
+        "name": "Nama Instance"
+      },
+      "actions": {
+        "delete": "Menghapus",
+        "resume": "Melanjutkan",
+        "stop": "Hentikan Contoh"
+      },
+      "loading": "Memuat instance...",
+      "title": "Instans Komputasi Saya",
+      "create": "Contoh Baru",
+      "createFirst": "Buat instance pertama Anda",
+      "empty": "Tidak ada instance aktif yang ditemukan."
+    },
+    "status": {
+      "running": "Berlari",
+      "stopped": "Berhenti",
+      "pending": "Tertunda",
+      "terminating": "Mengakhiri"
+    },
+    "confirmStop": {
+      "title": "Hentikan contoh",
+      "confirm": "Konfirmasi Berhenti",
+      "body": "Menghentikan melepaskan sumber daya GPU. Anda tidak akan ditagih sampai Anda memulainya lagi."
+    },
+    "confirmStart": {
+      "confirm": "Awal",
+      "title": "Mulai contoh",
+      "body": "Memulai instance akan melanjutkan penagihan."
+    },
+    "confirmDelete": {
+      "confirm": "Menghapus",
+      "title": "Hapus contoh",
+      "body": "Hal ini tidak dapat diubah. Instance dan datanya akan dihapus secara permanen."
+    },
+    "logout": "Keluar",
+    "console": "Konsol Cloud",
+    "resourceQuota": "Kuota Sumber Daya"
+  },
+  "credit": {
+    "type": {
+      "usage": "Penggunaan",
+      "manual_adjust": "Penyesuaian manual",
+      "monthly_reset": "Reset bulanan",
+      "auto_stop": "Berhenti otomatis (tidak ada saldo)",
+      "limit_increase": "Batasi peningkatan",
+      "admin_grant": "Hibah Admin"
+    },
+    "balance": "Keseimbangan",
+    "title": "Riwayat Kredit GPU",
+    "tableBalance": "Keseimbangan",
+    "loadMore": "Muat lebih banyak",
+    "tableType": "Jenis",
+    "tableDescription": "Keterangan",
+    "tableAmount": "Jumlah",
+    "tableTime": "Waktu",
+    "limit": "Batas bulanan",
+    "cycleStartedAt": "Siklus dimulai",
+    "empty": "Tidak ada transaksi."
+  },
+  "notifications": {
+    "title": "Pemberitahuan",
+    "unread": "{{count}} baru",
+    "viewAll": "Lihat semua aktivitas",
+    "empty": "Tidak ada notifikasi baru."
+  },
+  "activity": {
+    "loadMore": "Muat lebih banyak",
+    "title": "Aktivitas",
+    "empty": "Belum ada aktivitas."
+  },
+  "audit": {
+    "action": {
+      "logout": "Keluar",
+      "password_change": "Perubahan kata sandi",
+      "login_local": "Masuk lokal",
+      "login_solid": "Login Cloud yang solid",
+      "signup_local": "Permintaan pendaftaran lokal",
+      "ssh_key_add": "Kunci SSH ditambahkan",
+      "signup_solid": "Permintaan pendaftaran Cloud yang solid",
+      "status_change": "Perubahan status",
+      "credit_grant": "Kredit diberikan",
+      "ssh_key_delete": "Kunci SSH dihapus",
+      "solid_link": "Cloud padat tertaut",
+      "quota_override": "Penggantian kuota",
+      "solid_unlink": "Solid Cloud tidak tertaut",
+      "group_quota_change": "Kuota grup berubah"
+    },
+    "msg": {
+      "quota_override": "{{actor}} menyesuaikan kuota Anda",
+      "status_change": "{{actor}} mengubah status Anda dari {{from}} menjadi {{to}}",
+      "credit_grant": "{{actor}} memberi Anda kredit GPU {{delta}} (batas baru {{newLimit}})"
+    },
+    "actor": "Aktor",
+    "target": "Target"
+  },
+  "admin": {
+    "menu": {
+      "users": "Pengguna",
+      "audit": "Log Audit",
+      "groupQuotas": "Kuota Grup"
+    },
+    "quota": {
+      "cpu": "Inti CPU",
+      "monthlyLimit": "Batas bulanan",
+      "currentBalance": "Saldo saat ini",
+      "grant": "Menganugerahkan",
+      "save": "Menyimpan",
+      "saved": "Disimpan",
+      "limitIncreaseHint": "Peningkatan batas juga menambah selisih saldo saat ini",
+      "instances": "Instans Bersamaan",
+      "gpuCredit": "Kredit GPU",
+      "ram": "RAM (GiB)",
+      "storage": "Penyimpanan (GiB)",
+      "grantHint": "Bonus ditambahkan ke siklus ini saja (dihapus pada reset bulanan berikutnya)",
+      "effective": "Efektif",
+      "override": "Mengesampingkan",
+      "editTitle": "Edit Kuota — {{name}}",
+      "useGroupDefault": "Gunakan default grup",
+      "currentUsage": "Penggunaan saat ini",
+      "groupDefault": "Default grup",
+      "groupTitle": "Kuota default {{role}}"
+    },
+    "users": {
+      "filter": {
+        "pending": "Tertunda",
+        "all": "Semua",
+        "approved": "Disetujui",
+        "suspended": "Tergantung",
+        "rejected": "Ditolak"
+      },
+      "table": {
+        "name": "Nama",
+        "role": "Peran",
+        "department": "Departemen",
+        "provider": "Login",
+        "status": "Status",
+        "action": "Tindakan",
+        "username": "Nama belakang",
+        "createdAt": "Diminta"
+      },
+      "action": {
+        "reject": "Menolak",
+        "approve": "Menyetujui",
+        "suspend": "Menskors",
+        "reactivate": "Mengaktifkan kembali",
+        "editQuota": "Edit Kuota"
+      },
+      "status": {
+        "pending": "Tertunda",
+        "approved": "Disetujui",
+        "suspended": "Tergantung",
+        "rejected": "Ditolak"
+      },
+      "confirm": {
+        "approveTitle": "Setujui pengguna",
+        "approveBody": "Setujui pengguna ini? Mereka akan dapat segera masuk.",
+        "rejectBody": "Tolak permintaan pendaftaran pengguna ini. Mereka tidak akan bisa masuk.",
+        "suspendTitle": "Tangguhkan pengguna",
+        "reactivateBody": "Aktifkan kembali pengguna ini?",
+        "rejectTitle": "Tolak pendaftaran",
+        "reactivateTitle": "Aktifkan kembali pengguna",
+        "suspendBody": "Tangguhkan pengguna ini. Sesi aktif apa pun akan dihentikan."
+      },
+      "title": "Pengguna",
+      "empty": "Tidak ada pengguna."
+    },
+    "console": "Konsol Admin"
+  },
+  "me": {
+    "section": {
+      "profile": "Profil",
+      "password": "Kata sandi",
+      "activity": "Aktivitas",
+      "sshKeys": "Kunci SSH",
+      "solid": "Koneksi Cloud yang Solid"
+    },
+    "profile": {
+      "username": "Nama Pengguna (ID Siswa)",
+      "email": "E-mail",
+      "role": "Peran",
+      "department": "Departemen",
+      "nameEn": "Nama (Bahasa Inggris)",
+      "advisor": "Penasihat",
+      "lab": "Laboratorium",
+      "createdAt": "Bergabung",
+      "provider": "Metode masuk",
+      "providerLocal": "Lokal",
+      "nameKo": "Nama (Korea)",
+      "providerSolid": "Awan Padat",
+      "notSet": "(tidak disetel)",
+      "providerBoth": "Lokal + Awan Padat"
+    },
+    "solid": {
+      "account": "Akun",
+      "userId": "ID Pengguna",
+      "linkSuccess": "Cloud padat tertaut",
+      "domainId": "ID domain",
+      "linkButton": "Tautan Cloud Padat",
+      "linked": "Terhubung ke Cloud Padat",
+      "linking": "Menghubungkan...",
+      "username": "Nama Pengguna Cloud Padat",
+      "password": "Kata sandi",
+      "domain": "Domain",
+      "unlinkButton": "Putuskan tautan",
+      "linkSubtitle": "Otentikasi dengan kredensial Solid Cloud Anda untuk menautkan akun ini sehingga Anda dapat menggunakan login mana pun.",
+      "notLinked": "Tidak tertaut ke Solid Cloud",
+      "errorConflict": "Akun Solid Cloud ini sudah tertaut ke pengguna lain.",
+      "unlinking": "Membatalkan tautan...",
+      "unlinkNeedsPassword": "Tetapkan kata sandi lokal sebelum memutuskan tautan.",
+      "errorAuth": "Otentikasi Solid Cloud gagal.",
+      "unlinkConfirm": "Putuskan tautan Cloud Padat? Anda hanya dapat masuk dengan kata sandi lokal Anda setelahnya."
+    },
+    "password": {
+      "current": "Kata sandi saat ini",
+      "title": "Ubah Kata Sandi",
+      "new": "Kata sandi baru",
+      "saving": "Penghematan...",
+      "errorShort": "Kata sandi minimal harus 8 karakter.",
+      "success": "Kata sandi diperbarui.",
+      "confirm": "Konfirmasikan kata sandi baru",
+      "hint": "Setidaknya 8 karakter",
+      "submit": "Simpan kata sandi",
+      "errorMismatch": "Kata sandi baru tidak cocok.",
+      "noPasswordHint": "Tidak ada kata sandi lokal yang ditetapkan. Memasukkan kata sandi baru akan mengaktifkan login lokal."
+    },
+    "ssh": {
+      "name": "Nama",
+      "fingerprint": "Sidik jari",
+      "delete": "Menghapus",
+      "createdAt": "Ditambahkan",
+      "adding": "Menambahkan...",
+      "add": "Tambahkan kunci",
+      "title": "Kunci Publik SSH",
+      "deleteConfirm": "Hapus kunci SSH ini?",
+      "empty": "Tidak ada kunci SSH yang terdaftar.",
+      "publicKey": "Kunci Publik",
+      "namePlaceholder": "misalnya, laptop pribadi",
+      "subtitle": "Kunci yang didaftarkan di sini dapat dipilih saat membuat instance baru.",
+      "errorFormat": "Format kunci publik SSH tidak valid.",
+      "publicKeyPlaceholder": "ssh-rsa AAAA... atau ssh-ed25519 AAAA...",
+      "errorRequired": "Nama dan kunci publik diperlukan."
+    },
+    "title": "Akun Saya",
+    "menu": "Akun Saya",
+    "back": "Kembali ke Dasbor"
+  },
+  "region": {
+    "loading": "Memuat...",
+    "queue": "Antre",
+    "tip": "💡 Tip: RTX 4090 cocok untuk beban kerja ringan; pilih RTX Pro 6000 untuk pelatihan model besar.",
+    "title": "Ketersediaan Wilayah"
+  },
+  "create": {
+    "step1": {
+      "loading": "Memuat template...",
+      "title": "1. Pilih Templat/ISO"
+    },
+    "step2": {
+      "title": "2. Pilih Penawaran Komputasi",
+      "cpu": "CPU",
+      "ram": "RAM",
+      "performance": "Pertunjukan",
+      "price": "Harga",
+      "loading": "Memuat penawaran...",
+      "vram": "VRAM"
+    },
+    "step3": {
+      "instanceName": "Nama Instance",
+      "instanceNamePh": "misalnya, proyek-gpu-saya-01",
+      "title": "3. Pengaturan Lingkungan",
+      "sshKey": "Kunci Publik SSH",
+      "generating": "Menghasilkan...",
+      "keyLoaded": "Kunci Dimuat",
+      "useSaved": "Gunakan kunci SSH yang disimpan",
+      "generateKey": "Hasilkan Pasangan Kunci",
+      "instanceNameHint": "Pengidentifikasi unik untuk ruang kerja Anda.",
+      "manualOrGenerate": "Masukkan secara manual / Hasilkan baru",
+      "sshKeyHint": "Masukkan kunci publik Anda yang ada atau buat yang baru.",
+      "downloadNote": "Jika Anda membuat pasangan kunci baru, kunci pribadi (.pem) akan diunduh secara otomatis. Harap simpan dengan aman; itu tidak akan ditampilkan lagi."
+    },
+    "footer": {
+      "back": "Kembali",
+      "next": "Berikutnya",
+      "launching": "Meluncurkan...",
+      "launch": "Luncurkan Mesin Virtual"
+    },
+    "errors": {
+      "createFailed": "Gagal meluncurkan instance."
+    },
+    "title": "Buat Instans Baru",
+    "stepOf": "Langkah {{current}} dari {{total}}"
+  },
+  "setup": {
+    "steps": {
+      "idle": "Menganggur",
+      "billing": "Penagihan",
+      "review": "Tinjauan",
+      "mode": "Mode"
+    },
+    "unit": {
+      "hour": "H",
+      "min": "menit",
+      "month": "bulan",
+      "credit": "C",
+      "times": "kali",
+      "sessions": "sesi",
+      "creditPerStep": "C/langkah"
+    },
+    "mode": {
+      "hybridDesc": "Menambahkan akses SSH langsung ke node fisik di atas container. Paling cocok untuk laboratorium kecil atau ketika penyewaan node fisik diperlukan.",
+      "container": "Modus kontainer",
+      "hybrid": "Kontainer + hibrida SSH",
+      "hybridNote": "Memilih hibrida memungkinkan penyewaan node fisik, akun SSH, dan kuota rumah per node. (Diimplementasikan pada fase selanjutnya)",
+      "containerDesc": "Kelola GPU melalui container K8s. Terbaik untuk menyajikan cluster GPU ke banyak pengguna dalam skala besar."
+    },
+    "billing": {
+      "pricing": "Kebijakan penetapan harga",
+      "cooldown": "Cooldown sebelum disewakan kembali",
+      "maxLease": "Sewa maksimum per sesi",
+      "modeCredit": "Kredit",
+      "surgeHint": "Kredit/jam meningkat sebesar ini setiap kali sumber daya menjadi langka.",
+      "maxConcurrent": "Sesi serentak maksimal",
+      "modeDynamic": "Yang pertama datang",
+      "pricingStatic": "Statis — harga tetap yang ditetapkan admin",
+      "pricingDynamic": "Dinamis — harga naik seiring menurunnya ketersediaan",
+      "surge": "Kenaikan harga per penurunan ketersediaan",
+      "modeFree": "Bebas",
+      "modeCreditDesc": "Bayar dengan mengurangi pulsa. Dikendalikan hanya dengan kredit, tanpa batasan lainnya.",
+      "pricingHint": "Pilih bagaimana harga penawaran ditetapkan.",
+      "modeFreeDesc": "Gunakan secara bebas tanpa batas. Tidak ada kredit, sewa, atau batasan sesi bersamaan.",
+      "modeDynamicDesc": "Gunakan siapa cepat dia dapat tanpa kredit. Batas sewa maksimum, cooldown, dan sesi bersamaan melindungi ketersediaan."
+    },
+    "idle": {
+      "containerNote": "Mode kontainer: diklaim kembali melalui Berhenti, melestarikan data.",
+      "sshNote": "Mode SSH: data tetap berada di disk lokal dan dapat digunakan kembali apa adanya.",
+      "timeout": "Waktu pengambilan otomatis menganggur",
+      "timeoutHint": "Sesi diambil kembali secara otomatis saat GPU tidak digunakan selama jangka waktu tersebut."
+    },
+    "lease": {
+      "extHours": "Jam maksimal per ekstensi",
+      "extHoursHint": "Jam maksimal yang dapat dipilih pengguna per ekstensi. (hanya mode siapa yang datang pertama)",
+      "maxExt": "Ekstensi maksimal",
+      "maxExtHint": "Jumlah maksimum ekstensi per sesi. 0 menonaktifkan perluasan."
+    },
+    "review": {
+      "idleLabel": "Klaim kembali otomatis yang menganggur",
+      "modeLabel": "Modus operasi",
+      "hint": "Anda akan mulai dengan pengaturan di bawah ini. Ubah kapan saja di Admin → Pengaturan Sistem.",
+      "billingLabel": "Modus penagihan"
+    },
+    "features": {
+      "signupHint": "Jika tidak aktif, link pendaftaran di halaman login disembunyikan dan akun dibuat oleh admin.",
+      "datasetFeatureHint": "Jika tidak aktif, menu himpunan data, caching, dan pemilihan himpunan data dalam sesi akan disembunyikan (mengurangi ketergantungan pada penyimpanan pusat).",
+      "alertsHint": "Jika nonaktif, pengguna tidak dapat berlangganan peringatan ketersediaan GPU/node.",
+      "datasetHint": "Jika tidak aktif, pengguna tidak dapat mendaftar/meminta kumpulan data; hanya admin yang mendaftarkannya.",
+      "alerts": "Peringatan ketersediaan beban kerja",
+      "datasetFeature": "Fitur kumpulan data",
+      "groupJoin": "Permintaan bergabung grup/organisasi",
+      "dataset": "Pendaftaran kumpulan data",
+      "signup": "Permintaan pendaftaran pengguna",
+      "creditHint": "Jika tidak aktif, pengguna/grup tidak dapat meminta isi ulang; admin memberikan kredit secara langsung.",
+      "credit": "Permintaan isi ulang pulsa",
+      "groupJoinHint": "Jika tidak aktif, pengguna tidak dapat meminta keanggotaan sendiri; admin mengelolanya."
+    },
+    "wizardTitle": "Pengaturan Awal Giosk",
+    "back": "Kembali",
+    "next": "Berikutnya",
+    "finish": "Selesaikan penyiapan",
+    "wizardSubtitle": "Konfigurasikan mode operasi dan kebijakan default. Semuanya bisa diubah nanti di Admin → Pengaturan Sistem."
+  },
+  "topbar": {
+    "nodeBadge": "Node {{up}}/{{total}} · GPU {{gpu}}%"
+  }
+}

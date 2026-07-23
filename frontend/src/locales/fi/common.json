@@ -1,0 +1,518 @@
+{
+  "common": {
+    "next": "Seuraavaksi",
+    "back": "Takaisin",
+    "login": "Kirjaudu sisään",
+    "logout": "Kirjaudu ulos",
+    "save": "Tallentaa",
+    "close": "Lähellä",
+    "confirm": "Vahvistaa",
+    "cancel": "Peruuttaa",
+    "delete": "Poistaa",
+    "loading": "Ladataan...",
+    "optional": "valinnainen",
+    "language": "Kieli",
+    "required": "tarvitaan",
+    "korean": "한국어",
+    "english": "englanti",
+    "refresh": "Päivitä"
+  },
+  "auth": {
+    "brand": {
+      "kuName": "Dankookin yliopisto",
+      "enName": "DANKOOKIN YLIOPISTO"
+    },
+    "login": {
+      "submit": "Kirjaudu sisään",
+      "password": "Salasana",
+      "errorGeneric": "Kirjautuminen epäonnistui.",
+      "errorNetwork": "Tapahtui verkkovirhe.",
+      "submitting": "Kirjaudutaan sisään...",
+      "signupLink": "Rekisteröidy palveluun",
+      "usernameSolid": "Solid Cloud -käyttäjänimi",
+      "usernameLocal": "Opiskelijatunnus / Käyttäjätunnus",
+      "domain": "Verkkotunnus",
+      "tabSolid": "Solid Cloud -kirjautuminen",
+      "tabLocal": "Palveluun kirjautuminen",
+      "errorPending": "Odottaa järjestelmänvalvojan hyväksyntää.",
+      "errorRejected": "Tämä rekisteröitymispyyntö hylättiin.",
+      "errorSuspended": "Tämä tili on jäädytetty.",
+      "errorInvalid": "Virheellinen käyttäjätunnus tai salasana."
+    },
+    "signupPending": {
+      "backToLogin": "Takaisin kirjautumiseen",
+      "body": "Voit kirjautua sisään järjestelmänvalvojan hyväksynnän jälkeen. Tämä voi kestää jonkin aikaa.",
+      "submittedAt": "Lähetetty",
+      "title": "Ilmoittautumispyyntö lähetetty"
+    },
+    "localSignup": {
+      "section": {
+        "credentials": "Tili",
+        "name": "Nimi",
+        "affiliation": "Liittyminen"
+      },
+      "field": {
+        "username": "Opiskelijatunnus / Käyttäjätunnus",
+        "email": "Sähköposti",
+        "password": "Salasana (vähintään 8 merkkiä)",
+        "passwordConfirm": "Vahvista salasana"
+      },
+      "title": "Rekisteröidy palveluun",
+      "submit": "Pyydä ilmoittautumista",
+      "subtitle": "Täytä alla oleva lomake. Voit kirjautua sisään, kun järjestelmänvalvoja hyväksyy pyyntösi.",
+      "errorPasswordShort": "Salasanassa on oltava vähintään 8 merkkiä.",
+      "errorGeneric": "Ilmoittautuminen epäonnistui.",
+      "errorGroup": "Sinun on valittava organisaatio ja ryhmä.",
+      "errorRequired": "Täytä kaikki pakolliset kentät.",
+      "errorAdvisor": "Perus- ja jatko-opiskelijoiden on tarjottava neuvonantaja.",
+      "submitting": "Lähetetään...",
+      "errorTerms": "Sinun on hyväksyttävä ehdot rekisteröityäksesi.",
+      "errorPasswordMismatch": "Salasanat eivät täsmää."
+    },
+    "signup": {
+      "section": {
+        "account": "Tili",
+        "name": "Nimi",
+        "password": "Huollon salasana (valinnainen)",
+        "affiliation": "Liittyminen ja rooli"
+      },
+      "field": {
+        "email": "Sähköposti",
+        "name": "Nimi",
+        "username": "Käyttäjätunnus (opiskelijatunnus)",
+        "firstNameKo": "Etunimi (korea)",
+        "lastNameEn": "Sukunimi (englanniksi)",
+        "namePlaceholder": "esim. Hong Gildong",
+        "lastNameKo": "Sukunimi (korea)",
+        "department": "osasto",
+        "role": "Rooli",
+        "advisor": "Neuvonantaja",
+        "selectPh": "Valitse",
+        "group": "ryhmä",
+        "org": "Organisaatio",
+        "advisorPlaceholder": "Neuvonantajan nimi",
+        "firstNameEn": "Etunimi (englanniksi)",
+        "lab": "Lab (valinnainen)",
+        "sponsor": "Sponsori (valinnainen)",
+        "passwordHint": "Aseta salasana kirjautuaksesi suoraan opiskelijatunnuksellasi/käyttäjänimelläsi ilman Solid Cloudia.",
+        "noJoinableGroup": "Tällä organisaatiolla ei ole ryhmiä, joihin voi liittyä. Ota yhteyttä organisaation järjestelmänvalvojaan.",
+        "sponsorPlaceholder": "Sponsorin nimi (neuvoja, tiiminvetäjä jne.)",
+        "passwordPlaceholder": "Jätä tyhjäksi käyttääksesi vain Solid Cloud -kirjautumista"
+      },
+      "role": {
+        "professor": "Professori",
+        "staff": "Henkilökunta",
+        "undergrad": "Perustutkinto",
+        "graduate": "Valmistunut"
+      },
+      "title": "Rekisteröidy Giosk-konsoliin",
+      "subtitle": "Solid Cloud -todennus vahvistettu. Hyväksy ehdot ja anna lisätietoja.",
+      "errorTerms": "Sinun on hyväksyttävä ehdot rekisteröityäksesi.",
+      "errorAdvisor": "Perus- ja jatko-opiskelijoiden on tarjottava neuvonantaja.",
+      "errorGeneric": "Ilmoittautuminen epäonnistui.",
+      "termsView": "Katso ehdot",
+      "terms": "Hyväksyn palveluehdot ja tietosuojakäytännön. (pakollinen)",
+      "submit": "Suorita rekisteröityminen loppuun",
+      "submitting": "Ilmoittautuminen..."
+    }
+  },
+  "dashboard": {
+    "labels": {
+      "storageProjects": "Tallennus (projektit)",
+      "cpuCores": "CPU-ytimet",
+      "instances": "Esineet",
+      "systemMemory": "Järjestelmän muisti"
+    },
+    "units": {
+      "cores": "ytimet",
+      "gb": "GB",
+      "ea": "ea",
+      "gib": "GiB"
+    },
+    "gpuCredit": {
+      "title": "GPU:n luottokiintiö",
+      "perMonth": "/ {{limit}} C (kuukausi)",
+      "renewal": "Kuukausittainen uusiminen: {{date}}"
+    },
+    "instances": {
+      "table": {
+        "status": "Status",
+        "offering": "Tarjoaminen",
+        "template": "Malli",
+        "connection": "Yhteys",
+        "name": "Ilmentymän nimi",
+        "ip": "IP-osoite",
+        "action": "Toiminta"
+      },
+      "actions": {
+        "delete": "Poistaa",
+        "resume": "Jatkaa",
+        "stop": "Lopeta instanssi"
+      },
+      "create": "Uusi instanssi",
+      "title": "Omat laskentaesiintymät",
+      "createFirst": "Luo ensimmäinen esiintymäsi",
+      "empty": "Aktiivisia esiintymiä ei löytynyt.",
+      "loading": "Ladataan tapauksia..."
+    },
+    "status": {
+      "pending": "Odottaa",
+      "running": "Juoksemassa",
+      "terminating": "Lopetetaan",
+      "stopped": "Pysähtynyt"
+    },
+    "confirmStop": {
+      "body": "Pysäyttäminen vapauttaa GPU-resursseja. Sinua ei laskuteta ennen kuin aloitat sen uudelleen.",
+      "title": "Pysäytä esimerkki",
+      "confirm": "Vahvista Stop"
+    },
+    "confirmStart": {
+      "confirm": "Aloita",
+      "body": "Instanssin käynnistäminen jatkaa laskutusta.",
+      "title": "Aloita esiintymä"
+    },
+    "confirmDelete": {
+      "confirm": "Poistaa",
+      "title": "Poista ilmentymä",
+      "body": "Tämä on peruuttamatonta. Ilmentymä ja sen tiedot poistetaan pysyvästi."
+    },
+    "logout": "Kirjaudu ulos",
+    "resourceQuota": "Resurssikiintiö",
+    "console": "Cloud Console"
+  },
+  "credit": {
+    "type": {
+      "monthly_reset": "Kuukausittainen nollaus",
+      "usage": "Käyttö",
+      "admin_grant": "Järjestelmänvalvojan apuraha",
+      "limit_increase": "Rajoita lisäystä",
+      "auto_stop": "Automaattinen pysäytys (ei tasapainoa)",
+      "manual_adjust": "Manuaalinen säätö"
+    },
+    "balance": "Saldo",
+    "loadMore": "Lataa lisää",
+    "tableType": "Tyyppi",
+    "tableBalance": "Saldo",
+    "tableAmount": "Määrä",
+    "tableDescription": "Kuvaus",
+    "tableTime": "Aika",
+    "title": "GPU:n luottohistoria",
+    "cycleStartedAt": "Kierros alkoi",
+    "empty": "Ei liiketoimia.",
+    "limit": "Kuukausiraja"
+  },
+  "notifications": {
+    "title": "Ilmoitukset",
+    "empty": "Ei uusia ilmoituksia.",
+    "unread": "{{count}} uusi",
+    "viewAll": "Näytä kaikki toiminta"
+  },
+  "activity": {
+    "loadMore": "Lataa lisää",
+    "title": "Toiminta",
+    "empty": "Ei toimintaa vielä."
+  },
+  "audit": {
+    "action": {
+      "logout": "Kirjaudu ulos",
+      "login_local": "Paikallinen kirjautuminen",
+      "login_solid": "Solid Cloud -kirjautuminen",
+      "signup_local": "Paikallinen ilmoittautumispyyntö",
+      "credit_grant": "Luotto myönnetty",
+      "solid_unlink": "Solid Cloud -linkitys poistettu",
+      "status_change": "Statusmuutos",
+      "solid_link": "Solid Cloud linkitetty",
+      "password_change": "Salasanan vaihto",
+      "ssh_key_add": "SSH-avain lisätty",
+      "ssh_key_delete": "SSH-avain poistettu",
+      "quota_override": "Kiintiön ohitus",
+      "group_quota_change": "Ryhmäkiintiö muutettu",
+      "signup_solid": "Kiinteä Cloud-kirjautumispyyntö"
+    },
+    "msg": {
+      "credit_grant": "{{actor}} myönsi sinulle {{delta}} GPU-pisteitä (uusi raja {{newLimit}})",
+      "status_change": "{{actor}} muutti tilasi {{from}}:stä {{to}}:ksi",
+      "quota_override": "{{actor}} muokkasi kiintiötäsi"
+    },
+    "actor": "Näyttelijä",
+    "target": "Kohde"
+  },
+  "admin": {
+    "menu": {
+      "users": "Käyttäjät",
+      "audit": "Tarkastuslokit",
+      "groupQuotas": "Ryhmäkiintiöt"
+    },
+    "quota": {
+      "cpu": "CPU-ytimet",
+      "monthlyLimit": "Kuukausiraja",
+      "ram": "RAM (GiB)",
+      "save": "Tallentaa",
+      "instances": "Samanaikaiset esiintymät",
+      "gpuCredit": "GPU-luotto",
+      "storage": "Tallennustila (GiB)",
+      "grant": "Myöntää",
+      "override": "Ohittaa",
+      "limitIncreaseHint": "Rajan nostaminen lisää myös eroa nykyiseen saldoon",
+      "currentUsage": "Nykyinen käyttö",
+      "groupDefault": "Ryhmän oletusarvo",
+      "groupTitle": "{{role}} oletuskiintiö",
+      "currentBalance": "Nykyinen saldo",
+      "editTitle": "Muokkaa kiintiötä – {{name}}",
+      "grantHint": "Bonus lisätty vain tähän jaksoon (tyhjennetään seuraavan kuukausittaisen nollauksen yhteydessä)",
+      "effective": "Tehokas",
+      "useGroupDefault": "Käytä ryhmän oletusarvoa",
+      "saved": "Tallennettu"
+    },
+    "users": {
+      "filter": {
+        "pending": "Odottaa",
+        "all": "Kaikki",
+        "suspended": "Keskeytetty",
+        "rejected": "Hylätty",
+        "approved": "Hyväksytty"
+      },
+      "table": {
+        "name": "Nimi",
+        "role": "Rooli",
+        "department": "osasto",
+        "provider": "Kirjaudu sisään",
+        "status": "Status",
+        "action": "Toiminta",
+        "username": "Käyttäjätunnus",
+        "createdAt": "Pyydetty"
+      },
+      "action": {
+        "approve": "Hyväksyä",
+        "reject": "Hylätä",
+        "suspend": "Keskeyttää",
+        "editQuota": "Muokkaa kiintiötä",
+        "reactivate": "Aktivoi uudelleen"
+      },
+      "status": {
+        "pending": "Odottaa",
+        "suspended": "Keskeytetty",
+        "rejected": "Hylätty",
+        "approved": "Hyväksytty"
+      },
+      "confirm": {
+        "approveTitle": "Hyväksy käyttäjä",
+        "reactivateBody": "Aktivoi tämä käyttäjä uudelleen?",
+        "rejectTitle": "Hylkää ilmoittautuminen",
+        "reactivateTitle": "Aktivoi käyttäjä uudelleen",
+        "rejectBody": "Hylkää tämän käyttäjän kirjautumispyyntö. He eivät voi kirjautua sisään.",
+        "approveBody": "Hyväksytäänkö tämä käyttäjä? He voivat kirjautua sisään välittömästi.",
+        "suspendBody": "Jäädytä tämä käyttäjä. Kaikki aktiiviset istunnot lopetetaan.",
+        "suspendTitle": "Keskeytä käyttäjä"
+      },
+      "title": "Käyttäjät",
+      "empty": "Ei käyttäjiä."
+    },
+    "console": "Hallintakonsoli"
+  },
+  "me": {
+    "section": {
+      "password": "Salasana",
+      "activity": "Toiminta",
+      "profile": "Profiili",
+      "sshKeys": "SSH-avaimet",
+      "solid": "Kiinteä pilviyhteys"
+    },
+    "profile": {
+      "username": "Käyttäjätunnus (opiskelijatunnus)",
+      "email": "Sähköposti",
+      "role": "Rooli",
+      "department": "osasto",
+      "advisor": "Neuvonantaja",
+      "createdAt": "Liittyi",
+      "providerLocal": "Paikallinen",
+      "nameEn": "Nimi (englanniksi)",
+      "lab": "Lab",
+      "nameKo": "Nimi (korea)",
+      "providerSolid": "Kiinteä pilvi",
+      "provider": "Kirjautumistapa",
+      "providerBoth": "Paikallinen + kiinteä pilvi",
+      "notSet": "(ei asetettu)"
+    },
+    "solid": {
+      "account": "Tili",
+      "linkSuccess": "Solid Cloud linkitetty",
+      "notLinked": "Ei linkitetty Solid Cloudiin",
+      "domainId": "Verkkotunnuksen tunnus",
+      "linked": "Linkitetty Solid Cloudiin",
+      "unlinkButton": "Poista linkitys",
+      "username": "Solid Cloud -käyttäjänimi",
+      "password": "Salasana",
+      "domain": "Verkkotunnus",
+      "linking": "Linkitetään...",
+      "userId": "Käyttäjätunnus",
+      "linkButton": "Linkitä Solid Cloud",
+      "linkSubtitle": "Todennus Solid Cloud -kirjautumistiedoillasi yhdistääksesi tämän tilin, jotta voit käyttää jompaakumpaa kirjautumistunnusta.",
+      "unlinkNeedsPassword": "Aseta paikallinen salasana ennen linkityksen poistamista.",
+      "unlinking": "Poistetaan linkitystä...",
+      "errorConflict": "Tämä Solid Cloud -tili on jo linkitetty toiseen käyttäjään.",
+      "unlinkConfirm": "Poistetaanko Solid Cloudin linkitys? Voit kirjautua sisään vain sen jälkeen paikallisella salasanallasi.",
+      "errorAuth": "Solid Cloud -todennus epäonnistui."
+    },
+    "password": {
+      "title": "Vaihda salasana",
+      "current": "Nykyinen salasana",
+      "confirm": "Vahvista uusi salasana",
+      "new": "Uusi salasana",
+      "saving": "Tallennetaan...",
+      "errorShort": "Salasanassa on oltava vähintään 8 merkkiä.",
+      "hint": "Vähintään 8 merkkiä",
+      "submit": "Tallenna salasana",
+      "success": "Salasana päivitetty.",
+      "errorMismatch": "Uudet salasanat eivät täsmää.",
+      "noPasswordHint": "Paikallista salasanaa ei ole asetettu. Uuden salasanan syöttäminen mahdollistaa paikallisen kirjautumisen."
+    },
+    "ssh": {
+      "name": "Nimi",
+      "empty": "Ei rekisteröityjä SSH-avaimia.",
+      "title": "Julkiset SSH-avaimet",
+      "delete": "Poistaa",
+      "fingerprint": "Sormenjälki",
+      "namePlaceholder": "esim. henkilökohtainen kannettava tietokone",
+      "createdAt": "Lisätty",
+      "subtitle": "Tässä rekisteröidyt avaimet voidaan valita uutta ilmentymää luotaessa.",
+      "errorRequired": "Nimi ja julkinen avain vaaditaan.",
+      "publicKeyPlaceholder": "ssh-rsa AAAA... tai ssh-ed25519 AAAA...",
+      "add": "Lisää avain",
+      "publicKey": "Julkinen avain",
+      "adding": "Lisätään...",
+      "deleteConfirm": "Poistetaanko tämä SSH-avain?",
+      "errorFormat": "Virheellinen julkisen SSH-avaimen muoto."
+    },
+    "title": "Oma tili",
+    "menu": "Oma tili",
+    "back": "Takaisin hallintapaneeliin"
+  },
+  "region": {
+    "queue": "Jonottaa",
+    "loading": "Ladataan...",
+    "tip": "💡 Vinkki: RTX 4090 sopii kevyille työkuormille; valitse RTX Pro 6000 suurten mallien harjoitteluun.",
+    "title": "Alueen saatavuus"
+  },
+  "create": {
+    "step1": {
+      "loading": "Ladataan malleja...",
+      "title": "1. Valitse Malli / ISO"
+    },
+    "step2": {
+      "performance": "Suorituskyky",
+      "ram": "RAM",
+      "price": "Hinta",
+      "loading": "Ladataan tarjouksia...",
+      "title": "2. Valitse Compute Offering",
+      "cpu": "CPU",
+      "vram": "VRAM"
+    },
+    "step3": {
+      "instanceName": "Ilmentymän nimi",
+      "sshKey": "Julkinen SSH-avain",
+      "title": "3. Ympäristöasetukset",
+      "generating": "Luodaan...",
+      "useSaved": "Käytä tallennettua SSH-avainta",
+      "instanceNamePh": "esim. my-gpu-projekti-01",
+      "keyLoaded": "Avain ladattu",
+      "instanceNameHint": "Ainutlaatuinen tunniste työtilallesi.",
+      "downloadNote": "Jos luot uuden avainparin, yksityinen avain (.pem) ladataan automaattisesti. Pidä se turvassa; sitä ei näytetä uudelleen.",
+      "sshKeyHint": "Anna olemassa oleva julkinen avaimesi tai luo uusi.",
+      "manualOrGenerate": "Syötä manuaalisesti / Luo uusi",
+      "generateKey": "Luo avainpari"
+    },
+    "footer": {
+      "back": "Takaisin",
+      "next": "Seuraavaksi",
+      "launch": "Käynnistä ilmentymä",
+      "launching": "Käynnistetään..."
+    },
+    "errors": {
+      "createFailed": "Ilmentymän käynnistäminen epäonnistui."
+    },
+    "title": "Luo uusi ilmentymä",
+    "stepOf": "Vaihe {{current}}/{{total}}"
+  },
+  "setup": {
+    "steps": {
+      "mode": "tila",
+      "billing": "Laskutus",
+      "review": "Arvostelu",
+      "idle": "Tyhjäkäynti"
+    },
+    "unit": {
+      "hour": "h",
+      "min": "min",
+      "month": "mo",
+      "credit": "C",
+      "times": "kertaa",
+      "sessions": "istuntoja",
+      "creditPerStep": "C/askel"
+    },
+    "mode": {
+      "container": "Säiliötila",
+      "hybrid": "Kontti + SSH hybridi",
+      "containerDesc": "Hallitse GPU:ita K8s-säiliöiden kautta. Paras GPU-klusterin palvelemiseen useille käyttäjille laajassa mittakaavassa.",
+      "hybridNote": "Hybridin valitseminen mahdollistaa fyysisen solmun vuokrauksen, SSH-tilit ja solmukohtaiset kotikiintiöt. (Otetaan käyttöön myöhemmässä vaiheessa)",
+      "hybridDesc": "Lisää suoran SSH-yhteyden säiliöiden päällä oleviin fyysisiin solmuihin. Paras pieniin laboratorioihin tai kun tarvitaan fyysisten solmujen vuokrausta."
+    },
+    "billing": {
+      "pricing": "Hinnoittelupolitiikka",
+      "pricingHint": "Valitse, miten tarjoushinnat asetetaan.",
+      "pricingStatic": "Staattinen – kiinteä järjestelmänvalvojan asettama hinta",
+      "surgeHint": "Krediitit/tunti lisääntyvät tällä määrällä joka kerta, kun resurssit ovat vähissä.",
+      "maxConcurrent": "Enintään samanaikaiset istunnot",
+      "maxLease": "Max vuokra per istunto",
+      "modeDynamic": "Saapumisjärjestyksessä",
+      "cooldown": "Jäähdytys ennen uudelleenvuokrausta",
+      "modeFree": "Ilmainen",
+      "modeCredit": "Luotto",
+      "modeDynamicDesc": "Käytä saapumisjärjestyksessä ilman krediittejä. Maksimivuokra-, jäähdytys- ja samanaikaisten istuntojen rajoitukset suojaavat saatavuutta.",
+      "pricingDynamic": "Dynaaminen – hinta nousee, kun saatavuus laskee",
+      "surge": "Hinnan nousu per saatavuuden lasku",
+      "modeCreditDesc": "Maksa vähentämällä krediittejä. Hallitsee vain krediittejä, ei muita rajoituksia.",
+      "modeFreeDesc": "Käytä vapaasti ilman rajoituksia. Ei luottoja, vuokrasopimuksia tai samanaikaisten istuntojen enimmäismääriä."
+    },
+    "idle": {
+      "containerNote": "Säiliötila: palautettu Stop-toiminnolla, tiedot säilytetään.",
+      "sshNote": "SSH-tila: tiedot pysyvät paikallisella levyllä ja niitä voidaan käyttää uudelleen sellaisenaan.",
+      "timeoutHint": "Istunnot palautetaan automaattisesti, kun GPU pysyy käyttämättömänä näin pitkään.",
+      "timeout": "Tyhjäkäynnin automaattinen palautusaika"
+    },
+    "lease": {
+      "maxExt": "Max laajennukset",
+      "extHours": "Enimmäistunnit pidennystä kohti",
+      "extHoursHint": "Käyttäjä voi valita enintään tunnit laajennusta kohti. (vain saapumisjärjestyksessä)",
+      "maxExtHint": "Laajennusten enimmäismäärä istuntoa kohden. 0 poistaa laajennuksen käytöstä."
+    },
+    "review": {
+      "idleLabel": "Tyhjäkäynnin automaattinen palautus",
+      "billingLabel": "Laskutustila",
+      "modeLabel": "Toimintatila",
+      "hint": "Aloitat alla olevilla asetuksilla. Voit muuttaa niitä milloin tahansa kohdassa Järjestelmänvalvoja → Järjestelmäasetukset."
+    },
+    "features": {
+      "datasetFeature": "Tietojoukot-ominaisuus",
+      "dataset": "Tietojoukon rekisteröinti",
+      "signup": "Käyttäjien kirjautumispyynnöt",
+      "alerts": "Työkuorman saatavuushälytykset",
+      "alertsHint": "Kun se ei ole käytössä, käyttäjät eivät voi tilata GPU/solmun saatavuusilmoituksia.",
+      "signupHint": "Kun se on pois päältä, kirjautumissivun kirjautumislinkki on piilotettu ja järjestelmänvalvojat luovat tilit.",
+      "datasetHint": "Kun se on pois päältä, käyttäjät eivät voi rekisteröidä/pyytää tietojoukkoja; vain ylläpitäjät rekisteröivät ne.",
+      "credit": "Luoton lisäyspyynnöt",
+      "datasetFeatureHint": "Kun se ei ole käytössä, tietojoukkovalikot, välimuisti ja istunnon aikana tapahtuva tietojoukon valinta ovat kaikki piilossa (vähemmän riippuvuutta keskusmuistista).",
+      "creditHint": "Kun se on pois päältä, käyttäjät/ryhmät eivät voi pyytää lisäyksiä; järjestelmänvalvojat myöntävät krediittejä suoraan.",
+      "groupJoin": "Ryhmän/organisaation liittymispyynnöt",
+      "groupJoinHint": "Kun pois päältä, käyttäjät eivät voi itse pyytää jäsenyyttä. järjestelmänvalvojat hallitsevat sitä."
+    },
+    "back": "Takaisin",
+    "next": "Seuraavaksi",
+    "wizardSubtitle": "Määritä toimintatila ja oletuskäytännöt. Kaikkia voi muuttaa myöhemmin kohdassa Admin → System Settings.",
+    "finish": "Viimeistele asennus",
+    "wizardTitle": "Gioskin alkuasetukset"
+  },
+  "topbar": {
+    "nodeBadge": "Solmut {{up}}/{{total}} · GPU {{gpu}}%"
+  }
+}

@@ -1,0 +1,518 @@
+{
+  "common": {
+    "delete": "Töröl",
+    "login": "Bejelentkezés",
+    "confirm": "Erősítse meg",
+    "back": "Vissza",
+    "loading": "Terhelés...",
+    "next": "Következő",
+    "cancel": "Mégse",
+    "save": "Megtakarítás",
+    "close": "Közeli",
+    "language": "Nyelv",
+    "optional": "választható",
+    "required": "kívánt",
+    "korean": "한국어",
+    "english": "angol",
+    "logout": "Kijelentkezés",
+    "refresh": "Frissítés"
+  },
+  "auth": {
+    "brand": {
+      "enName": "DANKOOK EGYETEM",
+      "kuName": "Dankook Egyetem"
+    },
+    "login": {
+      "domain": "Domain",
+      "submit": "Bejelentkezés",
+      "password": "Jelszó",
+      "usernameLocal": "Diákazonosító / Felhasználónév",
+      "signupLink": "Regisztráljon a szolgáltatásra",
+      "errorNetwork": "Hálózati hiba történt.",
+      "submitting": "Bejelentkezés...",
+      "tabLocal": "Szolgáltatás bejelentkezés",
+      "usernameSolid": "Solid Cloud felhasználónév",
+      "tabSolid": "Solid Cloud Bejelentkezés",
+      "errorInvalid": "Érvénytelen felhasználónév vagy jelszó.",
+      "errorPending": "A rendszergazda jóváhagyására vár.",
+      "errorGeneric": "Sikertelen bejelentkezés.",
+      "errorRejected": "Ezt a regisztrációs kérelmet elutasították.",
+      "errorSuspended": "Ezt a fiókot felfüggesztettük."
+    },
+    "signupPending": {
+      "title": "Regisztrációs kérelem elküldve",
+      "backToLogin": "Vissza a bejelentkezéshez",
+      "submittedAt": "Beküldve",
+      "body": "A rendszergazda jóváhagyása után tud majd bejelentkezni. Ez eltarthat egy ideig."
+    },
+    "localSignup": {
+      "section": {
+        "name": "Név",
+        "credentials": "fiók",
+        "affiliation": "Affiliáció"
+      },
+      "field": {
+        "username": "Diákazonosító / Felhasználónév",
+        "email": "Email",
+        "password": "Jelszó (legalább 8 karakter)",
+        "passwordConfirm": "Erősítse meg a jelszót"
+      },
+      "title": "Regisztráljon a szolgáltatásra",
+      "subtitle": "Töltse ki az alábbi űrlapot. Akkor tud majd bejelentkezni, ha egy rendszergazda jóváhagyja kérését.",
+      "submitting": "Beküldés...",
+      "errorTerms": "A regisztrációhoz el kell fogadnia a feltételeket.",
+      "errorGroup": "Ki kell választania egy szervezetet és egy csoportot.",
+      "errorGeneric": "A regisztráció sikertelen.",
+      "submit": "Regisztráció kérése",
+      "errorAdvisor": "Az egyetemi és a posztgraduális hallgatóknak tanácsadót kell biztosítaniuk.",
+      "errorPasswordShort": "A jelszónak legalább 8 karakterből kell állnia.",
+      "errorRequired": "Kérjük, töltse ki az összes kötelező mezőt.",
+      "errorPasswordMismatch": "A jelszavak nem egyeznek."
+    },
+    "signup": {
+      "section": {
+        "account": "fiók",
+        "name": "Név",
+        "password": "Szervizjelszó (opcionális)",
+        "affiliation": "Kapcsolat és szerepkör"
+      },
+      "field": {
+        "email": "Email",
+        "name": "Név",
+        "role": "Szerep",
+        "department": "Osztály",
+        "lastNameKo": "Vezetéknév (koreai)",
+        "username": "Felhasználónév (tanulói azonosító)",
+        "firstNameKo": "Keresztnév (koreai)",
+        "namePlaceholder": "például Hong Gildong",
+        "group": "Csoport",
+        "org": "Szervezet",
+        "selectPh": "Válassza ki",
+        "sponsorPlaceholder": "A szponzor neve (tanácsadó, csapatvezető stb.)",
+        "sponsor": "Szponzor (opcionális)",
+        "lab": "Lab (nem kötelező)",
+        "firstNameEn": "Keresztnév (angol)",
+        "advisorPlaceholder": "A tanácsadó neve",
+        "lastNameEn": "Vezetéknév (angol)",
+        "advisor": "Tanácsadó",
+        "passwordHint": "Állítson be egy jelszót, amellyel közvetlenül jelentkezhet be diákazonosítójával/felhasználónevével, Solid Cloud nélkül.",
+        "passwordPlaceholder": "Hagyja üresen, ha csak a Solid Cloud bejelentkezést szeretné használni",
+        "noJoinableGroup": "Ennek a szervezetnek nincsenek csatlakozható csoportjai. Lépjen kapcsolatba a szervezet adminisztrátorával."
+      },
+      "role": {
+        "graduate": "Diplomás",
+        "professor": "Egyetemi tanár",
+        "undergrad": "Egyetemista",
+        "staff": "Személyzet"
+      },
+      "title": "Regisztráljon a Giosk konzolra",
+      "subtitle": "A Solid Cloud hitelesítés ellenőrizve. Kérjük, fogadja el a feltételeket, és adjon meg további információkat.",
+      "errorTerms": "A regisztrációhoz el kell fogadnia a feltételeket.",
+      "errorAdvisor": "Az egyetemi és a posztgraduális hallgatóknak tanácsadót kell biztosítaniuk.",
+      "errorGeneric": "A regisztráció sikertelen.",
+      "termsView": "Feltételek megtekintése",
+      "submitting": "Regisztráció...",
+      "terms": "Elfogadom a Szolgáltatási feltételeket és az Adatvédelmi szabályzatot. (kívánt)",
+      "submit": "Regisztráció befejezése"
+    }
+  },
+  "dashboard": {
+    "labels": {
+      "systemMemory": "Rendszermemória",
+      "cpuCores": "CPU magok",
+      "instances": "Példányok",
+      "storageProjects": "Tárolás (projektek)"
+    },
+    "units": {
+      "cores": "Magok",
+      "gib": "Ellenék",
+      "gb": "GB",
+      "ea": "ea"
+    },
+    "gpuCredit": {
+      "title": "GPU hitelkvóta",
+      "renewal": "Havi megújítás: {{date}}",
+      "perMonth": "/{{limit}} C (hónap)"
+    },
+    "instances": {
+      "table": {
+        "status": "Állapot",
+        "template": "Sablon",
+        "offering": "Ajánlat",
+        "connection": "Kapcsolat",
+        "action": "Akció",
+        "name": "Példány neve",
+        "ip": "IP-cím"
+      },
+      "actions": {
+        "delete": "Töröl",
+        "resume": "Folytatás",
+        "stop": "Példány leállítása"
+      },
+      "createFirst": "Hozd létre az első példányt",
+      "empty": "Nem található aktív példány.",
+      "loading": "Példányok betöltése...",
+      "create": "Új példány",
+      "title": "Számítási példányaim"
+    },
+    "status": {
+      "running": "Futás",
+      "pending": "Függőben levő",
+      "stopped": "Megállt",
+      "terminating": "Megszűnik"
+    },
+    "confirmStop": {
+      "confirm": "Erősítse meg a Leállítást",
+      "title": "Példány leállítása",
+      "body": "A leállítás felszabadítja a GPU erőforrásait. Addig nem számlázunk ki, amíg újra nem kezdi."
+    },
+    "confirmStart": {
+      "confirm": "Indul",
+      "title": "Indítsa el a példányt",
+      "body": "A példány elindítása folytatja a számlázást."
+    },
+    "confirmDelete": {
+      "confirm": "Töröl",
+      "title": "Példány törlése",
+      "body": "Ez visszafordíthatatlan. A példány és adatai véglegesen törlődnek."
+    },
+    "logout": "Kijelentkezés",
+    "resourceQuota": "Erőforrás kvóta",
+    "console": "Cloud Console"
+  },
+  "credit": {
+    "type": {
+      "usage": "Használat",
+      "manual_adjust": "Kézi beállítás",
+      "admin_grant": "Adminisztrátori támogatás",
+      "limit_increase": "Limit növekedés",
+      "auto_stop": "Automatikus leállítás (nincs egyensúly)",
+      "monthly_reset": "Havi visszaállítás"
+    },
+    "balance": "Egyensúly",
+    "title": "GPU hiteltörténet",
+    "tableBalance": "Egyensúly",
+    "cycleStartedAt": "A ciklus elindult",
+    "tableTime": "Idő",
+    "tableAmount": "Összeg",
+    "tableDescription": "Leírás",
+    "tableType": "Írja be",
+    "limit": "Havi limit",
+    "empty": "Nincsenek tranzakciók.",
+    "loadMore": "Töltsön be többet"
+  },
+  "notifications": {
+    "empty": "Nincsenek új értesítések.",
+    "title": "Értesítések",
+    "viewAll": "Az összes tevékenység megtekintése",
+    "unread": "{{count}} új"
+  },
+  "activity": {
+    "loadMore": "Töltsön be többet",
+    "title": "Tevékenység",
+    "empty": "Még nincs tevékenység."
+  },
+  "audit": {
+    "action": {
+      "logout": "Kijelentkezés",
+      "ssh_key_delete": "SSH kulcs törölve",
+      "login_local": "Helyi bejelentkezés",
+      "login_solid": "Solid Cloud bejelentkezés",
+      "solid_link": "Solid Cloud összekapcsolva",
+      "signup_solid": "Szilárd Cloud regisztrációs kérelem",
+      "signup_local": "Helyi regisztrációs kérelem",
+      "ssh_key_add": "SSH kulcs hozzáadva",
+      "password_change": "Jelszóváltás",
+      "group_quota_change": "Csoportkvóta módosult",
+      "credit_grant": "Hitel megadva",
+      "quota_override": "Kvóta felülbírálása",
+      "solid_unlink": "Solid Cloud leválasztva",
+      "status_change": "Állapotváltozás"
+    },
+    "msg": {
+      "credit_grant": "A {{actor}} {{delta}} GPU-krediteket adott Önnek (új limit {{newLimit}})",
+      "status_change": "A {{actor}} megváltoztatta az Ön állapotát {{from}}-ről {{to}}-re",
+      "quota_override": "{{actor}} módosította a kvótát"
+    },
+    "actor": "Színész",
+    "target": "Cél"
+  },
+  "admin": {
+    "menu": {
+      "users": "Felhasználók",
+      "groupQuotas": "Csoportkvóták",
+      "audit": "Ellenőrzési naplók"
+    },
+    "quota": {
+      "cpu": "CPU magok",
+      "monthlyLimit": "Havi limit",
+      "grant": "Grant",
+      "save": "Megtakarítás",
+      "instances": "Egyidejű példányok",
+      "currentBalance": "Jelenlegi egyenleg",
+      "effective": "Hatékony",
+      "gpuCredit": "GPU kredit",
+      "editTitle": "Kvóta szerkesztése — {{name}}",
+      "ram": "RAM (GiB)",
+      "storage": "Tárhely (GiB)",
+      "saved": "Mentve",
+      "grantHint": "Bónusz csak ehhez a ciklushoz van hozzáadva (a következő havi visszaállításkor törlődik)",
+      "limitIncreaseHint": "A limit növelése az aktuális egyenleghez is hozzáadja a különbözetet",
+      "override": "Felülbírálás",
+      "groupDefault": "Csoport alapértelmezett",
+      "useGroupDefault": "Csoport alapértelmezett használata",
+      "currentUsage": "Jelenlegi használat",
+      "groupTitle": "{{role}} alapértelmezett kvóta"
+    },
+    "users": {
+      "filter": {
+        "pending": "Függőben levő",
+        "suspended": "Felfüggesztett",
+        "all": "Minden",
+        "approved": "Jóváhagyott",
+        "rejected": "Elutasítva"
+      },
+      "table": {
+        "name": "Név",
+        "role": "Szerep",
+        "department": "Osztály",
+        "provider": "Bejelentkezés",
+        "status": "Állapot",
+        "action": "Akció",
+        "username": "Felhasználónév",
+        "createdAt": "Kért"
+      },
+      "action": {
+        "reject": "Elutasít",
+        "approve": "Jóváhagyni",
+        "reactivate": "Aktiválja újra",
+        "suspend": "Felfüggeszteni",
+        "editQuota": "Kvóta szerkesztése"
+      },
+      "status": {
+        "pending": "Függőben levő",
+        "approved": "Jóváhagyott",
+        "suspended": "Felfüggesztett",
+        "rejected": "Elutasítva"
+      },
+      "confirm": {
+        "suspendTitle": "Felhasználó felfüggesztése",
+        "approveTitle": "Felhasználó jóváhagyása",
+        "approveBody": "Jóváhagyja ezt a felhasználót? Azonnal be tudnak majd jelentkezni.",
+        "rejectTitle": "Regisztráció elutasítása",
+        "reactivateTitle": "Felhasználó újraaktiválása",
+        "reactivateBody": "Újraaktiválja ezt a felhasználót?",
+        "suspendBody": "A felhasználó felfüggesztése. Minden aktív munkamenet megszakad.",
+        "rejectBody": "A felhasználó regisztrációs kérelmének elutasítása. Nem tudnak majd bejelentkezni."
+      },
+      "title": "Felhasználók",
+      "empty": "Nincsenek felhasználók."
+    },
+    "console": "Felügyeleti konzol"
+  },
+  "me": {
+    "section": {
+      "profile": "Profil",
+      "password": "Jelszó",
+      "activity": "Tevékenység",
+      "sshKeys": "SSH kulcsok",
+      "solid": "Szilárd felhő kapcsolat"
+    },
+    "profile": {
+      "username": "Felhasználónév (tanulói azonosító)",
+      "email": "Email",
+      "role": "Szerep",
+      "department": "Osztály",
+      "advisor": "Tanácsadó",
+      "providerLocal": "Helyi",
+      "lab": "Labor",
+      "providerSolid": "Szilárd felhő",
+      "providerBoth": "Helyi + Solid Cloud",
+      "nameKo": "Név (koreai)",
+      "nameEn": "Név (angol)",
+      "notSet": "(nincs beállítva)",
+      "createdAt": "Csatlakozott",
+      "provider": "Bejelentkezési mód"
+    },
+    "solid": {
+      "account": "fiók",
+      "linkSuccess": "Solid Cloud összekapcsolva",
+      "linkSubtitle": "A fiók összekapcsolásához hitelesítsen Solid Cloud hitelesítő adatait, így bármelyik bejelentkezést használhatja.",
+      "linking": "Összekapcsolás...",
+      "unlinkButton": "Leválasztás",
+      "unlinkConfirm": "Leválasztja a Solid Cloud szolgáltatást? Csak ezután tud majd bejelentkezni a helyi jelszavával.",
+      "username": "Solid Cloud felhasználónév",
+      "password": "Jelszó",
+      "domain": "Domain",
+      "unlinking": "Leválasztás...",
+      "userId": "Felhasználói azonosító",
+      "domainId": "Domain ID",
+      "linkButton": "Link Solid Cloud",
+      "linked": "A Solid Cloudhoz kapcsolódik",
+      "notLinked": "Nem kapcsolódik a Solid Cloudhoz",
+      "unlinkNeedsPassword": "A leválasztás előtt állítson be egy helyi jelszót.",
+      "errorAuth": "A Solid Cloud hitelesítés sikertelen.",
+      "errorConflict": "Ez a Solid Cloud-fiók már össze van kapcsolva egy másik felhasználóval."
+    },
+    "password": {
+      "title": "Jelszó módosítása",
+      "current": "Jelenlegi jelszó",
+      "saving": "Megtakarítás...",
+      "errorShort": "A jelszónak legalább 8 karakterből kell állnia.",
+      "noPasswordHint": "Nincs beállítva helyi jelszó. Új jelszó megadása lehetővé teszi a helyi bejelentkezést.",
+      "errorMismatch": "Az új jelszavak nem egyeznek.",
+      "success": "Jelszó frissítve.",
+      "submit": "Jelszó mentése",
+      "hint": "Legalább 8 karakter",
+      "new": "Új jelszó",
+      "confirm": "Erősítse meg az új jelszót"
+    },
+    "ssh": {
+      "name": "Név",
+      "title": "SSH nyilvános kulcsok",
+      "delete": "Töröl",
+      "fingerprint": "Ujjlenyomat",
+      "empty": "Nincs regisztrálva SSH-kulcs.",
+      "adding": "Hozzáadás...",
+      "errorRequired": "A név és a nyilvános kulcs megadása kötelező.",
+      "publicKeyPlaceholder": "ssh-rsa AAAA... vagy ssh-ed25519 AAAA...",
+      "errorFormat": "Érvénytelen SSH nyilvános kulcs formátum.",
+      "deleteConfirm": "Törli ezt az SSH-kulcsot?",
+      "namePlaceholder": "például személyes-laptop",
+      "add": "Kulcs hozzáadása",
+      "createdAt": "Hozzáadva",
+      "publicKey": "Nyilvános kulcs",
+      "subtitle": "Az itt regisztrált kulcsok új példány létrehozásakor választhatók ki."
+    },
+    "title": "Saját fiók",
+    "menu": "Saját fiók",
+    "back": "Vissza az irányítópultra"
+  },
+  "region": {
+    "loading": "Terhelés...",
+    "queue": "Sor",
+    "title": "Régió elérhetősége",
+    "tip": "💡 Tipp: Az RTX 4090 kis terhelésekhez is illeszkedik; válasszon RTX Pro 6000-et a nagy modellek edzéséhez."
+  },
+  "create": {
+    "step1": {
+      "loading": "Sablonok betöltése...",
+      "title": "1. Válassza a Sablon / ISO lehetőséget"
+    },
+    "step2": {
+      "loading": "Ajánlatok betöltése...",
+      "vram": "VRAM",
+      "price": "Ár",
+      "cpu": "CPU",
+      "performance": "Teljesítmény",
+      "title": "2. Válassza a Compute Offering lehetőséget",
+      "ram": "RAM"
+    },
+    "step3": {
+      "instanceName": "Példány neve",
+      "instanceNameHint": "Egyedi azonosító a munkaterülethez.",
+      "sshKeyHint": "Adja meg meglévő nyilvános kulcsát, vagy hozzon létre egy újat.",
+      "instanceNamePh": "pl. my-gpu-project-01",
+      "useSaved": "Használjon mentett SSH-kulcsot",
+      "generateKey": "Kulcspár létrehozása",
+      "manualOrGenerate": "Kézi bevitel / Új létrehozása",
+      "sshKey": "SSH nyilvános kulcs",
+      "generating": "Létrehozás...",
+      "keyLoaded": "Kulcs betöltve",
+      "title": "3. Környezeti beállítások",
+      "downloadNote": "Ha új kulcspárt generál, a privát kulcs (.pem) automatikusan letöltésre kerül. Kérjük, őrizze meg; nem jelenik meg újra."
+    },
+    "footer": {
+      "back": "Vissza",
+      "next": "Következő",
+      "launching": "Indítás...",
+      "launch": "Példány indítása"
+    },
+    "errors": {
+      "createFailed": "Nem sikerült elindítani a példányt."
+    },
+    "stepOf": "A {{total}} {{current}} lépése",
+    "title": "Új példány létrehozása"
+  },
+  "setup": {
+    "steps": {
+      "billing": "Számlázás",
+      "idle": "Tétlen",
+      "review": "Tekintse át",
+      "mode": "Mód"
+    },
+    "unit": {
+      "min": "min",
+      "hour": "h",
+      "credit": "C",
+      "creditPerStep": "C/lépés",
+      "sessions": "üléseken",
+      "times": "alkalommal",
+      "month": "mo"
+    },
+    "mode": {
+      "container": "Konténer mód",
+      "hybrid": "Konténer + SSH hibrid",
+      "hybridDesc": "Közvetlen SSH-hozzáférést biztosít a tárolók tetején lévő fizikai csomópontokhoz. A legjobb kis laboratóriumok számára, vagy ha fizikai csomópont lízingre van szükség.",
+      "hybridNote": "A hibrid kiválasztása lehetővé teszi a fizikai csomópontok bérbeadását, az SSH-fiókokat és a csomópontonkénti otthoni kvótákat. (Későbbi fázisban valósul meg)",
+      "containerDesc": "GPU-k kezelése K8s-tárolókon keresztül. A legjobb a GPU-fürtök széles körű kiszolgálásához sok felhasználó számára."
+    },
+    "billing": {
+      "pricing": "Árképzési politika",
+      "pricingHint": "Válassza ki az ajánlati árak beállításának módját.",
+      "surge": "Áremelkedés a rendelkezésre állás csökkenése után",
+      "pricingStatic": "Statikus – rögzített adminisztrátor által beállított ár",
+      "pricingDynamic": "Dinamikus – az árak emelkednek a rendelkezésre állás csökkenésével",
+      "modeCredit": "Hitel",
+      "surgeHint": "A kredit/óra összeg ezzel az összeggel nő minden alkalommal, amikor az erőforrások szűkülnek.",
+      "modeFree": "Ingyenes",
+      "cooldown": "Lehűtés az újrabérlés előtt",
+      "maxConcurrent": "Maximális egyidejű munkamenetek",
+      "maxLease": "Maximális bérlet munkamenetenként",
+      "modeDynamic": "Első érkezés",
+      "modeCreditDesc": "Fizessen kreditek levonásával. Csak kreditek vezérlik, egyéb korlátok nélkül.",
+      "modeDynamicDesc": "Használja az érkezési sorrendet kreditek nélkül. A maximális bérleti, leállási és egyidejű munkamenet-korlátok védik a rendelkezésre állást.",
+      "modeFreeDesc": "Használja szabadon, korlátozások nélkül. Nincsenek hitelek, lízingek vagy egyidejű munkamenet-korlátok."
+    },
+    "idle": {
+      "timeout": "Idle automatikus visszaigénylési idő",
+      "timeoutHint": "A munkamenetek automatikusan visszanyerhetők, ha a GPU ennyi ideig tétlen marad.",
+      "containerNote": "Tároló mód: visszanyerve a Stop segítségével, az adatok megőrzése.",
+      "sshNote": "SSH mód: az adatok a helyi lemezen maradnak, és újra felhasználhatók."
+    },
+    "lease": {
+      "extHours": "Maximum óra hosszabbításonként",
+      "maxExtHint": "A bővítmények maximális száma munkamenetenként. 0 letiltja a kiterjesztést.",
+      "extHoursHint": "A felhasználók bővítményenként választható maximális órák száma. (csak érkezési sorrendben)",
+      "maxExt": "Max kiterjesztések"
+    },
+    "review": {
+      "modeLabel": "Üzemmód",
+      "idleLabel": "Üresjárati automatikus visszaigénylés",
+      "billingLabel": "Számlázási mód",
+      "hint": "Kezdje az alábbi beállításokkal. Ezeket bármikor módosíthatja az Adminisztrálás → Rendszerbeállítások menüpontban."
+    },
+    "features": {
+      "signup": "Felhasználói regisztrációs kérések",
+      "signupHint": "Ha ki van kapcsolva, a bejelentkezési oldalon található regisztrációs link el van rejtve, és a fiókokat a rendszergazdák hozzák létre.",
+      "datasetFeatureHint": "Ha ki van kapcsolva, az adatkészlet-menük, a gyorsítótárazás és a munkameneten belüli adatkészlet-kiválasztás mind rejtve marad (kevésbé függ a központi tárolótól).",
+      "alerts": "Munkaterhelés rendelkezésre állási figyelmeztetések",
+      "creditHint": "Kikapcsolt állapotban a felhasználók/csoportok nem kérhetnek feltöltést; a rendszergazdák közvetlenül adnak krediteket.",
+      "datasetHint": "Ha ki van kapcsolva, a felhasználók nem regisztrálhatnak/kérhetnek adatkészleteket; csak a rendszergazdák regisztrálják őket.",
+      "credit": "Hitelfeltöltési kérelmek",
+      "datasetFeature": "Adatkészletek funkció",
+      "dataset": "Adatkészlet regisztráció",
+      "groupJoinHint": "Kikapcsolt állapotban a felhasználók nem kérhetnek önállóan tagságot; az adminok kezelik.",
+      "groupJoin": "Csoport/szervezet csatlakozási kérelmek",
+      "alertsHint": "Ha ki van kapcsolva, a felhasználók nem iratkozhatnak fel a GPU/csomópont rendelkezésre állási riasztásaira."
+    },
+    "back": "Vissza",
+    "next": "Következő",
+    "finish": "Fejezze be a beállítást",
+    "wizardTitle": "Giosk kezdeti beállítása",
+    "wizardSubtitle": "Állítsa be az üzemmódot és az alapértelmezett házirendeket. Később mindent megváltoztathat az Adminisztrálás → Rendszerbeállítások menüpontban."
+  },
+  "topbar": {
+    "nodeBadge": "Csomópontok {{up}}/{{total}} · GPU {{gpu}}%"
+  }
+}

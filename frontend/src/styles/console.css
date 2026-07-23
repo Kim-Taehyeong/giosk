@@ -1,0 +1,368 @@
+/* ============================================================================
+ * 콘솔 셸 스타일 — 목업(gshare-*.html) CSS를 이식.
+ * 모든 규칙은 .console-root 아래로 스코프하여 기존 Tailwind 페이지와 충돌 방지.
+ * 테마 변수(:root / [data-theme=dark])는 정의만 하므로 전역에 둬도 안전.
+ * ThemeContext 가 <html data-theme="dark"> 를 토글한다.
+ * ========================================================================== */
+
+:root {
+  --bg:#f7f8fa; --surface:#ffffff; --surface-2:#f4f5f7; --border:#e5e7eb;
+  --text:#111827; --muted:#6b7280; --primary:#4f46e5; --primary-soft:#eef2ff;
+  --gpu:#4f46e5; --gpu-soft:#eef2ff; --free:#0f9d6e; --free-soft:#e9f5ef;
+  --warn:#b4730a; --warn-soft:#fbf3e6; --danger:#dc2626; --danger-soft:#fceced;
+  --ok:#0f9d6e; --shadow:0 1px 2px rgba(17,24,39,.04),0 1px 3px rgba(17,24,39,.06);
+  --radius:12px;
+}
+html[data-theme="dark"] {
+  --bg:#0f1218; --surface:#171a21; --surface-2:#1e222b; --border:#2b303b;
+  --text:#e7e9ee; --muted:#9aa1ad; --primary:#7c8aff; --primary-soft:#23263a;
+  --gpu:#7c8aff; --gpu-soft:#23263a; --free:#34c08a; --free-soft:#11251c;
+  --warn:#d89636; --warn-soft:#2a2210; --danger:#e06666; --danger-soft:#2a1616;
+  --ok:#34c08a; --shadow:0 1px 2px rgba(0,0,0,.25),0 6px 18px rgba(0,0,0,.3);
+}
+
+/* Layout shell (root grid) */
+.console-root {
+  display:grid; grid-template-columns:248px 1fr; grid-template-rows:64px 1fr;
+  min-height:100vh; grid-template-areas:"logo top" "nav main";
+  background:var(--bg); color:var(--text); font-size:14.5px; line-height:1.55;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  font-family:"Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  font-weight:450;
+}
+.console-root *{box-sizing:border-box; font-family:inherit}
+.console-root a{color:inherit;text-decoration:none}
+.console-modal-bg{font-family:"Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+  system-ui, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif}
+.console-modal-bg *{font-family:inherit}
+
+/* Topbar */
+.console-root .logo{grid-area:logo;display:flex;align-items:center;gap:10px;padding:0 18px;border-bottom:1px solid var(--border);
+  border-right:1px solid var(--border);background:var(--surface)}
+.console-root .logo .giosk{font-weight:900;font-size:25px;letter-spacing:-1.5px;color:var(--primary);line-height:1}
+.console-root .logo .logo-div{width:2px;height:26px;flex:0 0 auto;border-radius:2px;background:var(--primary);opacity:.45}
+.console-root .logo .logo-name{display:flex;flex-direction:column;line-height:1.12;min-width:0}
+.console-root .logo .logo-name strong{font-size:14.5px;font-weight:800;letter-spacing:-.3px}
+.console-root .logo .logo-name small{font-size:9px;font-weight:700;letter-spacing:2.5px;color:var(--muted)}
+.console-root .topbar{grid-area:top;display:flex;align-items:center;gap:14px;padding:0 18px;background:var(--surface);
+  border-bottom:1px solid var(--border)}
+.console-root .proj{position:relative;display:flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid var(--border);border-radius:8px;
+  background:var(--surface-2);cursor:pointer;font-weight:600}
+.console-root .proj small{color:var(--muted);font-weight:500}
+.console-root .spacer{flex:1}
+.console-root .badge-credit{display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;background:var(--surface-2);
+  border:1px solid var(--border);color:var(--text);font-weight:700;font-size:13px;cursor:pointer;transition:.15s}
+.console-root .badge-credit:hover{border-color:var(--primary);color:var(--primary)}
+.console-root .icon-btn{position:relative;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);cursor:pointer;
+  display:grid;place-items:center;font-size:15px;color:var(--text)}
+.console-root .user{position:relative;display:flex;align-items:center;gap:8px;cursor:pointer}
+.console-root .avatar{width:30px;height:30px;border-radius:50%;background:var(--primary-soft)!important;color:var(--primary)!important;
+  display:grid;place-items:center;font-weight:700;font-size:12px}
+
+/* Nav */
+.console-root .nav{grid-area:nav;background:var(--surface);border-right:1px solid var(--border);padding:12px 10px;overflow-y:auto}
+.console-root .nav .group{font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.07em;
+  padding:16px 12px 6px}
+.console-root .nav a{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:9px;color:var(--muted);font-weight:600;font-size:14px;cursor:pointer}
+.console-root .nav a .i{width:18px;text-align:center;display:inline-flex;align-items:center;justify-content:center}
+.console-root .nav a:hover{background:var(--surface-2);color:var(--text)}
+.console-root .nav a.active{background:var(--primary-soft);color:var(--primary)}
+.console-root .nav a .tag{margin-left:auto;font-size:10px;background:var(--free-soft);color:var(--free);padding:1px 6px;border-radius:6px;font-weight:700}
+
+/* Main */
+.console-root .main{grid-area:main;padding:24px 28px;overflow-y:auto}
+.console-root .page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px}
+.console-root .page-head h1{font-size:24px;font-weight:800;letter-spacing:-.4px}
+.console-root .page-head p{color:var(--muted);font-size:13.5px;margin-top:3px;font-weight:500}
+.console-root .crumb{color:var(--muted);font-size:12.5px;margin-bottom:5px;font-weight:600}
+
+/* Cards & grid */
+.console-root .grid{display:grid;gap:16px}
+.console-root .cols-5{grid-template-columns:repeat(5,1fr)}
+.console-root .cols-4{grid-template-columns:repeat(4,1fr)}
+.console-root .cols-3{grid-template-columns:repeat(3,1fr)}
+.console-root .cols-2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:1100px){.console-root .cols-5{grid-template-columns:repeat(2,1fr)}.console-root .cols-4{grid-template-columns:repeat(2,1fr)}.console-root .cols-3{grid-template-columns:1fr}}
+.console-root .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.console-root .card h3{font-size:15.5px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.console-root .card h3 .muted{color:var(--muted);font-weight:500;font-size:12.5px;margin-left:auto}
+.console-root .stat .label{color:var(--muted);font-size:13px;font-weight:600}
+.console-root .stat .value{font-size:28px;font-weight:800;letter-spacing:-.5px;margin:8px 0 4px}
+.console-root .stat .value small{font-size:13.5px;color:var(--muted);font-weight:600}
+.console-root .bar{height:8px;border-radius:6px;background:var(--surface-2);overflow:hidden;margin-top:6px}
+/* framed: 전체 트랙을 흰색+테두리로(어두운 카드 위에서도 빈 영역이 보이게). 채움만 색. */
+.console-root .bar.framed{background:#fff;border:1px solid var(--border)}
+.console-root .bar > i{display:block;height:100%;border-radius:6px;background:var(--primary)}
+.console-root .bar.gpu > i{background:var(--primary)}
+.console-root .bar.warn > i{background:var(--warn)}
+.console-root .bar.free > i{background:var(--free)}
+
+/* Badges & pills */
+.console-root .pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.console-root .pill.gpu{background:var(--gpu-soft);color:var(--gpu)} .console-root .pill.free{background:var(--free-soft);color:var(--free)}
+.console-root .pill.run{background:var(--free-soft);color:var(--free)} .console-root .pill.wait{background:var(--warn-soft);color:var(--warn)}
+.console-root .pill.pause{background:var(--surface-2);color:var(--muted)} .console-root .pill.err{background:var(--danger-soft);color:var(--danger)}
+.console-root .pill.ok{background:var(--free-soft);color:var(--free)} .console-root .pill.cordon{background:var(--warn-soft);color:var(--warn)}
+.console-root .pill.primary{background:var(--primary-soft);color:var(--primary)}
+.console-root .pill.danger{background:var(--danger-soft);color:var(--danger)}
+.console-root .pill.warn{background:var(--warn-soft);color:var(--warn)}
+.console-root .dot-s{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block}
+
+/* Table */
+.console-root table{width:100%;border-collapse:collapse}
+.console-root th{text-align:left;font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.02em;
+  padding:11px 14px;border-bottom:1px solid var(--border);background:var(--surface-2)}
+.console-root th:first-child{border-top-left-radius:8px}
+.console-root th:last-child{border-top-right-radius:8px}
+.console-root td{padding:13px 14px;border-bottom:1px solid var(--border);font-size:13.5px;vertical-align:middle;font-weight:500}
+.console-root tbody tr:last-child td{border-bottom:none}
+.console-root tbody tr:hover{background:var(--surface-2)}
+.console-root td.flex{padding:13px 14px}
+.console-root .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12.5px;color:var(--muted)}
+
+/* Buttons */
+.console-root .btn{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex:0 0 auto;padding:8px 14px;border-radius:9px;border:1px solid var(--border);
+  background:var(--surface-2);color:var(--text);font-weight:700;font-size:13px;cursor:pointer;transition:.15s}
+.console-root .btn:hover{filter:brightness(.98);transform:translateY(-1px);box-shadow:0 2px 8px rgba(10,15,28,.10)}
+.console-root .btn:active{transform:translateY(0);box-shadow:none}
+.console-root .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.console-root .btn.gpu{background:var(--gpu);border-color:var(--gpu);color:#fff}
+.console-root .btn.free{background:var(--free);border-color:var(--free);color:#fff}
+.console-root .btn.ghost{background:transparent}
+.console-root .btn.sm{padding:5px 10px;font-size:12px}
+.console-root .btn.danger{color:var(--danger);border-color:var(--danger);background:color-mix(in srgb, var(--danger) 9%, transparent)}
+.console-root .btn.danger:hover{background:color-mix(in srgb, var(--danger) 16%, transparent)}
+.console-root .btn.warn{color:var(--warn);border-color:var(--warn);background:var(--warn-soft)}
+.console-root .btn.ok{color:var(--free);border-color:var(--free);background:var(--free-soft)}
+
+/* Start cards */
+.console-root .task-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;cursor:pointer;
+  transition:.18s;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.console-root .task-card:hover{transform:translateY(-3px);border-color:var(--primary)}
+.console-root .task-card .ico{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-size:22px;margin-bottom:14px}
+.console-root .task-card h4{font-size:16.5px;font-weight:800;letter-spacing:-.2px;margin-bottom:7px}
+.console-root .task-card p{color:var(--muted);font-size:13px;font-weight:500;min-height:34px}
+.console-root .task-card .ribbon{position:absolute;top:14px;right:14px;background:var(--free);color:#fff;
+  font-size:11.5px;font-weight:800;padding:4px 11px;border-radius:20px;box-shadow:0 2px 6px rgba(15,157,110,.35)}
+
+/* Gauge row */
+.console-root .qrow{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)}
+.console-root .qrow:last-child{border-bottom:none}
+.console-root .qrow .qn{width:130px;color:var(--text);font-weight:600;font-size:13.5px}
+.console-root .qrow .bar{flex:1;margin:0;height:10px}
+.console-root .qrow .qv{width:130px;text-align:right;font-weight:700;font-size:13.5px}
+
+/* Availability row */
+.console-root .avail{display:flex;align-items:center;justify-content:space-between;padding:14px 12px;border:1px solid var(--border);border-radius:10px;margin-bottom:10px;background:var(--surface-2)}
+.console-root .avail:last-child{margin-bottom:0}
+.console-root .avail .gpu-name{font-weight:700;font-size:14px}
+.console-root .avail .free-n{font-weight:800;font-size:18px}
+
+/* Modal */
+.console-root .modal-bg, .console-modal-bg{position:fixed;inset:0;background:rgba(10,15,28,.55);display:flex;align-items:flex-start;justify-content:center;
+  padding:40px 16px;z-index:50;overflow-y:auto;backdrop-filter:blur(2px)}
+.console-modal-bg .modal, .console-root .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:760px;max-width:100%;
+  box-shadow:0 24px 64px rgba(0,0,0,.3);animation:console-pop .2s ease;color:var(--text)}
+@keyframes console-pop{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
+.console-modal-bg .modal-head, .console-root .modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid var(--border)}
+.console-modal-bg .modal-head h3, .console-root .modal-head h3{font-size:16px;font-weight:700;margin:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* 모달용 버튼/아이콘버튼 스타일(모달이 .console-root 밖에서 렌더돼도 깨지지 않도록) */
+.console-modal-bg .icon-btn{width:34px;height:34px;flex:0 0 auto;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);
+  cursor:pointer;display:grid;place-items:center;font-size:15px;color:var(--text)}
+.console-modal-bg .btn{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex:0 0 auto;padding:8px 14px;border-radius:9px;
+  border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-weight:700;font-size:13px;cursor:pointer;transition:.15s}
+.console-modal-bg .btn:hover{filter:brightness(.98)}
+.console-modal-bg .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.console-modal-bg .btn.danger{color:var(--danger);border-color:var(--danger)}
+.console-modal-bg .btn.sm{padding:5px 10px;font-size:12px}
+.console-modal-bg .pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.console-modal-bg .pill.primary{background:var(--primary-soft);color:var(--primary)}
+.console-modal-bg .pill.gpu{background:var(--gpu-soft);color:var(--gpu)}
+.console-modal-bg .pill.free{background:var(--free-soft);color:var(--free)}
+.console-modal-bg .pill.pause{background:var(--surface-2);color:var(--muted)}
+.console-modal-bg .muted{color:var(--muted)}
+.console-modal-bg h3{font-size:15.5px;font-weight:700;margin-bottom:12px}
+.console-modal-bg .modal-body, .console-root .modal-body{padding:22px}
+.console-modal-bg .modal-foot, .console-root .modal-foot{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-top:1px solid var(--border);
+  background:var(--surface-2);border-radius:0 0 16px 16px}
+
+/* Stepper */
+.console-root .steps, .console-modal-bg .steps{display:flex;gap:6px;margin-bottom:22px}
+.console-root .steps .s, .console-modal-bg .steps .s{flex:1;text-align:center;font-size:12px;font-weight:700;color:var(--muted);padding:8px;border-radius:8px;background:var(--surface-2)}
+.console-root .steps .s.active, .console-modal-bg .steps .s.active{background:var(--primary-soft);color:var(--primary)}
+.console-root .steps .s.done, .console-modal-bg .steps .s.done{color:var(--free)}
+
+/* class choice */
+.console-modal-bg .choice, .console-root .choice{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:6px}
+.console-modal-bg .choice .opt, .console-root .choice .opt{border:2px solid var(--border);border-radius:12px;padding:18px;cursor:pointer;transition:.15s}
+.console-modal-bg .choice .opt:hover, .console-root .choice .opt:hover{border-color:var(--primary)}
+.console-modal-bg .choice .opt.sel, .console-root .choice .opt.sel{border-color:var(--primary);background:var(--primary-soft)}
+.console-modal-bg .choice .opt h4, .console-root .choice .opt h4{font-size:15px;display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.console-modal-bg .choice .opt p, .console-root .choice .opt p{color:var(--muted);font-size:12px}
+
+/* Form controls */
+.console-root label.fld, .console-modal-bg label.fld{display:block;font-weight:700;font-size:12.5px;margin:16px 0 7px}
+.console-root input[type=range], .console-modal-bg input[type=range]{width:100%;accent-color:var(--gpu)}
+.console-root select,.console-root input[type=text],.console-root input[type=password],.console-root input[type=email],.console-root input[type=number],.console-root textarea,
+.console-modal-bg select,.console-modal-bg input[type=text],.console-modal-bg input[type=password],.console-modal-bg input[type=email],.console-modal-bg input[type=number],.console-modal-bg textarea{
+  width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);
+  color:var(--text);font-size:13px;font-family:inherit;transition:border-color .15s ease}
+.console-root select:focus,.console-root input:focus,.console-root textarea:focus,
+.console-modal-bg select:focus,.console-modal-bg input:focus,.console-modal-bg textarea:focus{
+  outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+/* 커스텀 셀렉트(네이티브 화살표 제거 + 셰브론 아이콘) */
+.console-root select,.console-modal-bg select{
+  appearance:none;-webkit-appearance:none;-moz-appearance:none;cursor:pointer;padding-right:32px;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239aa1ad' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat:no-repeat;background-position:right 10px center;background-size:15px}
+.console-root textarea, .console-modal-bg textarea{resize:vertical;min-height:90px;font-family:ui-monospace,"SF Mono",Menlo,monospace}
+.console-root .slider-val, .console-modal-bg .slider-val{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:4px}
+.console-root .cost-box, .console-modal-bg .cost-box{background:var(--primary-soft);border:1px solid var(--border);
+  border-radius:12px;padding:16px;margin-top:18px}
+.console-root .cost-box .row, .console-modal-bg .cost-box .row{display:flex;justify-content:space-between;padding:4px 0;font-size:13px}
+.console-root .cost-box .row.big, .console-modal-bg .cost-box .row.big{font-size:18px;font-weight:800;border-top:1px dashed var(--border);margin-top:8px;padding-top:10px}
+
+/* Misc */
+.console-root .kv{display:grid;grid-template-columns:130px 1fr;gap:8px 14px;font-size:13px}
+.console-root .kv .k{color:var(--muted);font-weight:600}
+.console-root .flex, .console-modal-bg .flex{display:flex;align-items:center;gap:8px}
+.console-root td.flex{display:table-cell;white-space:nowrap;gap:0;vertical-align:middle}
+.console-root td.flex>*{vertical-align:middle}
+.console-root td.flex>*+*{margin-left:8px}
+.console-root .gap{gap:8px}.console-root .wrap{flex-wrap:wrap}
+.console-root hr.sep, .console-modal-bg hr.sep{border:none;border-top:1px solid var(--border);margin:16px 0}
+.console-root .legend, .console-modal-bg .legend{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.55}
+/* legend 안 인라인 아이콘(svg)을 글자 줄에 맞춰 정렬(아이콘이 위로 튀어 "한 줄이 아닌" 느낌 방지) */
+.console-root .legend > svg:first-child, .console-modal-bg .legend > svg:first-child{vertical-align:-0.18em;margin-right:2px}
+
+/* Tabs (connection modal) */
+.console-root .tabs, .console-modal-bg .tabs{display:flex;gap:6px;margin-bottom:16px}
+.console-root .tabs .t, .console-modal-bg .tabs .t{flex:1;text-align:center;font-size:12.5px;font-weight:700;color:var(--muted);padding:9px;border-radius:9px;
+  background:var(--surface-2);cursor:pointer;border:1px solid var(--border)}
+.console-root .tabs .t.active, .console-modal-bg .tabs .t.active{background:var(--primary-soft);color:var(--primary);border-color:var(--primary)}
+.console-root .codeblock, .console-modal-bg .codeblock{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;
+  font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12.5px;color:var(--text);word-break:break-all;display:flex;
+  align-items:flex-start;gap:10px;justify-content:space-between;margin-top:6px}
+.console-root .codeblock .cp, .console-modal-bg .codeblock .cp{cursor:pointer;color:var(--primary);font-weight:700;font-size:11.5px;white-space:nowrap}
+
+/* sub tabs */
+.console-root .subtabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap}
+.console-root .subtabs .st{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
+  font-size:13px;font-weight:700;color:var(--muted);padding:8px 14px;border-radius:9px;
+  background:var(--surface-2);cursor:pointer;border:1px solid var(--border)}
+.console-root .subtabs .st.active{background:var(--primary-soft);color:var(--primary);border-color:var(--primary)}
+
+/* CSS bar chart */
+.console-root .chart{display:flex;align-items:flex-end;gap:10px;height:180px;padding:10px 4px 0;border-bottom:1px solid var(--border)}
+.console-root .chart .col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;height:100%}
+.console-root .chart .col .cbar{width:60%;max-width:34px;border-radius:6px 6px 0 0;background:var(--primary);transition:.2s}
+.console-root .chart .col .cbar:hover{filter:brightness(1.08)}
+.console-root .chart .col .cx{font-size:10.5px;color:var(--muted);font-weight:600}
+.console-root .seg{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
+.console-root .seg span{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--muted)}
+.console-root .seg .sw{width:10px;height:10px;border-radius:3px;display:inline-block}
+
+/* permission matrix */
+.console-root .matrix td, .console-root .matrix th{text-align:center}
+.console-root .matrix td:first-child, .console-root .matrix th:first-child{text-align:left;font-weight:700}
+
+/* Dropdown */
+.console-root .dropdown{position:absolute;top:calc(100% + 8px);right:0;min-width:200px;background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.2);padding:6px;z-index:60}
+.console-root .dd-item{display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:9px;cursor:pointer;font-weight:600;font-size:13px}
+.console-root .dd-item:hover{background:var(--surface-2)}
+.console-root .dd-item small{margin-left:auto;font-weight:500;color:var(--muted)}
+
+/* Toast — 아래에서 위로 쌓이는 스택 */
+.console-toast-stack{position:fixed;bottom:24px;right:24px;z-index:80;display:flex;flex-direction:column-reverse;
+  gap:8px;align-items:flex-end;pointer-events:none}
+.console-toast{background:var(--text);color:var(--bg);padding:12px 18px;border-radius:10px;
+  font-weight:700;font-size:13px;box-shadow:var(--shadow);pointer-events:none;
+  opacity:0;transform:translateY(10px);animation:toastIn .25s ease forwards}
+.console-toast.show{opacity:1;transform:none}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* 선택 박스 애니메이션 */
+.console-root .selbox{transition:border-color .18s ease, background .18s ease, transform .12s ease, box-shadow .18s ease}
+.console-root .selbox:hover{transform:translateY(-1px)}
+.console-root .selbox:active{transform:scale(.99)}
+.console-root .selbox.on{box-shadow:0 0 0 3px var(--primary-soft)}
+@keyframes console-pop-in{from{transform:scale(0) rotate(-25deg);opacity:0}to{transform:none;opacity:1}}
+.console-root .pop-in{display:inline-flex;align-items:center;animation:console-pop-in .24s cubic-bezier(.34,1.56,.64,1)}
+
+/* generic helpers used in pages */
+.console-root .muted{color:var(--muted)}
+.console-root .right{margin-left:auto}
+.console-root .mt{margin-top:16px}
+.console-root .mb{margin-bottom:16px}
+
+/* ── 진입 애니메이션 (페이지 전환 + 카드/그래프가 부드럽게 떠오름) ── */
+@keyframes console-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes console-fade{from{opacity:0}to{opacity:1}}
+@keyframes console-bar-grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes console-col-grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+
+/* 페이지 전환: 라우트가 바뀌면 .console-page 가 리마운트되어 전체가 살짝 페이드 */
+.console-root .console-page{animation:console-fade .28s ease both}
+
+/* 카드/통계/태스크 카드가 아래에서 위로 떠오름 */
+.console-root .console-page .card,
+.console-root .console-page .task-card{animation:console-rise .46s cubic-bezier(.22,.61,.36,1) both}
+
+/* 그리드 내 항목 순차(스태거) 등장 */
+.console-root .console-page .grid > *:nth-child(1){animation-delay:.02s}
+.console-root .console-page .grid > *:nth-child(2){animation-delay:.07s}
+.console-root .console-page .grid > *:nth-child(3){animation-delay:.12s}
+.console-root .console-page .grid > *:nth-child(4){animation-delay:.17s}
+.console-root .console-page .grid > *:nth-child(5){animation-delay:.22s}
+.console-root .console-page .grid > *:nth-child(6){animation-delay:.27s}
+.console-root .console-page .grid > *:nth-child(7){animation-delay:.32s}
+.console-root .console-page .grid > *:nth-child(8){animation-delay:.37s}
+
+/* 진행 막대 채움이 좌→우로 자라남 */
+.console-root .console-page .bar > i{transform-origin:left center;animation:console-bar-grow .65s .12s cubic-bezier(.22,.61,.36,1) both}
+
+/* 막대 그래프 컬럼이 아래→위로 자라남 (순차) */
+.console-root .console-page .chart .col .cbar{transform-origin:bottom center;animation:console-col-grow .5s cubic-bezier(.22,.61,.36,1) both}
+.console-root .console-page .chart .col:nth-child(1) .cbar{animation-delay:.04s}
+.console-root .console-page .chart .col:nth-child(2) .cbar{animation-delay:.08s}
+.console-root .console-page .chart .col:nth-child(3) .cbar{animation-delay:.12s}
+.console-root .console-page .chart .col:nth-child(4) .cbar{animation-delay:.16s}
+.console-root .console-page .chart .col:nth-child(5) .cbar{animation-delay:.2s}
+.console-root .console-page .chart .col:nth-child(6) .cbar{animation-delay:.24s}
+.console-root .console-page .chart .col:nth-child(7) .cbar{animation-delay:.28s}
+.console-root .console-page .chart .col:nth-child(n+8) .cbar{animation-delay:.32s}
+
+/* 접근성: 모션 최소화 설정 시 애니메이션 끔 */
+@media (prefers-reduced-motion: reduce){
+  .console-root .console-page,
+  .console-root .console-page .card,
+  .console-root .console-page .task-card,
+  .console-root .console-page .bar > i,
+  .console-root .console-page .chart .col .cbar{animation:none !important}
+}
+
+/* 클릭으로 상세에 들어가는 행 — 눌리는 느낌을 주고, 첫 열(이름)을 링크처럼 강조한다. */
+.console-root tr.row-link{transition:background .12s ease}
+.console-root tr.row-link:hover{background:var(--surface-2)}
+.console-root tr.row-link:hover td:first-child{color:var(--primary)}
+
+/* 자세히 보기 — 즉시 나타나면 표가 '띡' 하고 튄다. 살짝 펼쳐지듯 등장시켜 시선이 따라가게 한다. */
+@keyframes console-expand{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.console-root .row-detail{animation:console-expand .16s ease-out}
+
+/* 스피너 회전 — Spinner.jsx */
+@keyframes giosk-spin { to { transform: rotate(360deg); } }
+
+/* 감시월 전체화면 — 브라우저 fullscreen 시 여백/스크롤 확보(콘텐츠가 화면에 딱 맞게) */
+.mon-wrap:fullscreen { padding: 22px 30px; overflow-y: auto; overflow-x: hidden; }
+.mon-wrap:-webkit-full-screen { padding: 22px 30px; overflow-y: auto; overflow-x: hidden; }
+.mon-wrap:fullscreen .page-head { padding-top: 4px; }
+
+/* 접속 만료 임박(30초 이하) — 시선 유도 펄스 */
+@keyframes giosk-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+/* 고정 컬럼폭 테이블(감사 로그 등) — 페이지마다 컬럼 너비가 출렁이지 않게 */
+.console-root .fixed-cols table{table-layout:fixed;width:100%}
+.console-root .fixed-cols th, .console-root .fixed-cols td{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

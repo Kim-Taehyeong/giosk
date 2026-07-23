@@ -1,0 +1,518 @@
+{
+  "common": {
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "loading": "読み込み中...",
+    "cancel": "キャンセル",
+    "confirm": "確認する",
+    "save": "保存",
+    "delete": "消去",
+    "back": "戻る",
+    "next": "次",
+    "close": "近い",
+    "refresh": "リフレッシュ",
+    "language": "言語",
+    "korean": "한국어",
+    "english": "英語",
+    "required": "必須",
+    "optional": "オプション"
+  },
+  "auth": {
+    "brand": {
+      "kuName": "檀国大学",
+      "enName": "檀国大学"
+    },
+    "login": {
+      "tabLocal": "サービスログイン",
+      "tabSolid": "ソリッドクラウドログイン",
+      "usernameLocal": "学生証・ユーザー名",
+      "usernameSolid": "Solid Cloud ユーザー名",
+      "password": "パスワード",
+      "domain": "ドメイン",
+      "submit": "ログイン",
+      "submitting": "ログイン中...",
+      "signupLink": "サービスに登録する",
+      "errorGeneric": "ログインに失敗しました。",
+      "errorNetwork": "ネットワークエラーが発生しました。",
+      "errorPending": "管理者の承認を待っています。",
+      "errorSuspended": "このアカウントは停止されました。",
+      "errorRejected": "このサインアップ要求は拒否されました。",
+      "errorInvalid": "ユーザー名またはパスワードが無効です。"
+    },
+    "signupPending": {
+      "title": "登録リクエストが送信されました",
+      "body": "管理者の承認後にログインできるようになります。これには時間がかかる場合があります。",
+      "submittedAt": "提出日",
+      "backToLogin": "ログインに戻る"
+    },
+    "localSignup": {
+      "title": "サービスに登録する",
+      "subtitle": "以下のフォームに記入してください。管理者がリクエストを承認すると、ログインできるようになります。",
+      "section": {
+        "credentials": "アカウント",
+        "name": "名前",
+        "affiliation": "所属"
+      },
+      "field": {
+        "username": "学生証・ユーザー名",
+        "password": "パスワード（8文字以上）",
+        "email": "電子メール",
+        "passwordConfirm": "パスワードを認証する"
+      },
+      "submit": "サインアップをリクエストする",
+      "submitting": "送信中...",
+      "errorTerms": "サインアップするには規約に同意する必要があります。",
+      "errorAdvisor": "学部生および大学院生には指導教員が必要です。",
+      "errorRequired": "すべての必須フィールドに入力してください。",
+      "errorGroup": "組織とグループを選択する必要があります。",
+      "errorPasswordShort": "パスワードは 8 文字以上である必要があります。",
+      "errorGeneric": "サインアップに失敗しました。",
+      "errorPasswordMismatch": "パスワードが一致しません。"
+    },
+    "signup": {
+      "title": "Giosk コンソールにサインアップする",
+      "subtitle": "Solid Cloud 認証が確認されました。利用規約に同意し、追加情報を入力してください。",
+      "section": {
+        "account": "アカウント",
+        "name": "名前",
+        "affiliation": "所属と役割",
+        "password": "サービスパスワード (オプション)"
+      },
+      "field": {
+        "username": "ユーザー名（学生証）",
+        "email": "電子メール",
+        "name": "名前",
+        "namePlaceholder": "例えばホン・ギルドン",
+        "lastNameKo": "姓 (韓国語)",
+        "firstNameKo": "名（韓国語）",
+        "lastNameEn": "姓 (英語)",
+        "firstNameEn": "名（英語）",
+        "role": "役割",
+        "department": "部門",
+        "lab": "ラボ（オプション）",
+        "advisor": "アドバイザー",
+        "advisorPlaceholder": "アドバイザーの名前",
+        "org": "組織",
+        "group": "グループ",
+        "selectPh": "選択",
+        "sponsor": "スポンサー（任意）",
+        "sponsorPlaceholder": "スポンサー名（アドバイザー、チームリーダーなど）",
+        "passwordHint": "Solid Cloud を使用せずに学生 ID/ユーザー名で直接ログインするためのパスワードを設定します。",
+        "passwordPlaceholder": "Solid Cloud ログインのみを使用する場合は空のままにしてください",
+        "noJoinableGroup": "この組織には参加可能なグループがありません。組織管理者に連絡してください。"
+      },
+      "role": {
+        "undergrad": "学部",
+        "graduate": "卒業",
+        "professor": "教授",
+        "staff": "スタッフ"
+      },
+      "terms": "利用規約とプライバシーポリシーに同意します。 （必須）",
+      "termsView": "規約を見る",
+      "submit": "サインアップを完了する",
+      "submitting": "サインアップ中...",
+      "errorTerms": "サインアップするには規約に同意する必要があります。",
+      "errorAdvisor": "学部生および大学院生には指導教員が必要です。",
+      "errorGeneric": "サインアップに失敗しました。"
+    }
+  },
+  "dashboard": {
+    "console": "クラウドコンソール",
+    "logout": "ログアウト",
+    "resourceQuota": "リソース割り当て",
+    "labels": {
+      "instances": "インスタンス",
+      "cpuCores": "CPUコア",
+      "systemMemory": "システムメモリ",
+      "storageProjects": "ストレージ (プロジェクト)"
+    },
+    "units": {
+      "ea": "えー",
+      "cores": "コア",
+      "gib": "GiB",
+      "gb": "GB"
+    },
+    "gpuCredit": {
+      "title": "GPU クレジット クォータ",
+      "renewal": "月次更新: {{date}}",
+      "perMonth": "/ {{limit}} C (月)"
+    },
+    "instances": {
+      "title": "私のコンピューティングインスタンス",
+      "create": "新しいインスタンス",
+      "table": {
+        "status": "状態",
+        "name": "インスタンス名",
+        "offering": "オファリング",
+        "template": "テンプレート",
+        "ip": "IPアドレス",
+        "connection": "繋がり",
+        "action": "アクション"
+      },
+      "actions": {
+        "stop": "インスタンスの停止",
+        "resume": "再開する",
+        "delete": "消去"
+      },
+      "empty": "アクティブなインスタンスが見つかりません。",
+      "createFirst": "最初のインスタンスを作成する",
+      "loading": "インスタンスをロード中..."
+    },
+    "status": {
+      "running": "ランニング",
+      "stopped": "停止しました",
+      "terminating": "終了中",
+      "pending": "保留中"
+    },
+    "confirmStop": {
+      "title": "インスタンスを停止する",
+      "body": "停止すると GPU リソースが解放されます。再度開始するまで料金は発生しません。",
+      "confirm": "停止の確認"
+    },
+    "confirmStart": {
+      "title": "インスタンスの開始",
+      "body": "インスタンスを開始すると課金が再開されます。",
+      "confirm": "始める"
+    },
+    "confirmDelete": {
+      "title": "インスタンスの削除",
+      "body": "これは元に戻すことができません。インスタンスとそのデータは完全に削除されます。",
+      "confirm": "消去"
+    }
+  },
+  "credit": {
+    "title": "GPU クレジット履歴",
+    "balance": "バランス",
+    "limit": "月間限度額",
+    "cycleStartedAt": "サイクルが開始されました",
+    "loadMore": "さらにロードする",
+    "empty": "取引はありません。",
+    "tableType": "タイプ",
+    "tableAmount": "額",
+    "tableBalance": "バランス",
+    "tableDescription": "説明",
+    "tableTime": "時間",
+    "type": {
+      "monthly_reset": "毎月のリセット",
+      "admin_grant": "管理者の許可",
+      "limit_increase": "制限の増加",
+      "usage": "使用法",
+      "auto_stop": "オートストップ（バランスなし）",
+      "manual_adjust": "手動調整"
+    }
+  },
+  "notifications": {
+    "title": "通知",
+    "empty": "新しい通知はありません。",
+    "viewAll": "すべてのアクティビティを表示",
+    "unread": "{{count}}新しい"
+  },
+  "activity": {
+    "title": "活動",
+    "loadMore": "さらにロードする",
+    "empty": "まだ活動はありません。"
+  },
+  "audit": {
+    "actor": "俳優",
+    "target": "ターゲット",
+    "action": {
+      "login_local": "ローカルログイン",
+      "login_solid": "Solid Cloud ログイン",
+      "logout": "ログアウト",
+      "signup_local": "ローカルサインアップリクエスト",
+      "signup_solid": "Solid Cloud サインアップ リクエスト",
+      "password_change": "パスワードの変更",
+      "ssh_key_add": "SSHキーが追加されました",
+      "ssh_key_delete": "SSHキーが削除されました",
+      "solid_link": "ソリッドクラウドリンク済み",
+      "solid_unlink": "ソリッドクラウドのリンク解除",
+      "status_change": "ステータス変更",
+      "quota_override": "クォータのオーバーライド",
+      "credit_grant": "クレジットが付与されました",
+      "group_quota_change": "グループ割り当てが変更されました"
+    },
+    "msg": {
+      "credit_grant": "{{actor}} により {{delta}} GPU クレジットが付与されました (新しい制限 {{newLimit}})",
+      "status_change": "{{actor}} によりステータスが {{from}} から {{to}} に変更されました",
+      "quota_override": "{{actor}} が割り当てを調整しました"
+    }
+  },
+  "admin": {
+    "console": "管理コンソール",
+    "menu": {
+      "users": "ユーザー",
+      "groupQuotas": "グループクォータ",
+      "audit": "監査ログ"
+    },
+    "quota": {
+      "cpu": "CPUコア",
+      "ram": "RAM (GiB)",
+      "storage": "ストレージ (GiB)",
+      "instances": "同時インスタンス",
+      "gpuCredit": "GPUクレジット",
+      "monthlyLimit": "月間限度額",
+      "currentBalance": "現在の残高",
+      "grantHint": "ボーナスはこのサイクルにのみ追加されます (次の毎月のリセットでクリアされます)",
+      "limitIncreaseHint": "制限を増やすと、現在の残高にも差が追加されます",
+      "grant": "付与",
+      "save": "保存",
+      "saved": "保存されました",
+      "editTitle": "クォータの編集 — {{name}}",
+      "currentUsage": "現在の使用状況",
+      "effective": "効果的",
+      "override": "オーバーライド",
+      "groupDefault": "グループのデフォルト",
+      "useGroupDefault": "グループのデフォルトを使用する",
+      "groupTitle": "{{role}} デフォルトのクォータ"
+    },
+    "users": {
+      "title": "ユーザー",
+      "filter": {
+        "all": "全て",
+        "pending": "保留中",
+        "approved": "承認された",
+        "suspended": "一時停止中",
+        "rejected": "拒否されました"
+      },
+      "table": {
+        "username": "ユーザー名",
+        "name": "名前",
+        "role": "役割",
+        "department": "部門",
+        "provider": "ログイン",
+        "status": "状態",
+        "createdAt": "リクエスト済み",
+        "action": "アクション"
+      },
+      "action": {
+        "approve": "承認する",
+        "reject": "拒否する",
+        "suspend": "つるす",
+        "reactivate": "再アクティブ化",
+        "editQuota": "クォータの編集"
+      },
+      "status": {
+        "pending": "保留中",
+        "approved": "承認された",
+        "suspended": "一時停止中",
+        "rejected": "拒否されました"
+      },
+      "empty": "ユーザーがいません。",
+      "confirm": {
+        "approveTitle": "ユーザーを承認する",
+        "approveBody": "このユーザーを承認しますか?すぐにログインできるようになります。",
+        "rejectTitle": "サインアップを拒否する",
+        "rejectBody": "このユーザーのサインアップ要求を拒否します。ログインできなくなります。",
+        "suspendTitle": "ユーザーの一時停止",
+        "suspendBody": "このユーザーを一時停止します。アクティブなセッションはすべて終了されます。",
+        "reactivateTitle": "ユーザーを再アクティブ化する",
+        "reactivateBody": "このユーザーを再アクティブ化しますか?"
+      }
+    }
+  },
+  "me": {
+    "title": "私のアカウント",
+    "menu": "私のアカウント",
+    "back": "ダッシュボードに戻る",
+    "section": {
+      "profile": "プロフィール",
+      "solid": "強固なクラウド接続",
+      "password": "パスワード",
+      "sshKeys": "SSHキー",
+      "activity": "活動"
+    },
+    "profile": {
+      "username": "ユーザー名（学生証）",
+      "email": "電子メール",
+      "nameKo": "名前（韓国語）",
+      "nameEn": "名前（英語）",
+      "role": "役割",
+      "department": "部門",
+      "lab": "研究室",
+      "advisor": "アドバイザー",
+      "createdAt": "参加しました",
+      "provider": "ログイン方法",
+      "providerLocal": "地元",
+      "providerSolid": "ソリッドクラウド",
+      "providerBoth": "ローカル + ソリッド クラウド",
+      "notSet": "(未設定)"
+    },
+    "solid": {
+      "linked": "ソリッドクラウドと連携",
+      "notLinked": "Solid Cloud にリンクされていません",
+      "userId": "ユーザーID",
+      "domainId": "ドメインID",
+      "account": "アカウント",
+      "linkButton": "リンクソリッドクラウド",
+      "linkSubtitle": "Solid Cloud 資格情報で認証してこのアカウントをリンクし、どちらのログインでも使用できるようにします。",
+      "linking": "リンク中...",
+      "linkSuccess": "ソリッドクラウドリンク済み",
+      "unlinkButton": "リンクを解除する",
+      "unlinking": "リンクを解除中...",
+      "unlinkConfirm": "Solid Cloud のリンクを解除しますか?その後は、ローカル パスワードを使用してのみログインできるようになります。",
+      "unlinkNeedsPassword": "リンクを解除する前にローカルパスワードを設定してください。",
+      "errorAuth": "Solid Cloud 認証に失敗しました。",
+      "errorConflict": "この Solid Cloud アカウントはすでに別のユーザーにリンクされています。",
+      "username": "Solid Cloud ユーザー名",
+      "password": "パスワード",
+      "domain": "ドメイン"
+    },
+    "password": {
+      "title": "パスワードを変更する",
+      "current": "現在のパスワード",
+      "new": "新しいパスワード",
+      "confirm": "新しいパスワードを確認します",
+      "submit": "パスワードを保存する",
+      "saving": "保存中...",
+      "hint": "少なくとも 8 文字",
+      "noPasswordHint": "ローカルパスワードは設定されていません。新しいパスワードを入力すると、ローカルログインが可能になります。",
+      "errorMismatch": "新しいパスワードが一致しません。",
+      "errorShort": "パスワードは 8 文字以上である必要があります。",
+      "success": "パスワードが更新されました。"
+    },
+    "ssh": {
+      "title": "SSH公開鍵",
+      "subtitle": "ここで登録したキーは新規インスタンス作成時に選択できます。",
+      "empty": "SSH キーが登録されていません。",
+      "name": "名前",
+      "namePlaceholder": "例: 個人のラップトップ",
+      "publicKey": "公開鍵",
+      "publicKeyPlaceholder": "ssh-rsa AAAA... または ssh-ed25519 AAAA...",
+      "fingerprint": "指紋",
+      "createdAt": "追加した",
+      "add": "キーを追加",
+      "adding": "追加中...",
+      "delete": "消去",
+      "deleteConfirm": "この SSH キーを削除しますか?",
+      "errorFormat": "SSH 公開キーの形式が無効です。",
+      "errorRequired": "名前と公開キーは必須です。"
+    }
+  },
+  "region": {
+    "title": "利用可能な地域",
+    "queue": "列",
+    "loading": "読み込み中...",
+    "tip": "💡 ヒント: RTX 4090 は軽いワークロードに適しています。大規模モデルのトレーニングには RTX Pro 6000 を選択してください。"
+  },
+  "create": {
+    "title": "新しいインスタンスの作成",
+    "stepOf": "{{total}} のステップ {{current}}",
+    "step1": {
+      "title": "1. テンプレート/ISOを選択します",
+      "loading": "テンプレートを読み込んでいます..."
+    },
+    "step2": {
+      "title": "2. コンピューティング オファリングを選択します",
+      "loading": "オファリングを読み込んでいます...",
+      "vram": "VRAM",
+      "performance": "パフォーマンス",
+      "cpu": "CPU",
+      "ram": "ラム",
+      "price": "価格"
+    },
+    "step3": {
+      "title": "3. 環境設定",
+      "instanceName": "インスタンス名",
+      "instanceNameHint": "ワークスペースの一意の識別子。",
+      "instanceNamePh": "例: my-gpu-project-01",
+      "sshKey": "SSH公開鍵",
+      "sshKeyHint": "既存の公開キーを入力するか、新しい公開キーを生成します。",
+      "useSaved": "保存した SSH キーを使用する",
+      "manualOrGenerate": "手動で入力 / 新規生成",
+      "generating": "生成中...",
+      "generateKey": "キーペアの生成",
+      "keyLoaded": "キーがロードされました",
+      "downloadNote": "新しいキー ペアを生成すると、秘密キー (.pem) が自動的にダウンロードされます。安全に保管してください。再び表示されることはありません。"
+    },
+    "footer": {
+      "back": "戻る",
+      "next": "次",
+      "launching": "起動中...",
+      "launch": "インスタンスの起動"
+    },
+    "errors": {
+      "createFailed": "インスタンスの起動に失敗しました。"
+    }
+  },
+  "setup": {
+    "wizardTitle": "Giosk の初期セットアップ",
+    "wizardSubtitle": "動作モードとデフォルトのポリシーを構成します。すべては後から「管理者」→「システム設定」で変更できます。",
+    "steps": {
+      "mode": "モード",
+      "billing": "請求する",
+      "idle": "アイドル状態",
+      "review": "レビュー"
+    },
+    "back": "戻る",
+    "next": "次",
+    "finish": "セットアップを完了する",
+    "unit": {
+      "hour": "h",
+      "min": "分",
+      "month": "も",
+      "credit": "C",
+      "creditPerStep": "C/ステップ",
+      "sessions": "セッション",
+      "times": "回"
+    },
+    "mode": {
+      "container": "コンテナモード",
+      "containerDesc": "K8s コンテナ経由で GPU を管理します。 GPU クラスターを多数のユーザーに大規模に提供する場合に最適です。",
+      "hybrid": "コンテナ + SSH ハイブリッド",
+      "hybridDesc": "コンテナー上の物理ノードへの直接 SSH アクセスを追加します。小規模なラボ、または物理ノードのリースが必要な場合に最適です。",
+      "hybridNote": "ハイブリッドを選択すると、物理ノードのリース、SSH アカウント、およびノー​​ドごとのホーム クォータが有効になります。 (後のフェーズで実装)"
+    },
+    "billing": {
+      "pricing": "価格設定ポリシー",
+      "pricingHint": "提供価格の設定方法を選択します。",
+      "pricingStatic": "静的 — 固定の管理者セット価格",
+      "pricingDynamic": "動的 — 可用性が低下すると価格が上昇します",
+      "surge": "在庫状況の低下に伴う価格の上昇",
+      "surgeHint": "リソースが不足するたびに、クレジット/時間はこの量ずつ増加します。",
+      "maxLease": "セッションごとの最大リース",
+      "cooldown": "再リリース前のクールダウン",
+      "maxConcurrent": "最大同時セッション数",
+      "modeCredit": "クレジット",
+      "modeCreditDesc": "クレジットを差し引いて支払います。クレジットのみで制御され、その他の制限はありません。",
+      "modeDynamic": "先着順",
+      "modeDynamicDesc": "クレジットなしで先着順でご利用ください。最大リース、クールダウン、および同時セッションの制限により、可用性が保護されます。",
+      "modeFree": "無料",
+      "modeFreeDesc": "制限なくご自由にお使いください。クレジット、リース、同時セッションの上限はありません。"
+    },
+    "idle": {
+      "timeout": "アイドル自動回収時間",
+      "timeoutHint": "GPU がこの期間アイドル状態のままになると、セッションは自動的に再利用されます。",
+      "containerNote": "コンテナ モード: データを保存しながら、Stop 経由で再利用されます。",
+      "sshNote": "SSH モード: データはローカル ディスクに残り、そのまま再利用できます。"
+    },
+    "lease": {
+      "extHours": "延長ごとの最大時間",
+      "extHoursHint": "ユーザーが内線番号ごとに選択できる最大時間。 (先着モードのみ)",
+      "maxExt": "最大拡張子数",
+      "maxExtHint": "セッションごとの拡張機能の最大数。 0 は拡張を無効にします。"
+    },
+    "review": {
+      "hint": "まずは以下の設定から始めます。管理者→システム設定でいつでも変更できます。",
+      "modeLabel": "動作モード",
+      "idleLabel": "アイドル状態の自動回収",
+      "billingLabel": "課金モード"
+    },
+    "features": {
+      "signup": "ユーザーサインアップリクエスト",
+      "signupHint": "オフの場合、ログイン ページのサインアップ リンクは非表示になり、アカウントは管理者によって作成されます。",
+      "datasetFeature": "データセット機能",
+      "datasetFeatureHint": "オフの場合、データセット メニュー、キャッシュ、セッション内のデータセット選択はすべて非表示になります (中央ストレージへの依存度が低くなります)。",
+      "dataset": "データセットの登録",
+      "datasetHint": "オフの場合、ユーザーはデータセットを登録/要求できません。管理者のみが登録します。",
+      "alerts": "ワークロード可用性アラート",
+      "alertsHint": "オフの場合、ユーザーは GPU/ノードの可用性アラートを購読できません。",
+      "groupJoin": "グループ/組織への参加リクエスト",
+      "groupJoinHint": "オフの場合、ユーザーはメンバーシップを自己リクエストできません。管理者が管理します。",
+      "credit": "クレジットの補充リクエスト",
+      "creditHint": "オフの場合、ユーザー/グループはチャージをリクエストできません。管理者はクレジットを直接付与します。"
+    }
+  },
+  "topbar": {
+    "nodeBadge": "ノード {{up}}/{{total}} · GPU {{gpu}}%"
+  }
+}

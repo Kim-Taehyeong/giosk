@@ -1,0 +1,518 @@
+{
+  "common": {
+    "delete": "Eliminare",
+    "confirm": "Confermare",
+    "back": "Indietro",
+    "login": "Login",
+    "cancel": "Cancellare",
+    "save": "Salva",
+    "close": "Vicino",
+    "logout": "Esci",
+    "loading": "Caricamento...",
+    "next": "Prossimo",
+    "language": "Lingua",
+    "refresh": "Aggiorna",
+    "english": "Inglese",
+    "korean": "한국어",
+    "optional": "opzionale",
+    "required": "necessario"
+  },
+  "auth": {
+    "brand": {
+      "kuName": "Università Dankook",
+      "enName": "UNIVERSITÀ DANKOOK"
+    },
+    "login": {
+      "submit": "Login",
+      "password": "Password",
+      "domain": "Dominio",
+      "errorGeneric": "Accesso non riuscito.",
+      "tabSolid": "Accesso a Solid Cloud",
+      "signupLink": "Iscriviti al servizio",
+      "tabLocal": "Accesso al servizio",
+      "usernameLocal": "ID studente/nome utente",
+      "submitting": "Accesso...",
+      "usernameSolid": "Nome utente Solid Cloud",
+      "errorNetwork": "Si è verificato un errore di rete.",
+      "errorPending": "In attesa dell'approvazione dell'amministratore.",
+      "errorRejected": "Questa richiesta di registrazione è stata respinta.",
+      "errorInvalid": "Nome utente o password non validi.",
+      "errorSuspended": "Questo account è stato sospeso."
+    },
+    "signupPending": {
+      "backToLogin": "Torna al login",
+      "submittedAt": "Inserito il",
+      "body": "Potrai accedere dopo l'approvazione dell'amministratore. L'operazione potrebbe richiedere del tempo.",
+      "title": "Richiesta di registrazione inviata"
+    },
+    "localSignup": {
+      "section": {
+        "credentials": "Account",
+        "name": "Nome",
+        "affiliation": "Affiliazione"
+      },
+      "field": {
+        "username": "ID studente/nome utente",
+        "email": "E-mail",
+        "password": "Password (almeno 8 caratteri)",
+        "passwordConfirm": "Conferma password"
+      },
+      "title": "Iscriviti al servizio",
+      "submitting": "Invio...",
+      "errorRequired": "Si prega di compilare tutti i campi obbligatori.",
+      "errorPasswordShort": "La password deve contenere almeno 8 caratteri.",
+      "submit": "Richiedi l'iscrizione",
+      "subtitle": "Compila il modulo sottostante. Potrai accedere una volta che un amministratore avrà approvato la tua richiesta.",
+      "errorTerms": "Devi accettare i termini per iscriverti.",
+      "errorGroup": "È necessario selezionare un'organizzazione e un gruppo.",
+      "errorAdvisor": "Gli studenti universitari e laureati devono fornire un consulente.",
+      "errorGeneric": "Registrazione non riuscita.",
+      "errorPasswordMismatch": "Le password non corrispondono."
+    },
+    "signup": {
+      "section": {
+        "account": "Account",
+        "name": "Nome",
+        "affiliation": "Affiliazione e ruolo",
+        "password": "Password di servizio (facoltativa)"
+      },
+      "field": {
+        "email": "E-mail",
+        "name": "Nome",
+        "username": "Nome utente (ID studente)",
+        "firstNameKo": "Nome (coreano)",
+        "advisor": "Consulente",
+        "department": "Dipartimento",
+        "role": "Ruolo",
+        "group": "Gruppo",
+        "org": "Organizzazione",
+        "selectPh": "Selezionare",
+        "sponsorPlaceholder": "Nome dello sponsor (consulente, responsabile del team, ecc.)",
+        "lastNameEn": "Cognome (inglese)",
+        "firstNameEn": "Nome (inglese)",
+        "sponsor": "Sponsor (facoltativo)",
+        "lab": "Laboratorio (facoltativo)",
+        "namePlaceholder": "per esempio. Hong Gildong",
+        "lastNameKo": "Cognome (coreano)",
+        "advisorPlaceholder": "Nome del consigliere",
+        "passwordPlaceholder": "Lasciare vuoto per utilizzare solo l'accesso a Solid Cloud",
+        "passwordHint": "Imposta una password per accedere direttamente con il tuo ID studente/nome utente senza Solid Cloud.",
+        "noJoinableGroup": "Questa organizzazione non ha gruppi unibili. Contatta l'amministratore dell'organizzazione."
+      },
+      "role": {
+        "graduate": "Laureato",
+        "staff": "Personale",
+        "professor": "Professore",
+        "undergrad": "Studente universitario"
+      },
+      "title": "Iscriviti a Giosk Console",
+      "subtitle": "Autenticazione Solid Cloud verificata. Accetta i termini e fornisci ulteriori informazioni.",
+      "errorTerms": "Devi accettare i termini per iscriverti.",
+      "errorAdvisor": "Gli studenti universitari e laureati devono fornire un consulente.",
+      "errorGeneric": "Registrazione non riuscita.",
+      "submit": "Completa la registrazione",
+      "submitting": "Iscrizione...",
+      "termsView": "Visualizza i termini",
+      "terms": "Accetto i Termini di servizio e l'Informativa sulla privacy. (necessario)"
+    }
+  },
+  "dashboard": {
+    "labels": {
+      "instances": "Istanze",
+      "cpuCores": "Core della CPU",
+      "storageProjects": "Archiviazione (progetti)",
+      "systemMemory": "Memoria di sistema"
+    },
+    "units": {
+      "cores": "Nuclei",
+      "gb": "GB",
+      "gib": "GiB",
+      "ea": "eas"
+    },
+    "gpuCredit": {
+      "perMonth": "/{{limit}} C (mese)",
+      "renewal": "Rinnovo mensile: {{date}}",
+      "title": "Quota di credito GPU"
+    },
+    "instances": {
+      "table": {
+        "status": "Stato",
+        "offering": "Offerta",
+        "template": "Modello",
+        "connection": "Connessione",
+        "action": "Azione",
+        "ip": "Indirizzo IP",
+        "name": "Nome istanza"
+      },
+      "actions": {
+        "delete": "Eliminare",
+        "resume": "Riprendere",
+        "stop": "Interrompi istanza"
+      },
+      "title": "Le mie istanze di calcolo",
+      "create": "Nuova istanza",
+      "createFirst": "Crea la tua prima istanza",
+      "empty": "Nessuna istanza attiva trovata.",
+      "loading": "Caricamento istanze..."
+    },
+    "status": {
+      "running": "Corsa",
+      "pending": "In attesa di",
+      "terminating": "Terminazione",
+      "stopped": "Fermato"
+    },
+    "confirmStop": {
+      "body": "L'interruzione rilascia risorse GPU. Non ti verrà addebitato alcun importo finché non lo riavvii.",
+      "confirm": "Conferma arresto",
+      "title": "Arresta l'istanza"
+    },
+    "confirmStart": {
+      "confirm": "Inizio",
+      "title": "Avvia istanza",
+      "body": "L'avvio dell'istanza riprende la fatturazione."
+    },
+    "confirmDelete": {
+      "confirm": "Eliminare",
+      "title": "Elimina istanza",
+      "body": "Questo è irreversibile. L'istanza e i relativi dati verranno rimossi definitivamente."
+    },
+    "logout": "Esci",
+    "console": "Console cloud",
+    "resourceQuota": "Quota di risorse"
+  },
+  "credit": {
+    "type": {
+      "usage": "Utilizzo",
+      "manual_adjust": "Regolazione manuale",
+      "monthly_reset": "Reset mensile",
+      "auto_stop": "Arresto automatico (nessun bilanciamento)",
+      "admin_grant": "Concessione amministrativa",
+      "limit_increase": "Aumento del limite"
+    },
+    "balance": "Bilancia",
+    "loadMore": "Carica di più",
+    "tableType": "Tipo",
+    "tableAmount": "Quantità",
+    "tableBalance": "Bilancia",
+    "tableDescription": "Descrizione",
+    "tableTime": "Tempo",
+    "empty": "Nessuna transazione.",
+    "cycleStartedAt": "Ciclo iniziato",
+    "title": "Cronologia crediti GPU",
+    "limit": "Limite mensile"
+  },
+  "notifications": {
+    "title": "Notifiche",
+    "viewAll": "Visualizza tutte le attività",
+    "unread": "{{count}} nuovo",
+    "empty": "Nessuna nuova notifica."
+  },
+  "activity": {
+    "loadMore": "Carica di più",
+    "title": "Attività",
+    "empty": "Nessuna attività ancora"
+  },
+  "audit": {
+    "action": {
+      "logout": "Esci",
+      "login_solid": "Accesso a Solid Cloud",
+      "password_change": "Modifica della password",
+      "signup_local": "Richiesta di registrazione locale",
+      "login_local": "Accesso locale",
+      "status_change": "Cambiamento di stato",
+      "solid_link": "Solid Cloud collegato",
+      "ssh_key_add": "Chiave SSH aggiunta",
+      "solid_unlink": "Solid Cloud scollegato",
+      "credit_grant": "Credito concesso",
+      "ssh_key_delete": "Chiave SSH eliminata",
+      "signup_solid": "Richiesta di registrazione a Solid Cloud",
+      "quota_override": "Superamento della quota",
+      "group_quota_change": "La quota del gruppo è cambiata"
+    },
+    "msg": {
+      "credit_grant": "{{actor}} ti ha concesso crediti GPU {{delta}} (nuovo limite {{newLimit}})",
+      "status_change": "{{actor}} ha cambiato il tuo stato da {{from}} a {{to}}",
+      "quota_override": "{{actor}} ha modificato la tua quota"
+    },
+    "actor": "Attore",
+    "target": "Bersaglio"
+  },
+  "admin": {
+    "menu": {
+      "users": "Utenti",
+      "audit": "Registri di controllo",
+      "groupQuotas": "Quote di gruppo"
+    },
+    "quota": {
+      "cpu": "Core della CPU",
+      "monthlyLimit": "Limite mensile",
+      "gpuCredit": "Credito GPU",
+      "save": "Salva",
+      "instances": "Istanze simultanee",
+      "currentBalance": "Saldo attuale",
+      "grant": "Concessione",
+      "saved": "Salvato",
+      "effective": "Efficace",
+      "storage": "Spazio di archiviazione (GiB)",
+      "override": "Sostituisci",
+      "ram": "RAM (GiB)",
+      "grantHint": "Bonus aggiunto solo a questo ciclo (cancellato al successivo ripristino mensile)",
+      "limitIncreaseHint": "Aumentando il limite si aggiunge anche la differenza al saldo attuale",
+      "editTitle": "Modifica quota: {{name}}",
+      "groupDefault": "Impostazione predefinita del gruppo",
+      "groupTitle": "Quota predefinita {{role}}",
+      "currentUsage": "Utilizzo attuale",
+      "useGroupDefault": "Utilizza l'impostazione predefinita del gruppo"
+    },
+    "users": {
+      "filter": {
+        "pending": "In attesa di",
+        "all": "Tutto",
+        "approved": "Approvato",
+        "suspended": "Sospeso",
+        "rejected": "Respinto"
+      },
+      "table": {
+        "name": "Nome",
+        "role": "Ruolo",
+        "department": "Dipartimento",
+        "provider": "Login",
+        "status": "Stato",
+        "action": "Azione",
+        "username": "Nome utente",
+        "createdAt": "Richiesto"
+      },
+      "action": {
+        "approve": "Approvare",
+        "suspend": "Sospendere",
+        "reject": "Rifiutare",
+        "reactivate": "Riattivare",
+        "editQuota": "Modifica quota"
+      },
+      "status": {
+        "pending": "In attesa di",
+        "approved": "Approvato",
+        "suspended": "Sospeso",
+        "rejected": "Respinto"
+      },
+      "confirm": {
+        "rejectTitle": "Rifiuta la registrazione",
+        "suspendTitle": "Sospendere l'utente",
+        "approveBody": "Approvare questo utente? Potranno accedere immediatamente.",
+        "suspendBody": "Sospendi questo utente. Eventuali sessioni attive verranno terminate.",
+        "approveTitle": "Approva l'utente",
+        "rejectBody": "Rifiuta la richiesta di registrazione di questo utente. Non saranno in grado di accedere.",
+        "reactivateTitle": "Riattiva utente",
+        "reactivateBody": "Riattivare questo utente?"
+      },
+      "title": "Utenti",
+      "empty": "Nessun utente."
+    },
+    "console": "Console di amministrazione"
+  },
+  "me": {
+    "section": {
+      "password": "Password",
+      "activity": "Attività",
+      "profile": "Profilo",
+      "sshKeys": "Chiavi SSH",
+      "solid": "Solida connessione cloud"
+    },
+    "profile": {
+      "username": "Nome utente (ID studente)",
+      "email": "E-mail",
+      "role": "Ruolo",
+      "department": "Dipartimento",
+      "advisor": "Consulente",
+      "lab": "Laboratorio",
+      "createdAt": "Partecipato",
+      "providerLocal": "Locale",
+      "nameKo": "Nome (coreano)",
+      "providerSolid": "Nuvola solida",
+      "provider": "Metodo di accesso",
+      "providerBoth": "Locale + Cloud solido",
+      "nameEn": "Nome (inglese)",
+      "notSet": "(non impostato)"
+    },
+    "solid": {
+      "account": "Account",
+      "linkSuccess": "Solid Cloud collegato",
+      "unlinkButton": "Scollega",
+      "domainId": "Identificativo del dominio",
+      "userId": "ID utente",
+      "unlinkConfirm": "Scollegare Solid Cloud? Successivamente potrai accedere solo con la tua password locale.",
+      "linkButton": "Collega Solid Cloud",
+      "username": "Nome utente Solid Cloud",
+      "password": "Password",
+      "domain": "Dominio",
+      "linked": "Collegato a Solid Cloud",
+      "linking": "Collegamento...",
+      "linkSubtitle": "Autenticati con le tue credenziali Solid Cloud per collegare questo account in modo da poter utilizzare entrambi gli accessi.",
+      "unlinking": "Scollegamento...",
+      "errorAuth": "Autenticazione Solid Cloud non riuscita.",
+      "notLinked": "Non collegato a Solid Cloud",
+      "errorConflict": "Questo account Solid Cloud è già collegato a un altro utente.",
+      "unlinkNeedsPassword": "Imposta una password locale prima di scollegarti."
+    },
+    "password": {
+      "current": "Password attuale",
+      "title": "Cambiare la password",
+      "saving": "Risparmio...",
+      "errorShort": "La password deve contenere almeno 8 caratteri.",
+      "success": "Password aggiornata.",
+      "confirm": "Conferma la nuova password",
+      "new": "Nuova password",
+      "submit": "Salva password",
+      "hint": "Almeno 8 caratteri",
+      "noPasswordHint": "Non è impostata alcuna password locale. L'immissione di una nuova password abiliterà l'accesso locale.",
+      "errorMismatch": "Le nuove password non corrispondono."
+    },
+    "ssh": {
+      "subtitle": "Le chiavi registrate qui possono essere selezionate durante la creazione di una nuova istanza.",
+      "name": "Nome",
+      "publicKey": "Chiave pubblica",
+      "fingerprint": "Impronta digitale",
+      "createdAt": "Aggiunto",
+      "empty": "Nessuna chiave SSH registrata.",
+      "delete": "Eliminare",
+      "namePlaceholder": "ad esempio, laptop personale",
+      "title": "Chiavi pubbliche SSH",
+      "publicKeyPlaceholder": "ssh-rsa AAAA... o ssh-ed25519 AAAA...",
+      "errorRequired": "Sono richiesti nome e chiave pubblica.",
+      "deleteConfirm": "Eliminare questa chiave SSH?",
+      "errorFormat": "Formato chiave pubblica SSH non valido.",
+      "adding": "Aggiunta...",
+      "add": "Aggiungi chiave"
+    },
+    "title": "Il mio conto",
+    "menu": "Il mio conto",
+    "back": "Torna alla dashboard"
+  },
+  "region": {
+    "loading": "Caricamento...",
+    "queue": "Coda",
+    "tip": "💡 Suggerimento: RTX 4090 è adatta a carichi di lavoro leggeri; scegli RTX Pro 6000 per l'addestramento su modelli di grandi dimensioni.",
+    "title": "Disponibilità regionale"
+  },
+  "create": {
+    "step1": {
+      "title": "1. Selezionare Modello/ISO",
+      "loading": "Caricamento modelli..."
+    },
+    "step2": {
+      "cpu": "processore",
+      "performance": "Prestazione",
+      "ram": "RAM",
+      "title": "2. Selezionare Offerta di calcolo",
+      "price": "Prezzo",
+      "vram": "VRAM",
+      "loading": "Caricamento offerte..."
+    },
+    "step3": {
+      "instanceName": "Nome istanza",
+      "generating": "Generazione...",
+      "title": "3. Impostazioni dell'ambiente",
+      "useSaved": "Utilizza una chiave SSH salvata",
+      "instanceNamePh": "ad esempio, my-gpu-project-01",
+      "sshKey": "Chiave pubblica SSH",
+      "sshKeyHint": "Inserisci la tua chiave pubblica esistente o generane una nuova.",
+      "instanceNameHint": "Identificatore univoco per il tuo spazio di lavoro.",
+      "manualOrGenerate": "Inserisci manualmente / Genera nuovo",
+      "keyLoaded": "Chiave caricata",
+      "generateKey": "Genera coppia di chiavi",
+      "downloadNote": "Se generi una nuova coppia di chiavi, la chiave privata (.pem) verrà scaricata automaticamente. Per favore, tienilo al sicuro; non verrà mostrato nuovamente."
+    },
+    "footer": {
+      "back": "Indietro",
+      "next": "Prossimo",
+      "launching": "Lancio...",
+      "launch": "Avvia istanza"
+    },
+    "errors": {
+      "createFailed": "Impossibile avviare l'istanza."
+    },
+    "title": "Crea nuova istanza",
+    "stepOf": "Passo {{current}} di {{total}}"
+  },
+  "setup": {
+    "steps": {
+      "mode": "Modalità",
+      "billing": "Fatturazione",
+      "idle": "Oziare",
+      "review": "Revisione"
+    },
+    "unit": {
+      "hour": "H",
+      "min": "min",
+      "credit": "C",
+      "times": "volte",
+      "month": "mo",
+      "sessions": "sessioni",
+      "creditPerStep": "C/gradino"
+    },
+    "mode": {
+      "container": "Modalità contenitore",
+      "hybrid": "Contenitore + ibrido SSH",
+      "containerDesc": "Gestisci le GPU tramite contenitori K8s. Ideale per servire un cluster GPU a molti utenti su larga scala.",
+      "hybridNote": "La selezione dell'ibrido abilita il leasing dei nodi fisici, gli account SSH e le quote home per nodo. (Implementato in una fase successiva)",
+      "hybridDesc": "Aggiunge l'accesso SSH diretto ai nodi fisici sopra i contenitori. Ideale per piccoli laboratori o quando è necessario il leasing di nodi fisici."
+    },
+    "billing": {
+      "pricingStatic": "Statico: prezzo fisso impostato dall'amministratore",
+      "pricingHint": "Scegli come vengono impostati i prezzi dell'offerta.",
+      "surge": "Aumento del prezzo per diminuzione della disponibilità",
+      "pricingDynamic": "Dinamico: il prezzo aumenta al diminuire della disponibilità",
+      "modeCredit": "Credito",
+      "pricing": "Politica dei prezzi",
+      "modeFree": "Gratuito",
+      "surgeHint": "I crediti/ora aumentano di questo importo ogni volta che le risorse scarseggiano.",
+      "maxConcurrent": "Numero massimo di sessioni simultanee",
+      "maxLease": "Leasing massimo per sessione",
+      "cooldown": "Cooldown prima del rilascio",
+      "modeDynamic": "Primo arrivato",
+      "modeCreditDesc": "Paga detraendo crediti. Controllato solo dai crediti, senza altri limiti.",
+      "modeDynamicDesc": "Utilizza il primo arrivato senza crediti. I limiti massimi di lease, cooldown e sessioni simultanee proteggono la disponibilità.",
+      "modeFreeDesc": "Utilizzalo liberamente senza limiti. Nessun credito, leasing o limite di sessioni simultanee."
+    },
+    "idle": {
+      "timeoutHint": "Le sessioni vengono recuperate automaticamente quando la GPU rimane inattiva per questo tempo.",
+      "timeout": "Tempo di recupero automatico inattivo",
+      "sshNote": "Modalità SSH: i dati rimangono sul disco locale e possono essere riutilizzati così come sono.",
+      "containerNote": "Modalità contenitore: recuperato tramite Stop, preservando i dati."
+    },
+    "lease": {
+      "extHours": "Ore massime per interno",
+      "extHoursHint": "Numero massimo di ore che un utente può scegliere per interno. (solo modalità primo arrivato)",
+      "maxExtHint": "Numero massimo di estensioni per sessione. 0 disabilita l'estensione.",
+      "maxExt": "Estensioni massime"
+    },
+    "review": {
+      "modeLabel": "Modalità operativa",
+      "hint": "Inizierai con le impostazioni di seguito. Modificali in qualsiasi momento in Amministrazione → Impostazioni di sistema.",
+      "idleLabel": "Recupero automatico inattività",
+      "billingLabel": "Modalità di fatturazione"
+    },
+    "features": {
+      "signup": "Richieste di registrazione dell'utente",
+      "alerts": "Avvisi sulla disponibilità del carico di lavoro",
+      "signupHint": "Quando è disattivato, il collegamento di registrazione nella pagina di accesso è nascosto e gli account vengono creati dagli amministratori.",
+      "datasetHint": "Quando è disattivato, gli utenti non possono registrarsi/richiedere set di dati; solo gli amministratori li registrano.",
+      "datasetFeature": "Funzionalità dei set di dati",
+      "dataset": "Registrazione del set di dati",
+      "groupJoin": "Richieste di adesione a gruppi/organizzazioni",
+      "credit": "Richieste di ricarica del credito",
+      "groupJoinHint": "Quando è disattivato, gli utenti non possono richiedere autonomamente l'iscrizione; gli amministratori lo gestiscono.",
+      "datasetFeatureHint": "Quando è disattivato, i menu dei set di dati, la memorizzazione nella cache e la selezione dei set di dati durante la sessione sono tutti nascosti (minore dipendenza dall'archiviazione centrale).",
+      "alertsHint": "Quando è disattivato, gli utenti non possono iscriversi agli avvisi di disponibilità GPU/nodo.",
+      "creditHint": "Quando è spento gli utenti/gruppi non possono richiedere ricariche; gli amministratori concedono direttamente i crediti."
+    },
+    "back": "Indietro",
+    "next": "Prossimo",
+    "wizardSubtitle": "Configurare la modalità operativa e le policy predefinite. Tutto può essere modificato in seguito in Amministrazione → Impostazioni di sistema.",
+    "finish": "Termina la configurazione",
+    "wizardTitle": "Configurazione iniziale di Giosk"
+  },
+  "topbar": {
+    "nodeBadge": "Nodi {{up}}/{{total}} · GPU {{gpu}}%"
+  }
+}

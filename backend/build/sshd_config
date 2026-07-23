@@ -1,0 +1,17 @@
+# giosk-sshd 사이드카 sshd 설정 — 게이트웨이 관리키 공개키 인증만 허용.
+# Include 는 맨 위 — sshd 는 먼저 읽은 값이 이기므로 런타임 오버라이드가 유효하려면 앞서야 한다.
+Include /etc/ssh/sshd_config.d/*.conf
+Port 22
+PermitRootLogin no
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PermitEmptyPasswords no
+PubkeyAuthentication yes
+# 신뢰 키는 root 소유 경로에서만 읽는다(공유 홈은 사용자가 쓸 수 있어 신뢰 불가).
+AuthorizedKeysFile /etc/ssh/authorized_keys/%u
+PermitUserEnvironment no
+X11Forwarding no
+PrintMotd no
+# 포트포워딩 허용 — 사용자가 게이트웨이 경유로 ~/-L 터널(예: 텐서보드)을 쓸 수 있게.
+AllowTcpForwarding yes
+Subsystem sftp /usr/lib/ssh/sftp-server

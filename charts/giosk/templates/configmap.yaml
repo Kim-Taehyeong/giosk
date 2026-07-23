@@ -1,0 +1,103 @@
+{{- include "giosk.validate" . -}}
+{{- $dbHost := .Values.database.host -}}
+{{- if .Values.database.bundled -}}{{- $dbHost = printf "%s-mysql" (include "giosk.fullname" .) -}}{{- end -}}
+{{- $registry := .Values.registry.external -}}
+{{/* FQDN(.<ns>)로 — 빌드 Job(giosk-grp-build)·세션(giosk-grp-user-N)은 다른 ns 라 짧은 이름이 해석 안 됨 */}}
+{{/* LB IP 지정 시 GIOSK_REGISTRY=그 노드도달 주소(세션 풀=노드 containerd 가 해석 가능). 아니면 서비스 FQDN. */}}
+{{- if .Values.registry.install -}}
+  {{- $rsvc := .Values.registry.service | default dict -}}
+  {{- if and (eq ($rsvc.type | default "ClusterIP") "LoadBalancer") $rsvc.loadBalancerIP -}}
+    {{- $registry = printf "%s:%v" $rsvc.loadBalancerIP .Values.registry.port -}}
+  {{- else -}}
+    {{- $registry = printf "%s-registry.%s:%v" (include "giosk.fullname" .) .Release.Namespace .Values.registry.port -}}
+  {{- end -}}
+{{- end -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "giosk.fullname" . }}-config
+data:
+  # values → GIOSK_* 환경변수 (backend/internal/config 와 1:1)
+  GIOSK_DEPLOYMENT_MODE: {{ .Values.deployment.mode | quote }}
+  GIOSK_BILLING_MODE: {{ .Values.billing.mode | quote }}
+  GIOSK_NS_PREFIX: {{ .Values.k8s.namespacePrefix | default "giosk-grp-" | quote }}
+  GIOSK_CREDIT_PRICING: {{ .Values.billing.credit.pricing | quote }}
+  GIOSK_CREDIT_SURGE_INCREMENT: {{ .Values.billing.credit.surgeIncrement | quote }}
+  GIOSK_CREDIT_MAX_SESSIONS: {{ .Values.billing.credit.maxConcurrentSessions | quote }}
+  GIOSK_DYNAMIC_MAX_LEASE_HOURS: {{ .Values.billing.dynamic.maxLeaseHours | quote }}
+  GIOSK_DYNAMIC_COOLDOWN_HOURS: {{ .Values.billing.dynamic.cooldownHours | quote }}
+  GIOSK_DYNAMIC_MAX_SESSIONS: {{ .Values.billing.dynamic.maxConcurrentSessions | quote }}
+  GIOSK_LEASE_EXTENSION_HOURS: {{ .Values.billing.dynamic.lease.extensionHours | quote }}
+  GIOSK_LEASE_MAX_EXTENSIONS: {{ .Values.billing.dynamic.lease.maxExtensions | quote }}
+  GIOSK_PERSISTENCE_CLASS: {{ .Values.storage.persistence.storageClass | quote }}
+  GIOSK_SHARED_HOME: {{ .Values.storage.persistence.sharedHome | default true | quote }}
+  GIOSK_NFS_CLASS: {{ .Values.storage.nfsClass | default "nfs" | quote }}
+  GIOSK_STORAGE_PRICE_PER_GIB_MONTH: {{ (.Values.storage.pricePerGiBMonth | default 0) | quote }}
+  GIOSK_SCRATCH_ENABLED: {{ (.Values.storage.scratch).enabled | default false | quote }}
+  GIOSK_SCRATCH_HOSTPATH: {{ (.Values.storage.scratch).hostPath | default "/scratch" | quote }}
+  GIOSK_DATASETS_ENABLED: {{ .Values.storage.datasets.enabled | quote }}
+  GIOSK_DATASETS_NFS_SERVER: {{ .Values.storage.datasets.nfs.server | quote }}
+  GIOSK_DATASETS_NFS_PATH: {{ .Values.storage.datasets.nfs.path | quote }}
+  GIOSK_DATASET_CACHE_HOSTPATH: {{ .Values.storage.datasets.cacheHostPath | default "/dataset-cache" | quote }}
+  GIOSK_PHYSICAL_NODES_ENABLED: {{ .Values.physicalNodes.enabled | quote }}
+  GIOSK_PHYSICAL_LABEL: {{ .Values.physicalNodes.label | default "giosk.io/physical" | quote }}
+  # NVIDIA device plugin 설정 ConfigMap(GPU Operator). 지정 시 웹에서 타임셰어링을 켜면
+  # 프로파일 upsert + 노드 라벨(nvidia.com/device-plugin.config)로 즉시 반영된다.
+  GIOSK_DEVICE_PLUGIN_CONFIG_NS: {{ (.Values.gpuSharing).devicePluginConfigNamespace | default "" | quote }}
+  GIOSK_DEVICE_PLUGIN_CONFIG_NAME: {{ (.Values.gpuSharing).devicePluginConfigName | default "" | quote }}
+  GIOSK_PHYSICAL_NFS_SERVER: {{ .Values.physicalNodes.nfs.server | quote }}
+  GIOSK_PHYSICAL_NFS_PATH: {{ .Values.physicalNodes.nfs.path | quote }}
+  GIOSK_PHYSICAL_UID_BASE: {{ .Values.physicalNodes.uidBase | default 100000 | quote }}
+  GIOSK_DB_HOST: {{ $dbHost | quote }}
+  GIOSK_DB_PORT: {{ .Values.database.port | quote }}
+  GIOSK_DB_NAME: {{ .Values.database.name | quote }}
+  GIOSK_DB_USER: {{ .Values.database.user | quote }}
+  GIOSK_BRAND_NAME: {{ .Values.branding.name | quote }}
+  GIOSK_BRAND_ACCENT: {{ .Values.branding.accent | quote }}
+  GIOSK_ADMIN_USERNAME: {{ .Values.admin.username | quote }}
+  # GIOSK_ADMIN_PASSWORD · GIOSK_AGENT_TOKEN 은 Secret(secret.yaml)에서 env 주입
+  GIOSK_IDLE_TIMEOUT_MIN: {{ .Values.idle.timeoutMin | quote }}
+  GIOSK_FEATURE_SIGNUP_REQUEST: {{ .Values.features.signupRequest | quote }}
+  GIOSK_FEATURE_DATASET_REGISTER: {{ .Values.features.datasetRegister | quote }}
+  GIOSK_FEATURE_WORKLOAD_ALERTS: {{ .Values.features.workloadAlerts | quote }}
+  GIOSK_FEATURE_GROUP_JOIN: {{ .Values.features.groupJoinRequest | quote }}
+  GIOSK_FEATURE_CREDIT_REQUEST: {{ .Values.features.creditRequest | quote }}
+  GIOSK_QUOTA_MAX_GPU: {{ .Values.quota.maxGpuCount | quote }}
+  GIOSK_QUOTA_MAX_VRAM_GB: {{ .Values.quota.maxVramGb | quote }}
+  GIOSK_QUOTA_MAX_SESSIONS: {{ .Values.quota.maxConcurrentSessions | quote }}
+  GIOSK_VOLUME_QUOTA_GB: {{ .Values.quota.volumeQuotaGb | quote }}
+  # 세션 웹(VSCode) 노출 모드: loadbalancer(MetalLB) | nodeport | portforward
+  GIOSK_SESSION_EXPOSE: {{ .Values.session.expose | quote }}
+  # Prometheus(메트릭) — monitoring.enabled 면 in-cluster 서비스, 아니면 외부 URL.
+  GIOSK_PROMETHEUS_URL: {{ .Values.monitoring.prometheusURL | default (ternary (printf "http://kps-kube-prometheus-stack-prometheus.%s:9090" .Release.Namespace) "" .Values.monitoring.install) | quote }}
+  # CORS 허용 오리진(콤마구분). 단일 오리진(nginx 프록시) 배포면 비워둬도 무방.
+  GIOSK_CORS_ORIGINS: {{ .Values.api.corsOrigins | default "" | quote }}
+  # 노드 GPU 종류 라벨. NVIDIA GPU Operator(GFD)·fake-gpu-operator 둘 다 nvidia.com/gpu.product 사용.
+  GIOSK_GPU_TYPE_LABEL: {{ .Values.k8s.gpuTypeLabel | default "nvidia.com/gpu.product" | quote }}
+  # 노드 CUDA(드라이버) 버전 라벨. GFD 가 부여(nvidia.com/cuda.driver-version). 라벨 없으면 "—" 로 표기.
+  GIOSK_CUDA_LABEL: {{ .Values.k8s.cudaLabel | default "nvidia.com/cuda.driver-version" | quote }}
+  # 이미지 빌드/세션 풀 레지스트리. registry.enabled=true 면 인클러스터 서비스, 아니면 registry.external.
+  GIOSK_REGISTRY: {{ $registry | quote }}
+  # cosign 서명키 Secret(빌드 ns). registry.cosign.enabled 면 빌드 후 서명(키 없으면 자동 생성).
+  GIOSK_COSIGN_KEY_SECRET: {{ if .Values.registry.cosign.enabled }}{{ .Values.registry.cosign.keySecret | quote }}{{ else }}""{{ end }}
+  {{- if .Values.gateway.enabled }}
+  # ── 접속 게이트웨이 ──
+  # API 는 이 값들로 세션 접속 URL/SSH 명령을 만든다. 비밀(GIOSK_GATEWAY_SECRET)은 Secret 에서 주입.
+  # ⚠️ DOMAIN 이 비면 config 기본값(gw.giosk.local)이 먹어 실제로 열리지 않는 링크가 나간다.
+  GIOSK_GATEWAY_DOMAIN: {{ required "gateway.enabled=true 면 gateway.domain 필수(<iid>-<ch>.<domain> 와일드카드 DNS)" .Values.gateway.domain | quote }}
+  GIOSK_GATEWAY_SCHEME: {{ .Values.gateway.scheme | default "https" | quote }}
+  # SSH 접속 호스트 — 미지정 시 게이트웨이 LB IP(MetalLB), 그것도 없으면 도메인.
+  GIOSK_GATEWAY_HOST: {{ .Values.gateway.host | default .Values.gateway.service.loadBalancerIP | default .Values.gateway.domain | quote }}
+  GIOSK_GATEWAY_SSH_PORT: {{ .Values.gateway.sshPort | default 2222 | quote }}
+  # 외부(VPN 밖) 접속용 SSH 점프 호스트. 지정 시 콘솔이 -J 붙은 명령도 함께 보여준다. 빈값=내부 명령만.
+  GIOSK_GATEWAY_SSH_PROXY_JUMP: {{ .Values.gateway.sshProxyJump | default "" | quote }}
+  # 컨테이너 세션 SSH 사이드카(빈값=컨테이너 SSH 비활성 → SSH 탭 미표시, 물리 세션만 SSH).
+  GIOSK_SESSION_SSHD_IMAGE: {{ .Values.gateway.sshdImage | default "" | quote }}
+  # sshd 사이드카·물리 계정이 신뢰할 게이트웨이 공개키(공개값이라 ConfigMap 가능).
+  GIOSK_GATEWAY_SSH_PUBKEY: {{ .Values.gateway.sshPublicKey | default "" | quote }}
+  {{- end }}
+  # 알림 이메일(SMTP). host 비우면 이메일 발송 생략(웹훅만). 비밀번호는 Secret(smtp-password).
+  GIOSK_SMTP_HOST: {{ .Values.smtp.host | default "" | quote }}
+  GIOSK_SMTP_PORT: {{ .Values.smtp.port | default 587 | quote }}
+  GIOSK_SMTP_USERNAME: {{ .Values.smtp.username | default "" | quote }}
+  GIOSK_SMTP_FROM: {{ .Values.smtp.from | default "" | quote }}

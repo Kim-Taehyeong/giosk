@@ -1,0 +1,42 @@
+{{- if and .Values.physicalNodes.enabled .Values.physicalNodes.nodeAgent.enabled -}}
+# 물리노드 전용 DaemonSet — giosk.io/physical=true 노드에만 배치.
+# 계정/SSH/NFS 마운트 reconcile (hostPath + 권한 필요).
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "giosk.fullname" . }}-node-agent
+spec:
+  selector:
+    matchLabels: { app: giosk-node-agent }
+  template:
+    metadata:
+      labels: { app: giosk-node-agent }
+    spec:
+      nodeSelector:
+        {{- toYaml .Values.physicalNodes.nodeAgent.nodeSelector | nindent 8 }}
+      # hostNetwork 는 쓰지 않는다(클러스터 DNS 로 API Service 해석). nsenter 는 hostPID 로 호스트 PID1
+      # 네임스페이스(mount/net 포함)에 진입하므로 호스트 마운트·NFS 접근은 정상 동작.
+      hostPID: true
+      containers:
+        - name: node-agent
+          image: "{{ .Values.image.nodeAgent.repository }}:{{ .Values.image.nodeAgent.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            privileged: true          # 계정 생성·mount.nfs·nsenter(호스트 PID1) 위해
+          env:
+            - name: GIOSK_API_URL
+              value: "http://{{ include "giosk.fullname" . }}-api:{{ .Values.api.service.port }}"
+            - name: GIOSK_NODE_NAME
+              valueFrom: { fieldRef: { fieldPath: spec.nodeName } }
+            - name: GIOSK_AGENT_TOKEN
+              valueFrom:
+                secretKeyRef: { name: {{ include "giosk.fullname" . }}-secrets, key: agent-token }
+            - name: GIOSK_AGENT_MODE
+              value: "shell"           # 실제 호스트 계정/마운트(운영). log=개발용
+            - name: GIOSK_PHYSICAL_HOME_HOSTPATH
+              value: {{ .Values.physicalNodes.homeHostPath | quote }}  # 물리 SSH 로컬 home 루트(<root>/<user>)
+            {{- if .Values.gateway.enabled }}
+            - name: GIOSK_GATEWAY_SSH_PUBKEY
+              value: {{ .Values.gateway.sshPublicKey | default "" | quote }}  # 게이트웨이 프록시 접속용 공개키 병기
+            {{- end }}
+{{- end -}}

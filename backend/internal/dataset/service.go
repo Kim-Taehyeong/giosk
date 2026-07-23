@@ -1,0 +1,370 @@
+package dataset
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+
+	"giosk/internal/k8s"
+	"giosk/internal/metrics"
+)
+
+// remoteSize는 URL 의 콘텐츠 크기(바이트)를 best-effort 로 측정한다(HEAD→실패 시 ranged GET).
+// 측정 불가/오류면 0(표시는 "—"). 등록 응답 지연 방지를 위해 5초 타임아웃.
+func remoteSize(url string) int64 {
+	if url == "" {
+		return 0
+	}
+	cl := &http.Client{Timeout: 5 * time.Second}
+	if req, err := http.NewRequest(http.MethodHead, url, nil); err == nil {
+		if resp, err := cl.Do(req); err == nil {
+			_ = resp.Body.Close()
+			if resp.ContentLength > 0 {
+				return resp.ContentLength
+			}
+		}
+	}
+	// HEAD 미지원 서버 대비: 1바이트 범위 요청 → Content-Range 의 전체 크기 파싱.
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return 0
+	}
+	req.Header.Set("Range", "bytes=0-0")
+	resp, err := cl.Do(req)
+	if err != nil {
+		return 0
+	}
+	defer resp.Body.Close()
+	if cr := resp.Header.Get("Content-Range"); cr != "" { // 형식: "bytes 0-0/12345"
+		if i := strings.LastIndex(cr, "/"); i >= 0 {
+			if n, err := strconv.ParseInt(strings.TrimSpace(cr[i+1:]), 10, 64); err == nil {
+				return n
+			}
+		}
+	}
+	return 0
+}
+
+// Provisioner는 데이터셋 RWX NFS PVC 프로비저닝 + URL 적재 계약(*k8s.Client 구현).
+type Provisioner interface {
+	CreatePVC(ctx context.Context, s k8s.PVCSpec) error
+	RunDatasetFetch(ctx context.Context, ns, jobName, nfsServer, nfsBase, name, url string) error // mkdir <base>/dataset/<name> + curl
+	EnsureSharedNFSPVC(ctx context.Context, s k8s.SharedNFSSpec) error                            // 정규경로에 정적 NFS PVC 바인딩
+	RunDatasetCache(ctx context.Context, ns, jobName, node, nfsServer, nfsDatasetPath, hostBase, name string) error
+	RunDatasetUncache(ctx context.Context, ns, jobName, node, hostBase, name string) error
+	BuildJobStatus(ctx context.Context, ns, name string) (string, error)
+	BuildLogs(ctx context.Context, ns, jobName string, tail int64) string // 다운로드 진행률 파싱(PROGRESS 로그)
+	DeleteBuildJob(ctx context.Context, ns, name string) error
+}
+
+// Service는 dataset 비즈니스 로직.
+type Service struct {
+	repo         Repository
+	prov         Provisioner
+	storageClass string // 데이터셋 PVC 스토리지클래스(폴백 동적 PVC용)
+	namespace    string // 데이터셋 PVC 네임스페이스(예: <prefix>datasets)
+	nfsServer    string // 데이터셋 정규 NFS 서버(설정 시 정규경로 모드)
+	nfsBase      string // 데이터셋 정규 NFS 베이스(예: /export) — 데이터는 <base>/dataset/<name>
+	cacheHost    string // 노드 로컬 캐시 루트(hostPath, 예: /dataset-cache)
+	met          *metrics.Client // 다운로드 진행률(다운로드 Pod 수신 바이트) 조회용
+}
+
+// WithMetrics는 다운로드 진행률 산출용 Prometheus 클라이언트를 주입한다.
+func (s *Service) WithMetrics(m *metrics.Client) *Service { s.met = m; return s }
+
+func NewService(repo Repository) *Service { return &Service{repo: repo} }
+
+// WithStorage는 데이터셋 저장 의존성을 주입한다. nfsServer/nfsBase 가 있으면 정규경로(/dataset/<name>) 모드.
+func (s *Service) WithStorage(prov Provisioner, storageClass, namespace, nfsServer, nfsBase, cacheHost string) *Service {
+	s.prov, s.storageClass, s.namespace = prov, storageClass, namespace
+	s.nfsServer, s.nfsBase, s.cacheHost = nfsServer, nfsBase, cacheHost
+	return s
+}
+
+// CacheHostPath는 노드 로컬 캐시 루트(세션 hostPath 마운트 산정용). 빈값=캐시 비활성.
+func (s *Service) CacheHostPath() string { return s.cacheHost }
+
+// DatasetCachePlacement는 세션 마운트 판정용으로 datasetID별 (cached 노드 목록, 노드로컬 경로)를 반환한다.
+// 캐시 비활성(cacheHost 빈값)이면 빈 맵 → 세션은 전부 NFS 마운트. session.DatasetCacheReader 구현.
+func (s *Service) DatasetCachePlacement(ids []int64) (map[int64][]string, map[int64]string) {
+	if s.cacheHost == "" || len(ids) == 0 {
+		return nil, nil
+	}
+	nodes := map[int64][]string{}
+	hostPaths := map[int64]string{}
+	for _, id := range ids {
+		d, err := s.repo.Get(id)
+		if err != nil {
+			continue
+		}
+		nodes[id] = s.repo.CachedNodesOf(id)
+		hostPaths[id] = s.cacheHost + "/" + d.Name
+	}
+	return nodes, hostPaths
+}
+
+// canonical은 정규 NFS 경로 모드 여부(서버+베이스 설정 시).
+func (s *Service) canonical() bool { return s.prov != nil && s.nfsServer != "" && s.nfsBase != "" }
+
+// pvcSizeGi는 PVC 용량(GiB) 산정 — 명시 GB 없으면 측정 바이트에서 올림 + 여유 1Gi.
+func pvcSizeGi(d *Dataset) int {
+	if d.SizeGB >= 1 {
+		return d.SizeGB
+	}
+	return int(d.SizeBytes>>30) + 1
+}
+
+// ensureStorage는 (폴백) 동적 RWX NFS PVC(ds-<id>)를 멱등 생성한다. 정규경로 모드에선 미사용.
+func (s *Service) ensureStorage(ctx context.Context, d *Dataset) {
+	if s.prov == nil || d.PVCName != "" {
+		return
+	}
+	name := fmt.Sprintf("ds-%d", d.ID)
+	err := s.prov.CreatePVC(ctx, k8s.PVCSpec{
+		Namespace: s.namespace, Name: name, SizeGiB: pvcSizeGi(d),
+		StorageClass: s.storageClass, AccessMode: "RWX",
+	})
+	if err != nil {
+		log.Printf("[dataset] PVC 생성 실패 ds %d: %v", d.ID, err)
+		return
+	}
+	_ = s.repo.SetPVC(d.ID, name, s.namespace)
+}
+
+// RunReconciler는 적재중(loading) 데이터셋의 다운로드 Job 을 폴링해 완료/실패를 반영한다.
+// 완료 시 정규경로(<base>/dataset/<name>)에 정적 NFS PVC(ds-<id>)를 바인딩하고 ready 로 전이한다.
+func (s *Service) RunReconciler(ctx context.Context, interval time.Duration) {
+	if !s.canonical() {
+		return
+	}
+	if interval <= 0 {
+		interval = 10 * time.Second
+	}
+	log.Printf("[dataset-reconciler] started (nfs=%s:%s/dataset)", s.nfsServer, s.nfsBase)
+	t := time.NewTicker(interval)
+	defer t.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-t.C:
+			s.reconcileOnce(ctx)
+		}
+	}
+}
+
+func (s *Service) reconcileOnce(ctx context.Context) {
+	for _, d := range s.repo.ListLoading() {
+		job := fmt.Sprintf("dl-ds-%d", d.ID)
+		st, err := s.prov.BuildJobStatus(ctx, s.namespace, job)
+		if err != nil || st == k8s.BuildRunning {
+			continue
+		}
+		if st == k8s.BuildFailed {
+			_ = s.repo.SetLoadStatus(d.ID, "failed") // Job 보존(로그 조회)
+			log.Printf("[dataset] ds %d 적재 실패", d.ID)
+			continue
+		}
+		// 성공 → 정규경로에 정적 NFS PVC 바인딩 + ready.
+		pvc := fmt.Sprintf("ds-%d", d.ID)
+		err = s.prov.EnsureSharedNFSPVC(ctx, k8s.SharedNFSSpec{
+			Namespace: s.namespace, Name: pvc,
+			NFSServer: s.nfsServer, NFSPath: s.nfsBase + "/dataset/" + d.Name, SizeGiB: pvcSizeGi(&d),
+		})
+		if err != nil {
+			log.Printf("[dataset] ds %d PVC 바인딩 실패: %v", d.ID, err)
+			continue
+		}
+		_ = s.repo.SetPVC(d.ID, pvc, s.namespace)
+		_ = s.repo.SetLoadStatus(d.ID, "ready")
+		_ = s.prov.DeleteBuildJob(ctx, s.namespace, job)
+		log.Printf("[dataset] ds %d 적재 완료 → /dataset/%s", d.ID, d.Name)
+	}
+	// 노드 로컬 캐시 복사 Job 폴링 → cached/failed 전이.
+	for _, c := range s.repo.ListCaching() {
+		job := fmt.Sprintf("dc-%d-%s", c.DatasetID, c.Node)
+		st, err := s.prov.BuildJobStatus(ctx, s.namespace, job)
+		if err != nil || st == k8s.BuildRunning {
+			continue
+		}
+		if st == k8s.BuildFailed {
+			_ = s.repo.CacheUpsert(c.DatasetID, c.Node, "failed")
+			log.Printf("[dataset] ds %d 노드 %s 캐시 실패", c.DatasetID, c.Node)
+			continue
+		}
+		_ = s.repo.CacheUpsert(c.DatasetID, c.Node, "cached")
+		_ = s.prov.DeleteBuildJob(ctx, s.namespace, job)
+		log.Printf("[dataset] ds %d 노드 %s 로컬 캐시 완료", c.DatasetID, c.Node)
+	}
+}
+
+// List는 전역 레지스트리 + 내 데이터셋/신청을 반환한다.
+func (s *Service) List(ctx context.Context, userID int64) (*ListRes, error) {
+	global, err := s.repo.GlobalActive()
+	if err != nil {
+		return nil, err
+	}
+	for i := range global { // 다운로드 중인 데이터셋은 진행률(%)·ETA·받은 용량 채움
+		if global[i].LoadStatus == "loading" {
+			global[i].Progress, global[i].EtaSec, global[i].Downloaded = s.downloadProgress(ctx, global[i].ID, global[i].SizeBytes)
+		}
+	}
+	mine, err := s.repo.Mine(userID)
+	if err != nil {
+		return nil, err
+	}
+	return &ListRes{Global: global, Mine: mine}, nil
+}
+
+// downloadProgress는 다운로드 Job 로그의 "PROGRESS <bytes>" 시계열(2초 간격)로 진행률·ETA·받은 용량을 산출한다.
+// Prometheus 가 아니라 실제 기록된 파일 크기 기반이라 정밀하다. 로그/용량 미가용이면 0.
+const progressIntervalSec = 2 // 다운로드 Job 의 PROGRESS 출력 간격(RunDatasetFetch 의 sleep 과 일치)
+
+func (s *Service) downloadProgress(ctx context.Context, id int64, total int64) (pct, etaSec int, downloaded int64) {
+	if s.prov == nil || total <= 0 {
+		return 0, 0, 0
+	}
+	logs := s.prov.BuildLogs(ctx, s.namespace, fmt.Sprintf("dl-ds-%d", id), 20)
+	if logs == "" {
+		return 0, 0, 0
+	}
+	// "PROGRESS <n>" 값들을 시간순으로 수집.
+	var vals []int64
+	toks := strings.Fields(logs)
+	for i := 0; i+1 < len(toks); i++ {
+		if toks[i] == "PROGRESS" {
+			if n, err := strconv.ParseInt(toks[i+1], 10, 64); err == nil {
+				vals = append(vals, n)
+			}
+		}
+	}
+	if len(vals) == 0 {
+		return 0, 0, 0
+	}
+	downloaded = vals[len(vals)-1]
+	pct = int(downloaded * 100 / total)
+	if pct > 99 {
+		pct = 99
+	}
+	if pct < 0 {
+		pct = 0
+	}
+	// 속도 = (마지막-처음)/경과시간 → ETA = 남은바이트/속도. 표본 2개 이상일 때만.
+	if len(vals) >= 2 {
+		elapsed := float64(len(vals)-1) * progressIntervalSec
+		rate := float64(downloaded-vals[0]) / elapsed // bytes/s
+		if rate > 0 {
+			etaSec = int(float64(total-downloaded) / rate)
+			if etaSec < 0 {
+				etaSec = 0
+			}
+		}
+	}
+	return pct, etaSec, downloaded
+}
+
+// Register는 업로드-등록 신청을 접수한다(승인 대기).
+func (s *Service) Register(userID int64, req RegisterReq) error {
+	scope := req.TargetScope
+	if scope == "" {
+		scope = ScopePersonal
+	}
+	if s.repo.NameTaken(req.Name) { // 정규경로 /dataset/<name> 충돌 방지 — 이름 유일
+		return ErrNameTaken
+	}
+	// 등록은 즉시 끝내고(용량 측정으로 막지 않음), URL 용량은 백그라운드로 측정해 채운다(프론트는 "측정 중" 표시).
+	r := &Request{
+		Name: req.Name, RequesterUserID: userID, SizeClass: req.SizeClass,
+		SizeGB: req.SizeGB, SizeBytes: 0, Hash: req.Hash, SourceURL: req.SourceURL, TargetScope: scope, Status: StatusPending,
+	}
+	if err := s.repo.CreateRequest(r); err != nil {
+		return err
+	}
+	if r.SourceURL != "" {
+		go func(id int64, url string) {
+			if b := remoteSize(url); b > 0 {
+				_ = s.repo.SetRequestSize(id, b)
+			}
+		}(r.ID, r.SourceURL)
+	}
+	return nil
+}
+
+func (s *Service) Delete(id int64) error { return s.repo.Delete(id) }
+
+// UpdateDescription은 데이터셋 설명을 수정한다(관리자).
+func (s *Service) UpdateDescription(id int64, desc string) error { return s.repo.SetDescription(id, desc) }
+
+func (s *Service) PendingRequests() ([]Request, error) { return s.repo.ListPendingRequests() }
+
+// Approve는 신청을 승인하고 데이터셋 레지스트리에 등록한 뒤 RWX NFS PVC 를 프로비저닝한다.
+func (s *Service) Approve(ctx context.Context, reqID, reviewer int64, ownerName string) error {
+	req, err := s.repo.GetRequest(reqID)
+	if err != nil {
+		return err
+	}
+	status, owner := StatusActive, ownerName
+	if req.TargetScope == ScopePersonal {
+		status = StatusPrivate
+	}
+	bytes := req.SizeBytes // 등록 시 백그라운드 측정값. 아직 0이면 승인 시점에 동기 측정(폴백).
+	if bytes == 0 && req.SourceURL != "" {
+		bytes = remoteSize(req.SourceURL)
+	}
+	d := &Dataset{
+		Name: req.Name, Scope: req.TargetScope, Owner: owner, OwnerUserID: &req.RequesterUserID,
+		SizeClass: req.SizeClass, SizeGB: req.SizeGB, SizeBytes: bytes, Hash: req.Hash,
+		SourceURL: req.SourceURL, Status: status, LoadStatus: "ready",
+	}
+	if s.canonical() {
+		// 정규경로 모드: NFS <base>/dataset/<name> 로 먼저 적재(loading) → 리컨실러가 완료 시 PVC 바인딩+ready.
+		d.LoadStatus = "loading"
+		if err := s.repo.CreateDataset(d); err != nil {
+			return err
+		}
+		if err := s.prov.RunDatasetFetch(ctx, s.namespace, fmt.Sprintf("dl-ds-%d", d.ID), s.nfsServer, s.nfsBase, d.Name, d.SourceURL); err != nil {
+			log.Printf("[dataset] 적재 Job 실패 ds %d: %v", d.ID, err)
+			_ = s.repo.SetLoadStatus(d.ID, "failed")
+		}
+		return s.repo.MarkRequest(reqID, reviewer, "approved")
+	}
+	// 폴백(정규 NFS 미설정): 동적 빈 PVC 만 생성.
+	if err := s.repo.CreateDataset(d); err != nil {
+		return err
+	}
+	s.ensureStorage(ctx, d)
+	return s.repo.MarkRequest(reqID, reviewer, "approved")
+}
+
+func (s *Service) Reject(reqID, reviewer int64) error {
+	return s.repo.MarkRequest(reqID, reviewer, "rejected")
+}
+
+// ToggleCache는 노드 로컬 캐시를 토글한다.
+//   - 이미 행 있으면 해제: 행 삭제 + 노드 로컬 디렉터리 정리 Job(best-effort).
+//   - 없으면 캐시 시작: status=caching 기록 + NFS→노드 로컬(hostPath) 복사 Job. 리컨실러가 cached/failed 로 전이.
+func (s *Service) ToggleCache(ctx context.Context, datasetID int64, node string) error {
+	d, err := s.repo.Get(datasetID)
+	if err != nil {
+		return err
+	}
+	jobBase := fmt.Sprintf("dc-%d-%s", datasetID, node)
+	if _, exists := s.repo.CacheStatus(datasetID, node); exists {
+		_ = s.repo.CacheDelete(datasetID, node)
+		if s.prov != nil && s.cacheHost != "" {
+			_ = s.prov.RunDatasetUncache(ctx, s.namespace, "rm-"+jobBase, node, s.cacheHost, d.Name)
+		}
+		return nil
+	}
+	if s.prov == nil || s.cacheHost == "" || !s.canonical() {
+		return fmt.Errorf("노드 로컬 캐시 비활성(NFS/캐시 경로 미설정)")
+	}
+	if err := s.repo.CacheUpsert(datasetID, node, "caching"); err != nil {
+		return err
+	}
+	return s.prov.RunDatasetCache(ctx, s.namespace, jobBase, node, s.nfsServer, s.nfsBase+"/dataset/"+d.Name, s.cacheHost, d.Name)
+}

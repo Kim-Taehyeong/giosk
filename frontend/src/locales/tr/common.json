@@ -1,0 +1,518 @@
+{
+  "common": {
+    "delete": "Silmek",
+    "next": "Sonraki",
+    "confirm": "Onaylamak",
+    "cancel": "İptal etmek",
+    "login": "Giriş yapmak",
+    "back": "Geri",
+    "logout": "Oturumu kapat",
+    "loading": "Yükleniyor...",
+    "save": "Kaydetmek",
+    "close": "Kapalı",
+    "refresh": "Yenile",
+    "language": "Dil",
+    "korean": "한국어",
+    "required": "gerekli",
+    "english": "İngilizce",
+    "optional": "isteğe bağlı"
+  },
+  "auth": {
+    "brand": {
+      "enName": "DANKOOK ÜNİVERSİTESİ",
+      "kuName": "Dankook Üniversitesi"
+    },
+    "login": {
+      "submit": "Giriş yapmak",
+      "domain": "İhtisas",
+      "password": "Şifre",
+      "errorGeneric": "Giriş başarısız oldu.",
+      "errorNetwork": "Bir ağ hatası oluştu.",
+      "errorSuspended": "Bu hesap askıya alındı.",
+      "errorPending": "Yönetici onayı bekleniyor.",
+      "errorRejected": "Bu kayıt isteği reddedildi.",
+      "usernameLocal": "Öğrenci Kimliği / Kullanıcı Adı",
+      "tabSolid": "Katı Bulut Girişi",
+      "submitting": "Giriş yapılıyor...",
+      "signupLink": "Hizmet için kaydolun",
+      "tabLocal": "Hizmet Girişi",
+      "usernameSolid": "Solid Cloud Kullanıcı Adı",
+      "errorInvalid": "Geçersiz kullanıcı adı veya şifre."
+    },
+    "signupPending": {
+      "backToLogin": "Girişe geri dön",
+      "body": "Yönetici onayından sonra giriş yapabileceksiniz. Bu biraz zaman alabilir.",
+      "submittedAt": "Gönderilme tarihi",
+      "title": "Kayıt isteği gönderildi"
+    },
+    "localSignup": {
+      "section": {
+        "name": "İsim",
+        "credentials": "Hesap",
+        "affiliation": "Üyelik"
+      },
+      "field": {
+        "username": "Öğrenci Kimliği / Kullanıcı Adı",
+        "email": "E-posta",
+        "password": "Şifre (en az 8 karakter)",
+        "passwordConfirm": "Şifreyi onayla"
+      },
+      "title": "Hizmet için kaydolun",
+      "submitting": "Gönderiliyor...",
+      "subtitle": "Aşağıdaki formu doldurun. Bir yönetici isteğinizi onayladığında oturum açabileceksiniz.",
+      "submit": "Kayıt iste",
+      "errorRequired": "Lütfen gerekli tüm alanları doldurun.",
+      "errorTerms": "Kayıt olmak için şartları kabul etmelisiniz.",
+      "errorAdvisor": "Lisans ve lisansüstü öğrencilerinin danışman bulundurması gerekmektedir.",
+      "errorGroup": "Bir kuruluş ve grup seçmelisiniz.",
+      "errorPasswordShort": "Şifre en az 8 karakter olmalıdır.",
+      "errorGeneric": "Kayıt başarısız oldu.",
+      "errorPasswordMismatch": "Şifreler eşleşmiyor."
+    },
+    "signup": {
+      "section": {
+        "account": "Hesap",
+        "name": "İsim",
+        "password": "Servis Şifresi (isteğe bağlı)",
+        "affiliation": "Üyelik ve Rol"
+      },
+      "field": {
+        "email": "E-posta",
+        "name": "İsim",
+        "role": "Rol",
+        "department": "Departman",
+        "lastNameEn": "Soyadı (İngilizce)",
+        "namePlaceholder": "örneğin Hong Gildong",
+        "username": "Kullanıcı adı (Öğrenci Kimliği)",
+        "firstNameKo": "Ad (Korece)",
+        "lastNameKo": "Soyadı (Korece)",
+        "firstNameEn": "Ad (İngilizce)",
+        "selectPh": "Seçme",
+        "group": "Grup",
+        "noJoinableGroup": "Bu kuruluşta katılabilecek grup yok. Kuruluş yöneticisiyle iletişime geçin.",
+        "advisorPlaceholder": "Danışmanın adı",
+        "org": "Organizasyon",
+        "passwordPlaceholder": "Yalnızca Solid Cloud oturum açma özelliğini kullanmak için boş bırakın",
+        "lab": "Laboratuvar (isteğe bağlı)",
+        "advisor": "Danışman",
+        "sponsor": "Sponsor (isteğe bağlı)",
+        "passwordHint": "Solid Cloud olmadan doğrudan Öğrenci Kimliğiniz/Kullanıcı Adınızla oturum açmak için bir şifre belirleyin.",
+        "sponsorPlaceholder": "Sponsorun adı (danışman, ekip lideri vb.)"
+      },
+      "role": {
+        "undergrad": "Lisans",
+        "graduate": "Mezun olmak",
+        "professor": "Profesör",
+        "staff": "Kadro"
+      },
+      "subtitle": "Solid Cloud kimlik doğrulaması doğrulandı. Lütfen şartları kabul edin ve ek bilgi sağlayın.",
+      "title": "Giosk Konsoluna kaydolun",
+      "errorTerms": "Kayıt olmak için şartları kabul etmelisiniz.",
+      "errorAdvisor": "Lisans ve lisansüstü öğrencilerinin danışman bulundurması gerekmektedir.",
+      "errorGeneric": "Kayıt başarısız oldu.",
+      "terms": "Hizmet Şartlarını ve Gizlilik Politikasını kabul ediyorum. (gerekli)",
+      "termsView": "Şartları görüntüle",
+      "submit": "Kaydı tamamla",
+      "submitting": "Kayıt olunuyor..."
+    }
+  },
+  "dashboard": {
+    "labels": {
+      "cpuCores": "CPU Çekirdekleri",
+      "instances": "Örnekler",
+      "storageProjects": "Depolama (Projeler)",
+      "systemMemory": "Sistem Belleği"
+    },
+    "units": {
+      "ea": "adet",
+      "cores": "Çekirdekler",
+      "gb": "Büyük Britanya",
+      "gib": "GiB"
+    },
+    "gpuCredit": {
+      "renewal": "Aylık yenileme: {{date}}",
+      "title": "GPU Kredi Kotası",
+      "perMonth": "/ {{limit}} C (Ay)"
+    },
+    "instances": {
+      "table": {
+        "status": "Durum",
+        "offering": "Teklif",
+        "connection": "Bağlantı",
+        "template": "Şablon",
+        "action": "Aksiyon",
+        "ip": "IP adresi",
+        "name": "Örnek Adı"
+      },
+      "actions": {
+        "delete": "Silmek",
+        "resume": "Sürdürmek",
+        "stop": "Örneği Durdur"
+      },
+      "create": "Yeni Örnek",
+      "title": "Bilgi İşlem Örneklerim",
+      "loading": "Örnekler yükleniyor...",
+      "createFirst": "İlk örneğinizi oluşturun",
+      "empty": "Aktif örnek bulunamadı."
+    },
+    "status": {
+      "running": "Koşma",
+      "stopped": "Durduruldu",
+      "pending": "Askıda olması",
+      "terminating": "Fesih"
+    },
+    "confirmStop": {
+      "title": "Örneği durdur",
+      "confirm": "Durdurmayı Onayla",
+      "body": "Durdurmak GPU kaynaklarını serbest bırakır. Tekrar başlatana kadar faturalandırılmayacaksınız."
+    },
+    "confirmStart": {
+      "confirm": "Başlangıç",
+      "body": "Örneğin başlatılması faturalandırmayı sürdürür.",
+      "title": "Örneği başlat"
+    },
+    "confirmDelete": {
+      "confirm": "Silmek",
+      "body": "Bu geri döndürülemez. Örnek ve verileri kalıcı olarak kaldırılacak.",
+      "title": "Örneği sil"
+    },
+    "logout": "Oturumu kapat",
+    "resourceQuota": "Kaynak Kotası",
+    "console": "Bulut Konsolu"
+  },
+  "credit": {
+    "type": {
+      "monthly_reset": "Aylık sıfırlama",
+      "limit_increase": "Sınır artışı",
+      "admin_grant": "Yönetici izni",
+      "usage": "Kullanım",
+      "manual_adjust": "Manuel ayar",
+      "auto_stop": "Otomatik durdurma (denge yok)"
+    },
+    "balance": "Denge",
+    "loadMore": "Daha fazlasını yükle",
+    "tableBalance": "Denge",
+    "tableType": "Tip",
+    "tableAmount": "Miktar",
+    "tableDescription": "Tanım",
+    "tableTime": "Zaman",
+    "title": "GPU Kredi Geçmişi",
+    "limit": "Aylık limit",
+    "cycleStartedAt": "Döngü başladı",
+    "empty": "İşlem yok."
+  },
+  "notifications": {
+    "title": "Bildirimler",
+    "empty": "Yeni bildirim yok.",
+    "viewAll": "Tüm etkinliği görüntüle",
+    "unread": "{{count}} yeni"
+  },
+  "activity": {
+    "loadMore": "Daha fazlasını yükle",
+    "title": "Etkinlik",
+    "empty": "Henüz etkinlik yok."
+  },
+  "audit": {
+    "action": {
+      "logout": "Oturumu kapat",
+      "login_local": "Yerel giriş",
+      "login_solid": "Katı Bulut oturum açma",
+      "signup_local": "Yerel kayıt isteği",
+      "password_change": "Şifre değişikliği",
+      "status_change": "Durum değişikliği",
+      "signup_solid": "Solid Cloud kayıt isteği",
+      "quota_override": "Kotayı geçersiz kılma",
+      "ssh_key_delete": "SSH anahtarı silindi",
+      "solid_unlink": "Katı Bulut bağlantısı kesildi",
+      "credit_grant": "Kredi verildi",
+      "solid_link": "Katı Bulut bağlantılı",
+      "ssh_key_add": "SSH anahtarı eklendi",
+      "group_quota_change": "Grup kotası değiştirildi"
+    },
+    "msg": {
+      "status_change": "{{actor}}, durumunuzu {{from}}'den {{to}}'ye değiştirdi",
+      "quota_override": "{{actor}} kotanızı ayarladı",
+      "credit_grant": "{{actor}} size {{delta}} GPU kredileri verdi (yeni limit {{newLimit}})"
+    },
+    "target": "Hedef",
+    "actor": "Aktör"
+  },
+  "admin": {
+    "menu": {
+      "users": "Kullanıcılar",
+      "audit": "Denetim Günlükleri",
+      "groupQuotas": "Grup Kotaları"
+    },
+    "quota": {
+      "cpu": "CPU Çekirdekleri",
+      "monthlyLimit": "Aylık limit",
+      "ram": "RAM (GiB)",
+      "save": "Kaydetmek",
+      "grant": "Hibe etmek",
+      "saved": "Kaydedildi",
+      "effective": "Etkili",
+      "gpuCredit": "GPU Kredisi",
+      "override": "Geçersiz kıl",
+      "storage": "Depolama (GiB)",
+      "currentUsage": "Mevcut kullanım",
+      "currentBalance": "Mevcut bakiye",
+      "editTitle": "Kotayı Düzenle — {{name}}",
+      "instances": "Eşzamanlı Örnekler",
+      "grantHint": "Bonus yalnızca bu döngüye eklendi (bir sonraki aylık sıfırlamada temizlenir)",
+      "limitIncreaseHint": "Limitin artırılması cari bakiyedeki farkı da artırıyor",
+      "useGroupDefault": "Grup varsayılanını kullan",
+      "groupTitle": "{{role}} varsayılan kotası",
+      "groupDefault": "Grup varsayılanı"
+    },
+    "users": {
+      "filter": {
+        "pending": "Askıda olması",
+        "all": "Tüm",
+        "suspended": "Askıya alınmış",
+        "rejected": "Reddedilmiş",
+        "approved": "Onaylı"
+      },
+      "table": {
+        "name": "İsim",
+        "role": "Rol",
+        "department": "Departman",
+        "provider": "Giriş yapmak",
+        "status": "Durum",
+        "action": "Aksiyon",
+        "username": "Kullanıcı adı",
+        "createdAt": "İstendi"
+      },
+      "action": {
+        "approve": "Onaylamak",
+        "reject": "Reddetmek",
+        "suspend": "Askıya almak",
+        "reactivate": "Yeniden etkinleştir",
+        "editQuota": "Kotayı Düzenle"
+      },
+      "status": {
+        "pending": "Askıda olması",
+        "approved": "Onaylı",
+        "suspended": "Askıya alınmış",
+        "rejected": "Reddedilmiş"
+      },
+      "confirm": {
+        "rejectTitle": "Kaydı reddet",
+        "approveTitle": "Kullanıcıyı onayla",
+        "approveBody": "Bu kullanıcı onaylansın mı? Hemen giriş yapabilecekler.",
+        "rejectBody": "Bu kullanıcının kaydolma isteğini reddedin. Giriş yapamayacaklar.",
+        "reactivateBody": "Bu kullanıcı yeniden etkinleştirilsin mi?",
+        "suspendTitle": "Kullanıcıyı askıya al",
+        "reactivateTitle": "Kullanıcıyı yeniden etkinleştir",
+        "suspendBody": "Bu kullanıcıyı askıya alın. Tüm aktif oturumlar sonlandırılacaktır."
+      },
+      "title": "Kullanıcılar",
+      "empty": "Kullanıcı yok."
+    },
+    "console": "Yönetici Konsolu"
+  },
+  "me": {
+    "section": {
+      "password": "Şifre",
+      "activity": "Etkinlik",
+      "profile": "Profil",
+      "solid": "Katı Bulut Bağlantısı",
+      "sshKeys": "SSH Anahtarları"
+    },
+    "profile": {
+      "username": "Kullanıcı adı (Öğrenci Kimliği)",
+      "email": "E-posta",
+      "role": "Rol",
+      "department": "Departman",
+      "advisor": "Danışman",
+      "createdAt": "Katıldı",
+      "nameEn": "İsim (İngilizce)",
+      "nameKo": "İsim (Korece)",
+      "providerLocal": "Yerel",
+      "notSet": "(ayarlanmadı)",
+      "providerBoth": "Yerel + Katı Bulut",
+      "providerSolid": "Katı Bulut",
+      "provider": "Giriş yöntemi",
+      "lab": "Laboratuvar"
+    },
+    "solid": {
+      "userId": "Kullanıcı kimliği",
+      "account": "Hesap",
+      "linkButton": "Katı Bulutu Bağlayın",
+      "linkSuccess": "Katı Bulut bağlantılı",
+      "linked": "Solid Cloud'a bağlı",
+      "domainId": "Etki alanı kimliği",
+      "username": "Solid Cloud Kullanıcı Adı",
+      "password": "Şifre",
+      "domain": "İhtisas",
+      "notLinked": "Solid Cloud'a bağlı değil",
+      "linkSubtitle": "Bu hesabı bağlamak için Solid Cloud kimlik bilgilerinizle kimlik doğrulaması yapın, böylece her iki oturum açma işlemini de kullanabilirsiniz.",
+      "unlinkNeedsPassword": "Bağlantıyı kaldırmadan önce yerel bir şifre belirleyin.",
+      "errorConflict": "Bu Solid Cloud hesabı zaten başka bir kullanıcıya bağlı.",
+      "errorAuth": "Katı Bulut kimlik doğrulaması başarısız oldu.",
+      "unlinkButton": "Bağlantıyı kaldır",
+      "unlinkConfirm": "Solid Cloud'un bağlantısı kaldırılsın mı? Daha sonra yalnızca yerel şifrenizle giriş yapabileceksiniz.",
+      "unlinking": "Bağlantı kaldırılıyor...",
+      "linking": "Bağlanıyor..."
+    },
+    "password": {
+      "title": "Şifre değiştir",
+      "current": "Mevcut Şifre",
+      "new": "Yeni Şifre",
+      "confirm": "Yeni şifreyi onayla",
+      "saving": "Kaydediliyor...",
+      "errorShort": "Şifre en az 8 karakter olmalıdır.",
+      "hint": "En az 8 karakter",
+      "submit": "Şifreyi kaydet",
+      "noPasswordHint": "Yerel parola ayarlanmadı. Yeni bir şifre girilmesi yerel giriş yapılmasını sağlayacaktır.",
+      "errorMismatch": "Yeni şifreler eşleşmiyor.",
+      "success": "Şifre güncellendi."
+    },
+    "ssh": {
+      "name": "İsim",
+      "fingerprint": "Parmak izi",
+      "createdAt": "Eklendi",
+      "delete": "Silmek",
+      "add": "Anahtar ekle",
+      "deleteConfirm": "Bu SSH anahtarı silinsin mi?",
+      "empty": "Kayıtlı SSH anahtarı yok.",
+      "publicKey": "Genel Anahtar",
+      "namePlaceholder": "ör. kişisel dizüstü bilgisayar",
+      "title": "SSH Genel Anahtarları",
+      "publicKeyPlaceholder": "ssh-rsa AAAA... veya ssh-ed25519 AAAA...",
+      "adding": "Ekleniyor...",
+      "subtitle": "Burada kaydedilen anahtarlar yeni bir örnek oluştururken seçilebilir.",
+      "errorFormat": "Geçersiz SSH ortak anahtar biçimi.",
+      "errorRequired": "Ad ve ortak anahtar gereklidir."
+    },
+    "title": "Hesabım",
+    "menu": "Hesabım",
+    "back": "Kontrol Paneline Geri Dön"
+  },
+  "region": {
+    "loading": "Yükleniyor...",
+    "queue": "Sıra",
+    "tip": "💡 İpucu: RTX 4090 hafif iş yüklerine uygundur; Büyük model eğitimi için RTX Pro 6000'i seçin.",
+    "title": "Bölge Kullanılabilirliği"
+  },
+  "create": {
+    "step1": {
+      "title": "1. Şablon / ISO'yu seçin",
+      "loading": "Şablonlar yükleniyor..."
+    },
+    "step2": {
+      "title": "2. Bilgi İşlem Teklifini Seçin",
+      "performance": "Performans",
+      "ram": "Veri deposu",
+      "cpu": "İşlemci",
+      "price": "Fiyat",
+      "loading": "Teklifler yükleniyor...",
+      "vram": "VRAM"
+    },
+    "step3": {
+      "instanceName": "Örnek Adı",
+      "instanceNameHint": "Çalışma alanınız için benzersiz tanımlayıcı.",
+      "instanceNamePh": "örneğin, benim-gpu-projem-01",
+      "title": "3. Ortam Ayarları",
+      "generating": "Oluşturuluyor...",
+      "manualOrGenerate": "Manuel olarak girin / Yeni oluştur",
+      "sshKeyHint": "Mevcut genel anahtarınızı girin veya yeni bir tane oluşturun.",
+      "downloadNote": "Yeni bir anahtar çifti oluşturursanız özel anahtar (.pem) otomatik olarak indirilecektir. Lütfen onu güvende tutun; bir daha gösterilmeyecek.",
+      "useSaved": "Kaydedilmiş bir SSH anahtarını kullanın",
+      "generateKey": "Anahtar Çifti Oluştur",
+      "sshKey": "SSH Genel Anahtarı",
+      "keyLoaded": "Anahtar Yüklendi"
+    },
+    "footer": {
+      "back": "Geri",
+      "next": "Sonraki",
+      "launch": "Örneği Başlat",
+      "launching": "Başlatılıyor..."
+    },
+    "errors": {
+      "createFailed": "Örnek başlatılamadı."
+    },
+    "stepOf": "{{total}}'nin {{current}} adımı",
+    "title": "Yeni Örnek Oluştur"
+  },
+  "setup": {
+    "steps": {
+      "mode": "Mod",
+      "billing": "Faturalandırma",
+      "idle": "Boşta",
+      "review": "Gözden geçirmek"
+    },
+    "unit": {
+      "min": "dk.",
+      "month": "ay",
+      "hour": "H",
+      "credit": "C",
+      "times": "kez",
+      "creditPerStep": "C/adım",
+      "sessions": "oturumlar"
+    },
+    "mode": {
+      "hybridDesc": "Konteynerlerin üzerindeki fiziksel düğümlere doğrudan SSH erişimi ekler. Küçük laboratuvarlar için veya fiziksel düğüm kiralamanın gerekli olduğu durumlar için en iyisidir.",
+      "containerDesc": "GPU'ları K8 konteynerleri aracılığıyla yönetin. Bir GPU kümesini geniş ölçekte birçok kullanıcıya sunmak için en iyisi.",
+      "hybridNote": "Hibritin seçilmesi, fiziksel düğüm kiralamayı, SSH hesaplarını ve düğüm başına ev kotalarını etkinleştirir. (Daha sonraki bir aşamada uygulandı)",
+      "container": "Konteyner modu",
+      "hybrid": "Konteyner + SSH hibriti"
+    },
+    "billing": {
+      "pricingStatic": "Statik — yönetici tarafından belirlenen sabit fiyat",
+      "pricing": "Fiyatlandırma politikası",
+      "pricingHint": "Teklif fiyatlarının nasıl belirleneceğini seçin.",
+      "pricingDynamic": "Dinamik — stok durumu azaldıkça fiyat artar",
+      "modeCredit": "Kredi",
+      "modeFree": "Özgür",
+      "surgeHint": "Kaynaklar her azaldığında kredi/saat bu miktarda artar.",
+      "modeFreeDesc": "Hiçbir sınırlama olmaksızın özgürce kullanın. Kredi, kiralama veya eşzamanlı oturum sınırı yok.",
+      "modeCreditDesc": "Kredi düşerek ödeyin. Yalnızca kredilerle kontrol edilir, başka sınırlama yoktur.",
+      "surge": "Kontenjan düşüşü başına fiyat artışı",
+      "maxLease": "Oturum başına maksimum kiralama",
+      "cooldown": "Yeniden kiralamadan önce bekleme süresi",
+      "modeDynamic": "İlk gelen",
+      "maxConcurrent": "Maksimum eşzamanlı oturum",
+      "modeDynamicDesc": "Kredisiz ilk gelen seçeneğini kullanın. Maksimum kiralama, bekleme süresi ve eşzamanlı oturum sınırları kullanılabilirliği korur."
+    },
+    "idle": {
+      "timeout": "Boşta kalan otomatik geri alma süresi",
+      "timeoutHint": "GPU bu kadar uzun süre boşta kaldığında oturumlar otomatik olarak geri alınır.",
+      "containerNote": "Konteyner modu: Durdurma yoluyla geri kazanılır, veriler korunur.",
+      "sshNote": "SSH modu: veriler yerel diskte kalır ve olduğu gibi yeniden kullanılabilir."
+    },
+    "lease": {
+      "extHours": "Uzantı başına maksimum saat",
+      "maxExt": "Maksimum uzantılar",
+      "maxExtHint": "Oturum başına maksimum uzantı sayısı. 0 genişletmeyi devre dışı bırakır.",
+      "extHoursHint": "Bir kullanıcının uzantı başına seçebileceği maksimum saat. (yalnızca ilk gelen modu)"
+    },
+    "review": {
+      "modeLabel": "Çalışma modu",
+      "billingLabel": "Faturalandırma modu",
+      "idleLabel": "Boşta otomatik geri alma",
+      "hint": "Aşağıdaki ayarlarla başlayacaksınız. Bunları istediğiniz zaman Yönetici → Sistem Ayarları'ndan değiştirebilirsiniz."
+    },
+    "features": {
+      "signup": "Kullanıcı kayıt istekleri",
+      "datasetFeature": "Veri kümeleri özelliği",
+      "datasetFeatureHint": "Kapalıyken veri kümesi menüleri, önbelleğe alma ve oturum içi veri kümesi seçiminin tümü gizlenir (merkezi depolamaya daha az bağımlılık).",
+      "signupHint": "Kapatıldığında giriş sayfasındaki kayıt bağlantısı gizlenir ve hesaplar yöneticiler tarafından oluşturulur.",
+      "creditHint": "Kapalıyken kullanıcılar/gruplar yükleme talebinde bulunamaz; yöneticiler doğrudan kredi verir.",
+      "alerts": "İş yükü kullanılabilirliği uyarıları",
+      "alertsHint": "Kapalıyken kullanıcılar GPU/düğüm kullanılabilirliği uyarılarına abone olamazlar.",
+      "datasetHint": "Kapalıyken kullanıcılar veri kümelerini kaydedemez/talep edemez; yalnızca yöneticiler bunları kaydeder.",
+      "groupJoin": "Gruba/kuruluş katılma istekleri",
+      "dataset": "Veri kümesi kaydı",
+      "groupJoinHint": "Kapalıyken kullanıcılar kendi kendilerine üyelik talebinde bulunamaz; Adminler yönetiyor.",
+      "credit": "Kredi yükleme talepleri"
+    },
+    "wizardTitle": "Giosk İlk Kurulumu",
+    "back": "Geri",
+    "next": "Sonraki",
+    "wizardSubtitle": "İşletim modunu ve varsayılan ilkeleri yapılandırın. Her şey daha sonra Yönetici → Sistem Ayarları'ndan değiştirilebilir.",
+    "finish": "Kurulumu bitir"
+  },
+  "topbar": {
+    "nodeBadge": "Düğümler {{up}}/{{total}} · GPU {{gpu}}%"
+  }
+}

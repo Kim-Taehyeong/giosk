@@ -1,0 +1,518 @@
+{
+  "common": {
+    "delete": "Tanggalin",
+    "login": "Mag-login",
+    "save": "I-save",
+    "confirm": "Kumpirmahin",
+    "logout": "Mag-logout",
+    "close": "Isara",
+    "cancel": "Kanselahin",
+    "next": "Susunod",
+    "back": "Bumalik",
+    "loading": "Naglo-load...",
+    "refresh": "I-refresh",
+    "english": "Ingles",
+    "korean": "한국어",
+    "language": "Wika",
+    "optional": "opsyonal",
+    "required": "kinakailangan"
+  },
+  "auth": {
+    "brand": {
+      "enName": "UNIVERSITY NG DANKOOK",
+      "kuName": "Unibersidad ng Dankook"
+    },
+    "login": {
+      "submit": "Mag-login",
+      "password": "Password",
+      "domain": "Domain",
+      "errorNetwork": "Nagkaroon ng error sa network.",
+      "errorGeneric": "Nabigo ang pag-login.",
+      "usernameLocal": "Student ID / Username",
+      "signupLink": "Mag-sign up para sa serbisyo",
+      "usernameSolid": "Solid Cloud Username",
+      "errorSuspended": "Nasuspinde ang account na ito.",
+      "tabSolid": "Solid Cloud Login",
+      "tabLocal": "Pag-login sa Serbisyo",
+      "submitting": "Nagla-log in...",
+      "errorPending": "Naghihintay ng pag-apruba ng administrator.",
+      "errorRejected": "Tinanggihan ang kahilingan sa pag-signup na ito.",
+      "errorInvalid": "Di-wastong username o password."
+    },
+    "signupPending": {
+      "title": "Naisumite ang kahilingan sa pag-sign up",
+      "submittedAt": "Naisumite noong",
+      "backToLogin": "Bumalik sa pag-login",
+      "body": "Magagawa mong mag-log in pagkatapos ng pag-apruba ng administrator. Maaaring tumagal ito ng ilang oras."
+    },
+    "localSignup": {
+      "section": {
+        "credentials": "Account",
+        "name": "Pangalan",
+        "affiliation": "Kaakibat"
+      },
+      "field": {
+        "username": "Student ID / Username",
+        "email": "Email",
+        "password": "Password (hindi bababa sa 8 character)",
+        "passwordConfirm": "Kumpirmahin ang password"
+      },
+      "title": "Mag-sign up para sa serbisyo",
+      "errorRequired": "Mangyaring punan ang lahat ng kinakailangang mga patlang.",
+      "submit": "Humiling ng pag-sign up",
+      "subtitle": "Punan ang form sa ibaba. Magagawa mong mag-log in kapag naaprubahan ng isang administrator ang iyong kahilingan.",
+      "errorGeneric": "Nabigo ang pag-sign up.",
+      "errorAdvisor": "Ang mga mag-aaral na undergraduate at nagtapos ay dapat magbigay ng isang tagapayo.",
+      "submitting": "Isinusumite...",
+      "errorPasswordShort": "Dapat na hindi bababa sa 8 character ang password.",
+      "errorTerms": "Dapat mong tanggapin ang mga tuntunin upang mag-sign up.",
+      "errorGroup": "Dapat kang pumili ng organisasyon at grupo.",
+      "errorPasswordMismatch": "Hindi tugma ang mga password."
+    },
+    "signup": {
+      "section": {
+        "account": "Account",
+        "name": "Pangalan",
+        "affiliation": "Kaakibat at Papel",
+        "password": "Password ng Serbisyo (opsyonal)"
+      },
+      "field": {
+        "email": "Email",
+        "name": "Pangalan",
+        "lastNameKo": "Apelyido (Korean)",
+        "role": "Tungkulin",
+        "department": "Kagawaran",
+        "firstNameEn": "Unang Pangalan (Ingles)",
+        "username": "Username (Student ID)",
+        "lab": "Lab (opsyonal)",
+        "namePlaceholder": "hal. Hong Gildong",
+        "group": "Grupo",
+        "org": "Organisasyon",
+        "selectPh": "Pumili",
+        "advisor": "Tagapayo",
+        "lastNameEn": "Apelyido (Ingles)",
+        "firstNameKo": "Unang Pangalan (Korean)",
+        "sponsor": "Sponsor (opsyonal)",
+        "passwordPlaceholder": "Iwanang walang laman upang gamitin ang Solid Cloud login lamang",
+        "sponsorPlaceholder": "Pangalan ng sponsor (tagapayo, pinuno ng koponan, atbp.)",
+        "noJoinableGroup": "Ang organisasyong ito ay walang mga grupong maaaring salihan. Makipag-ugnayan sa admin ng org.",
+        "advisorPlaceholder": "Pangalan ng tagapayo",
+        "passwordHint": "Magtakda ng password upang direktang mag-log in gamit ang iyong Student ID/Username nang walang Solid Cloud."
+      },
+      "role": {
+        "undergrad": "Undergraduate",
+        "graduate": "Graduate",
+        "staff": "Mga tauhan",
+        "professor": "Propesor"
+      },
+      "title": "Mag-sign up para sa Giosk Console",
+      "subtitle": "Na-verify ang Solid Cloud authentication. Mangyaring tanggapin ang mga tuntunin at magbigay ng karagdagang impormasyon.",
+      "errorTerms": "Dapat mong tanggapin ang mga tuntunin upang mag-sign up.",
+      "errorAdvisor": "Ang mga mag-aaral na undergraduate at nagtapos ay dapat magbigay ng isang tagapayo.",
+      "errorGeneric": "Nabigo ang pag-sign up.",
+      "terms": "Sumasang-ayon ako sa Mga Tuntunin ng Serbisyo at Patakaran sa Privacy. (kailangan)",
+      "submit": "Kumpletuhin ang pag-signup",
+      "termsView": "Tingnan ang mga tuntunin",
+      "submitting": "Nagsa-sign up..."
+    }
+  },
+  "dashboard": {
+    "labels": {
+      "instances": "Mga pagkakataon",
+      "cpuCores": "Mga CPU Core",
+      "systemMemory": "Memorya ng System",
+      "storageProjects": "Imbakan (Mga Proyekto)"
+    },
+    "units": {
+      "ea": "ea",
+      "cores": "Mga core",
+      "gb": "GB",
+      "gib": "GiB"
+    },
+    "gpuCredit": {
+      "perMonth": "/ {{limit}} C (Buwan)",
+      "renewal": "Buwanang pag-renew: {{date}}",
+      "title": "Quota ng Kredito ng GPU"
+    },
+    "instances": {
+      "table": {
+        "template": "Template",
+        "status": "Katayuan",
+        "ip": "IP address",
+        "offering": "Nag-aalok",
+        "connection": "Koneksyon",
+        "action": "Aksyon",
+        "name": "Pangalan ng Instance"
+      },
+      "actions": {
+        "resume": "Ipagpatuloy",
+        "delete": "Tanggalin",
+        "stop": "Ihinto ang Instance"
+      },
+      "create": "Bagong Instance",
+      "title": "Aking Mga Instance ng Compute",
+      "createFirst": "Lumikha ng iyong unang pagkakataon",
+      "empty": "Walang nakitang aktibong instance.",
+      "loading": "Naglo-load ng mga instance..."
+    },
+    "status": {
+      "stopped": "Huminto",
+      "running": "Tumatakbo",
+      "terminating": "Pagwawakas",
+      "pending": "Nakabinbin"
+    },
+    "confirmStop": {
+      "body": "Ang paghinto ay naglalabas ng mga mapagkukunan ng GPU. Hindi ka sisingilin hanggang sa simulan mo itong muli.",
+      "confirm": "Kumpirmahin ang Stop",
+      "title": "Itigil ang halimbawa"
+    },
+    "confirmStart": {
+      "confirm": "Magsimula",
+      "title": "Simulan ang halimbawa",
+      "body": "Ang pagsisimula ng instance ay magpapatuloy sa pagsingil."
+    },
+    "confirmDelete": {
+      "confirm": "Tanggalin",
+      "title": "Tanggalin ang instance",
+      "body": "Ito ay hindi na maibabalik. Ang instance at ang data nito ay permanenteng aalisin."
+    },
+    "logout": "Mag-logout",
+    "resourceQuota": "Quota ng Mapagkukunan",
+    "console": "Cloud Console"
+  },
+  "credit": {
+    "type": {
+      "usage": "Paggamit",
+      "manual_adjust": "Manu-manong pagsasaayos",
+      "admin_grant": "Admin grant",
+      "limit_increase": "Limitahan ang pagtaas",
+      "monthly_reset": "Buwanang pag-reset",
+      "auto_stop": "Auto stop (walang balanse)"
+    },
+    "balance": "Balanse",
+    "title": "Kasaysayan ng Kredito ng GPU",
+    "tableBalance": "Balanse",
+    "loadMore": "Mag-load pa",
+    "tableAmount": "Halaga",
+    "tableTime": "Oras",
+    "tableType": "Uri",
+    "tableDescription": "Paglalarawan",
+    "limit": "Buwanang limitasyon",
+    "empty": "Walang transaksyon.",
+    "cycleStartedAt": "Nagsimula na ang cycle"
+  },
+  "notifications": {
+    "title": "Mga abiso",
+    "empty": "Walang bagong notification.",
+    "viewAll": "Tingnan ang lahat ng aktibidad",
+    "unread": "{{count}} bago"
+  },
+  "activity": {
+    "loadMore": "Mag-load pa",
+    "title": "Aktibidad",
+    "empty": "Wala pang aktibidad."
+  },
+  "audit": {
+    "action": {
+      "logout": "Mag-logout",
+      "signup_solid": "Kahilingan sa pag-signup sa Solid Cloud",
+      "signup_local": "Kahilingan sa lokal na pag-sign up",
+      "password_change": "Pagbabago ng password",
+      "login_solid": "Solid Cloud login",
+      "ssh_key_delete": "Ang SSH key ay tinanggal",
+      "login_local": "Lokal na pag-login",
+      "ssh_key_add": "Idinagdag ang SSH key",
+      "solid_link": "Naka-link ang Solid Cloud",
+      "status_change": "Pagbabago ng katayuan",
+      "group_quota_change": "Nagbago ang quota ng grupo",
+      "solid_unlink": "Na-unlink ang Solid Cloud",
+      "credit_grant": "Ipinagkaloob ang kredito",
+      "quota_override": "Override sa quota"
+    },
+    "msg": {
+      "quota_override": "{{actor}} ang iyong quota",
+      "status_change": "Binago ng {{actor}} ang iyong status mula {{from}} patungong {{to}}",
+      "credit_grant": "Binigyan ka ng {{actor}} ng {{delta}} GPU credits (bagong limitasyon {{newLimit}})"
+    },
+    "target": "Target",
+    "actor": "artista"
+  },
+  "admin": {
+    "menu": {
+      "users": "Mga gumagamit",
+      "groupQuotas": "Mga Quota ng Grupo",
+      "audit": "Mga Log ng Audit"
+    },
+    "quota": {
+      "cpu": "Mga CPU Core",
+      "monthlyLimit": "Buwanang limitasyon",
+      "currentBalance": "Kasalukuyang balanse",
+      "save": "I-save",
+      "saved": "Nai-save",
+      "grant": "Grant",
+      "gpuCredit": "Kredito sa GPU",
+      "currentUsage": "Kasalukuyang paggamit",
+      "storage": "Imbakan (GiB)",
+      "limitIncreaseHint": "Ang pagtaas ng limitasyon ay nagdaragdag din ng pagkakaiba sa kasalukuyang balanse",
+      "effective": "Epektibo",
+      "grantHint": "Idinagdag ang bonus sa cycle na ito lamang (na-clear sa susunod na buwanang pag-reset)",
+      "instances": "Mga Kasabay na Instance",
+      "ram": "RAM (GiB)",
+      "groupTitle": "{{role}} default na quota",
+      "groupDefault": "Default ng pangkat",
+      "useGroupDefault": "Gamitin ang default ng grupo",
+      "editTitle": "I-edit ang Quota — {{name}}",
+      "override": "I-override"
+    },
+    "users": {
+      "filter": {
+        "pending": "Nakabinbin",
+        "all": "Lahat",
+        "approved": "Naaprubahan",
+        "suspended": "Nasuspinde",
+        "rejected": "Tinanggihan"
+      },
+      "table": {
+        "name": "Pangalan",
+        "role": "Tungkulin",
+        "department": "Kagawaran",
+        "provider": "Mag-login",
+        "status": "Katayuan",
+        "action": "Aksyon",
+        "username": "Username",
+        "createdAt": "Hiniling"
+      },
+      "action": {
+        "reject": "Tanggihan",
+        "suspend": "Suspindihin",
+        "approve": "Aprubahan",
+        "editQuota": "I-edit ang Quota",
+        "reactivate": "Muling isaaktibo"
+      },
+      "status": {
+        "pending": "Nakabinbin",
+        "approved": "Naaprubahan",
+        "suspended": "Nasuspinde",
+        "rejected": "Tinanggihan"
+      },
+      "confirm": {
+        "rejectTitle": "Tanggihan ang pag-sign up",
+        "suspendTitle": "Suspindihin ang user",
+        "approveTitle": "Aprubahan ang user",
+        "approveBody": "Aprubahan ang user na ito? Makakapag-log in agad sila.",
+        "rejectBody": "Tanggihan ang kahilingan sa pag-signup ng user na ito. Hindi sila makakapag-log in.",
+        "reactivateTitle": "I-reactivate ang user",
+        "reactivateBody": "I-reactivate ang user na ito?",
+        "suspendBody": "Suspindihin ang user na ito. Ang anumang aktibong session ay wawakasan."
+      },
+      "title": "Mga gumagamit",
+      "empty": "Walang gumagamit."
+    },
+    "console": "Admin Console"
+  },
+  "me": {
+    "section": {
+      "password": "Password",
+      "profile": "Profile",
+      "activity": "Aktibidad",
+      "sshKeys": "Mga SSH Key",
+      "solid": "Solid Cloud Connection"
+    },
+    "profile": {
+      "username": "Username (Student ID)",
+      "email": "Email",
+      "role": "Tungkulin",
+      "department": "Kagawaran",
+      "advisor": "Tagapayo",
+      "nameEn": "Pangalan (Ingles)",
+      "lab": "Lab",
+      "createdAt": "Sumali",
+      "providerLocal": "Lokal",
+      "nameKo": "Pangalan (Korean)",
+      "providerBoth": "Lokal + Solid na Ulap",
+      "provider": "Paraan ng pag-login",
+      "providerSolid": "Solid na Ulap",
+      "notSet": "(hindi nakatakda)"
+    },
+    "solid": {
+      "userId": "User ID",
+      "account": "Account",
+      "domainId": "Domain ID",
+      "linkSuccess": "Naka-link ang Solid Cloud",
+      "linked": "Naka-link sa Solid Cloud",
+      "notLinked": "Hindi naka-link sa Solid Cloud",
+      "username": "Solid Cloud Username",
+      "password": "Password",
+      "domain": "Domain",
+      "unlinkButton": "I-unlink",
+      "unlinking": "Ina-unlink...",
+      "linking": "Nili-link...",
+      "linkButton": "I-link ang Solid Cloud",
+      "errorAuth": "Nabigo ang Solid Cloud authentication.",
+      "unlinkNeedsPassword": "Magtakda ng lokal na password bago mag-unlink.",
+      "errorConflict": "Ang Solid Cloud account na ito ay naka-link na sa isa pang user.",
+      "unlinkConfirm": "I-unlink ang Solid Cloud? Makakapag-log in ka lang gamit ang iyong lokal na password pagkatapos.",
+      "linkSubtitle": "Patotohanan gamit ang iyong mga kredensyal sa Solid Cloud upang i-link ang account na ito upang magamit mo ang alinman sa pag-login."
+    },
+    "password": {
+      "title": "Baguhin ang Password",
+      "current": "Kasalukuyang password",
+      "confirm": "Kumpirmahin ang bagong password",
+      "submit": "I-save ang password",
+      "new": "Bagong password",
+      "errorShort": "Dapat na hindi bababa sa 8 character ang password.",
+      "hint": "Hindi bababa sa 8 character",
+      "success": "Na-update ang password.",
+      "errorMismatch": "Hindi tugma ang mga bagong password.",
+      "noPasswordHint": "Walang nakatakdang lokal na password. Ang pagpasok ng bagong password ay magbibigay-daan sa lokal na pag-login.",
+      "saving": "Nagse-save..."
+    },
+    "ssh": {
+      "title": "Mga Pampublikong Susi ng SSH",
+      "name": "Pangalan",
+      "fingerprint": "Fingerprint",
+      "delete": "Tanggalin",
+      "createdAt": "Idinagdag",
+      "publicKey": "Pampublikong Susi",
+      "add": "Magdagdag ng susi",
+      "empty": "Walang nakarehistrong SSH key.",
+      "namePlaceholder": "hal., personal-laptop",
+      "errorFormat": "Di-wastong format ng pampublikong key ng SSH.",
+      "publicKeyPlaceholder": "ssh-rsa AAAA... o ssh-ed25519 AAAA...",
+      "errorRequired": "Pangalan at pampublikong susi ay kinakailangan.",
+      "subtitle": "Maaaring mapili ang mga key na nakarehistro dito kapag gumagawa ng bagong instance.",
+      "deleteConfirm": "Tanggalin ang SSH key na ito?",
+      "adding": "Idinaragdag..."
+    },
+    "title": "Aking Account",
+    "menu": "Aking Account",
+    "back": "Bumalik sa Dashboard"
+  },
+  "region": {
+    "loading": "Naglo-load...",
+    "queue": "Nakapila",
+    "tip": "💡 Tip: Ang RTX 4090 ay umaangkop sa magaan na workload; pumili ng RTX Pro 6000 para sa malalaking modelong pagsasanay.",
+    "title": "Availability ng Rehiyon"
+  },
+  "create": {
+    "step1": {
+      "title": "1. Piliin ang Template / ISO",
+      "loading": "Naglo-load ng mga template..."
+    },
+    "step2": {
+      "performance": "Pagganap",
+      "ram": "RAM",
+      "price": "Presyo",
+      "cpu": "CPU",
+      "loading": "Nilo-load ang mga alok...",
+      "vram": "VRAM",
+      "title": "2. Piliin ang Compute Offering"
+    },
+    "step3": {
+      "instanceName": "Pangalan ng Instance",
+      "instanceNamePh": "hal., my-gpu-project-01",
+      "sshKey": "SSH Pampublikong Key",
+      "manualOrGenerate": "Manu-manong ipasok / Bumuo ng bago",
+      "instanceNameHint": "Natatanging identifier para sa iyong workspace.",
+      "title": "3. Mga Setting ng Kapaligiran",
+      "generateKey": "Bumuo ng Key Pares",
+      "useSaved": "Gumamit ng naka-save na SSH key",
+      "sshKeyHint": "Ilagay ang iyong kasalukuyang pampublikong key o bumuo ng bago.",
+      "generating": "Binubuo...",
+      "downloadNote": "Kung bubuo ka ng bagong pares ng key, awtomatikong mada-download ang pribadong key (.pem). Mangyaring panatilihin itong ligtas; hindi na ito ipapakita muli.",
+      "keyLoaded": "Na-load ang Susi"
+    },
+    "footer": {
+      "back": "Bumalik",
+      "next": "Susunod",
+      "launching": "Inilunsad...",
+      "launch": "Ilunsad ang Instance"
+    },
+    "errors": {
+      "createFailed": "Nabigong ilunsad ang instance."
+    },
+    "title": "Lumikha ng Bagong Instance",
+    "stepOf": "Hakbang {{current}} ng {{total}}"
+  },
+  "setup": {
+    "steps": {
+      "mode": "Mode",
+      "review": "Balik-aral",
+      "billing": "Pagsingil",
+      "idle": "Idle"
+    },
+    "unit": {
+      "hour": "h",
+      "month": "mo",
+      "min": "min",
+      "credit": "C",
+      "sessions": "mga session",
+      "times": "beses",
+      "creditPerStep": "C/hakbang"
+    },
+    "mode": {
+      "hybrid": "Lalagyan + SSH hybrid",
+      "container": "Container mode",
+      "containerDesc": "Pamahalaan ang mga GPU sa pamamagitan ng mga K8s container. Pinakamahusay para sa paghahatid ng isang GPU cluster sa maraming user sa laki.",
+      "hybridNote": "Ang pagpili ng hybrid ay nagbibigay-daan sa pisikal na pag-upa ng node, mga SSH account, at mga quota ng bahay sa bawat node. (Ipinatupad sa susunod na yugto)",
+      "hybridDesc": "Nagdaragdag ng direktang access sa SSH sa mga pisikal na node sa ibabaw ng mga container. Pinakamahusay para sa maliliit na lab o kapag kailangan ang physical node leasing."
+    },
+    "billing": {
+      "pricingStatic": "Static — nakapirming presyo ng admin-set",
+      "pricingHint": "Piliin kung paano itinatakda ang mga presyo ng pag-aalok.",
+      "pricingDynamic": "Dynamic — tumataas ang presyo habang bumababa ang availability",
+      "modeCredit": "Credit",
+      "modeFree": "Libre",
+      "maxLease": "Max lease bawat session",
+      "pricing": "Patakaran sa pagpepresyo",
+      "cooldown": "Cooldown bago re-lease",
+      "maxConcurrent": "Max na kasabay na mga session",
+      "modeDynamic": "First-come",
+      "surge": "Pagtaas ng presyo sa bawat pagbaba ng availability",
+      "modeDynamicDesc": "Gamitin ang first-come nang walang credits. Pinoprotektahan ng max lease, cooldown, at concurrent-session limit ang availability.",
+      "modeFreeDesc": "Malayang gamitin nang walang limitasyon. Walang mga credit, lease, o concurrent-session caps.",
+      "modeCreditDesc": "Magbayad sa pamamagitan ng pagbabawas ng mga kredito. Kinokontrol ng mga kredito lamang, na walang iba pang mga limitasyon.",
+      "surgeHint": "Ang mga kredito/oras ay tumaas sa halagang ito sa bawat oras na kakaunti ang mga mapagkukunan."
+    },
+    "idle": {
+      "timeoutHint": "Auto-reclaim ang mga session kapag nananatiling idle ang GPU nang ganito katagal.",
+      "sshNote": "SSH mode: ang data ay nananatili sa lokal na disk at maaaring magamit muli kung kailan.",
+      "containerNote": "Container mode: na-reclaim sa pamamagitan ng Stop, pinapanatili ang data.",
+      "timeout": "Idle auto-reclaim na oras"
+    },
+    "lease": {
+      "extHoursHint": "Max na oras na mapipili ng isang user bawat extension. (first-come mode lang)",
+      "extHours": "Max na oras bawat extension",
+      "maxExt": "Mga max na extension",
+      "maxExtHint": "Max na bilang ng mga extension sa bawat session. Hindi pinapagana ng 0 ang pagpapalawak."
+    },
+    "review": {
+      "modeLabel": "Operating mode",
+      "billingLabel": "Billing mode",
+      "idleLabel": "Idle auto-reclaim",
+      "hint": "Magsisimula ka sa mga setting sa ibaba. Baguhin ang mga ito anumang oras sa Admin → Mga Setting ng System."
+    },
+    "features": {
+      "signup": "Mga kahilingan sa pag-signup ng user",
+      "groupJoin": "Mga kahilingan sa pagsali sa grupo/org",
+      "datasetFeature": "Tampok ng mga dataset",
+      "signupHint": "Kapag naka-off, ang link sa pag-signup sa login page ay nakatago at ang mga account ay nilikha ng mga admin.",
+      "alertsHint": "Kapag naka-off, hindi makakapag-subscribe ang mga user sa mga alerto sa availability ng GPU/node.",
+      "alerts": "Mga alerto sa availability ng workload",
+      "datasetHint": "Kapag naka-off, hindi makakapagrehistro/makahiling ng mga dataset ang mga user; mga admin lang ang nagrerehistro sa kanila.",
+      "groupJoinHint": "Kapag naka-off, hindi maaaring humiling sa sarili ng membership ang mga user; pinapamahalaan ito ng mga admin.",
+      "dataset": "Pagpaparehistro ng dataset",
+      "datasetFeatureHint": "Kapag naka-off, nakatago lahat ang mga menu ng dataset, caching, at in-session na dataset (mas kaunting pag-asa sa gitnang storage).",
+      "credit": "Mga kahilingan sa credit top-up",
+      "creditHint": "Kapag off, ang mga user/grupo ay hindi maaaring humiling ng mga top-up; ang mga admin ay direktang nagbibigay ng mga kredito."
+    },
+    "back": "Bumalik",
+    "next": "Susunod",
+    "wizardTitle": "Giosk Initial Setup",
+    "finish": "Tapusin ang setup",
+    "wizardSubtitle": "I-configure ang operating mode at mga default na patakaran. Maaaring baguhin ang lahat sa ibang pagkakataon sa Admin → Mga Setting ng System."
+  },
+  "topbar": {
+    "nodeBadge": "Mga node {{up}}/{{total}} · GPU {{gpu}}%"
+  }
+}

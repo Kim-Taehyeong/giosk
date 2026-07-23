@@ -1,0 +1,74 @@
+{{- /* 클러스터 내 번들 MySQL 8 (테스트베드/자기완결 설치용). 외부 DB 사용 시 database.bundled=false. */ -}}
+{{- if .Values.database.bundled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "giosk.fullname" . }}-mysql
+spec:
+  accessModes: [ReadWriteOnce]
+  {{- if .Values.database.storageClass }}
+  storageClassName: {{ .Values.database.storageClass | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.database.storageSize | default "8Gi" }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "giosk.fullname" . }}-mysql
+  labels: { app: giosk-mysql }
+spec:
+  replicas: 1
+  strategy: { type: Recreate }   # RWO 볼륨 → 롤링 금지
+  selector:
+    matchLabels: { app: giosk-mysql }
+  template:
+    metadata:
+      labels: { app: giosk-mysql }
+    spec:
+      containers:
+        - name: mysql
+          image: "{{ .Values.database.image | default "mysql:8.0" }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["--default-authentication-plugin=mysql_native_password"]
+          ports:
+            - { name: mysql, containerPort: 3306 }
+          env:
+            - name: MYSQL_DATABASE
+              value: {{ .Values.database.name | quote }}
+            - name: MYSQL_USER
+              value: {{ .Values.database.user | quote }}
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: {{ include "giosk.fullname" . }}-secrets, key: db-password }
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: {{ include "giosk.fullname" . }}-secrets, key: db-password }
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
+          readinessProbe:
+            exec: { command: ["sh", "-c", "mysqladmin ping -h127.0.0.1 -uroot -p\"$MYSQL_ROOT_PASSWORD\""] }
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { cpu: "1", memory: 1Gi }
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "giosk.fullname" . }}-mysql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "giosk.fullname" . }}-mysql
+  labels: { app: giosk-mysql }
+spec:
+  selector: { app: giosk-mysql }
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: mysql
+{{- end }}

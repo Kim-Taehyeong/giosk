@@ -1,0 +1,518 @@
+{
+  "common": {
+    "login": "Přihlášení",
+    "next": "Další",
+    "delete": "Vymazat",
+    "loading": "Načítání...",
+    "close": "Blízko",
+    "cancel": "Zrušit",
+    "save": "Uložit",
+    "back": "Zadní",
+    "confirm": "Potvrdit",
+    "language": "Jazyk",
+    "refresh": "Obnovit",
+    "korean": "한국어",
+    "english": "angličtina",
+    "optional": "volitelný",
+    "required": "požadovaný",
+    "logout": "Odhlášení"
+  },
+  "auth": {
+    "brand": {
+      "kuName": "Univerzita Dankook",
+      "enName": "UNIVERZITA DANKOOK"
+    },
+    "login": {
+      "submit": "Přihlášení",
+      "password": "Heslo",
+      "domain": "Doména",
+      "tabLocal": "Přihlášení do služby",
+      "usernameSolid": "Uživatelské jméno Solid Cloud",
+      "signupLink": "Zaregistrujte se do služby",
+      "errorGeneric": "Přihlášení se nezdařilo.",
+      "errorNetwork": "Došlo k chybě sítě.",
+      "submitting": "Přihlašování...",
+      "tabSolid": "Solidní přihlášení do cloudu",
+      "usernameLocal": "ID studenta / uživatelské jméno",
+      "errorSuspended": "Tento účet byl pozastaven.",
+      "errorRejected": "Tato žádost o registraci byla zamítnuta.",
+      "errorInvalid": "Neplatné uživatelské jméno nebo heslo.",
+      "errorPending": "Čeká se na schválení správcem."
+    },
+    "signupPending": {
+      "title": "Žádost o registraci odeslána",
+      "backToLogin": "Zpět k přihlášení",
+      "submittedAt": "Odesláno dne",
+      "body": "Po schválení administrátorem se budete moci přihlásit. To může chvíli trvat."
+    },
+    "localSignup": {
+      "section": {
+        "credentials": "Účet",
+        "name": "Jméno",
+        "affiliation": "Afiliace"
+      },
+      "field": {
+        "username": "ID studenta / uživatelské jméno",
+        "email": "E-mail",
+        "password": "Heslo (alespoň 8 znaků)",
+        "passwordConfirm": "Potvrďte heslo"
+      },
+      "title": "Zaregistrujte se do služby",
+      "subtitle": "Vyplňte níže uvedený formulář. Jakmile administrátor schválí vaši žádost, budete se moci přihlásit.",
+      "submitting": "Odesílání...",
+      "errorGeneric": "Registrace se nezdařila.",
+      "errorAdvisor": "Vysokoškolští a postgraduální studenti musí poskytnout poradce.",
+      "errorGroup": "Musíte vybrat organizaci a skupinu.",
+      "errorTerms": "Chcete-li se zaregistrovat, musíte přijmout podmínky.",
+      "errorPasswordShort": "Heslo musí mít alespoň 8 znaků.",
+      "errorRequired": "Vyplňte prosím všechna povinná pole.",
+      "submit": "Požádat o registraci",
+      "errorPasswordMismatch": "Hesla se neshodují."
+    },
+    "signup": {
+      "section": {
+        "account": "Účet",
+        "name": "Jméno",
+        "affiliation": "Afiliace a role",
+        "password": "Servisní heslo (volitelné)"
+      },
+      "field": {
+        "email": "E-mail",
+        "name": "Jméno",
+        "role": "Role",
+        "department": "Oddělení",
+        "lastNameEn": "příjmení (anglicky)",
+        "lastNameKo": "příjmení (korejština)",
+        "firstNameEn": "Křestní jméno (anglicky)",
+        "namePlaceholder": "např. Hong Gildong",
+        "lab": "Laboratoř (volitelné)",
+        "firstNameKo": "Křestní jméno (korejština)",
+        "username": "Uživatelské jméno (ID studenta)",
+        "org": "Organizace",
+        "group": "Skupina",
+        "selectPh": "Vybrat",
+        "advisorPlaceholder": "Jméno poradce",
+        "noJoinableGroup": "Tato organizace nemá žádné skupiny, do kterých se lze připojit. Kontaktujte administrátora organizace.",
+        "sponsorPlaceholder": "Jméno sponzora (poradce, vedoucí týmu atd.)",
+        "advisor": "poradce",
+        "sponsor": "Sponzor (volitelné)",
+        "passwordPlaceholder": "Chcete-li použít pouze přihlášení do Solid Cloud, ponechte prázdné",
+        "passwordHint": "Nastavte si heslo pro přímé přihlášení pomocí studentského ID/uživatelského jména bez Solid Cloudu."
+      },
+      "role": {
+        "undergrad": "Vysokoškolák",
+        "graduate": "Absolvent",
+        "staff": "Personál",
+        "professor": "Profesor"
+      },
+      "title": "Zaregistrujte se do Giosk Console",
+      "subtitle": "Ověření Solid Cloud ověřeno. Přijměte prosím podmínky a uveďte další informace.",
+      "errorTerms": "Chcete-li se zaregistrovat, musíte přijmout podmínky.",
+      "errorAdvisor": "Vysokoškolští a postgraduální studenti musí poskytnout poradce.",
+      "errorGeneric": "Registrace se nezdařila.",
+      "termsView": "Zobrazit podmínky",
+      "submit": "Dokončete registraci",
+      "terms": "Souhlasím se smluvními podmínkami a zásadami ochrany osobních údajů. (požadovaný)",
+      "submitting": "Přihlašování..."
+    }
+  },
+  "dashboard": {
+    "labels": {
+      "instances": "Instance",
+      "systemMemory": "Systémová paměť",
+      "cpuCores": "CPU jádra",
+      "storageProjects": "Úložiště (projekty)"
+    },
+    "units": {
+      "cores": "Jádra",
+      "gb": "GB",
+      "ea": "ea",
+      "gib": "GiB"
+    },
+    "gpuCredit": {
+      "title": "Kreditní kvóta GPU",
+      "perMonth": "/ {{limit}} C (měsíc)",
+      "renewal": "Měsíční obnova: {{date}}"
+    },
+    "instances": {
+      "table": {
+        "offering": "Nabídka",
+        "status": "Postavení",
+        "connection": "Spojení",
+        "template": "Šablona",
+        "action": "Akce",
+        "name": "Název instance",
+        "ip": "IP adresa"
+      },
+      "actions": {
+        "delete": "Vymazat",
+        "resume": "Resumé",
+        "stop": "Zastavit instanci"
+      },
+      "create": "Nová instance",
+      "title": "Moje výpočetní instance",
+      "empty": "Nebyly nalezeny žádné aktivní instance.",
+      "createFirst": "Vytvořte svou první instanci",
+      "loading": "Načítání instancí..."
+    },
+    "status": {
+      "pending": "Čeká na vyřízení",
+      "stopped": "Zastaveno",
+      "running": "Běh",
+      "terminating": "Ukončování"
+    },
+    "confirmStop": {
+      "confirm": "Potvrďte Stop",
+      "title": "Zastavit instanci",
+      "body": "Zastavení uvolní prostředky GPU. Nebude vám nic účtováno, dokud to znovu nezačnete."
+    },
+    "confirmStart": {
+      "confirm": "Start",
+      "title": "Spustit instanci",
+      "body": "Spuštěním instance se obnoví účtování."
+    },
+    "confirmDelete": {
+      "confirm": "Vymazat",
+      "title": "Smazat instanci",
+      "body": "To je nevratné. Instance a její data budou trvale odstraněny."
+    },
+    "logout": "Odhlášení",
+    "resourceQuota": "Kvóta zdrojů",
+    "console": "Cloudová konzole"
+  },
+  "credit": {
+    "type": {
+      "usage": "Používání",
+      "limit_increase": "Zvýšení limitu",
+      "admin_grant": "Administrátorský grant",
+      "monthly_reset": "Měsíční reset",
+      "auto_stop": "Automatické zastavení (bez vyvážení)",
+      "manual_adjust": "Ruční nastavení"
+    },
+    "balance": "Váhy",
+    "tableAmount": "Množství",
+    "tableBalance": "Váhy",
+    "tableType": "Typ",
+    "tableTime": "Čas",
+    "tableDescription": "Popis",
+    "limit": "Měsíční limit",
+    "title": "Kreditní historie GPU",
+    "loadMore": "Načíst více",
+    "empty": "Žádné transakce.",
+    "cycleStartedAt": "Cyklus zahájen"
+  },
+  "notifications": {
+    "title": "Oznámení",
+    "unread": "{{count}} nové",
+    "empty": "Žádná nová oznámení.",
+    "viewAll": "Zobrazit veškerou aktivitu"
+  },
+  "activity": {
+    "loadMore": "Načíst více",
+    "title": "Aktivita",
+    "empty": "Zatím žádná aktivita."
+  },
+  "audit": {
+    "action": {
+      "logout": "Odhlášení",
+      "signup_local": "Místní žádost o registraci",
+      "password_change": "Změna hesla",
+      "login_solid": "Solid Cloud přihlášení",
+      "login_local": "Místní přihlášení",
+      "signup_solid": "Žádost o registraci Solid Cloud",
+      "quota_override": "Přepsání kvóty",
+      "solid_link": "Solid Cloud propojen",
+      "solid_unlink": "Solid Cloud odpojen",
+      "status_change": "Změna stavu",
+      "ssh_key_add": "Přidán klíč SSH",
+      "ssh_key_delete": "Klíč SSH byl smazán",
+      "credit_grant": "Úvěr poskytnut",
+      "group_quota_change": "Kvóta skupiny se změnila"
+    },
+    "msg": {
+      "credit_grant": "{{actor}} vám udělil kredity GPU {{delta}} (nový limit {{newLimit}})",
+      "status_change": "{{actor}} změnil váš stav ze {{from}} na {{to}}",
+      "quota_override": "{{actor}} upravil vaši kvótu"
+    },
+    "actor": "Herec",
+    "target": "Cíl"
+  },
+  "admin": {
+    "menu": {
+      "users": "Uživatelé",
+      "groupQuotas": "Skupinové kvóty",
+      "audit": "Protokoly auditu"
+    },
+    "quota": {
+      "cpu": "CPU jádra",
+      "monthlyLimit": "Měsíční limit",
+      "gpuCredit": "Kredit GPU",
+      "instances": "Souběžné instance",
+      "save": "Uložit",
+      "ram": "RAM (GiB)",
+      "storage": "Úložiště (GiB)",
+      "currentBalance": "Aktuální zůstatek",
+      "grant": "Grant",
+      "effective": "Efektivní",
+      "saved": "Uloženo",
+      "grantHint": "Bonus přidaný pouze do tohoto cyklu (vymazán při příštím měsíčním resetu)",
+      "limitIncreaseHint": "Zvýšení limitu také přidá rozdíl k aktuálnímu zůstatku",
+      "editTitle": "Upravit kvótu — {{name}}",
+      "useGroupDefault": "Použít výchozí nastavení skupiny",
+      "groupTitle": "Výchozí kvóta {{role}}",
+      "currentUsage": "Současné použití",
+      "override": "Přepsat",
+      "groupDefault": "Výchozí nastavení skupiny"
+    },
+    "users": {
+      "filter": {
+        "pending": "Čeká na vyřízení",
+        "all": "Vše",
+        "approved": "Schválený",
+        "suspended": "Pozastaveno",
+        "rejected": "Odmítnuto"
+      },
+      "table": {
+        "username": "Uživatelské jméno",
+        "name": "Jméno",
+        "role": "Role",
+        "department": "Oddělení",
+        "provider": "Přihlášení",
+        "status": "Postavení",
+        "action": "Akce",
+        "createdAt": "Vyžádáno"
+      },
+      "action": {
+        "approve": "Schvalovat",
+        "reject": "Odmítnout",
+        "suspend": "Pozastavit",
+        "editQuota": "Upravit kvótu",
+        "reactivate": "Znovu aktivujte"
+      },
+      "status": {
+        "pending": "Čeká na vyřízení",
+        "approved": "Schválený",
+        "suspended": "Pozastaveno",
+        "rejected": "Odmítnuto"
+      },
+      "confirm": {
+        "approveTitle": "Schválit uživatele",
+        "suspendTitle": "Pozastavit uživatele",
+        "approveBody": "Schválit tohoto uživatele? Budou se moci okamžitě přihlásit.",
+        "rejectBody": "Odmítněte žádost tohoto uživatele o registraci. Nebudou se moci přihlásit.",
+        "suspendBody": "Pozastavit tohoto uživatele. Všechny aktivní relace budou ukončeny.",
+        "reactivateTitle": "Znovu aktivujte uživatele",
+        "rejectTitle": "Odmítnout registraci",
+        "reactivateBody": "Znovu aktivovat tohoto uživatele?"
+      },
+      "title": "Uživatelé",
+      "empty": "Žádní uživatelé."
+    },
+    "console": "Administrátorská konzole"
+  },
+  "me": {
+    "section": {
+      "profile": "Profil",
+      "password": "Heslo",
+      "activity": "Aktivita",
+      "solid": "Pevné připojení ke cloudu",
+      "sshKeys": "Klíče SSH"
+    },
+    "profile": {
+      "username": "Uživatelské jméno (ID studenta)",
+      "email": "E-mail",
+      "role": "Role",
+      "department": "Oddělení",
+      "advisor": "poradce",
+      "lab": "Laboratoř",
+      "createdAt": "Připojeno",
+      "providerLocal": "Místní",
+      "provider": "Způsob přihlášení",
+      "providerSolid": "Solid Cloud",
+      "nameEn": "jméno (anglicky)",
+      "nameKo": "jméno (korejština)",
+      "notSet": "(nenastaveno)",
+      "providerBoth": "Místní + Solid Cloud"
+    },
+    "solid": {
+      "account": "Účet",
+      "linkSuccess": "Solid Cloud propojen",
+      "notLinked": "Není propojeno se Solid Cloudem",
+      "linked": "Propojeno se Solid Cloudem",
+      "unlinkButton": "Odpojit",
+      "linkButton": "Link Solid Cloud",
+      "username": "Uživatelské jméno Solid Cloud",
+      "password": "Heslo",
+      "domain": "Doména",
+      "userId": "ID uživatele",
+      "unlinking": "Odpojování...",
+      "domainId": "ID domény",
+      "unlinkConfirm": "Odpojit Solid Cloud? Poté se budete moci přihlásit pouze pomocí místního hesla.",
+      "linking": "Propojování...",
+      "linkSubtitle": "Chcete-li propojit tento účet, ověřte se pomocí svých přihlašovacích údajů Solid Cloud, abyste mohli použít kterékoli přihlášení.",
+      "errorAuth": "Ověření Solid Cloud se nezdařilo.",
+      "unlinkNeedsPassword": "Před odpojením nastavte místní heslo.",
+      "errorConflict": "Tento účet Solid Cloud je již propojen s jiným uživatelem."
+    },
+    "password": {
+      "current": "Aktuální heslo",
+      "title": "Změnit heslo",
+      "errorShort": "Heslo musí mít alespoň 8 znaků.",
+      "noPasswordHint": "Není nastaveno žádné místní heslo. Zadáním nového hesla umožníte místní přihlášení.",
+      "confirm": "Potvrďte nové heslo",
+      "hint": "Minimálně 8 znaků",
+      "new": "Nové heslo",
+      "submit": "Uložit heslo",
+      "saving": "Ukládání...",
+      "errorMismatch": "Nová hesla se neshodují.",
+      "success": "Heslo aktualizováno."
+    },
+    "ssh": {
+      "name": "Jméno",
+      "createdAt": "Přidáno",
+      "title": "Veřejné klíče SSH",
+      "delete": "Vymazat",
+      "fingerprint": "Otisk prstu",
+      "publicKey": "Veřejný klíč",
+      "publicKeyPlaceholder": "ssh-rsa AAAA... nebo ssh-ed25519 AAAA...",
+      "subtitle": "Zde registrované klíče lze vybrat při vytváření nové instance.",
+      "adding": "Přidávání...",
+      "add": "Přidat klíč",
+      "empty": "Nejsou zaregistrovány žádné klíče SSH.",
+      "namePlaceholder": "např. osobní notebook",
+      "errorFormat": "Neplatný formát veřejného klíče SSH.",
+      "errorRequired": "Jméno a veřejný klíč jsou povinné.",
+      "deleteConfirm": "Smazat tento klíč SSH?"
+    },
+    "title": "Můj účet",
+    "menu": "Můj účet",
+    "back": "Zpět na Dashboard"
+  },
+  "region": {
+    "loading": "Načítání...",
+    "queue": "Fronta",
+    "tip": "💡 Tip: RTX 4090 se hodí pro lehkou zátěž; vyberte RTX Pro 6000 pro trénink velkých modelů.",
+    "title": "Dostupnost regionu"
+  },
+  "create": {
+    "step1": {
+      "loading": "Načítání šablon...",
+      "title": "1. Vyberte položku Template / ISO"
+    },
+    "step2": {
+      "title": "2. Vyberte možnost Compute Offering",
+      "performance": "Výkon",
+      "ram": "BERAN",
+      "price": "Cena",
+      "loading": "Načítání nabídek...",
+      "cpu": "CPU",
+      "vram": "VRAM"
+    },
+    "step3": {
+      "instanceName": "Název instance",
+      "sshKeyHint": "Zadejte svůj stávající veřejný klíč nebo vygenerujte nový.",
+      "instanceNameHint": "Jedinečný identifikátor pro váš pracovní prostor.",
+      "manualOrGenerate": "Zadat ručně / Vygenerovat nový",
+      "instanceNamePh": "např. my-gpu-project-01",
+      "title": "3. Nastavení prostředí",
+      "useSaved": "Použijte uložený klíč SSH",
+      "sshKey": "Veřejný klíč SSH",
+      "keyLoaded": "Klíč načten",
+      "generateKey": "Vygenerovat pár klíčů",
+      "generating": "Generování...",
+      "downloadNote": "Pokud vygenerujete nový pár klíčů, soukromý klíč (.pem) se stáhne automaticky. Prosím, uschovejte to; nebude se znovu zobrazovat."
+    },
+    "footer": {
+      "back": "Zadní",
+      "next": "Další",
+      "launching": "Spouštění...",
+      "launch": "Spusťte instanci"
+    },
+    "errors": {
+      "createFailed": "Spuštění instance se nezdařilo."
+    },
+    "stepOf": "Krok {{current}} ze {{total}}",
+    "title": "Vytvořit novou instanci"
+  },
+  "setup": {
+    "steps": {
+      "mode": "Režim",
+      "billing": "Fakturace",
+      "idle": "Líný",
+      "review": "Recenze"
+    },
+    "unit": {
+      "credit": "C",
+      "month": "mo",
+      "min": "min",
+      "hour": "h",
+      "times": "časy",
+      "creditPerStep": "C/krok",
+      "sessions": "sezení"
+    },
+    "mode": {
+      "hybridDesc": "Přidává přímý přístup SSH k fyzickým uzlům nad kontejnery. Nejlepší pro malé laboratoře nebo když je potřeba pronajmout fyzický uzel.",
+      "container": "Kontejnerový režim",
+      "hybrid": "Kontejner + hybrid SSH",
+      "hybridNote": "Výběr hybridního umožňuje pronájem fyzického uzlu, účty SSH a domácí kvóty pro uzel. (Implementováno v pozdější fázi)",
+      "containerDesc": "Spravujte GPU pomocí kontejnerů K8s. Nejlepší pro poskytování GPU clusteru mnoha uživatelům ve velkém měřítku."
+    },
+    "billing": {
+      "pricing": "Cenová politika",
+      "pricingStatic": "Statické — pevná cena nastavená správcem",
+      "pricingHint": "Vyberte, jak jsou nastaveny nabídkové ceny.",
+      "modeCredit": "Kredit",
+      "modeFree": "Uvolnit",
+      "surgeHint": "Kredity/hodina se o tuto částku navyšují pokaždé, když jsou zdroje vzácné.",
+      "modeDynamic": "Kdo přijde jako první",
+      "cooldown": "Vychladnutí před opětovným zapůjčením",
+      "maxConcurrent": "Maximální počet souběžných relací",
+      "maxLease": "Maximální pronájem na relaci",
+      "pricingDynamic": "Dynamický — cena roste s poklesem dostupnosti",
+      "surge": "Zvýšení ceny za pokles dostupnosti",
+      "modeDynamicDesc": "Použijte firstcome bez kreditů. Maximální pronájem, cooldown a limity souběžných relací chrání dostupnost.",
+      "modeFreeDesc": "Používejte volně bez omezení. Žádné kredity, leasingy nebo omezení souběžných relací.",
+      "modeCreditDesc": "Plaťte odečtením kreditů. Kontrolováno pouze kredity, bez dalších limitů."
+    },
+    "idle": {
+      "sshNote": "Režim SSH: data zůstávají na místním disku a lze je znovu použít tak, jak jsou.",
+      "timeoutHint": "Relace jsou automaticky obnoveny, když GPU zůstane nečinný tak dlouho.",
+      "timeout": "Doba automatického obnovení nečinnosti",
+      "containerNote": "Kontejnerový režim: obnovený pomocí Stop, zachování dat."
+    },
+    "lease": {
+      "maxExt": "Max rozšíření",
+      "maxExtHint": "Maximální počet rozšíření na relaci. 0 deaktivuje prodlužování.",
+      "extHoursHint": "Maximální počet hodin, které si uživatel může vybrat na rozšíření. (pouze režim kdo dřív přijde)",
+      "extHours": "Maximální počet hodin na prodloužení"
+    },
+    "review": {
+      "modeLabel": "Provozní režim",
+      "hint": "Začnete s nastavením níže. Můžete je kdykoli změnit v části Správce → Nastavení systému.",
+      "idleLabel": "Automatické obnovení nečinnosti",
+      "billingLabel": "Režim účtování"
+    },
+    "features": {
+      "signup": "Požadavky na registraci uživatele",
+      "groupJoin": "Žádosti o připojení ke skupině/organizaci",
+      "signupHint": "Když je vypnuto, odkaz na přihlášení na přihlašovací stránce je skrytý a účty vytvářejí administrátoři.",
+      "datasetFeatureHint": "Když je vypnuto, nabídky datových sad, ukládání do mezipaměti a výběr datové sady během relace jsou všechny skryté (menší závislost na centrálním úložišti).",
+      "alertsHint": "Když je vypnuto, uživatelé se nemohou přihlásit k odběru upozornění na dostupnost GPU/uzlů.",
+      "dataset": "Registrace datové sady",
+      "datasetFeature": "Funkce datových sad",
+      "datasetHint": "Když je vypnuto, uživatelé se nemohou registrovat/vyžadovat datové sady; registrují je pouze administrátoři.",
+      "alerts": "Upozornění na dostupnost pracovního vytížení",
+      "groupJoinHint": "Když je vypnuto, uživatelé nemohou sami žádat o členství; spravují to administrátoři.",
+      "creditHint": "Když je vypnuto, uživatelé/skupiny nemohou požadovat dobíjení; administrátoři udělují kredity přímo.",
+      "credit": "Žádosti o dobití kreditu"
+    },
+    "back": "Zadní",
+    "next": "Další",
+    "wizardTitle": "Počáteční nastavení Giosku",
+    "finish": "Dokončete nastavení",
+    "wizardSubtitle": "Nakonfigurujte provozní režim a výchozí zásady. Vše lze později změnit v Admin → Nastavení systému."
+  },
+  "topbar": {
+    "nodeBadge": "Uzly {{up}}/{{total}} · GPU {{gpu}}%"
+  }
+}

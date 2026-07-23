@@ -1,0 +1,518 @@
+{
+  "common": {
+    "delete": "Padam",
+    "next": "Seterusnya",
+    "confirm": "sahkan",
+    "loading": "Memuatkan...",
+    "save": "Jimat",
+    "close": "tutup",
+    "cancel": "Batal",
+    "logout": "Log keluar",
+    "refresh": "Segarkan semula",
+    "language": "Bahasa",
+    "korean": "한국어",
+    "optional": "pilihan",
+    "english": "Inggeris",
+    "required": "diperlukan",
+    "back": "belakang",
+    "login": "Log masuk"
+  },
+  "auth": {
+    "brand": {
+      "enName": "UNIVERSITI DANKOOK",
+      "kuName": "Universiti Dankook"
+    },
+    "login": {
+      "password": "Kata laluan",
+      "domain": "Domain",
+      "tabSolid": "Log Masuk Awan Pepejal",
+      "usernameLocal": "ID Pelajar / Nama Pengguna",
+      "errorGeneric": "Log masuk gagal.",
+      "errorNetwork": "Ralat rangkaian telah berlaku.",
+      "usernameSolid": "Nama Pengguna Awan Pepejal",
+      "tabLocal": "Log Masuk Perkhidmatan",
+      "submit": "Log masuk",
+      "signupLink": "Daftar untuk perkhidmatan",
+      "submitting": "Log masuk...",
+      "errorRejected": "Permintaan pendaftaran ini telah ditolak.",
+      "errorInvalid": "Nama pengguna atau kata laluan tidak sah.",
+      "errorPending": "Menunggu kelulusan pentadbir.",
+      "errorSuspended": "Akaun ini telah digantung."
+    },
+    "signupPending": {
+      "backToLogin": "Kembali ke log masuk",
+      "submittedAt": "Diserahkan pada",
+      "title": "Permintaan pendaftaran diserahkan",
+      "body": "Anda akan dapat log masuk selepas kelulusan pentadbir. Ini mungkin mengambil sedikit masa."
+    },
+    "localSignup": {
+      "section": {
+        "credentials": "Akaun",
+        "name": "Nama",
+        "affiliation": "Gabungan"
+      },
+      "field": {
+        "username": "ID Pelajar / Nama Pengguna",
+        "email": "E-mel",
+        "password": "Kata laluan (sekurang-kurangnya 8 aksara)",
+        "passwordConfirm": "Sahkan kata laluan"
+      },
+      "title": "Daftar untuk perkhidmatan",
+      "errorRequired": "Sila isi semua medan yang diperlukan.",
+      "errorPasswordShort": "Kata laluan mestilah sekurang-kurangnya 8 aksara.",
+      "errorGroup": "Anda mesti memilih organisasi dan kumpulan.",
+      "submit": "Minta pendaftaran",
+      "submitting": "Menyerahkan...",
+      "errorGeneric": "Pendaftaran gagal.",
+      "errorAdvisor": "Pelajar prasiswazah dan siswazah mesti menyediakan penasihat.",
+      "subtitle": "Isi borang di bawah. Anda boleh log masuk sebaik sahaja pentadbir meluluskan permintaan anda.",
+      "errorTerms": "Anda mesti menerima syarat untuk mendaftar.",
+      "errorPasswordMismatch": "Kata laluan tidak sepadan."
+    },
+    "signup": {
+      "section": {
+        "account": "Akaun",
+        "name": "Nama",
+        "password": "Kata Laluan Perkhidmatan (pilihan)",
+        "affiliation": "Gabungan & Peranan"
+      },
+      "field": {
+        "email": "E-mel",
+        "name": "Nama",
+        "role": "Peranan",
+        "department": "Jabatan",
+        "username": "Nama pengguna (ID Pelajar)",
+        "advisor": "Penasihat",
+        "org": "Organisasi",
+        "namePlaceholder": "cth. Hong Gildong",
+        "group": "Kumpulan",
+        "selectPh": "Pilih",
+        "sponsor": "Penaja (pilihan)",
+        "lastNameEn": "Nama Akhir (Bahasa Inggeris)",
+        "firstNameKo": "Nama Pertama (Bahasa Korea)",
+        "lastNameKo": "Nama Akhir (Bahasa Korea)",
+        "lab": "Makmal (pilihan)",
+        "advisorPlaceholder": "Nama penasihat",
+        "firstNameEn": "Nama Pertama (Bahasa Inggeris)",
+        "passwordPlaceholder": "Biarkan kosong untuk menggunakan log masuk Solid Cloud sahaja",
+        "sponsorPlaceholder": "Nama penaja (penasihat, ketua pasukan, dsb.)",
+        "noJoinableGroup": "Organisasi ini tidak mempunyai kumpulan yang boleh disertai. Hubungi admin org.",
+        "passwordHint": "Tetapkan kata laluan untuk log masuk terus dengan ID/Nama Pengguna Pelajar anda tanpa Solid Cloud."
+      },
+      "role": {
+        "staff": "Kakitangan",
+        "graduate": "Graduan",
+        "undergrad": "Sarjana Muda",
+        "professor": "Profesor"
+      },
+      "title": "Daftar untuk Giosk Console",
+      "subtitle": "Pengesahan Awan Pepejal disahkan. Sila terima syarat dan berikan maklumat tambahan.",
+      "errorTerms": "Anda mesti menerima syarat untuk mendaftar.",
+      "errorAdvisor": "Pelajar prasiswazah dan siswazah mesti menyediakan penasihat.",
+      "errorGeneric": "Pendaftaran gagal.",
+      "termsView": "Lihat istilah",
+      "submit": "Pendaftaran lengkap",
+      "submitting": "Mendaftar...",
+      "terms": "Saya bersetuju menerima Syarat Perkhidmatan dan Dasar Privasi. (diperlukan)"
+    }
+  },
+  "dashboard": {
+    "labels": {
+      "storageProjects": "Storan (Projek)",
+      "cpuCores": "Teras CPU",
+      "instances": "Contoh",
+      "systemMemory": "Memori Sistem"
+    },
+    "units": {
+      "cores": "Teras",
+      "ea": "ea",
+      "gib": "GiB",
+      "gb": "GB"
+    },
+    "gpuCredit": {
+      "title": "Kuota Kredit GPU",
+      "perMonth": "/ {{limit}} C (Bulan)",
+      "renewal": "Pembaharuan bulanan: {{date}}"
+    },
+    "instances": {
+      "table": {
+        "status": "Status",
+        "template": "templat",
+        "action": "Tindakan",
+        "connection": "Sambungan",
+        "name": "Nama Contoh",
+        "offering": "Penawaran",
+        "ip": "alamat IP"
+      },
+      "actions": {
+        "delete": "Padam",
+        "resume": "Sambung semula",
+        "stop": "Hentikan Contoh"
+      },
+      "create": "Contoh Baru",
+      "title": "Contoh Pengiraan Saya",
+      "empty": "Tiada kejadian aktif ditemui.",
+      "createFirst": "Buat contoh pertama anda",
+      "loading": "Memuatkan contoh..."
+    },
+    "status": {
+      "running": "Berlari",
+      "pending": "Belum selesai",
+      "terminating": "Menamatkan",
+      "stopped": "Berhenti"
+    },
+    "confirmStop": {
+      "body": "Berhenti mengeluarkan sumber GPU. Anda tidak akan dibilkan sehingga anda memulakannya semula.",
+      "confirm": "Sahkan Berhenti",
+      "title": "Hentikan contoh"
+    },
+    "confirmStart": {
+      "confirm": "Mulakan",
+      "body": "Memulakan contoh menyambung semula pengebilan.",
+      "title": "Mulakan contoh"
+    },
+    "confirmDelete": {
+      "confirm": "Padam",
+      "title": "Padamkan contoh",
+      "body": "Ini tidak dapat dipulihkan. Contoh dan datanya akan dialih keluar secara kekal."
+    },
+    "logout": "Log keluar",
+    "console": "Konsol Awan",
+    "resourceQuota": "Kuota Sumber"
+  },
+  "credit": {
+    "type": {
+      "usage": "Penggunaan",
+      "manual_adjust": "Pelarasan manual",
+      "limit_increase": "Hadkan peningkatan",
+      "auto_stop": "Auto berhenti (tiada baki)",
+      "admin_grant": "Pemberian admin",
+      "monthly_reset": "Tetapan semula bulanan"
+    },
+    "balance": "Baki",
+    "cycleStartedAt": "Kitaran bermula",
+    "limit": "Had bulanan",
+    "tableBalance": "Baki",
+    "loadMore": "Muatkan lagi",
+    "tableType": "taip",
+    "tableAmount": "Jumlah",
+    "tableDescription": "Penerangan",
+    "tableTime": "Masa",
+    "title": "Sejarah Kredit GPU",
+    "empty": "Tiada transaksi."
+  },
+  "notifications": {
+    "title": "Pemberitahuan",
+    "viewAll": "Lihat semua aktiviti",
+    "empty": "Tiada pemberitahuan baharu.",
+    "unread": "{{count}} baharu"
+  },
+  "activity": {
+    "title": "Aktiviti",
+    "loadMore": "Muatkan lagi",
+    "empty": "Tiada aktiviti lagi."
+  },
+  "audit": {
+    "action": {
+      "logout": "Log keluar",
+      "login_solid": "Log masuk Awan Pepejal",
+      "password_change": "Tukar kata laluan",
+      "signup_local": "Permintaan pendaftaran tempatan",
+      "ssh_key_delete": "Kunci SSH dipadamkan",
+      "login_local": "Log masuk tempatan",
+      "ssh_key_add": "Kunci SSH ditambah",
+      "status_change": "Perubahan status",
+      "signup_solid": "Permintaan pendaftaran Awan Pepejal",
+      "credit_grant": "Kredit diberikan",
+      "solid_unlink": "Awan Pepejal dinyahpautkan",
+      "group_quota_change": "Kuota kumpulan berubah",
+      "solid_link": "Awan Pepejal dipautkan",
+      "quota_override": "Gantikan kuota"
+    },
+    "msg": {
+      "status_change": "{{actor}} menukar status anda daripada {{from}} kepada {{to}}",
+      "quota_override": "{{actor}} melaraskan kuota anda",
+      "credit_grant": "{{actor}} memberi anda kredit GPU {{delta}} (had baharu {{newLimit}})"
+    },
+    "actor": "pelakon",
+    "target": "Sasaran"
+  },
+  "admin": {
+    "menu": {
+      "users": "Pengguna",
+      "groupQuotas": "Kuota Kumpulan",
+      "audit": "Log Audit"
+    },
+    "quota": {
+      "cpu": "Teras CPU",
+      "monthlyLimit": "Had bulanan",
+      "save": "Jimat",
+      "ram": "RAM (GiB)",
+      "grant": "Geran",
+      "currentBalance": "Baki semasa",
+      "gpuCredit": "Kredit GPU",
+      "saved": "Disimpan",
+      "instances": "Kejadian Serentak",
+      "limitIncreaseHint": "Menambahkan had juga menambah perbezaan pada baki semasa",
+      "storage": "Storan (GiB)",
+      "editTitle": "Edit Kuota — {{name}}",
+      "currentUsage": "Penggunaan semasa",
+      "groupTitle": "{{role}} kuota lalai",
+      "groupDefault": "Lalai kumpulan",
+      "grantHint": "Bonus ditambahkan pada kitaran ini sahaja (dikosongkan pada tetapan semula bulanan seterusnya)",
+      "effective": "Berkesan",
+      "useGroupDefault": "Gunakan lalai kumpulan",
+      "override": "mengatasi"
+    },
+    "users": {
+      "filter": {
+        "pending": "Belum selesai",
+        "all": "Semua",
+        "approved": "Diluluskan",
+        "rejected": "ditolak",
+        "suspended": "Digantung"
+      },
+      "table": {
+        "name": "Nama",
+        "role": "Peranan",
+        "department": "Jabatan",
+        "provider": "Log masuk",
+        "status": "Status",
+        "username": "Nama pengguna",
+        "action": "Tindakan",
+        "createdAt": "Diminta"
+      },
+      "action": {
+        "approve": "Luluskan",
+        "reject": "Tolak",
+        "suspend": "tangguh",
+        "editQuota": "Edit Kuota",
+        "reactivate": "Aktifkan semula"
+      },
+      "status": {
+        "pending": "Belum selesai",
+        "approved": "Diluluskan",
+        "rejected": "ditolak",
+        "suspended": "Digantung"
+      },
+      "confirm": {
+        "approveTitle": "Luluskan pengguna",
+        "rejectBody": "Tolak permintaan pendaftaran pengguna ini. Mereka tidak akan dapat log masuk.",
+        "approveBody": "Luluskan pengguna ini? Mereka akan dapat log masuk dengan segera.",
+        "suspendTitle": "Gantung pengguna",
+        "rejectTitle": "Tolak pendaftaran",
+        "suspendBody": "Gantung pengguna ini. Sebarang sesi aktif akan ditamatkan.",
+        "reactivateBody": "Aktifkan semula pengguna ini?",
+        "reactivateTitle": "Aktifkan semula pengguna"
+      },
+      "title": "Pengguna",
+      "empty": "Tiada pengguna."
+    },
+    "console": "Konsol Pentadbiran"
+  },
+  "me": {
+    "section": {
+      "profile": "Profil",
+      "password": "Kata laluan",
+      "activity": "Aktiviti",
+      "sshKeys": "Kunci SSH",
+      "solid": "Sambungan Awan Pepejal"
+    },
+    "profile": {
+      "username": "Nama pengguna (ID Pelajar)",
+      "email": "E-mel",
+      "role": "Peranan",
+      "department": "Jabatan",
+      "advisor": "Penasihat",
+      "lab": "Makmal",
+      "createdAt": "Menyertai",
+      "providerLocal": "Tempatan",
+      "nameKo": "Nama (Bahasa Korea)",
+      "providerBoth": "Setempat + Awan Pepejal",
+      "nameEn": "Nama (Bahasa Inggeris)",
+      "providerSolid": "Awan Pepejal",
+      "notSet": "(tidak ditetapkan)",
+      "provider": "Kaedah log masuk"
+    },
+    "solid": {
+      "userId": "ID pengguna",
+      "account": "Akaun",
+      "domainId": "ID Domain",
+      "linkSuccess": "Awan Pepejal dipautkan",
+      "notLinked": "Tidak dipautkan kepada Solid Cloud",
+      "linking": "Memautkan...",
+      "username": "Nama Pengguna Awan Pepejal",
+      "password": "Kata laluan",
+      "domain": "Domain",
+      "unlinking": "Menyahpaut...",
+      "unlinkConfirm": "Nyahpaut Solid Cloud? Anda hanya boleh log masuk dengan kata laluan tempatan anda selepas itu.",
+      "linked": "Dipautkan kepada Solid Cloud",
+      "errorAuth": "Pengesahan Awan Pepejal gagal.",
+      "unlinkNeedsPassword": "Tetapkan kata laluan setempat sebelum menyahpaut.",
+      "linkButton": "Pautkan Awan Pepejal",
+      "unlinkButton": "Nyahpaut",
+      "linkSubtitle": "Sahkan dengan kelayakan Solid Cloud anda untuk memautkan akaun ini supaya anda boleh menggunakan sama ada log masuk.",
+      "errorConflict": "Akaun Solid Cloud ini telah dipautkan kepada pengguna lain."
+    },
+    "password": {
+      "title": "Tukar Kata Laluan",
+      "saving": "Menyimpan...",
+      "errorShort": "Kata laluan mestilah sekurang-kurangnya 8 aksara.",
+      "submit": "Simpan kata laluan",
+      "current": "Kata laluan semasa",
+      "confirm": "Sahkan kata laluan baharu",
+      "hint": "Sekurang-kurangnya 8 aksara",
+      "new": "Kata laluan baharu",
+      "noPasswordHint": "Tiada kata laluan setempat ditetapkan. Memasukkan kata laluan baharu akan membolehkan log masuk tempatan.",
+      "success": "Kata laluan dikemas kini.",
+      "errorMismatch": "Kata laluan baharu tidak sepadan."
+    },
+    "ssh": {
+      "name": "Nama",
+      "fingerprint": "Cap jari",
+      "empty": "Tiada kunci SSH didaftarkan.",
+      "delete": "Padam",
+      "title": "Kunci Awam SSH",
+      "publicKey": "Kunci Awam",
+      "namePlaceholder": "cth., komputer riba peribadi",
+      "publicKeyPlaceholder": "ssh-rsa AAAA... atau ssh-ed25519 AAAA...",
+      "createdAt": "Ditambah",
+      "add": "Tambah kunci",
+      "deleteConfirm": "Padamkan kunci SSH ini?",
+      "subtitle": "Kekunci yang didaftarkan di sini boleh dipilih semasa membuat kejadian baharu.",
+      "errorFormat": "Format kunci awam SSH tidak sah.",
+      "errorRequired": "Nama dan kunci awam diperlukan.",
+      "adding": "Menambah..."
+    },
+    "title": "Akaun Saya",
+    "menu": "Akaun Saya",
+    "back": "Kembali ke Papan Pemuka"
+  },
+  "region": {
+    "loading": "Memuatkan...",
+    "title": "Ketersediaan Wilayah",
+    "tip": "💡 Petua: RTX 4090 sesuai dengan beban kerja yang ringan; pilih RTX Pro 6000 untuk latihan model besar.",
+    "queue": "Beratur"
+  },
+  "create": {
+    "step1": {
+      "title": "1. Pilih Templat / ISO",
+      "loading": "Memuatkan templat..."
+    },
+    "step2": {
+      "cpu": "CPU",
+      "ram": "RAM",
+      "performance": "Prestasi",
+      "price": "harga",
+      "vram": "VRAM",
+      "title": "2. Pilih Kiraan Tawaran",
+      "loading": "Memuatkan tawaran..."
+    },
+    "step3": {
+      "instanceName": "Nama Contoh",
+      "title": "3. Tetapan Persekitaran",
+      "sshKey": "Kunci Awam SSH",
+      "instanceNamePh": "cth., my-gpu-project-01",
+      "generating": "Menjana...",
+      "manualOrGenerate": "Masukkan secara manual / Jana baharu",
+      "instanceNameHint": "Pengecam unik untuk ruang kerja anda.",
+      "useSaved": "Gunakan kunci SSH yang disimpan",
+      "sshKeyHint": "Masukkan kunci awam sedia ada anda atau jana kunci baharu.",
+      "keyLoaded": "Kunci Dimuatkan",
+      "generateKey": "Hasilkan Pasangan Kunci",
+      "downloadNote": "Jika anda menjana pasangan kunci baharu, kunci peribadi (.pem) akan dimuat turun secara automatik. Sila pastikan ia selamat; ia tidak akan ditunjukkan lagi."
+    },
+    "footer": {
+      "back": "belakang",
+      "next": "Seterusnya",
+      "launch": "Lancarkan Instance",
+      "launching": "Melancarkan..."
+    },
+    "errors": {
+      "createFailed": "Gagal melancarkan contoh."
+    },
+    "title": "Buat Contoh Baharu",
+    "stepOf": "Langkah {{current}} daripada {{total}}"
+  },
+  "setup": {
+    "steps": {
+      "mode": "Mod",
+      "review": "Semakan",
+      "billing": "Pengebilan",
+      "idle": "terbiar"
+    },
+    "unit": {
+      "hour": "h",
+      "min": "min",
+      "month": "mo",
+      "credit": "C",
+      "times": "kali",
+      "creditPerStep": "C/langkah",
+      "sessions": "sesi"
+    },
+    "mode": {
+      "container": "Mod bekas",
+      "hybrid": "Bekas + SSH hibrid",
+      "containerDesc": "Urus GPU melalui bekas K8s. Terbaik untuk menyediakan kluster GPU kepada ramai pengguna secara berskala.",
+      "hybridDesc": "Menambahkan akses SSH terus ke nod fizikal di atas bekas. Terbaik untuk makmal kecil atau apabila pemajakan nod fizikal diperlukan.",
+      "hybridNote": "Memilih hibrid membolehkan pajakan nod fizikal, akaun SSH, dan kuota rumah setiap nod. (Dilaksanakan dalam fasa kemudian)"
+    },
+    "billing": {
+      "pricing": "Dasar penentuan harga",
+      "surge": "Kenaikan harga setiap penurunan ketersediaan",
+      "pricingDynamic": "Dinamik — harga meningkat apabila ketersediaan menurun",
+      "pricingStatic": "Statik — harga tetapan pentadbir",
+      "pricingHint": "Pilih cara harga tawaran ditetapkan.",
+      "surgeHint": "Peningkatan kredit/jam sebanyak jumlah ini setiap kali sumber berkurangan.",
+      "modeFree": "Percuma",
+      "maxConcurrent": "Sesi serentak maksimum",
+      "maxLease": "Pajakan maksimum setiap sesi",
+      "modeDynamic": "First-come",
+      "modeFreeDesc": "Gunakan secara bebas tanpa had. Tiada kredit, pajakan atau had sesi serentak.",
+      "modeCredit": "Kredit",
+      "cooldown": "Bertenang sebelum pajakan semula",
+      "modeCreditDesc": "Bayar dengan menolak kredit. Dikawal oleh kredit sahaja, tanpa had lain.",
+      "modeDynamicDesc": "Gunakan first-come tanpa kredit. Had pajakan, cooldown maks dan sesi serentak melindungi ketersediaan."
+    },
+    "idle": {
+      "timeout": "Masa auto tuntut semula terbiar",
+      "timeoutHint": "Sesi dituntut semula secara automatik apabila GPU kekal melahu selama ini.",
+      "sshNote": "Mod SSH: data kekal pada cakera tempatan dan boleh digunakan semula seperti sedia ada.",
+      "containerNote": "Mod bekas: dituntut semula melalui Stop, memelihara data."
+    },
+    "lease": {
+      "extHours": "Jam maksimum setiap sambungan",
+      "extHoursHint": "Jam maksimum pengguna boleh memilih setiap sambungan. (mod first-come sahaja)",
+      "maxExt": "Sambungan maks",
+      "maxExtHint": "Bilangan maksimum sambungan setiap sesi. 0 melumpuhkan pelanjutan."
+    },
+    "review": {
+      "modeLabel": "Mod pengendalian",
+      "billingLabel": "Mod pengebilan",
+      "idleLabel": "Tuntutan automatik terbiar",
+      "hint": "Anda akan bermula dengan tetapan di bawah. Tukarnya pada bila-bila masa dalam Pentadbiran → Tetapan Sistem."
+    },
+    "features": {
+      "dataset": "Pendaftaran set data",
+      "datasetFeatureHint": "Apabila dimatikan, menu set data, caching dan pemilihan set data dalam sesi semuanya tersembunyi (kurang pergantungan pada storan pusat).",
+      "datasetHint": "Apabila dimatikan, pengguna tidak boleh mendaftar/meminta set data; hanya pentadbir mendaftar mereka.",
+      "alerts": "Makluman ketersediaan beban kerja",
+      "creditHint": "Apabila dimatikan, pengguna/kumpulan tidak boleh meminta tambah nilai; pentadbir memberikan kredit secara langsung.",
+      "credit": "Permintaan tambah nilai kredit",
+      "groupJoin": "Permintaan penyertaan kumpulan/org",
+      "groupJoinHint": "Apabila dimatikan, pengguna tidak boleh meminta keahlian sendiri; admin menguruskannya.",
+      "signupHint": "Apabila dimatikan, pautan pendaftaran pada halaman log masuk disembunyikan dan akaun dibuat oleh pentadbir.",
+      "datasetFeature": "Ciri set data",
+      "signup": "Permintaan pendaftaran pengguna",
+      "alertsHint": "Apabila dimatikan, pengguna tidak boleh melanggan amaran ketersediaan GPU/nod."
+    },
+    "back": "belakang",
+    "next": "Seterusnya",
+    "finish": "Selesaikan persediaan",
+    "wizardSubtitle": "Konfigurasikan mod pengendalian dan dasar lalai. Semuanya boleh diubah kemudian dalam Admin → Tetapan Sistem.",
+    "wizardTitle": "Persediaan Awal Giosk"
+  },
+  "topbar": {
+    "nodeBadge": "Nod {{up}}/{{total}} · GPU {{gpu}}%"
+  }
+}
