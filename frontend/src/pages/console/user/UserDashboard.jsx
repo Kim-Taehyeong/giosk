@@ -83,7 +83,7 @@ export default function UserDashboard() {
                     <div className="flex" style={{ gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                       <span style={{ fontWeight: 800, fontSize: 14.5, color: s.fg }}>{n.title}</span>
                       {n.pinned && <span style={{ fontSize: 11, fontWeight: 700, color: s.fg, opacity: .7 }}>· {t('dash.noticePinned')}</span>}
-                      <span className="muted" style={{ fontSize: 12 }}>{n.createdAt}</span>
+                      <span className="muted" style={{ fontSize: 12 }}>{n.createdAt ? new Date(n.createdAt).toLocaleString() : ''}</span>
                     </div>
                     {n.body && <div style={{ fontSize: 13, marginTop: 3, lineHeight: 1.55 }}>{n.body}</div>}
                   </div>
@@ -249,11 +249,12 @@ export default function UserDashboard() {
                   </span>
                 : <span className="muted">—</span>
             ) },
-            { key: 'status', header: t('dash.colStatus'), render: (r) => (
-              r.status === 'running'
-                ? <Pill variant="run" dot>{t('dash.running')}</Pill>
-                : <Pill variant="wait" dot>{r.status}</Pill>
-            ) },
+            { key: 'status', header: t('dash.colStatus'), render: (r) => {
+              // 모든 상태를 i18n 라벨로 — running 만 번역하고 나머지를 raw enum(영문)으로 찍던 버그 수정.
+              const map = { running: ['run', 'running'], provisioning: ['wait', 'provisioning'], queued: ['wait', 'queued'], paused: ['pause', 'paused'], stopped: ['pause', 'paused'], terminated: ['pause', 'terminated'], failed: ['err', 'terminated'] };
+              const [v, k] = map[r.status] || ['wait', null];
+              return <Pill variant={v} dot>{k ? t('session.' + k, { defaultValue: r.status }) : r.status}</Pill>;
+            } },
           ]}
           rows={d.sessions}
           rowKey={(r) => r.id}

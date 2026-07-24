@@ -286,7 +286,7 @@
     "firstCome": "First-come",
     "freeMode": "Free",
     "noLimit": "No limit",
-    "fastStart": "Fast start",
+    "fastStart": "Fast start likely",
     "shareTier": "Partition tier (HAMi)",
     "tierN": "Tier {{n}}",
     "memory": "Memory",
