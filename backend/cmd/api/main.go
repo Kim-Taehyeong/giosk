@@ -79,6 +79,7 @@ func main() {
 	resourceSvc := resource.NewService(resource.NewRepository(db), kc, resource.NewSessionCounter(db))
 	sessionSvc := session.NewService(session.NewRepository(db), kc,
 		cfg.K8s.NamespacePrefix, cfg.K8s.GatewayDomain, cfg.Storage.PersistenceClass)
+	authSvc.WithKeySync(sessionSvc) // SSH 공개키 등록/교체 → 실행 중 컨테이너 세션 authorized_keys 즉시 반영
 
 	orgRepo := org.NewRepository(db)
 	orgSvc := org.NewService(orgRepo).WithBootstrapper(groupSvc)              // 조직 생성 시 기본 그룹+org_admin 배정

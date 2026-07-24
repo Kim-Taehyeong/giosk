@@ -36,6 +36,8 @@ func userView(u *User, e ProfileExtra) gin.H {
 		"firstName": u.FirstName, "lastName": u.LastName,
 		"role": u.Role, "status": u.Status,
 	}
+	// SSH 공개키는 비밀이 아니다 — 내정보/접속 화면이 "등록됨/미등록"을 판단하고 그대로 보여준다.
+	addIf(v, "sshPublicKey", u.SSHPublicKey)
 	if u.Role == RoleAdmin {
 		v["consoleLevel"] = "platform"
 	} else if e.ConsoleLevel != "" {

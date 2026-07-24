@@ -160,6 +160,38 @@ func (s *Service) WithGateway(secret, scheme, sshHost string, sshPort int, sshdI
 // containerSSH는 컨테이너 세션 SSH(사이드카)가 활성인지 여부.
 func (s *Service) containerSSH() bool { return s.sshdImage != "" }
 
+// SyncUserKeys는 사용자가 SSH 공개키를 등록/교체/삭제했을 때, 그 사용자의 활성 컨테이너 세션이
+// 있는 네임스페이스마다 authorized_keys Secret 을 갱신한다. sshd 는 접속마다 파일을 다시 읽으므로
+// 실행 중인 세션도 재시작 없이 새 키로 붙고, 지운 키는 즉시 막힌다.
+// auth.KeySyncer 구현 — 클러스터 미가용/세션 없음은 정상(무동작).
+func (s *Service) SyncUserKeys(ctx context.Context, userID int64) error {
+	if !s.containerSSH() {
+		return nil
+	}
+	list, err := s.repo.ListByUser(userID)
+	if err != nil {
+		return err
+	}
+	keys := s.repo.UserSSHKey(userID)
+	seen := map[string]bool{}
+	var firstErr error
+	for i := range list {
+		sess := &list[i]
+		if sess.Env == "ssh" || (sess.Phase != PhaseRunning && sess.Phase != PhaseProvisioning) {
+			continue
+		}
+		ns := s.namespaceOf(sess)
+		if seen[ns] {
+			continue
+		}
+		seen[ns] = true
+		if err := s.prov.UpsertUserKeys(ctx, ns, userID, keys); err != nil && firstErr == nil {
+			firstErr = err
+		}
+	}
+	return firstErr
+}
+
 // svcPorts는 세션 Service 가 노출할 포트 목록(웹 채널 + 컨테이너 sshd 22)을 만든다.
 func (s *Service) svcPorts(channels []k8s.WebChannelSpec) []k8s.SvcPort {
 	ports := make([]k8s.SvcPort, 0, len(channels)+1)

@@ -59,10 +59,26 @@ func (h *Handler) SetSSHKey(c *gin.Context) {
 		return
 	}
 	if err := h.svc.SetSSHKey(CurrentUser(c).ID, body.PublicKey); err != nil {
+		if errors.Is(err, ErrBadPublicKey) {
+			httpx.Err(c, 400, "bad_public_key", "SSH 공개키 형식이 올바르지 않습니다(ssh-ed25519/ssh-rsa ... 한 줄)")
+			return
+		}
 		httpx.Internal(c, "ssh key 저장 실패")
 		return
 	}
 	httpx.OK(c, gin.H{"ok": true})
+}
+
+// GenerateSSHKey는 서버에서 키쌍을 만들어 공개키를 등록하고 개인키를 1회 반환한다.
+// 개인키는 서버에 저장하지 않는다 — 응답을 놓치면 다시 생성해야 한다.
+func (h *Handler) GenerateSSHKey(c *gin.Context) {
+	u := CurrentUser(c)
+	priv, err := h.svc.GenerateSSHKey(u.ID, "giosk-"+u.Username)
+	if err != nil {
+		httpx.Internal(c, "ssh 키 생성 실패")
+		return
+	}
+	httpx.OK(c, gin.H{"privateKey": priv, "filename": "giosk-" + u.Username + ".pem"})
 }
 
 // ChangePassword는 현재/새 비밀번호로 본인 비밀번호를 변경한다.

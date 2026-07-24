@@ -39,6 +39,14 @@ export const AuthProvider = ({ children }) => {
     });
   }, []);
 
+  // /me 재조회 — 프로필 변경(SSH 공개키 등록 등) 직후 컨텍스트를 최신화한다. 갱신된 사용자 반환.
+  const refreshUser = async () => {
+    if (!getSessionKey()) return null;
+    const me = await apiGet('/auth/me');
+    persist(me);
+    return me;
+  };
+
   // 자체 로그인 — 실 백엔드. 성공 시 세션키 보관 + 사용자 컨텍스트 저장.
   const loginLocal = async (username, password) => {
     const res = await apiPost('/auth/login', { username, password });
@@ -70,6 +78,7 @@ export const AuthProvider = ({ children }) => {
         user,
         activeScope,
         setActiveScope,
+        refreshUser,
         pendingMessage,
         loginLocal,
         localSignup,

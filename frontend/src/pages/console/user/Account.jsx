@@ -7,6 +7,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { useTheme } from '../../../context/ThemeContext';
 import { useConsole } from '../../../context/ConsoleContext';
 import { useToast } from '../../../components/console/Toast';
+import SshKeyForm from '../../../components/console/SshKeyForm';
 import { apiPut } from '../../../api/client';
 
 const ROLE_LABEL = { org_admin: 'Org Admin', project_admin: 'Group Admin', member: 'Member' };
@@ -17,12 +18,9 @@ export default function Account() {
   const { theme, setTheme } = useTheme();
   const { activeGroup } = useConsole();
   const { toast } = useToast();
-  const [sshKey, setSshKey] = useState(() => localStorage.getItem('giosk_sshkey') || '');
   const orgName = activeGroup?.orgName || user?.orgName || '—';
   const groupName = activeGroup?.displayName || activeGroup?.name || user?.groupName;
   const memberRole = activeGroup?.role || user?.membershipRole || 'member';
-
-  const saveSsh = () => { localStorage.setItem('giosk_sshkey', sshKey); toast(t('account.sshSaved')); };
 
   const [pw, setPw] = useState({ current: '', next: '', confirm: '' });
   const changePw = async () => {
@@ -110,9 +108,7 @@ export default function Account() {
 
       <div className="card mb">
         <h3><KeyRound size={16} /> {t('account.ssh')}</h3>
-        <textarea value={sshKey} onChange={(e) => setSshKey(e.target.value)} placeholder="ssh-ed25519 AAAA..." />
-        <div className="legend">{t('account.sshHint')}</div>
-        <div className="mt"><button className="btn primary" onClick={saveSsh}>{t('account.save')}</button></div>
+        <SshKeyForm />
       </div>
 
       {/* 물리노드 로컬 Home 은 '데이터·볼륨 > 로컬 Home' 으로 이동(노드별 hostPath 특수 볼륨). 내정보에서는 제거. */}

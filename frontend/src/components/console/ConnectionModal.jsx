@@ -4,6 +4,8 @@ import { Code2, NotebookPen, TerminalSquare, ExternalLink, Copy, Clock, RefreshC
 import Modal from './Modal';
 import { useToast } from './Toast';
 import { getAccess } from '../../api/console/sessions';
+import { useAuth } from '../../context/AuthContext';
+import SshKeyForm from './SshKeyForm';
 
 const TABS = [
   { key: 'vscode', label: 'VSCode', icon: Code2 },
@@ -122,7 +124,16 @@ function WebPane({ info, urlLabel, openLabel, expiresAt, t, onRegenerate, regene
 
 // SSHPane은 SSH 접속 패널 — 두 가지 경로: (1) 프록시(게이트웨이) 한 점 접속(어디서든),
 // (2) 사내망 직접 접속(192 대역, 사무실 네트워크 안일 때 게이트웨이 우회). 물리 세션만 직접 경로 제공.
-function SSHPane({ info, expiresAt, t, onRegenerate, regenerating, onWebConnect }) {
+function SSHPane({ info, expiresAt, t, onRegenerate, regenerating, onWebConnect, hasKey }) {
+  // 키 미등록이면 복붙 명령을 줘도 로그인이 거부된다 → 여기서 바로 등록/생성할 수 있게 한다(막다른 길 방지).
+  // 등록하면 실행 중인 세션에도 즉시 반영된다(sshd 가 접속마다 authorized_keys 를 다시 읽음).
+  const keySetup = hasKey ? null : (
+    <div className="mt" style={{ padding: 12, borderRadius: 10, background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
+      <div style={{ fontWeight: 700, marginBottom: 6 }}>{t('conn.sshNeedKey', { defaultValue: 'SSH 공개키가 등록되어 있지 않습니다' })}</div>
+      <div className="legend" style={{ marginTop: 0 }}>{t('conn.sshNeedKeyHint', { defaultValue: '아래에서 등록하거나 키를 생성하세요. 실행 중인 세션에도 바로 반영됩니다.' })}</div>
+      <div className="mt"><SshKeyForm /></div>
+    </div>
+  );
   // 웹으로 연결하기 — 브라우저 터미널(키/명령 불요). 복붙 SSH 위에 우선 제공.
   const webBtn = onWebConnect ? (
     <div className="mt">
@@ -140,6 +151,7 @@ function SSHPane({ info, expiresAt, t, onRegenerate, regenerating, onWebConnect 
         <label className="fld">{t('conn.sshDirect', { defaultValue: '직접 접속 (사내망)' })}</label>
         <CodeRow text={info.cmd} />
         <div className="legend mt">{t('conn.sshDirectHint')}</div>
+        {keySetup}
       </div>
     );
   }
@@ -158,6 +170,7 @@ function SSHPane({ info, expiresAt, t, onRegenerate, regenerating, onWebConnect 
         <CodeRow text={info.directCmd} />
         <div className="legend">{t('conn.sshDirectInHint', { defaultValue: '사무실 네트워크(사내망) 안에서 노드에 바로 접속합니다. 게이트웨이를 거치지 않습니다.' })}</div>
       </>)}
+      {keySetup}
     </div>
   );
 }
@@ -179,6 +192,7 @@ function TerminalLaunchPane({ onOpen, t }) {
 export default function ConnectionModal({ session, onClose, initialTab }) {
   const { t } = useTranslation('consoleUser');
   const { toast } = useToast();
+  const { user } = useAuth();
   const [conn, setConn] = useState(null);
   const [err, setErr] = useState('');
   const [tab, setTab] = useState('vscode');
@@ -246,7 +260,7 @@ export default function ConnectionModal({ session, onClose, initialTab }) {
           {tab === 'terminal' && <TerminalLaunchPane onOpen={openTerminal} t={t} />}
           {/* 네이티브 SSH(물리 세션) — Proxy/직접 복붙 명령 + 웹으로 연결하기(새 창) */}
           {tab === 'ssh' && (conn.ssh
-            ? <SSHPane info={conn.ssh} expiresAt={conn.expiresAt} t={t} onRegenerate={regenerate} regenerating={regenerating} onWebConnect={openTerminal} />
+            ? <SSHPane info={conn.ssh} expiresAt={conn.expiresAt} t={t} onRegenerate={regenerate} regenerating={regenerating} onWebConnect={openTerminal} hasKey={!!user?.sshPublicKey} />
             : <TerminalLaunchPane onOpen={openTerminal} t={t} />)}
         </>
       )}

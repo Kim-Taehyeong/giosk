@@ -1,7 +1,9 @@
 package auth
 
 import (
+	"context"
 	"errors"
+	"log"
 	"time"
 
 	"giosk/pkg/idgen"
@@ -24,7 +26,17 @@ type Service struct {
 	repo       Repository
 	sessionTTL time.Duration
 	enricher   Enricher
+	keySync    KeySyncer
 }
+
+// KeySyncer는 SSH 공개키 변경을 실행 중인 세션에 반영하는 훅(session 서비스가 구현).
+// sshd 는 접속마다 authorized_keys 를 다시 읽으므로, Secret 만 갱신하면 재시작 없이 반영된다.
+type KeySyncer interface {
+	SyncUserKeys(ctx context.Context, userID int64) error
+}
+
+// WithKeySync는 키 변경 → 실행 중 세션 반영 훅을 주입한다(미주입=저장만).
+func (s *Service) WithKeySync(k KeySyncer) *Service { s.keySync = k; return s }
 
 // NewService는 auth 서비스를 만든다. sessionTTL 은 호출측(설정)에서 주입.
 func NewService(repo Repository, sessionTTL time.Duration) *Service {
@@ -97,9 +109,43 @@ func (s *Service) Authenticate(sessionKey string) (*User, error) {
 // Logout은 세션을 폐기한다.
 func (s *Service) Logout(sessionKey string) error { return s.repo.DeleteSession(sessionKey) }
 
-// SetSSHKey는 사용자의 단일 SSH 공개키를 갱신한다.
+// SetSSHKey는 사용자의 단일 SSH 공개키를 검증·정규화해 갱신하고,
+// 실행 중인 컨테이너 세션의 authorized_keys 에도 즉시 반영한다.
 func (s *Service) SetSSHKey(userID int64, key string) error {
-	return s.repo.UpdateSSHKey(userID, key)
+	norm, err := normalizePublicKey(key)
+	if err != nil {
+		return err
+	}
+	if err := s.repo.UpdateSSHKey(userID, norm); err != nil {
+		return err
+	}
+	s.syncKeys(userID)
+	return nil
+}
+
+// GenerateSSHKey는 서버에서 ed25519 키쌍을 만들어 공개키만 저장하고 개인키를 1회 반환한다
+// (EC2 키페어 방식 — 서버는 개인키를 보관하지 않는다). 반환값=개인키 PEM.
+func (s *Service) GenerateSSHKey(userID int64, comment string) (string, error) {
+	pub, priv, err := generateKeyPair(comment)
+	if err != nil {
+		return "", err
+	}
+	if err := s.repo.UpdateSSHKey(userID, pub); err != nil {
+		return "", err
+	}
+	s.syncKeys(userID)
+	return priv, nil
+}
+
+// syncKeys는 키 저장 후 실행 중 세션에 반영을 시도한다(베스트에포트 — DB 저장은 이미 성공,
+// 클러스터 미가용/세션 없음은 실패로 볼 필요가 없다. 다음 세션 생성 때 다시 반영된다).
+func (s *Service) syncKeys(userID int64) {
+	if s.keySync == nil {
+		return
+	}
+	if err := s.keySync.SyncUserKeys(context.Background(), userID); err != nil {
+		log.Printf("ssh key sync (user=%d): %v", userID, err)
+	}
 }
 
 // ChangePassword는 현재 비밀번호 확인 후 새 비밀번호로 교체한다(8자 이상).
