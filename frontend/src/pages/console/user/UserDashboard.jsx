@@ -208,22 +208,58 @@ export default function UserDashboard() {
               ))}
             </div>
           ) : (
-            avail.byType.map((r, i) => (
-              <div className="avail" key={i} style={{ flexDirection: 'column', alignItems: 'stretch', gap: 8 }}>
-                <div className="flex" style={{ justifyContent: 'space-between' }}>
-                  <span className="gpu-name">{r.gpuType}</span>
-                  <span className="flex gap">
-                    <span className="free-n">{r.free}/{r.total}</span>
-                    <Pill variant={r.free > 0 ? 'ok' : 'wait'}>{r.free > 0 ? t('dash.available') : t('dash.unavailable')}</Pill>
-                  </span>
+            avail.byType.map((r, i) => {
+              // 전용(통 카드)과 HAMi(분할)를 분리해 표기한다. 전용=정수 카드, HAMi=소수 GPU 단위
+              //  (물리 GPU=1, 잔여는 VRAM·코어 비율 → 예 1.3/2). "10슬롯 뻥튀기" 폐기.
+              const hasExcl = r.total > 0;
+              const hasHami = r.fractionalTotal > 0;
+              const hamiFree = r.fractionalFreeUnits || 0;
+              const anyFree = (hasExcl && r.free > 0) || (hasHami && hamiFree > 0.05);
+              return (
+                <div className="avail" key={i} style={{ flexDirection: 'column', alignItems: 'stretch', gap: 10 }}>
+                  <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span className="gpu-name">{r.gpuType}</span>
+                    <span className="flex gap" style={{ alignItems: 'center' }}>
+                      {hasHami && <Pill variant="gpu">{t('dash.hamiShared', { defaultValue: 'HAMi 분할' })}</Pill>}
+                      <Pill variant={anyFree ? 'ok' : 'wait'}>{anyFree ? t('dash.available') : t('dash.unavailable')}</Pill>
+                    </span>
+                  </div>
+                  {hasExcl && (
+                    <div>
+                      <div className="flex" style={{ justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
+                        <span className="muted">{t('dash.exclusiveWhole', { defaultValue: '전용 (통 카드)' })}</span>
+                        <span className="free-n">{r.free}/{r.total}</span>
+                      </div>
+                      <div className="flex" style={{ gap: 4 }}>
+                        {Array.from({ length: r.total }).map((_, j) => (
+                          <span key={j} style={{ flex: 1, height: 10, borderRadius: 3, background: j < r.free ? 'var(--free)' : 'var(--danger)' }} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {hasHami && (
+                    <div>
+                      <div className="flex" style={{ justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
+                        <span className="muted">{t('dash.hamiFractional', { defaultValue: '분할 (VRAM·코어 단위)' })}</span>
+                        <span className="free-n">{hamiFree.toFixed(1)}/{r.fractionalTotal} GPU</span>
+                      </div>
+                      {/* 카드별 소수 채움: 카드 j 에 (hamiFree - j) 만큼 부분 채움 */}
+                      <div className="flex" style={{ gap: 4 }}>
+                        {Array.from({ length: r.fractionalTotal }).map((_, j) => {
+                          const fill = Math.max(0, Math.min(1, hamiFree - j));
+                          return (
+                            <span key={j} style={{ flex: 1, height: 10, borderRadius: 3, position: 'relative', overflow: 'hidden', background: 'var(--danger)' }}>
+                              <span style={{ position: 'absolute', inset: 0, width: `${fill * 100}%`, background: 'var(--gpu)' }} />
+                            </span>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  {!hasExcl && !hasHami && <div className="muted" style={{ fontSize: 12 }}>{t('dash.unavailable')}</div>}
                 </div>
-                <div className="flex" style={{ gap: 4 }}>
-                  {Array.from({ length: r.total }).map((_, j) => (
-                    <span key={j} style={{ flex: 1, height: 10, borderRadius: 3, background: j < r.free ? 'var(--free)' : 'var(--danger)' }} />
-                  ))}
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
 

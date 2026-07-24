@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ChevronDown, Check, Building2, FolderKanban } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useConsole } from '../../context/ConsoleContext';
+import { useSystemConfig } from '../../context/SystemConfigContext';
 import { getMembershipContext } from '../../api/console/membership';
 
 // 탑바 도메인 셀렉터.
@@ -11,6 +12,7 @@ import { getMembershipContext } from '../../api/console/membership';
 export default function OrgGroupSelector({ variant, ns }) {
   const { t } = useTranslation(ns);
   const { activeGroup, setActiveGroup, activeCluster } = useConsole();
+  const { config } = useSystemConfig();
   const [open, setOpen] = useState(false);
   const [ctx, setCtx] = useState(null);
   const ref = useRef(null);
@@ -27,7 +29,8 @@ export default function OrgGroupSelector({ variant, ns }) {
     return (
       <div className="proj" role="button" style={{ cursor: 'default' }}>
         <small>{t('topbar.cluster')}</small>
-        <span>{activeCluster?.name || 'gpu-dc'}</span>
+        {/* 클러스터 이름: 활성 클러스터 > 설치 브랜드명. 하드코딩('gpu-dc') 제거. */}
+        <span>{activeCluster?.name || config?.branding?.name || 'Giosk'}</span>
       </div>
     );
   }
