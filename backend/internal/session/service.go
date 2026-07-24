@@ -45,6 +45,9 @@ type NodeLeaser interface {
 // Provisioner는 K8s 프로비저닝 계약(*k8s.Client 가 구현). 테스트 시 fake 주입 가능.
 type Provisioner interface {
 	EnsureNamespace(ctx context.Context, ns string) error
+	// 사용자 등록 SSH 공개키를 authorized_keys Secret 으로 반영(생성/갱신). sshd 사이드카가 마운트해
+	// 접속마다 다시 읽으므로, 실행 중 세션에도 키 등록/교체가 즉시 반영된다.
+	UpsertUserKeys(ctx context.Context, ns string, userID int64, keys string) error
 	CreateSessionPod(ctx context.Context, s k8s.SessionSpec) error
 	DeleteSessionPod(ctx context.Context, ns, name string) error
 	PodStatus(ctx context.Context, ns, name string) (*k8s.PodStatus, error)
@@ -909,6 +912,13 @@ func (s *Service) provision(ctx context.Context, ns string, sess *Session, image
 	if err := s.prov.EnsureNamespace(ctx, ns); err != nil {
 		return err
 	}
+	// 컨테이너 SSH 가 켜져 있으면 사용자 공개키 Secret 을 먼저 준비한다(키 미등록이면 빈 파일 →
+	// 세션은 정상 기동하고, 나중에 등록하면 Secret 갱신만으로 이 세션에도 바로 반영된다).
+	if s.containerSSH() {
+		if err := s.prov.UpsertUserKeys(ctx, ns, sess.UserID, s.repo.UserSSHKey(sess.UserID)); err != nil {
+			return err
+		}
+	}
 	channels := s.sessionChannels(sess.ImageID, sess.WebPassword)
 	if err := s.prov.CreateSessionPod(ctx, k8s.SessionSpec{
 		Namespace:   ns,
@@ -927,7 +937,9 @@ func (s *Service) provision(ctx context.Context, ns string, sess *Session, image
 		Volumes:     mounts,
 		WebChannels: channels,     // 이미지 channels 기반(vscode/jupyter)
 		SSHDImage:   s.sshdImage,  // 컨테이너 SSH 사이드카(빈값=비활성)
-		SSHDPubKey:  s.sshdPubKey, // 사이드카가 신뢰할 게이트웨이 공개키
+		SSHDPubKey:  s.sshdPubKey, // 사이드카가 신뢰할 게이트웨이 공개키(게이트웨이 off 면 빈값)
+			// 사용자 등록 공개키 Secret(위에서 upsert). Optional 마운트라 키 미등록이어도 세션은 뜬다.
+			UserKeysSecret: k8s.UserKeysSecretName(sess.UserID),
 		ScratchHost: s.scratchHostOf(sess.UserID),
 		PreferNodes: preferNodes, // 이미지 캐시 노드 소프트 선호(빠른 시작)
 		RequireNode: requireNode, // 데이터셋 로컬 캐시 노드 하드 핀(hostPath 마운트)
@@ -996,7 +1008,9 @@ func (s *Service) fillChannels(sess *Session) {
 	// 웹터미널(API 호스팅 exec) — 컨테이너 세션엔 항상 노출(사이드카/게이트웨이 불요, k8s exec 만).
 	// 프론트에서 "SSH" 버튼 → 브라우저 xterm 으로 바로 접속. (물리 세션은 아래 ssh 탭에서 웹연결 제공.)
 	sess.Channels = append(sess.Channels, "terminal")
-	if s.gatewayOn() && s.containerSSH() { // 컨테이너 sshd 사이드카 → 네이티브 SSH 탭도 노출
+	// 컨테이너 sshd 사이드카가 있으면 네이티브 SSH 탭을 노출한다 — 게이트웨이는 필요 없다.
+	// 직접 접속(LB IP:22 또는 노드IP:NodePort)이 기본 경로이고, 게이트웨이는 그 위에 얹는 추가 경로.
+	if s.containerSSH() {
 		sess.Channels = append(sess.Channels, "ssh")
 	}
 }
@@ -1048,7 +1062,34 @@ func (s *Service) Connection(ctx context.Context, instanceID string, userID int6
 			conn.Web = acc
 		}
 	}
+	// 컨테이너 SSH — 게이트웨이 없이도 항상 제공(사용자가 등록한 공개키로 인증).
+	if s.containerSSH() {
+		if acc := s.containerSSHAccess(ctx, sess); acc != nil {
+			conn.SSH = acc
+		}
+	}
 	return conn, nil
+}
+
+// containerSSHAccess는 컨테이너 세션의 "직접 SSH" 접속 정보를 만든다(게이트웨이 불요).
+// 노출 모드를 따라 MetalLB 가 있으면 LB IP 의 22 번으로, 없으면 노드 IP 의 NodePort 로 붙는다.
+// 주소가 아직 없으면(LB IP 할당 대기 등) nil — 프론트는 웹 터미널 경로를 계속 제공한다.
+// 로그인 계정은 sshd 사이드카가 세션 UID 로 만드는 work 이며, 인증은 사용자 등록 공개키뿐이다.
+func (s *Service) containerSSHAccess(ctx context.Context, sess *Session) map[string]string {
+	acc, err := s.prov.SessionServiceAccess(ctx, s.namespaceOf(sess), sess.InstanceID, s.exposeMode())
+	if err != nil {
+		return nil
+	}
+	const user = "work"
+	if acc.LBIP != "" {
+		return map[string]string{"direct": "true", "cmd": fmt.Sprintf("ssh %s@%s", user, acc.LBIP)}
+	}
+	if acc.SSHNodePort > 0 {
+		if ip := s.prov.FirstNodeIP(ctx); ip != "" {
+			return map[string]string{"direct": "true", "cmd": fmt.Sprintf("ssh -p %d %s@%s", acc.SSHNodePort, user, ip)}
+		}
+	}
+	return nil
 }
 
 // channelAccess는 웹 채널 1개의 노출 모드별 접속 정보(URL/시크릿/포워딩)를 채운다.

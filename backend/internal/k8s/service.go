@@ -35,7 +35,10 @@ type SvcPort struct {
 type SvcAccess struct {
 	Mode     string
 	LBIP     string // loadbalancer 할당 IP(없으면 대기중)
-	NodePort int    // nodeport 할당 포트
+	NodePort int    // nodeport 할당 포트(primary=첫 포트=웹 채널)
+	// sshd 사이드카 포트("ssh")의 NodePort. 웹과 포트가 다르므로 따로 읽는다.
+	// loadbalancer 모드면 LBIP 로 22 번에 바로 붙으므로 이 값은 쓰지 않는다.
+	SSHNodePort int
 }
 
 func svcType(mode string) corev1.ServiceType {
@@ -113,6 +116,12 @@ func (c *Client) SessionServiceAccess(ctx context.Context, ns, name, mode string
 	}
 	if len(svc.Spec.Ports) > 0 {
 		out.NodePort = int(svc.Spec.Ports[0].NodePort)
+	}
+	for _, p := range svc.Spec.Ports {
+		if p.Name == "ssh" {
+			out.SSHNodePort = int(p.NodePort)
+			break
+		}
 	}
 	for _, ing := range svc.Status.LoadBalancer.Ingress {
 		if ing.IP != "" {
