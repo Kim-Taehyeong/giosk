@@ -283,7 +283,6 @@ export default function NewSession() {
   };
   const image = images.find((i) => i.id === imageId) || imageChoices[0] || images[0];
   const exType = exclusiveTypes.find((x) => x.gpuType === exGpuType);
-  const exFree = exGpuType ? (availMap[exGpuType]?.free ?? 1) : 0; // 선택한 전용 GPU의 가용 대수(전체 합)
   // 전용 세션은 한 노드에서 N개를 co-locate 해야 하므로, 요청 가능 최대 = "단일 노드의 최대 free GPU 수".
   // (전체 free 합이 아니라 노드별 free 의 최댓값 — 파드는 노드에 걸칠 수 없음. 노드가 2장인데 1장 사용중이면 최대 1)
   const exPerNodeMaxFree = exGpuType
