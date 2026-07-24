@@ -261,7 +261,11 @@ export default function NewSession() {
   );
 
   const offering = offerings.find((o) => o.id === offeringId);
-  const imageChoices = images.filter((im) => (wtype === 'cpu' ? !im.gpu : im.gpu));
+  // CPU 세션은 CPU 전용 이미지를 우선 보여주되, 카탈로그에 CPU 이미지가 없으면 전체 이미지로 폴백한다
+  // (GPU/CUDA 이미지도 CPU 세션에서 정상 동작 — GPU 가속만 없을 뿐). 그래야 "CPU면 이미지가 아예 안 뜨는" 문제가 없다.
+  // GPU 세션은 GPU 이미지만.
+  const cpuImgs = images.filter((im) => !im.gpu);
+  const imageChoices = wtype === 'cpu' ? (cpuImgs.length ? cpuImgs : images) : images.filter((im) => im.gpu);
   // 현재 선택된 GPU 모델(전용=exGpuType / 공유=오퍼링의 gpuType / CPU=없음).
   const selectedGpuType = wtype === 'exclusive' ? exGpuType
     : wtype === 'shared' ? offering?.gpuType
