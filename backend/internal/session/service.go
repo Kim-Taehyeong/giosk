@@ -85,7 +85,7 @@ type Service struct {
 	leaser       NodeLeaser
 	charger      Charger          // 크레딧 소비 회계(nil=과금 비활성)
 	limits       *policy.Resolver // 하드 리소스 상한(계층 해석; nil=미강제)
-	expose       string           // 세션 웹 노출 모드(loadbalancer|nodeport|portforward)
+	expose       string           // 세션 웹 노출 모드(nodeport|loadbalancer)
 
 	surgeDynamic   bool                                                        // 동적(서지) 가격 활성
 	surgeIncrement int                                                         // 최대 가산 크레딧/시간(가용성 0일 때)
@@ -992,11 +992,13 @@ func (s *Service) scratchHostOf(userID int64) string {
 	return s.scratchHostPath + "/" + s.usernameOf(userID)
 }
 
+// exposeMode는 세션 노출 모드를 반환한다. loadbalancer(MetalLB) 만 별도로 인정하고,
+// 그 외(빈값·이전의 portforward 등)는 모두 nodeport 로 수렴한다 — 게이트웨이·인그레스 없이 바로 접속.
 func (s *Service) exposeMode() string {
-	if s.expose == "" {
-		return k8s.ExposePortForward
+	if s.expose == k8s.ExposeLoadBalancer {
+		return k8s.ExposeLoadBalancer
 	}
-	return s.expose
+	return k8s.ExposeNodePort
 }
 
 // attachMounts는 세션-볼륨 연결을 기록한다. 권한(perm)은 클라 입력이 아니라
@@ -1124,8 +1126,8 @@ func (s *Service) containerSSHAccess(ctx context.Context, sess *Session) map[str
 	return nil
 }
 
-// channelAccess는 웹 채널 1개의 노출 모드별 접속 정보(URL/시크릿/포워딩)를 채운다.
-// primary 채널만 노출 Service(LB/NodePort) 주소를 받고, 보조 채널은 port-forward 로 접속한다.
+// channelAccess는 웹 채널 1개의 접속 정보(URL/시크릿)를 채운다.
+// primary 채널만 노출 Service(LB/NodePort) 주소를 받는다.
 func (s *Service) channelAccess(ctx context.Context, sess *Session, ch k8s.WebChannelSpec, primary bool) map[string]string {
 	ns := s.namespaceOf(sess)
 	m := map[string]string{}
@@ -1136,10 +1138,10 @@ func (s *Service) channelAccess(ctx context.Context, sess *Session, ch k8s.WebCh
 	case "vscode":
 		m["password"] = ch.Secret // code-server 비밀번호
 	default:
-		// 커스텀 웹 채널 — 시크릿 없음(포트포워딩만). 비번/토큰 미설정.
+		// 커스텀 웹 채널 — 시크릿 없음. 비번/토큰 미설정.
 	}
 	mode := s.exposeMode()
-	if primary && mode != k8s.ExposePortForward {
+	if primary {
 		acc, _ := s.prov.SessionServiceAccess(ctx, ns, sess.InstanceID, mode)
 		switch mode {
 		case k8s.ExposeLoadBalancer:
@@ -1154,15 +1156,17 @@ func (s *Service) channelAccess(ctx context.Context, sess *Session, ch k8s.WebCh
 			}
 		}
 	}
+	// URL 을 못 만든 경우(NodePort 대기·보조 채널)에만 폴백. 게이트웨이가 실제로 켜져 있을 때만
+	// 서브도메인 URL 을 쓴다 — gateway.enabled=false 여도 GatewayDomain 기본값(gw.giosk.local)이
+	// 남아있으므로 s.gateway!="" 로 판단하면 안 되고 gatewayOn() 으로 판단해야 죽은 링크가 안 나간다.
 	if m["url"] == "" {
-		if s.gateway != "" {
+		if s.gatewayOn() {
 			m["url"] = fmt.Sprintf("https://%s.%s%s", sess.InstanceID, s.gateway, suffix)
 		} else {
 			m["url"] = fmt.Sprintf("http://localhost:%d%s", ch.Port, suffix)
+			m["localUrl"] = fmt.Sprintf("http://localhost:%d%s", ch.Port, suffix)
 		}
 	}
-	m["portForward"] = fmt.Sprintf("kubectl -n %s port-forward pod/%s %d:%d", ns, sess.InstanceID, ch.Port, ch.Port)
-	m["localUrl"] = fmt.Sprintf("http://localhost:%d%s", ch.Port, suffix)
 	return m
 }
 
@@ -1226,7 +1230,7 @@ func (s *Service) Access(ctx context.Context, instanceID string, userID int64) (
 // 아니면 기존 채널 접속 정보(직접 URL/포트포워드)로 폴백한다.
 func (s *Service) webAccess(ctx context.Context, sess *Session, ch k8s.WebChannelSpec, userID int64) map[string]string {
 	if !s.gatewayOn() {
-		return s.channelAccess(ctx, sess, ch, true) // 폴백: 직접 접속(nodeport/LB/포트포워드)
+		return s.channelAccess(ctx, sess, ch, true) // 폴백: 직접 접속(nodeport/LB)
 	}
 	claims := gateway.Claims{
 		IID: sess.InstanceID, Ch: ch.Name, NS: s.namespaceOf(sess), Port: ch.Port,
@@ -1238,12 +1242,7 @@ func (s *Service) webAccess(ctx context.Context, sess *Session, ch k8s.WebChanne
 		return map[string]string{}
 	}
 	url := fmt.Sprintf("%s://%s-%s.%s/?access=%s", s.webScheme(), sess.InstanceID, ch.Name, s.gateway, tok)
-	// 포트포워드는 게이트웨이 미도달 시 폴백용으로 함께 제공.
-	return map[string]string{
-		"url":         url,
-		"portForward": fmt.Sprintf("kubectl -n %s port-forward pod/%s %d:%d", s.namespaceOf(sess), sess.InstanceID, ch.Port, ch.Port),
-		"localUrl":    fmt.Sprintf("http://localhost:%d/", ch.Port),
-	}
+	return map[string]string{"url": url}
 }
 
 // sshAccess는 SSH 접속(복붙 한 줄) 정보를 만든다. 게이트웨이 활성 시 username=1회 토큰,
