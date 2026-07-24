@@ -9,10 +9,10 @@ import Bar from '../../../components/console/Bar';
 import Modal from '../../../components/console/Modal';
 import { Req } from '../../../components/console/Advanced';
 import PagedTable from '../../../components/console/PagedTable';
+import UserPicker from '../../../components/console/UserPicker';
 import { useToast } from '../../../components/console/Toast';
 import { useAuth } from '../../../context/AuthContext';
 import { getAdminVolumes, getScopedVolumes, getAdminStorage, importNfsVolume } from '../../../api/console/nodes';
-import { getUsers } from '../../../api/console/misc';
 
 const statusVariant = { bound: 'ok', pending: 'wait', failed: 'err' };
 
@@ -34,15 +34,15 @@ export default function VolumesAdmin() {
   const totalCap = vols.reduce((a, v) => a + (v.capGb || 0), 0);
   const nfsPct = storage?.nfsTotalGb ? Math.round((storage.nfsUsedGb / storage.nfsTotalGb) * 100) : 0;
 
+  // 소유자는 목록에서 고른 계정(ownerUser)만 인정한다. 예전엔 입력한 문자열로 검색해 첫 결과에
+  // 배정했는데, 동명이인·부분일치로 엉뚱한 사람 소유가 될 수 있었다.
   const submitImport = async () => {
-    if (!imp?.name || !imp?.nfsServer || !imp?.nfsPath || !imp?.owner) { toast(t('nodes.impMissing')); return; }
+    if (!imp?.name || !imp?.nfsServer || !imp?.nfsPath) { toast(t('nodes.impMissing')); return; }
+    if (!imp?.ownerUser) { toast(t('nodes.impNoUser')); return; }
     setImpBusy(true);
     try {
-      const { items } = await getUsers({ q: imp.owner, size: 5 });
-      const u = (items || []).find((x) => x.username === imp.owner) || (items || [])[0];
-      if (!u) { toast(t('nodes.impNoUser')); setImpBusy(false); return; }
-      await importNfsVolume({ name: imp.name, ownerUserId: u.id, nfsServer: imp.nfsServer, nfsPath: imp.nfsPath, sizeGiB: Number(imp.sizeGiB) || 1 });
-      toast(t('nodes.impDone', { name: imp.name, user: u.username }));
+      await importNfsVolume({ name: imp.name, ownerUserId: imp.ownerUser.id, nfsServer: imp.nfsServer, nfsPath: imp.nfsPath, sizeGiB: Number(imp.sizeGiB) || 1 });
+      toast(t('nodes.impDone', { name: imp.name, user: imp.ownerUser.username }));
       setImp(null); load();
     } catch { toast(t('nodes.impFail')); }
     setImpBusy(false);
@@ -51,7 +51,7 @@ export default function VolumesAdmin() {
   return (
     <div>
       <PageHead icon={HardDrive} title={t('volumes.title')} subtitle={t('volumes.subtitle')}
-        actions={isPlatform && <button className="btn primary" onClick={() => setImp({ name: '', owner: '', nfsServer: storage?.nfsServer || '', nfsPath: '', sizeGiB: 10 })}><Upload size={14} /> {t('nodes.importNfs')}</button>} />
+        actions={isPlatform && <button className="btn primary" onClick={() => setImp({ name: '', owner: '', ownerUser: null, nfsServer: storage?.nfsServer || '', nfsPath: '', sizeGiB: 10 })}><Upload size={14} /> {t('nodes.importNfs')}</button>} />
 
       {/* KPI */}
       <div className="grid cols-4 mb">
@@ -98,11 +98,18 @@ export default function VolumesAdmin() {
         {imp && (
           <div className="grid" style={{ gap: 12 }}>
             <div className="legend">{t('nodes.importHint')}</div>
-            <div className="grid cols-2" style={{ gap: 12 }}>
-              <div><label className="fld" style={{ marginTop: 0 }}>{t('nodes.impName')}<Req /></label>
-                <input type="text" value={imp.name} onChange={(e) => setImp({ ...imp, name: e.target.value })} placeholder="team-shared" /></div>
-              <div><label className="fld" style={{ marginTop: 0 }}>{t('nodes.impOwner')}<Req /></label>
-                <input type="text" value={imp.owner} onChange={(e) => setImp({ ...imp, owner: e.target.value })} placeholder="u0001" /></div>
+            <div><label className="fld" style={{ marginTop: 0 }}>{t('nodes.impName')}<Req /></label>
+              <input type="text" value={imp.name} onChange={(e) => setImp({ ...imp, name: e.target.value })} placeholder="team-shared" /></div>
+            {/* 소유자 — 조직·그룹으로 좁히고 목록에서 계정을 직접 고른다(동명이인 오배정 방지). */}
+            <div><label className="fld" style={{ marginTop: 0 }}>{t('nodes.impOwner')}<Req /></label>
+              <UserPicker value={imp.owner}
+                onChange={(v) => setImp((cur) => ({ ...cur, owner: v }))}
+                onPick={(u) => setImp((cur) => ({ ...cur, ownerUser: u, owner: u ? u.username : cur.owner }))} />
+              <div className="legend" style={{ marginTop: 4 }}>
+                {imp.ownerUser
+                  ? t('nodes.impOwnerPicked', { name: imp.ownerUser.name || imp.ownerUser.username, id: imp.ownerUser.username, defaultValue: '선택됨: {{name}} ({{id}})' })
+                  : t('nodes.impOwnerHint', { defaultValue: '목록에서 계정을 선택해야 임포트할 수 있습니다.' })}
+              </div>
             </div>
             <div className="grid cols-2" style={{ gap: 12 }}>
               <div><label className="fld" style={{ marginTop: 0 }}>{t('nodes.impServer')}<Req /></label>
