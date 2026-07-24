@@ -81,7 +81,6 @@ type Service struct {
 	storageClass string // 홈 PVC 스토리지클래스(스토리지 단일화: NFS RWX)
 	audit        AuditReader
 	met          *metrics.Client
-	maxSessions  int // 사용자당 동시 활성 세션 상한(0=무제한)
 	leaser       NodeLeaser
 	charger      Charger          // 크레딧 소비 회계(nil=과금 비활성)
 	limits       *policy.Resolver // 하드 리소스 상한(계층 해석; nil=미강제)
@@ -247,8 +246,6 @@ func (s *Service) WithLeaser(l NodeLeaser) *Service { s.leaser = l; return s }
 // WithMetrics는 유휴 판정용 Prometheus 클라이언트를 주입한다.
 func (s *Service) WithMetrics(m *metrics.Client) *Service { s.met = m; return s }
 
-// WithMaxSessions는 사용자당 동시 활성 세션 상한을 설정한다.
-func (s *Service) WithMaxSessions(n int) *Service { s.maxSessions = n; return s }
 
 // WithLimits는 하드 리소스 상한(계층 해석)을 주입한다. 크레딧과 무관하게 항상 강제되는 1차 정책.
 func (s *Service) WithLimits(r *policy.Resolver) *Service { s.limits = r; return s }
@@ -319,9 +316,8 @@ const homeSizeGiB = 10 // 세션 홈(/home/work) 영속 용량 기본값
 
 // Create는 스펙을 확정하고 Pod 를 프로비저닝한 뒤 세션을 기록한다.
 func (s *Service) Create(ctx context.Context, userID int64, username string, req CreateReq) (*Session, error) {
-	if s.maxSessions > 0 && s.repo.CountActive(userID) >= s.maxSessions {
-		return nil, ErrSessionLimit
-	}
+	// 동시 세션 상한은 checkHardLimits(정책 계층 해석)에서만 강제한다.
+	// billing.credit.maxConcurrentSessions 는 폐기 — 동시세션은 정책(quota)으로 일원화.
 	if req.Env == "ssh" {
 		return s.createSSH(ctx, userID, username, req)
 	}

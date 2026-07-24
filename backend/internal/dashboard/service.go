@@ -16,11 +16,17 @@ import (
 	"giosk/internal/config"
 	"giosk/internal/k8s"
 	"giosk/internal/metrics"
+	"giosk/internal/policy"
 )
 
 // NodeLister는 클러스터 노드 라이브 상태(k8s.Client 구현). 미가용이면 빈 슬라이스.
 type NodeLister interface {
 	ListNodes(ctx context.Context) ([]k8s.LiveNode, error)
+}
+
+// LimitResolver는 사용자별 계층 해석된 정책 상한을 준다(정책 = 동시세션 상한의 단일 출처).
+type LimitResolver interface {
+	Resolve(userID int64) policy.Resolved
 }
 
 // Service는 대시보드 집계 로직.
@@ -30,7 +36,11 @@ type Service struct {
 	nodes  NodeLister
 	cfg    *config.Config
 	alerts *alertlog.Store // 발화 경고 이력(감시월 통합 피드). nil 허용.
+	limits LimitResolver   // 정책 기반 동시세션 상한. nil 이면 무제한 표기.
 }
+
+// WithLimits는 정책 리졸버를 주입한다(대시보드 동시세션 KPI 를 정책값으로 표기).
+func (s *Service) WithLimits(r LimitResolver) *Service { s.limits = r; return s }
 
 func NewService(repo Repository, met *metrics.Client, nodes NodeLister, cfg *config.Config) *Service {
 	return &Service{repo: repo, met: met, nodes: nodes, cfg: cfg}
@@ -97,7 +107,7 @@ func (s *Service) User(ctx context.Context, userID int64) UserDashboard {
 			Balance:        balance,
 			Cap:            cap,
 			ActiveSessions: s.repo.UserActiveSessions(userID),
-			MaxSessions:    s.userMaxSessions(),
+			MaxSessions:    s.userMaxSessions(userID),
 			VramUsed:       used,
 			VramTotal:      total,
 			GpuHoursMonth:  s.repo.MonthlyGpuHours(userID),
@@ -211,8 +221,14 @@ func (s *Service) adminAlerts(ctx context.Context) []AdminAlert {
 	return out
 }
 
-// userMaxSessions는 과금 모드별 동시 세션 상한(0=무제한, 자유 모드).
-func (s *Service) userMaxSessions() int { return s.cfg.MaxSessionsPerUser() }
+// userMaxSessions는 사용자 동시 세션 상한을 정책(계층 해석)에서 가져온다(0=무제한).
+// billing.credit.maxConcurrentSessions 는 폐기 — 정책(quota)으로 일원화.
+func (s *Service) userMaxSessions(userID int64) int {
+	if s.limits == nil {
+		return 0
+	}
+	return s.limits.Resolve(userID).MaxConcurrentSessions
+}
 
 // scalar는 Prometheus 스칼라를 int 로(미가용 0).
 func (s *Service) scalar(ctx context.Context, q string) int {
