@@ -152,6 +152,7 @@ export default function NewSession() {
   const [availMap, setAvailMap] = useState({}); // gpuType → {free,total,vramFree,vramTotal} (실시간 가용)
   const [fracNodes, setFracNodes] = useState([]); // 분할 노드별 VRAM/코어/슬롯 잔여(오퍼링 가용 계산)
   const [nodeGpu, setNodeGpu] = useState({}); // node → gpuType (빠른 생성 배지: 캐시노드 타입 매칭)
+  const [nodesAvail, setNodesAvail] = useState([]); // byNode 원본 — 전용 GPU 개수 상한(단일 노드 free) 계산용
   const [wtype, setWtype] = useState(null);
   const [offeringId, setOfferingId] = useState(null);
   const [exGpuType, setExGpuType] = useState(null);
@@ -202,6 +203,7 @@ export default function NewSession() {
       const ng = {};
       (a.byNode || []).forEach((n) => { ng[n.node] = n.gpuType; });
       setNodeGpu(ng);
+      setNodesAvail(a.byNode || []);
       // 분할 노드별 잔여(노드 단위 패킹으로 "오퍼링 몇 개 더 가능"을 정확 계산).
       setFracNodes((a.byNode || []).filter((n) => n.fractional).map((n) => ({
         gpuType: n.gpuType,
@@ -281,7 +283,12 @@ export default function NewSession() {
   };
   const image = images.find((i) => i.id === imageId) || imageChoices[0] || images[0];
   const exType = exclusiveTypes.find((x) => x.gpuType === exGpuType);
-  const exFree = exGpuType ? (availMap[exGpuType]?.free ?? 1) : 0; // 선택한 전용 GPU의 가용 대수
+  const exFree = exGpuType ? (availMap[exGpuType]?.free ?? 1) : 0; // 선택한 전용 GPU의 가용 대수(전체 합)
+  // 전용 세션은 한 노드에서 N개를 co-locate 해야 하므로, 요청 가능 최대 = "단일 노드의 최대 free GPU 수".
+  // (전체 free 합이 아니라 노드별 free 의 최댓값 — 파드는 노드에 걸칠 수 없음. 노드가 2장인데 1장 사용중이면 최대 1)
+  const exPerNodeMaxFree = exGpuType
+    ? nodesAvail.filter((n) => n.gpuType === exGpuType).reduce((mx, n) => Math.max(mx, n.gpuFree || 0), 0)
+    : 0;
 
   const pricePerHour = wtype === 'cpu' ? cpuPrice
     : wtype === 'exclusive' ? (exType ? exType.fullPrice * gpuCount : 0)
@@ -535,10 +542,10 @@ export default function NewSession() {
                         <label className="fld">{t('newSession.gpuCount')}</label>
                         <div className="grid cols-3" style={{ gap: 12 }}>
                           {GPU_COUNTS.map((g) => {
-                            // 단일 노드 GPU 수를 넘는 개수는 막는다 — 파드는 여러 노드에 걸칠 수 없으므로
-                            // "한 노드에 그만큼 GPU가 있어야" 스케줄된다(예: 1장짜리 노드뿐이면 2개는 영구 Pending).
-                            const perNodeMax = selGt?.nodeGpus || 1;
-                            const un = g.n > exFree || g.n > perNodeMax;
+                            // 단일 노드의 "빈(free)" GPU 수를 넘는 개수는 막는다 — 파드는 여러 노드에 걸칠 수 없고,
+                            // 노드가 2장이어도 1장이 이미 대여중이면 2개는 스케줄 불가(영구 Pending). 전체 free 합이 아니라
+                            // 노드별 free 의 최댓값(exPerNodeMaxFree)이 실제 상한이다.
+                            const un = g.n > exPerNodeMaxFree;
                             return (
                               <SelBox key={g.n} on={gpuCount === g.n} disabled={un} onClick={() => setGpuCount(g.n)}>
                                 <div style={{ fontWeight: 800, fontSize: 18, display: 'flex', alignItems: 'center', gap: 8 }}>{gpuCount === g.n && <CheckMark />}{g.n}</div>
