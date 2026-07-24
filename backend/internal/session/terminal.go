@@ -3,6 +3,7 @@ package session
 import (
 	"context"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -77,7 +78,9 @@ func (h *Handler) serveTerminal(ws *websocket.Conn, instanceID string, userID in
 		}
 	}()
 
+	log.Printf("terminal: start instance=%s user=%d", instanceID, userID)
 	err := h.svc.RunTerminal(ctx, instanceID, userID, pr, &wsWriter{ws}, resize)
+	log.Printf("terminal: end instance=%s user=%d err=%v ctxErr=%v", instanceID, userID, err, ctx.Err())
 	if err != nil && ctx.Err() == nil {
 		_ = websocket.Message.Send(ws, []byte("\r\n["+err.Error()+"]\r\n"))
 	}

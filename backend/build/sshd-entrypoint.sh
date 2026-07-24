@@ -5,17 +5,19 @@
 #   SESSION_UID    로그인 계정 UID(세션 컨테이너와 동일 → 홈 파일 소유 일치)
 #   SESSION_USER   로그인 계정명(기본 work)
 #   HOME_DIR       공유 홈 마운트 경로(/home/work)
-#   GATEWAY_PUBKEY 신뢰할 공개키(OpenSSH 1줄) — 게이트웨이 관리키. 이것만 신뢰한다.
+#   GATEWAY_PUBKEY (선택) 게이트웨이 관리키(OpenSSH 1줄). 게이트웨이가 켜진 배포에서만 주입된다.
 #
-# 이 sshd 는 게이트웨이 SSH 프록시(<iid>.<ns>.svc:22)만 상대한다. 사용자는 게이트웨이에
-# 1회 토큰으로 인증하고, 게이트웨이가 관리키로 여기에 재접속한다 → 사용자 키 불필요.
+# 신뢰 키는 두 곳에서 온다(sshd_config AuthorizedKeysFile 이 둘 다 가리킴):
+#   1) 게이트웨이 관리키 — 아래에서 기록. 게이트웨이 프록시가 이 키로 재접속(사용자 키 불요).
+#   2) 사용자 등록 공개키 — /etc/giosk/ssh/authorized_keys (k8s Secret 마운트, read-only).
+#      사용자가 콘솔에서 키를 등록/교체하면 Secret 이 갱신되어 실행 중 세션에도 즉시 반영된다.
+# 둘 다 없으면 sshd 는 뜨되 아무도 로그인할 수 없다(웹 터미널로는 여전히 접속 가능).
 set -eu
 
 : "${SESSION_USER:=work}"
 : "${HOME_DIR:=/home/work}"
 
 [ -n "${SESSION_UID:-}" ] || { echo "sshd: SESSION_UID 필요" >&2; exit 1; }
-[ -n "${GATEWAY_PUBKEY:-}" ] || { echo "sshd: GATEWAY_PUBKEY 필요(신뢰 공개키 없음)" >&2; exit 1; }
 
 # 계정 생성 — 홈은 이미 마운트돼 있으므로 만들지 않는다(-H).
 addgroup -g "$SESSION_UID" "$SESSION_USER" 2>/dev/null || true
@@ -27,7 +29,8 @@ sed -i "s|^${SESSION_USER}:!:|${SESSION_USER}:*:|" /etc/shadow
 # authorized_keys 는 홈이 아닌 root 소유 경로에 둔다 — 공유 홈은 세션 사용자가 쓸 수 있어
 # 홈에 두면 사용자가 신뢰 키를 바꿔치기할 수 있다(sshd_config AuthorizedKeysFile 이 여기를 가리킴).
 mkdir -p /etc/ssh/authorized_keys
-printf '%s\n' "$GATEWAY_PUBKEY" > "/etc/ssh/authorized_keys/$SESSION_USER"
+# 게이트웨이 키는 있을 때만 기록(없으면 빈 파일 — 사용자 키 경로만으로 로그인).
+printf '%s\n' "${GATEWAY_PUBKEY:-}" > "/etc/ssh/authorized_keys/$SESSION_USER"
 chown -R root:root /etc/ssh/authorized_keys
 # 읽기는 열되(sshd 는 privsep 후 비-root 로 authorized_keys 를 읽는다 → root-only 700/600 이면 "Permission denied"),
 # 쓰기는 root 로만 제한한다. StrictModes 는 group/other '쓰기'만 금지하므로 755/644 가 안전하다.

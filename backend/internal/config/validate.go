@@ -84,13 +84,11 @@ func (c *Config) checkSharedHome() error {
 	return nil
 }
 
-// 접속 게이트웨이 설정 검증. 게이트웨이 SSH/토큰은 API 와 게이트웨이가 공유 비밀로 결합되므로,
-// 컨테이너 sshd 사이드카를 켰으면(SessionSSHDImage) 반드시 공유 비밀(GatewaySecret)이 있어야 한다
-// (없으면 토큰 발급 불가 → 접속 불능). 웹 게이트웨이 자체는 secret 없으면 조용히 직접접속 폴백.
+// 접속 게이트웨이 설정 검증.
+// 주의: sshd 사이드카(SessionSSHDImage)는 게이트웨이와 무관하게 켤 수 있다 — 사용자가 등록한
+// 공개키로 직접 SSH(LB/NodePort) 하는 것이 기본 경로이고, 게이트웨이는 그 위에 얹는 추가 경로다.
+// 따라서 "sshd 를 켜면 게이트웨이 비밀이 필수"라는 제약은 두지 않는다.
 func (c *Config) checkGateway() error {
-	if c.K8s.SessionSSHDImage != "" && c.K8s.GatewaySecret == "" {
-		return errors.New("k8s.sessionSSHDImage set but gatewaySecret empty: container SSH needs a shared gateway secret")
-	}
 	if c.K8s.GatewayScheme != "" && !oneOf(c.K8s.GatewayScheme, "http", "https") {
 		return fmt.Errorf("k8s.gatewayScheme invalid: %q (http|https)", c.K8s.GatewayScheme)
 	}
