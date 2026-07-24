@@ -73,6 +73,7 @@ export default function TerminalPane({ session, fill = false }) {
       clearTimeout(connectTimer);
       if (!alive) return;
       setStatus('open');
+      term.reset(); // "연결 중…" 안내를 지우고 셸 프롬프트만 깨끗이 받는다.
       safeFit();
       sendResize();
     };
