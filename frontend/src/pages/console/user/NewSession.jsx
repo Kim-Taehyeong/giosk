@@ -535,7 +535,10 @@ export default function NewSession() {
                         <label className="fld">{t('newSession.gpuCount')}</label>
                         <div className="grid cols-3" style={{ gap: 12 }}>
                           {GPU_COUNTS.map((g) => {
-                            const un = g.n > exFree;
+                            // 단일 노드 GPU 수를 넘는 개수는 막는다 — 파드는 여러 노드에 걸칠 수 없으므로
+                            // "한 노드에 그만큼 GPU가 있어야" 스케줄된다(예: 1장짜리 노드뿐이면 2개는 영구 Pending).
+                            const perNodeMax = selGt?.nodeGpus || 1;
+                            const un = g.n > exFree || g.n > perNodeMax;
                             return (
                               <SelBox key={g.n} on={gpuCount === g.n} disabled={un} onClick={() => setGpuCount(g.n)}>
                                 <div style={{ fontWeight: 800, fontSize: 18, display: 'flex', alignItems: 'center', gap: 8 }}>{gpuCount === g.n && <CheckMark />}{g.n}</div>
