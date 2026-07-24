@@ -16,6 +16,33 @@ import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { useAuth } from '../../../context/AuthContext';
 import { apiPut } from '../../../api/client';
 
+// SshKeyField는 위저드의 SSH 공개키 입력. 계정에 이미 등록돼 있으면 긴 키를 다시 보여주지 않고
+// 한 줄 요약 + "변경"만 노출한다(매번 빈 칸처럼 보이는 큰 상자가 뜨지 않게).
+function SshKeyField({ t, registered, value, onChange }) {
+  const [editing, setEditing] = useState(!registered);
+  const short = registered ? `${registered.slice(0, 18)}…${registered.slice(-12)}` : '';
+  if (!editing) {
+    return (
+      <>
+        <label className="fld">{t('newSession.sshKey')}</label>
+        <div className="flex" style={{ alignItems: 'center', justifyContent: 'space-between', gap: 10,
+          padding: '9px 12px', borderRadius: 8, background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
+          <span className="mono" style={{ fontSize: 12, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{short}</span>
+          <button type="button" className="btn sm" onClick={() => setEditing(true)}>
+            {t('newSession.sshKeyChange', { defaultValue: '변경' })}
+          </button>
+        </div>
+      </>
+    );
+  }
+  return (
+    <>
+      <label className="fld">{t('newSession.sshKey')}</label>
+      <textarea value={value} onChange={(e) => onChange(e.target.value)} placeholder="ssh-ed25519 AAAA..." style={{ minHeight: 70 }} />
+    </>
+  );
+}
+
 // saveSshKey는 위저드에서 입력/수정한 공개키를 계정(users.ssh_public_key)에 등록한다.
 // 계정에 저장돼야 세션 컨테이너/물리노드 authorized_keys 에 주입된다(예전엔 localStorage 에만 두어 유실됐다).
 // 저장 실패는 세션 생성을 막지 않는다 — 내정보 화면에서 다시 등록할 수 있다.
@@ -689,8 +716,7 @@ export default function NewSession() {
                 <h3>{t('newSession.reviewStart')}</h3>
                 <label className="fld" style={{ marginTop: 0 }}>{t('newSession.sessionName')}</label>
                 <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="my-train" />
-                <label className="fld">{t('newSession.sshKey')}</label>
-                <textarea value={sshKey} onChange={(e) => setSshKey(e.target.value)} placeholder="ssh-ed25519 AAAA..." style={{ minHeight: 70 }} />
+                <SshKeyField t={t} registered={user?.sshPublicKey} value={sshKey} onChange={setSshKey} />
 
                 {wtype !== 'cpu' && config.features.datasets && (
                   <DatasetNodePicker t={t} nodes={nodes} selGpuType={selGpuType} selNode={selNode} setSelNode={setSelNode} selDs={selDs} setSelDs={setSelDs} />
@@ -975,8 +1001,7 @@ function SSHWizard({ t, navigate, toast, nodes, vols, labels }) {
               <h3>{t('newSession.reviewStart')}</h3>
               <label className="fld" style={{ marginTop: 0 }}>{t('newSession.sessionName')}</label>
               <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="ssh-session" />
-              <label className="fld">{t('newSession.sshKey')}</label>
-              <textarea value={sshKey} onChange={(e) => setSshKey(e.target.value)} placeholder="ssh-ed25519 AAAA..." style={{ minHeight: 70 }} />
+              <SshKeyField t={t} registered={user?.sshPublicKey} value={sshKey} onChange={setSshKey} />
               <div className="cost-box mt">
                 <div className="row"><span>{t('newSession.sshNodeLabel')}</span><span>{sel || '—'}</span></div>
                 <div className="row"><span>{t('newSession.sshHome')}</span><span>{node ? `${node.homeUsedGb} GB` : '—'}</span></div>

@@ -229,7 +229,7 @@
     "connByImage": "Connection methods are determined by the image",
     "reviewStart": "Review and start",
     "sessionName": "Session name",
-    "sshKey": "SSH public key (empty = password login)",
+    "sshKey": "SSH public key (lets you SSH straight into the session)",
     "type": "Type",
     "offering": "Offering",
     "image": "Image",
@@ -310,7 +310,8 @@
     "runtimeLeft": "Runtime at this rate",
     "hoursApprox": "~{{n}} hours",
     "notEnough": "Not enough credit — 1 hour minimum required",
-    "tsSlotN": "1 of {{n}} slots"
+    "tsSlotN": "1 of {{n}} slots",
+    "sshKeyChange": "Change"
   },
   "session": {
     "title": "Sessions",

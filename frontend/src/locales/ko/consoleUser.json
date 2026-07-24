@@ -229,7 +229,7 @@
     "connByImage": "연결 방식은 이미지가 결정합니다",
     "reviewStart": "검토 후 시작",
     "sessionName": "세션 이름",
-    "sshKey": "SSH 공개키 (비우면 비밀번호 접속)",
+    "sshKey": "SSH 공개키 (등록하면 세션에 SSH로 바로 접속)",
     "type": "유형",
     "offering": "오퍼링",
     "image": "이미지",
@@ -310,7 +310,8 @@
     "runtimeLeft": "이 단가로 사용 가능",
     "hoursApprox": "약 {{n}}시간",
     "notEnough": "크레딧 부족 — 최소 1시간치 필요",
-    "tsSlotN": "슬롯 1개 / {{n}}"
+    "tsSlotN": "슬롯 1개 / {{n}}",
+    "sshKeyChange": "변경"
   },
   "session": {
     "title": "세션",
