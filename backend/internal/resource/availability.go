@@ -90,18 +90,11 @@ func (s *Service) Availability(ctx context.Context) Availability {
 	usedByType := map[string]int{}
 	fracFreeByType := map[string]int{} // 분할 가능 노드의 여유 GPU 합(타입별, 하위호환)
 	for _, n := range nodes {
+		// capN = 물리 GPU 수. node_admin 이 GFD 라벨 nvidia.com/gpu.count 에서 읽어 HAMi vGPU 뻥튀기를
+		// 이미 제거했으므로 여기서 추가 환산은 필요 없다.
 		capN := atoiSafe(n.GpuCapacity)
 		if capN == 0 {
 			continue // GPU 미보유 노드 제외
-		}
-		// HAMi 노드는 nvidia.com/gpu 를 "vGPU 수(= 물리 GPU 수 × deviceSplitCount)"로 광고한다.
-		// 아래 계산은 capN 을 "물리 GPU 수"로 가정하므로(전용 Total, 분할 VRAM=perGPU×capN,
-		// 코어=100×capN, 슬롯=split×capN), split 로 나눠 물리 수로 환산한다. 안 하면 전용 가용성이
-		// split 배(예 2노드×10=20)로, 분할 총량이 10배로 부풀려진다.
-		if hamiNodes[n.Name] {
-			if split := splitByNode[n.Name]; split > 1 && capN/split >= 1 {
-				capN /= split
-			}
 		}
 		used := usedNode[n.Name]
 		if physNodes[n.Name] {
