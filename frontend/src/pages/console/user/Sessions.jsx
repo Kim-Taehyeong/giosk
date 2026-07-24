@@ -17,6 +17,12 @@ import { measureRows, gpuUnmeasurable } from '../../../utils/sessionUsage';
 const CONN_ICON = { vscode: Code2, jupyter: NotebookPen, ssh: TerminalSquare, terminal: TerminalSquare };
 const CONN_LABEL = { vscode: 'VSCode', jupyter: 'Jupyter', ssh: 'SSH', terminal: 'SSH' };
 
+// connChips는 세션 채널 목록을 버튼용으로 정규화한다 — 웹터미널(terminal)과 SSH(ssh)는 접속 모달의
+// 통합 SSH 탭 하나로 다루므로 terminal→ssh 로 접고 중복을 없앤다(SSH 칩이 두 개로 뜨는 것 방지).
+function connChips(conn) {
+  return [...new Set((conn || []).map((c) => { const k = c.toLowerCase(); return k === 'terminal' ? 'ssh' : k; }))];
+}
+
 export default function Sessions() {
   const { t } = useTranslation('consoleUser');
   const { config } = useSystemConfig();
@@ -152,7 +158,7 @@ export default function Sessions() {
                 {dynamicMode && <td>{r.mode === 'cpu' ? '—' : leaseLeftText(r)}</td>}
                 <td className="flex">
                   {r.status === 'running' && r.conn.length
-                    ? r.conn.map((c) => { const k = c.toLowerCase(); const Icon = CONN_ICON[k] || TerminalSquare; return <button key={c} className="btn sm" onClick={() => { setConnTab(k); setConn(r); }} title={c}><Icon size={13} /> {CONN_LABEL[k] || c}</button>; })
+                    ? connChips(r.conn).map((k) => { const Icon = CONN_ICON[k] || TerminalSquare; return <button key={k} className="btn sm" onClick={() => { setConnTab(k); setConn(r); }} title={CONN_LABEL[k] || k}><Icon size={13} /> {CONN_LABEL[k] || k}</button>; })
                     : <span className="muted">—</span>}
                 </td>
                 <td><ChevronRight size={15} style={{ color: 'var(--muted)' }} /></td>

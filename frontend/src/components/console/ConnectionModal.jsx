@@ -222,7 +222,10 @@ export default function ConnectionModal({ session, onClose, initialTab }) {
       .then((r) => { if (!stale) setConn(r); })
       .catch((e) => { if (!stale) setErr(e?.message || t('conn.loadFail')); }); // 실패 시 로딩 문구가 영영 남지 않게
     return () => { stale = true; };
-  }, [session, initialTab, t]);
+    // 세션 id(와 초기 탭)로만 재조회한다. 부모(세션 목록)가 4초 폴링으로 리렌더될 때 session 객체
+    // 참조나 t 함수 identity 가 바뀌어도 재조회하지 않게 — 안 그러면 모달이 계속 리로드된다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.id, initialTab]);
 
   // 재생성 — 새 단기 토큰/링크를 발급받는다(만료됐거나 다시 붙을 때).
   const regenerate = async () => {
