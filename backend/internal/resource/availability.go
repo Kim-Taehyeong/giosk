@@ -26,6 +26,8 @@ type TypeAvail struct {
 	Nodes           int    `json:"nodes"`
 	FractionalFree  int    `json:"fractionalFree"`  // 분할 가능 물리 GPU 여유(대략치, 하위호환)
 	FractionalTotal int    `json:"fractionalTotal"` // 분할 가능 물리 GPU 총수
+	// HAMi 분할 가용을 "GPU 단위 소수"로(물리 GPU=1, 잔여 코어·VRAM 비율의 작은 쪽). 10슬롯 뻥튀기 대신.
+	FractionalFreeUnits float64 `json:"fractionalFreeUnits"`
 	// HAMi 분할 자원 잔여 — 물리 GPU 개수가 아니라 실제 VRAM(MB)/코어(%)/태스크슬롯 기준.
 	// 프론트가 "이 오퍼링(예: 4GB) 이 몇 개 더 들어가는지"를 노드별로 계산해 합산한다.
 	FracVramFreeMB  int `json:"fracVramFreeMb"`
@@ -113,14 +115,12 @@ func (s *Service) Availability(ctx context.Context) Availability {
 			t = &TypeAvail{GpuType: n.GpuType}
 			byType[n.GpuType] = t
 		}
-		t.Total += capN
 		t.Nodes++
-		usedByType[n.GpuType] += used
 		na := NodeAvail{
 			Node: n.Name, Gpu: gpuLabel(n.GpuType, capN), GpuType: n.GpuType,
 			GpuTotal: capN, GpuFree: capN - used, Physical: n.Physical,
 		}
-		if hamiNodes[n.Name] && !physNodes[n.Name] { // 분할(HAMi) 노드만 VRAM/코어/슬롯 잔여 계산
+		if hamiNodes[n.Name] && !physNodes[n.Name] { // 분할(HAMi) 노드 = 분할 전용(전용 가용에서 제외)
 			t.FractionalTotal += capN
 			fracFreeByType[n.GpuType] += capN - used
 			// 노드 단위 분할 자원: VRAM=perGPU×GPU수, 코어=100×GPU수, 슬롯=deviceSplitCount×GPU수.
@@ -142,6 +142,10 @@ func (s *Service) Availability(ctx context.Context) Availability {
 			t.FracCoresFree += na.FracCoresFree
 			t.FracSlotsTotal += na.FracSlotsTotal
 			t.FracSlotsFree += na.FracSlotsFree
+		} else {
+			// 비-HAMi(전용/물리) 노드만 전용(whole-card) 가용에 포함 — 전용과 HAMi 분리.
+			t.Total += capN
+			usedByType[n.GpuType] += used
 		}
 		out.ByNode = append(out.ByNode, na)
 	}
@@ -151,6 +155,22 @@ func (s *Service) Availability(ctx context.Context) Availability {
 			t.Free = 0
 		}
 		t.FractionalFree = clampNonNeg(fracFreeByType[gt])
+		// HAMi 분할 가용을 "GPU 단위 소수"로 표기(물리 GPU=1, 잔여는 코어·VRAM 비율 중 작은 쪽).
+		// 10슬롯 뻥튀기 대신 예: 2장 중 한 장 70% 사용 → 1.3 가용.
+		if t.FractionalTotal > 0 {
+			vf, cf := 1.0, 1.0
+			if t.FracVramTotalMB > 0 {
+				vf = float64(t.FracVramFreeMB) / float64(t.FracVramTotalMB)
+			}
+			if t.FracCoresTotal > 0 {
+				cf = float64(t.FracCoresFree) / float64(t.FracCoresTotal)
+			}
+			frac := vf
+			if cf < frac {
+				frac = cf
+			}
+			t.FractionalFreeUnits = frac * float64(t.FractionalTotal)
+		}
 		out.ByType = append(out.ByType, *t)
 	}
 	sort.Slice(out.ByType, func(i, j int) bool { return out.ByType[i].GpuType < out.ByType[j].GpuType })

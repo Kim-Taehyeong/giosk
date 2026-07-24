@@ -25,6 +25,7 @@ const (
 // 전용 요청(nvidia.com/gpu:N)이 그 노드에 떨어지면 통 GPU 대신 슬롯을 받는다 → 라벨로 배치를 가른다.
 const ShareModeLabel = "giosk.io/share-mode"
 const shareTimeslicing = "timeslicing"
+const shareHami = "hami" // HAMi 분할 노드 라벨값(node.ShareHami 와 동일). 전용 배치에서 배제용.
 
 // buildPod은 SessionSpec → corev1.Pod 로 변환한다(노드셀렉터 + GPU 리소스 매핑).
 func buildPod(s SessionSpec, gpuTypeLabel string) *corev1.Pod {
