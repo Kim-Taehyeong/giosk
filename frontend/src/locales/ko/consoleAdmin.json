@@ -117,7 +117,10 @@
     "mode_free": "무료",
     "opsHint": "운영 안내",
     "modeHint_dynamic": "선착순 모드 — 크레딧 없이 가용 시 먼저 잡는 방식입니다. 세션·유휴 통계와 경고로 운영을 관제하세요.",
-    "modeHint_free": "무료 모드 — 크레딧 제한이 없습니다. 세션·유휴 통계와 GPU 사용시간으로 활용도를 관제하세요."
+    "modeHint_free": "무료 모드 — 크레딧 제한이 없습니다. 세션·유휴 통계와 GPU 사용시간으로 활용도를 관제하세요.",
+    "metricsOffTitle": "모니터링 스택이 설치되어 있지 않습니다",
+    "metricsOffAll": "Prometheus·DCGM exporter 가 없어 GPU 사용률·VRAM·온도 지표를 표시할 수 없습니다. 모니터링을 활성화하면 실시간 지표가 나타납니다(설치: monitoring, dcgm 활성화).",
+    "metricsOffDcgm": "Prometheus 는 연결됐지만 DCGM exporter 의 GPU 지표가 없습니다. dcgm-exporter 를 설치하면 GPU 사용률·VRAM·온도가 실시간으로 표시됩니다."
   },
   "approvals": {
     "title": "요청 승인",
@@ -472,7 +475,9 @@
     "impMissing": "이름·소유자·NFS 서버·경로를 모두 입력하세요.",
     "impNoUser": "해당 계정을 찾을 수 없습니다.",
     "impDone": "{{name}} 볼륨을 {{user}} 에게 임포트했습니다.",
-    "impFail": "임포트 실패"
+    "impFail": "임포트 실패",
+    "impOwnerHint": "목록에서 계정을 선택해야 임포트할 수 있습니다.",
+    "impOwnerPicked": "선택됨: {{name}} ({{id}})"
   },
   "mset": {
     "title": "설정",

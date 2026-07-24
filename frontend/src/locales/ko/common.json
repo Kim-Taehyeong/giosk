@@ -513,6 +513,7 @@
     }
   },
   "topbar": {
-    "nodeBadge": "노드 {{up}}/{{total}} · GPU {{gpu}}%"
+    "nodeBadge": "노드 {{up}}/{{total}} · GPU {{gpu}}%",
+    "nodeBadgeNoGpu": "노드 {{up}}/{{total}} · GPU —"
   }
 }
