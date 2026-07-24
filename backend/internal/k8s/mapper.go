@@ -231,9 +231,10 @@ func nodeSelector(s SessionSpec, gpuTypeLabel string) map[string]string {
 
 // shareModeReqs는 공유 전략에 맞는 노드로 배치를 가르는 affinity 조건이다.
 //   - timeslice : 타임슬라이싱 노드에만(슬롯이 그 노드에만 광고됨).
-//   - exclusive : 타임슬라이싱 노드는 배제 — 안 그러면 통 GPU 대신 슬롯을 받는다.
-//     (NotIn 은 라벨 없는 노드도 매칭 → 기존 무라벨 노드는 전용으로 계속 동작.)
-//   - shared(HAMi)/cpu : 제약 없음(HAMi 는 gpumem/gpucores 요청 자체가 노드를 가름).
+//   - exclusive : 분할(HAMi)·타임슬라이싱 노드 배제 — 통 카드를 받아야 하므로.
+//     (NotIn 은 라벨 없는 노드도 매칭 → 무라벨 노드는 전용으로 계속 동작.)
+//   - shared(HAMi) : HAMi 노드에만. HAMi 가 클러스터 전체에 설치되면 exclusive 노드도 gpumem/gpucores
+//     를 광고해 무제약이면 공유 세션이 전용 노드에 떨어진다(전용 가용성이 잘못 까임) → In{hami} 로 강제.
 func shareModeReqs(s SessionSpec) []corev1.NodeSelectorRequirement {
 	switch s.GpuMode {
 	case GpuModeTimeslice:
@@ -242,7 +243,11 @@ func shareModeReqs(s SessionSpec) []corev1.NodeSelectorRequirement {
 		}}
 	case GpuModeExclusive:
 		return []corev1.NodeSelectorRequirement{{
-			Key: ShareModeLabel, Operator: corev1.NodeSelectorOpNotIn, Values: []string{shareTimeslicing},
+			Key: ShareModeLabel, Operator: corev1.NodeSelectorOpNotIn, Values: []string{shareTimeslicing, shareHami},
+		}}
+	case GpuModeShared:
+		return []corev1.NodeSelectorRequirement{{
+			Key: ShareModeLabel, Operator: corev1.NodeSelectorOpIn, Values: []string{shareHami},
 		}}
 	}
 	return nil
