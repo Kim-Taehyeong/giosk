@@ -38,9 +38,8 @@ export default function UserDashboard() {
   const creditMode = config.billing.mode === 'credit';
   const freeMode = config.billing.mode === 'free';
   const dyn = config.billing.dynamic;
-  const creditLimit = config.billing.credit.maxConcurrentSessions;
-  // free 모드라도 전역 정책 쿼터(최대 동시 세션)는 유효하다 → ∞ 대신 이 상한을 보여준다.
-  const quotaSessions = config.quota?.maxConcurrentSessions;
+  // 동시 세션 상한은 정책(quota)으로 일원화 — 대시보드는 백엔드 k.maxSessions(정책 해석값)를 쓴다.
+  // billing.credit.maxConcurrentSessions 는 폐기.
   const [d, setD] = useState(null);
   const [connSession, setConnSession] = useState(null); // 접속 모달 대상 세션
   const [connTab, setConnTab] = useState(null); // 클릭한 채널(모달 초기 탭)
@@ -153,8 +152,8 @@ export default function UserDashboard() {
         {freeMode ? (
           <>
             <StatCard icon={Layers} tone="free" label={t('dash.kpiConcurrent')} value={`${k.activeSessions}`}
-              unit={quotaSessions ? `/ ${quotaSessions}` : '/ ∞'}
-              bar={quotaSessions ? { value: k.activeSessions, max: quotaSessions, variant: 'free' } : undefined} />
+              unit={k.maxSessions ? `/ ${k.maxSessions}` : '/ ∞'}
+              bar={k.maxSessions ? { value: k.activeSessions, max: k.maxSessions, variant: 'free' } : undefined} />
             <StatCard icon={Clock} tone="gpu" label={t('dash.kpiGpuHours')} value={`${k.gpuHoursMonth}`} unit={t('dash.hoursUnit')} />
             <StatCard icon={Zap} tone="free" label={t('dash.kpiBilling')} value={t('dash.kpiFree')} />
             <StatCard icon={Server} tone="gpu" label={t('dash.kpiNodes')} value={`${avail.byNode.length}`} />
@@ -162,13 +161,13 @@ export default function UserDashboard() {
         ) : creditMode ? (
           <>
             <StatCard icon={Coins} tone="gpu" label={t('dash.kpiBalance')} value={`${k.balance}`} unit={`/ ${k.cap} C`} bar={{ value: k.balance, max: k.cap, variant: 'gpu' }} />
-            <StatCard icon={Layers} tone="free" label={t('dash.kpiSessions')} value={`${k.activeSessions}`} unit={`/ ${creditLimit}`} bar={{ value: k.activeSessions, max: creditLimit, variant: 'free' }} />
+            <StatCard icon={Layers} tone="free" label={t('dash.kpiSessions')} value={`${k.activeSessions}`} unit={k.maxSessions ? `/ ${k.maxSessions}` : '/ ∞'} bar={k.maxSessions ? { value: k.activeSessions, max: k.maxSessions, variant: 'free' } : undefined} />
             <StatCard icon={Clock} tone="gpu" label={t('dash.kpiGpuHours')} value={`${k.gpuHoursMonth}`} unit={t('dash.hoursUnit')} />
             <StatCard icon={Hourglass} tone="warn" label={t('dash.kpiEta')} value={t('dash.kpiEtaVal', { n: k.etaDays })} unit={`(${k.burn} C/day)`} />
           </>
         ) : (
           <>
-            <StatCard icon={Layers} tone="free" label={t('dash.kpiConcurrent')} value={`${k.activeSessions}`} unit={`/ ${dyn.maxConcurrentSessions}`} bar={{ value: k.activeSessions, max: dyn.maxConcurrentSessions, variant: 'free' }} />
+            <StatCard icon={Layers} tone="free" label={t('dash.kpiConcurrent')} value={`${k.activeSessions}`} unit={k.maxSessions ? `/ ${k.maxSessions}` : '/ ∞'} bar={k.maxSessions ? { value: k.activeSessions, max: k.maxSessions, variant: 'free' } : undefined} />
             <StatCard icon={Hourglass} tone="gpu" label={t('dash.kpiMaxLease')} value={`${dyn.maxLeaseHours}`} unit={t('dash.hoursUnit')} />
             <StatCard icon={Clock} tone="gpu" label={t('dash.kpiGpuHours')} value={`${k.gpuHoursMonth}`} unit={t('dash.hoursUnit')} />
             <StatCard icon={Timer} tone="warn" label={t('dash.kpiCooldown')} value={`${dyn.cooldownHours}`} unit={t('dash.hoursUnit')} />
