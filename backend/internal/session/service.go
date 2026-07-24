@@ -582,8 +582,16 @@ func (s *Service) applyGuarantee(ctx context.Context, sess *Session) {
 	if share <= 0 {
 		return
 	}
-	sess.CPUCores = maxInt(1, int(float64(n.CPUCores)*share+0.5))
-	sess.MemGB = maxInt(1, int(float64(n.MemGB)*share+0.5))
+	// 정책: "최소만 보장(request), 상한 없음(limit 미설정 → 자유 버스트/경쟁)".
+	// request 는 GPU 지분에 비례하되 requestFactor(0.5)를 곱해 보수적으로 잡는다. 이유:
+	//   한 노드의 세션 GPU 지분 합은 설계상 ≤ 1(공유=나눠가짐, 전용=독점) 이므로,
+	//   노드 위 CPU/Mem request 총합 = 0.5 × 노드 × Σ(share) ≤ 노드의 50%.
+	//   → 항상 ≥50% 헤드룸이 남아 "CPU/Mem 부족으로 스케줄 실패(영구 Pending)"가 원천 차단된다.
+	//   전용(share=1)도 노드의 50%만 요청 → 반드시 배치되고, limit 이 없어 노드 전체까지 버스트한다.
+	// ⚠️ "limit만" 방식은 금물: request 없이 limit 만 주면 k8s 가 request=limit 으로 자동 설정해 다시 100% 요청이 된다.
+	const requestFactor = 0.5
+	sess.CPUCores = maxInt(1, int(float64(n.CPUCores)*share*requestFactor+0.5))
+	sess.MemGB = maxInt(1, int(float64(n.MemGB)*share*requestFactor+0.5))
 }
 
 // minNodeOf는 해당 GPU 타입 후보 중 CPU 코어가 가장 적은(=최소 보장 기준) Ready 노드를 찾는다.
