@@ -40,9 +40,12 @@ async function request(method, path, body) {
   });
 
   const text = await res.text();
-  const data = text ? JSON.parse(text) : null;
+  // 본문이 JSON 이 아닐 수 있다 — 라우트 미등록(gin 의 "404 page not found"), nginx 502/504 HTML,
+  // 프록시 타임아웃 등. 그대로 JSON.parse 하면 SyntaxError 가 튀어 호출측 에러 처리가 통째로 무너진다.
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; } catch { data = null; }
   if (!res.ok) {
-    const err = new Error(translateError(data?.error) || res.statusText);
+    const err = new Error(translateError(data?.error) || res.statusText || `HTTP ${res.status}`);
     err.code = data?.code;
     err.status = res.status;
     throw err;

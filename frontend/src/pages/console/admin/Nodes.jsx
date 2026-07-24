@@ -61,7 +61,11 @@ export default function Nodes() {
   const gpuNodes = nodes.filter((r) => r.total !== undefined);
   const metricsOff = gpuNodes.length > 0 && gpuNodes.every((r) => !(r.total > 0));
 
-  useEffect(() => { getDatasets().then((d) => setDatasets(d.global)); }, []);
+  // 데이터셋 기능이 꺼진 배포에선 라우트 자체가 없다(404) → 켜져 있을 때만 조회.
+  useEffect(() => {
+    if (!datasetsOn) return;
+    getDatasets().then((d) => setDatasets(d.global || [])).catch(() => {});
+  }, [datasetsOn]);
   useEffect(() => { getAdminNodes().then(setNodes); }, []);
   useEffect(() => { getAdminDashboard().then((d) => setKpis(d.kpis)); }, []);
   useEffect(() => { getAdminStorage().then(setStorage).catch(() => {}); }, []);
