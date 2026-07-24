@@ -477,7 +477,8 @@
     "impDone": "{{name}} 볼륨을 {{user}} 에게 임포트했습니다.",
     "impFail": "임포트 실패",
     "impOwnerHint": "목록에서 계정을 선택해야 임포트할 수 있습니다.",
-    "impOwnerPicked": "선택됨: {{name}} ({{id}})"
+    "impOwnerPicked": "선택됨: {{name}} ({{id}})",
+    "metricsOffNotice": "모니터링(DCGM·Prometheus)이 설치되지 않아 GPU 사용률·VRAM 지표를 표시할 수 없습니다. 모니터링을 활성화하면 실시간 지표가 나타납니다."
   },
   "mset": {
     "title": "설정",

@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { TrendingUp, BellRing, Cpu, MemoryStick, Server, HeartPulse, Thermometer, Layers, Boxes, Users, Activity } from 'lucide-react';
+import { TrendingUp, BellRing, Cpu, MemoryStick, Server, HeartPulse, Thermometer, Layers, Boxes, Users } from 'lucide-react';
 import PageHead from '../../../components/console/PageHead';
 import StatCard from '../../../components/console/StatCard';
 import UtilLineChart from '../../../components/console/UtilLineChart';
@@ -8,6 +8,7 @@ import BarChart from '../../../components/console/BarChart';
 import DoughnutChart from '../../../components/console/DoughnutChart';
 import AlertFeed from '../../../components/console/AlertFeed';
 import ActiveUserList from '../../../components/console/ActiveUserList';
+import MetricsOffNotice from '../../../components/console/MetricsOffNotice';
 import MonitorControls from '../../../components/console/MonitorControls';
 import usePoll from '../../../hooks/usePoll';
 import { getInfraDashboard } from '../../../api/console/dashboard';
@@ -42,19 +43,8 @@ export default function InfraDashboard() {
       <PageHead crumb={t('badge')} title={t('dash.infraTitle')} subtitle={t('dash.infraSubtitle')}
         actions={<MonitorControls intervalMs={intervalMs} setIntervalMs={setIntervalMs} containerRef={wrap} />} />
 
-      {/* 지표 스택 미설치 안내 — 값이 0 인 게 아니라 수집기가 없다는 걸 명시 */}
-      {!gpuMetricsOn && (
-        <div className="card mb" style={{ display: 'flex', gap: 12, alignItems: 'flex-start', borderColor: 'var(--warn)' }}>
-          <span style={{ width: 36, height: 36, borderRadius: 10, display: 'grid', placeItems: 'center', flex: '0 0 auto',
-            background: 'var(--warn-soft, rgba(245,158,11,.15))', color: 'var(--warn)' }}><Activity size={19} /></span>
-          <div>
-            <div style={{ fontWeight: 800, marginBottom: 3 }}>{t('dash.metricsOffTitle')}</div>
-            <div className="legend" style={{ marginTop: 0 }}>
-              {mon.prometheus ? t('dash.metricsOffDcgm') : t('dash.metricsOffAll')}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* 지표 스택 미설치 안내 — 값이 0 인 게 아니라 수집기가 없다는 걸 명시(노드 화면과 같은 문구) */}
+      {!gpuMetricsOn && <MetricsOffNotice dcgmOnly={mon.prometheus} />}
 
       {/* 인프라 KPI (GPU 온도는 값이 있을 때만) */}
       <div className="grid cols-4 mb">

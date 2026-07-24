@@ -477,7 +477,8 @@
     "impDone": "Imported volume {{name}} to {{user}}.",
     "impFail": "Import failed",
     "impOwnerHint": "Pick an account from the list to import.",
-    "impOwnerPicked": "Selected: {{name}} ({{id}})"
+    "impOwnerPicked": "Selected: {{name}} ({{id}})",
+    "metricsOffNotice": "Monitoring (DCGM/Prometheus) is not installed, so GPU utilization and VRAM cannot be shown. Enable monitoring to see live metrics."
   },
   "mset": {
     "title": "Settings",
