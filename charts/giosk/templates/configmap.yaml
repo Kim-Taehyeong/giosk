@@ -66,7 +66,7 @@ data:
   GIOSK_QUOTA_MAX_VRAM_GB: {{ .Values.quota.maxVramGb | quote }}
   GIOSK_QUOTA_MAX_SESSIONS: {{ .Values.quota.maxConcurrentSessions | quote }}
   GIOSK_VOLUME_QUOTA_GB: {{ .Values.quota.volumeQuotaGb | quote }}
-  # 세션 웹(VSCode) 노출 모드: loadbalancer(MetalLB) | nodeport | portforward
+  # 세션 웹(VSCode) 노출 모드: nodeport(기본) | loadbalancer(MetalLB)
   GIOSK_SESSION_EXPOSE: {{ .Values.session.expose | quote }}
   # Prometheus(메트릭) — monitoring.enabled 면 in-cluster 서비스, 아니면 외부 URL.
   GIOSK_PROMETHEUS_URL: {{ .Values.monitoring.prometheusURL | default (ternary (printf "http://kps-kube-prometheus-stack-prometheus.%s:9090" .Release.Namespace) "" .Values.monitoring.install) | quote }}

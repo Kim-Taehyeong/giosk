@@ -261,7 +261,7 @@ func Load(lookup func(string) (string, bool)) (*Config, error) {
 			GatewayJump:            g.str("GIOSK_GATEWAY_SSH_PROXY_JUMP", ""),
 			SessionSSHDImage:       g.str("GIOSK_SESSION_SSHD_IMAGE", ""),
 			SessionSSHDPubKey:      g.str("GIOSK_GATEWAY_SSH_PUBKEY", ""),
-			SessionExpose:          g.str("GIOSK_SESSION_EXPOSE", "portforward"),
+			SessionExpose:          g.str("GIOSK_SESSION_EXPOSE", "nodeport"),
 			DevicePluginConfigNS:   g.str("GIOSK_DEVICE_PLUGIN_CONFIG_NS", ""),
 			DevicePluginConfigName: g.str("GIOSK_DEVICE_PLUGIN_CONFIG_NAME", ""),
 			Registry:               g.str("GIOSK_REGISTRY", ""),
