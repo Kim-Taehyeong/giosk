@@ -37,6 +37,8 @@ export default function UserDashboard() {
   const freeMode = config.billing.mode === 'free';
   const dyn = config.billing.dynamic;
   const creditLimit = config.billing.credit.maxConcurrentSessions;
+  // free 모드라도 전역 정책 쿼터(최대 동시 세션)는 유효하다 → ∞ 대신 이 상한을 보여준다.
+  const quotaSessions = config.quota?.maxConcurrentSessions;
   const [d, setD] = useState(null);
   const [connSession, setConnSession] = useState(null); // 접속 모달 대상 세션
   const [connTab, setConnTab] = useState(null); // 클릭한 채널(모달 초기 탭)
@@ -148,7 +150,9 @@ export default function UserDashboard() {
       <div className="grid cols-4 mb">
         {freeMode ? (
           <>
-            <StatCard icon={Layers} tone="free" label={t('dash.kpiConcurrent')} value={`${k.activeSessions}`} unit="/ ∞" />
+            <StatCard icon={Layers} tone="free" label={t('dash.kpiConcurrent')} value={`${k.activeSessions}`}
+              unit={quotaSessions ? `/ ${quotaSessions}` : '/ ∞'}
+              bar={quotaSessions ? { value: k.activeSessions, max: quotaSessions, variant: 'free' } : undefined} />
             <StatCard icon={Clock} tone="gpu" label={t('dash.kpiGpuHours')} value={`${k.gpuHoursMonth}`} unit={t('dash.hoursUnit')} />
             <StatCard icon={Zap} tone="free" label={t('dash.kpiBilling')} value={t('dash.kpiFree')} />
             <StatCard icon={Server} tone="gpu" label={t('dash.kpiNodes')} value={`${avail.byNode.length}`} />
