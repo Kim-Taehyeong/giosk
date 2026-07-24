@@ -590,8 +590,15 @@ func (s *Service) applyGuarantee(ctx context.Context, sess *Session) {
 	//   전용(share=1)도 노드의 50%만 요청 → 반드시 배치되고, limit 이 없어 노드 전체까지 버스트한다.
 	// ⚠️ "limit만" 방식은 금물: request 없이 limit 만 주면 k8s 가 request=limit 으로 자동 설정해 다시 100% 요청이 된다.
 	const requestFactor = 0.5
-	sess.CPUCores = maxInt(1, int(float64(n.CPUCores)*share*requestFactor+0.5))
-	sess.MemGB = maxInt(1, int(float64(n.MemGB)*share*requestFactor+0.5))
+	// share 상한 1.0 — 요청 GPU 수가 노드 GPU 수를 초과해 share>1 이 되어도(그런 세션은 어차피
+	// "한 노드에 그만큼의 GPU가 없어" GPU 부족으로 스케줄 불가) CPU/Mem request 가 노드 용량을
+	// 넘어 폭주하지 않게 막는다. 이로써 request 총합은 언제나 ≤ 노드의 50% 로 유지된다.
+	effShare := share
+	if effShare > 1.0 {
+		effShare = 1.0
+	}
+	sess.CPUCores = maxInt(1, int(float64(n.CPUCores)*effShare*requestFactor+0.5))
+	sess.MemGB = maxInt(1, int(float64(n.MemGB)*effShare*requestFactor+0.5))
 }
 
 // minNodeOf는 해당 GPU 타입 후보 중 CPU 코어가 가장 적은(=최소 보장 기준) Ready 노드를 찾는다.

@@ -45,7 +45,12 @@ export default function UserSessionDetail() {
   if (!r) return <Spinner pad label={t('sdetail.loading', { defaultValue: '…' })} />;
 
   const act = async (fn, msg) => { await fn(id); toast(msg); load(); };
-  const doDelete = async () => { if (await confirm({ title: t('session.delete'), message: t('confirmDelete'), confirmText: t('session.delete') })) act(deleteSession, t('session.deleted')); };
+  const doDelete = async () => {
+    if (!await confirm({ title: t('session.delete'), message: t('confirmDelete'), confirmText: t('session.delete') })) return;
+    await deleteSession(id);
+    toast(t('session.deleted'));
+    navigate('/console/sessions'); // 삭제 후엔 상세에 머무르지 말고 목록으로(세션이 사라졌으므로)
+  };
   const doExtend = async () => { try { await extendSession(id); toast(t('session.extended', { h: lease.extensionHours || 1 })); } catch { toast(t('session.extendFailed')); } load(); };
   const canExtend = dynamicMode && r?.mode !== 'cpu' && r?.status === 'running' && (r?.extensionsUsed || 0) < lease.maxExtensions;
   const statusPill = (s) => {
