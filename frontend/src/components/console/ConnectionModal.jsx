@@ -10,9 +10,8 @@ import SshKeyForm from './SshKeyForm';
 const TABS = [
   { key: 'vscode', label: 'VSCode', icon: Code2 },
   { key: 'jupyter', label: 'Jupyter', icon: NotebookPen },
-  // 웹터미널(컨테이너 세션) — 브라우저 xterm 으로 바로 접속. "SSH" 로 표기.
-  { key: 'terminal', label: 'SSH', icon: TerminalSquare },
-  // 네이티브 SSH(물리 세션·sshd 사이드카) — 복붙 명령 + 웹으로 연결하기.
+  // SSH 탭 하나로 통합 — 네이티브 SSH(복붙 명령)와 웹 터미널("웹으로 연결하기")을 같은 탭에 넣는다.
+  // 세션이 제공하는 채널이 ssh(사이드카)든 terminal(웹터미널)이든 이 탭 하나로 다룬다.
   { key: 'ssh', label: 'SSH', icon: TerminalSquare },
 ];
 
@@ -187,6 +186,13 @@ function TerminalLaunchPane({ onOpen, t }) {
   );
 }
 
+// availOf는 세션이 제공하는 접속 채널을 소문자로 반환하되, 웹터미널(terminal)을 통합 SSH 탭으로
+// 접어 넣기 위해 terminal→ssh 로 정규화하고 중복을 제거한다. conn 이 없으면 기본 3종을 가정한다.
+function availOf(session) {
+  const raw = session.conn?.length ? session.conn.map((c) => c.toLowerCase()) : ['vscode', 'jupyter', 'ssh'];
+  return [...new Set(raw.map((c) => (c === 'terminal' ? 'ssh' : c)))];
+}
+
 // 세션 접속 모달 — 게이트웨이 단기 토큰 URL(VSCode/Jupyter)·복붙 SSH 제공.
 // 접속 링크는 발급 시점부터 짧게만 유효(게이트웨이가 원본 비밀을 대신 주입 → 사용자에게 비밀 미노출).
 export default function ConnectionModal({ session, onClose, initialTab }) {
@@ -204,8 +210,10 @@ export default function ConnectionModal({ session, onClose, initialTab }) {
   useEffect(() => {
     if (!session) return;
     // 세션이 제공하는 연결 방식 중 첫 탭 선택(호출부가 initialTab 을 주면 그 채널을 우선).
-    const avail = session.conn?.length ? session.conn.map((c) => c.toLowerCase()) : ['vscode', 'jupyter', 'ssh'];
-    const want = initialTab && avail.includes(initialTab) ? initialTab : null;
+    // terminal(웹터미널)·ssh(사이드카/물리) 는 통합 SSH 탭 하나로 다루므로 terminal→ssh 로 정규화한다.
+    const avail = availOf(session);
+    const wanted = initialTab === 'terminal' ? 'ssh' : initialTab;
+    const want = wanted && avail.includes(wanted) ? wanted : null;
     setTab(want || (avail.includes('vscode') ? 'vscode' : avail[0]));
     setConn(null);
     setErr('');
@@ -226,7 +234,7 @@ export default function ConnectionModal({ session, onClose, initialTab }) {
   };
 
   if (!session) return null;
-  const avail = (session.conn || []).map((c) => c.toLowerCase());
+  const avail = availOf(session);
   const tabs = TABS.filter((t) => avail.length === 0 || avail.includes(t.key));
 
   return (
@@ -256,9 +264,8 @@ export default function ConnectionModal({ session, onClose, initialTab }) {
           {tab === 'jupyter' && (conn.jupyter
             ? <WebPane info={conn.jupyter} urlLabel={t('conn.jupyterUrl')} openLabel={t('conn.openJupyter')} expiresAt={conn.expiresAt} t={t} onRegenerate={regenerate} regenerating={regenerating} />
             : <div className="muted">{t('conn.unavailable')}</div>)}
-          {/* 웹터미널(컨테이너 세션) — 새 창으로 브라우저 xterm 열기 */}
-          {tab === 'terminal' && <TerminalLaunchPane onOpen={openTerminal} t={t} />}
-          {/* 네이티브 SSH(물리 세션) — Proxy/직접 복붙 명령 + 웹으로 연결하기(새 창) */}
+          {/* 통합 SSH 탭 — 네이티브 SSH(복붙 명령)가 있으면 SSHPane(웹 터미널 버튼 포함),
+              없으면 웹 터미널만 여는 패널. terminal 채널만 있는 세션도 여기로 흡수된다. */}
           {tab === 'ssh' && (conn.ssh
             ? <SSHPane info={conn.ssh} expiresAt={conn.expiresAt} t={t} onRegenerate={regenerate} regenerating={regenerating} onWebConnect={openTerminal} hasKey={!!user?.sshPublicKey} />
             : <TerminalLaunchPane onOpen={openTerminal} t={t} />)}
