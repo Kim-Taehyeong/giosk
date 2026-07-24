@@ -27,8 +27,11 @@ type SessionSpec struct {
 	HomePVC     string           // 홈 영속 PVC 이름(/home/work 마운트). 빈값이면 미마운트.
 	Volumes     []VolMountSpec   // 추가 볼륨 마운트(PVC 기반)
 	WebChannels []WebChannelSpec // 활성 웹 채널(code-server/jupyter): 포트 + 인증 env
-	SSHDImage   string           // 컨테이너 SSH 사이드카 이미지(빈값=사이드카 없음). 게이트웨이 SSH 프록시 대상.
-	SSHDPubKey  string           // 사이드카 sshd 가 신뢰할 게이트웨이 공개키(authorized_keys)
+	SSHDImage   string           // 컨테이너 SSH 사이드카 이미지(빈값=사이드카 없음). 직접 SSH·게이트웨이 프록시 공용.
+	SSHDPubKey  string           // 사이드카 sshd 가 신뢰할 게이트웨이 공개키(authorized_keys). 게이트웨이 off 면 빈값.
+	// 사용자 등록 공개키를 담은 Secret 이름(키: authorized_keys). 사이드카에 read-only 로 마운트되어
+	// sshd 가 접속마다 다시 읽는다 → 키 등록/교체가 실행 중 세션에도 즉시 반영. 빈값/미존재면 마운트 생략(Optional).
+	UserKeysSecret string
 	ScratchHost string           // 노드로컬 스크래치 계정폴더(hostPath). 빈값이면 미마운트.
 	PreferNodes []string         // 이미지 캐시된 노드(소프트 선호) — 빠른 시작. nodeSelector(타입) 안에서만 효과.
 	RequireNode string           // 하드 핀(required nodeAffinity hostname) — 데이터셋 노드 로컬 캐시 hostPath 마운트용.

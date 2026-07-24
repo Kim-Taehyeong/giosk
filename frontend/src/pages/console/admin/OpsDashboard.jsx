@@ -97,7 +97,7 @@ export default function OpsDashboard() {
           : <StatCard icon={Timer} tone="primary" label={t(`dash.mode_${mode}`)} value={t('dash.noCredit')} />}
       </div>
 
-      {/* 세션 도넛 + (credit)크레딧 추이 / (그외)경고 피드 */}
+      {/* 세션 도넛 + (credit)크레딧 추이 / (그외)사용 중 유저 — 세션 옆 빈칸을 유저 목록으로 채운다 */}
       <div className="grid cols-2 mb">
         <div className="card">
           <h3><Layers size={16} /> {t('dash.sessions')}</h3>
@@ -113,18 +113,13 @@ export default function OpsDashboard() {
             <h3><TrendingUp size={16} /> {t('dash.creditTrend')}</h3>
             <UtilLineChart percent={false} labels={(d.creditTrend || []).map((x) => x.date)} values={(d.creditTrend || []).map((x) => x.amount)} />
           </div>
-        ) : (
-          <div className="card">
-            <h3><BellRing size={16} /> {t('dash.alertFeed')}</h3>
-            <AlertFeed events={d.alertFeed} emptyLabel={t('dash.noAlerts')} />
-          </div>
-        )}
+        ) : activeUsersCard}
       </div>
 
-      {/* 사용 중 유저 + (credit)상위 그룹 / (그외)경고 피드 */}
-      <div className="grid cols-2 mb">
-        {activeUsersCard}
-        {creditMode ? (
+      {/* credit: 사용 중 유저 + 상위 그룹 / 그외: 경고 피드 1개(위에서 유저를 이미 배치했으므로 중복 금지) */}
+      {creditMode ? (
+        <div className="grid cols-2 mb">
+          {activeUsersCard}
           <div className="card">
             <h3><FolderKanban size={16} /> {t('dash.topGroups')}</h3>
             <DataTable rows={d.topGroups} columns={[
@@ -132,13 +127,13 @@ export default function OpsDashboard() {
               { key: 'credit', header: t('dash.consumed'), render: (r) => `${r.credit} C` },
             ]} />
           </div>
-        ) : (
-          <div className="card">
-            <h3><BellRing size={16} /> {t('dash.alertFeed')}</h3>
-            <AlertFeed events={d.alertFeed} emptyLabel={t('dash.noAlerts')} />
-          </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="card mb">
+          <h3><BellRing size={16} /> {t('dash.alertFeed')}</h3>
+          <AlertFeed events={d.alertFeed} emptyLabel={t('dash.noAlerts')} />
+        </div>
+      )}
 
       {creditMode ? (
         <div className="card">
