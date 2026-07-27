@@ -142,6 +142,9 @@ type Storage struct {
 type Dataset struct {
 	Enabled bool
 	NFS     NFS
+	// LocalMount는 API 파드에 데이터셋 NFS 가 마운트된 로컬 경로(파일 업로드 시 API 가 직접 기록).
+	// 차트가 datasets.enabled 시 이 경로로 NFS 를 마운트한다. 빈값=업로드 비활성(URL 등록만).
+	LocalMount string
 }
 
 // NFS — in-cluster(클러스터 내 provisioner) 또는 external(외부 서버 마운트).
@@ -219,6 +222,7 @@ func Load(lookup func(string) (string, bool)) (*Config, error) {
 					Server: g.str("GIOSK_DATASETS_NFS_SERVER", ""),
 					Path:   g.str("GIOSK_DATASETS_NFS_PATH", ""),
 				},
+				LocalMount: g.str("GIOSK_DATASETS_NFS_MOUNT", ""),
 			},
 		},
 		PhysicalNodes: PhysicalNodes{

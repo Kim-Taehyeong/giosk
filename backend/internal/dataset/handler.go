@@ -3,6 +3,7 @@ package dataset
 import (
 	"errors"
 	"strconv"
+	"strings"
 
 	"giosk/internal/auth"
 	"giosk/pkg/httpx"
@@ -37,6 +38,41 @@ func (h *Handler) Register(c *gin.Context) {
 			return
 		}
 		httpx.Internal(c, "등록 신청 실패")
+		return
+	}
+	httpx.Created(c, gin.H{"ok": true})
+}
+
+// Upload는 최고관리자가 zip/tar 아카이브(또는 단일 파일)를 직접 업로드해 데이터셋으로 등록한다(multipart).
+// form: file(파일), name(데이터셋 이름), scope(global|personal, 기본 global).
+func (h *Handler) Upload(c *gin.Context) {
+	if !h.svc.UploadEnabled() {
+		httpx.Err(c, 503, "upload_disabled", "파일 업로드가 비활성화되어 있습니다(데이터셋 NFS 마운트 필요)")
+		return
+	}
+	name := strings.TrimSpace(c.PostForm("name"))
+	if name == "" {
+		httpx.BadRequest(c, "데이터셋 이름(name)이 필요합니다")
+		return
+	}
+	fh, err := c.FormFile("file")
+	if err != nil {
+		httpx.BadRequest(c, "업로드 파일(file)이 필요합니다")
+		return
+	}
+	f, err := fh.Open()
+	if err != nil {
+		httpx.Internal(c, "업로드 파일 열기 실패")
+		return
+	}
+	defer f.Close()
+	u := auth.CurrentUser(c)
+	if err := h.svc.Upload(c.Request.Context(), u.ID, name, c.PostForm("scope"), u.Username, fh.Filename, fh.Size, f); err != nil {
+		if errors.Is(err, ErrNameTaken) {
+			httpx.Err(c, 409, "name_taken", "이미 같은 이름의 데이터셋이 있습니다")
+			return
+		}
+		httpx.Internal(c, "업로드 실패: "+err.Error())
 		return
 	}
 	httpx.Created(c, gin.H{"ok": true})

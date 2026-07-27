@@ -15,5 +15,6 @@ func RegisterAdmin(admin gin.IRouter, h *Handler) {
 	admin.POST("/dataset-requests/:reqId/approve", h.Approve)
 	admin.POST("/dataset-requests/:reqId/reject", h.Reject)
 	admin.POST("/datasets/:id/cache", h.ToggleCache)
+	admin.POST("/datasets/upload", h.Upload)          // zip/tar 직접 업로드(최고관리자)
 	admin.PATCH("/datasets/:id", h.UpdateDescription) // 데이터셋 설명 수정
 }

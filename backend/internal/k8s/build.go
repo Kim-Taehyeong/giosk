@@ -170,6 +170,28 @@ echo "EXTRACT DONE"`
 	return c.runSimpleJobCmd(ctx, ns, jobName, "alpine:3.20", []string{"sh", "-c", script}, nil, nil, vol, mounts)
 }
 
+// RunDatasetExtract는 이미 NFS(/nfs/dataset/<name>)에 올라온 아카이브를 제자리 해제한다(원본 보존).
+// 파일 업로드 경로용: API 가 업로드 파일을 NFS 에 직접 쓴 뒤 이 잡으로 해제만 한다(다운로드 없음).
+func (c *Client) RunDatasetExtract(ctx context.Context, ns, jobName, nfsServer, nfsBase, name string) error {
+	if !c.Available() {
+		return ErrNoCluster
+	}
+	if err := c.EnsureNamespace(ctx, ns); err != nil {
+		return err
+	}
+	_ = c.DeleteBuildJob(ctx, ns, jobName)
+	dir := "/nfs/dataset/" + name
+	script := "set -e; apk add --no-cache unzip tar >/dev/null 2>&1 || true\n" +
+		"a=$(ls " + dir + "/*.zip " + dir + "/*.tar.gz " + dir + "/*.tgz " + dir + "/*.tar 2>/dev/null | head -1)\n" +
+		"[ -z \"$a\" ] && { echo 'no-archive(단일파일)'; exit 0; }\n" +
+		"echo EXTRACT\n" +
+		"case \"$a\" in *.zip) unzip -o -q \"$a\" -d '" + dir + "';; *.tar.gz|*.tgz) tar -xzf \"$a\" -C '" + dir + "';; *.tar) tar -xf \"$a\" -C '" + dir + "';; esac\n" +
+		"echo extracted"
+	vol := []corev1.Volume{{Name: "nfs", VolumeSource: corev1.VolumeSource{NFS: &corev1.NFSVolumeSource{Server: nfsServer, Path: nfsBase}}}}
+	mounts := []corev1.VolumeMount{{Name: "nfs", MountPath: "/nfs"}}
+	return c.runSimpleJobCmd(ctx, ns, jobName, "alpine:3.20", []string{"sh", "-c", script}, nil, nil, vol, mounts)
+}
+
 // RunDatasetCache는 특정 노드에 핀되어 데이터셋 NFS(<nfsServer>:<nfsDatasetPath>, RO)를
 // 그 노드의 로컬 디스크 hostPath(<hostBase>/<name>)로 복사하는 Job 을 만든다(노드 로컬 캐시).
 // 세션은 캐시된 노드에서 이 hostPath 를 직접 마운트해 NFS 보다 빠르게 접근한다.
