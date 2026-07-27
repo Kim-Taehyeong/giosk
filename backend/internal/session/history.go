@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"math"
 	"time"
-
-	"giosk/internal/metrics"
 )
 
 // HistPoint는 세션 사용률 이력의 한 시점(정렬된 시계열). 값은 % 로 정규화한다
@@ -102,8 +100,12 @@ func (s *Service) History(ctx context.Context, sess *Session, hours int) ([]Hist
 	var gpuUtil, vramUsedMB map[int64]float64
 	switch ins.GpuSource {
 	case gpuSrcDCGM:
-		gpuUtil = s.rangeMap(ctx, fmt.Sprintf(`avg(%s)`, metrics.DCGMPodSeries("DCGM_FI_DEV_GPU_UTIL", pod)), start, end, step)
-		vramUsedMB = s.rangeMap(ctx, fmt.Sprintf(`sum(%s)`, metrics.DCGMPodSeries("DCGM_FI_DEV_FB_USED", pod)), start, end, step)
+		// 전용 세션은 노드 GPU 를 통째로 쓴다 = 노드 GPU 지표가 곧 세션 지표. HAMi 가 클러스터 전체
+		// device-plugin 이라 DCGM 의 pod 매핑이 불가(exported_pod 없음) → 세션이 놓인 노드로 귀속한다
+		// (dcgm-exporter pod→node 는 kube_pod_info 조인). 노드당 1 GPU 전용에서 정확.
+		j := fmt.Sprintf(` * on(pod,namespace) group_left(node) kube_pod_info{node=%q}`, sess.Node)
+		gpuUtil = s.rangeMap(ctx, `avg by(node) (DCGM_FI_DEV_GPU_UTIL`+j+`)`, start, end, step)
+		vramUsedMB = s.rangeMap(ctx, `sum by(node) (DCGM_FI_DEV_FB_USED`+j+`)`, start, end, step)
 	case gpuSrcHAMi:
 		// HAMi v2.9.0 메트릭명(hami_* 접두, 라벨 exported_pod). 옛 Device_utilization_desc_of_container/
 		// vGPU_device_memory_usage_in_bytes{podname=} 는 v2.9.0 에서 사라져 이력이 항상 빈 값→"미가용"이 됐다.

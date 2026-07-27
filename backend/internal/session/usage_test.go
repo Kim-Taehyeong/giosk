@@ -22,7 +22,9 @@ func fakeProm(t *testing.T, series map[string]map[string]float64) *metrics.Clien
 		q, _ := url.QueryUnescape(r.URL.Query().Get("query"))
 		label := "pod"
 		if strings.Contains(q, "by(exported_pod)") {
-			label = "exported_pod" // HAMi v2.9.0 쿼리는 exported_pod 로 그룹핑(DCGM 은 by(pod))
+			label = "exported_pod" // HAMi v2.9.0 쿼리는 exported_pod 로 그룹핑
+		} else if strings.Contains(q, "by(node)") {
+			label = "node" // 전용(DCGM)은 노드 GPU 로 귀속 → by(node)
 		} else if strings.Contains(q, "podname") {
 			label = "podname"
 		}
@@ -59,14 +61,14 @@ func TestUsageOf_SourceBySharingMode(t *testing.T) {
 	met := fakeProm(t, map[string]map[string]float64{
 		"container_cpu_usage_seconds_total":    {"ses-excl": 2.5, "ses-hami": 1.0, "ses-slice": 0.5, "ses-cpu": 3.0},
 		"container_memory_working_set_bytes":   {"ses-excl": 2 * 1024 * 1024 * 1024},
-		"DCGM_FI_DEV_GPU_UTIL":                    {"ses-excl": 73},
+		"DCGM_FI_DEV_GPU_UTIL":                    {"node-a": 73}, // 전용은 노드 GPU 로 귀속(by node)
 		"hami_container_device_utilization_ratio": {"ses-hami": 42},
 		"hami_vgpu_memory_used_bytes":             {"ses-hami": 3 * 1024 * 1024 * 1024},
 	})
 	svc := &Service{met: met}
 
 	rows := []Session{
-		{InstanceID: "ses-excl", GpuMode: "exclusive", CPUCores: 8, MemGB: 32},
+		{InstanceID: "ses-excl", GpuMode: "exclusive", CPUCores: 8, MemGB: 32, Node: "node-a"},
 		{InstanceID: "ses-hami", GpuMode: "shared", VramMB: 8192},
 		{InstanceID: "ses-slice", GpuMode: "timeslice"},
 		{InstanceID: "ses-cpu", GpuMode: "cpu"},

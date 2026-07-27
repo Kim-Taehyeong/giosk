@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-
-	"giosk/internal/metrics"
 )
 
 // GPU 지표 출처 — 세션의 gpu_mode 가 결정한다.
@@ -87,9 +85,9 @@ func runningOnly(rows []Session) []Session {
 func (s *Service) usageOf(ctx context.Context, rows []Session) map[string]*Usage {
 	out := make(map[string]*Usage, len(rows))
 
-	var pods []string     // Pod 메트릭(CPU/RAM) 대상 = 컨테이너 세션 전부
-	var dcgmPods []string // 전용 GPU 세션
-	var hamiPods []string // 분할(HAMi) GPU 세션
+	var pods []string                // Pod 메트릭(CPU/RAM) 대상 = 컨테이너 세션 전부
+	dcgmNodes := map[string]string{} // 전용 GPU 세션: instanceID→node(세션이 놓인 노드의 GPU 로 귀속)
+	var hamiPods []string            // 분할(HAMi) GPU 세션
 	for i := range rows {
 		r := rows[i]
 		u := &Usage{
@@ -117,9 +115,9 @@ func (s *Service) usageOf(ctx context.Context, rows []Session) map[string]*Usage
 			// 한 카드에 슬롯 N개가 붙으므로 카드 전체 사용률이 모든 세션에 똑같이 복사된다.
 			// 그럴듯하지만 틀린 값이라 아예 내주지 않는다.
 			u.GpuReason = gpuNoneTimeslice
-		default: // exclusive | mig — 카드를 통째로 받으므로 DCGM = 그 세션 사용량
+		default: // exclusive | mig — 카드를 통째로 받으므로 노드 GPU = 그 세션 사용량
 			u.GpuSource = gpuSrcDCGM
-			dcgmPods = append(dcgmPods, r.InstanceID)
+			dcgmNodes[r.InstanceID] = r.Node
 		}
 	}
 
@@ -150,46 +148,40 @@ func (s *Service) usageOf(ctx context.Context, rows []Session) map[string]*Usage
 		}
 	}
 
-	s.fillDCGM(ctx, out, dcgmPods)
+	s.fillDCGM(ctx, out, dcgmNodes)
 	s.fillHAMi(ctx, out, hamiPods)
 	markUnavailable(out)
 	return out
 }
 
-// fillDCGM은 전용 GPU 세션의 util/VRAM 을 DCGM(pod 라벨)에서 채운다.
-// GPU 여러 장이면 util 은 평균, VRAM 은 합이 맞다.
-func (s *Service) fillDCGM(ctx context.Context, out map[string]*Usage, pods []string) {
-	if len(pods) == 0 {
+// fillDCGM은 전용 GPU 세션의 util/VRAM 을 그 세션이 놓인 "노드"의 DCGM 지표로 채운다.
+// nodes: instanceID→node. 왜 pod 가 아니라 node 인가: HAMi 가 클러스터 전체 device-plugin 이면
+// DCGM 의 pod-resources 기반 GPU→pod 매핑이 HAMi vGPU device ID 와 안 맞아 워크로드 pod 라벨이
+// 안 붙는다(exported_pod 없음). 전용 세션은 노드 GPU 를 통째로 쓰므로 노드 GPU 지표 = 세션 지표다.
+// dcgm-exporter pod→node 는 kube_pod_info 로 매핑(노드 대시보드와 동일 방식).
+// ⚠️ 노드에 GPU 가 여러 장이면 노드 평균/합이라 같은 노드의 전용 세션들엔 동일 값이 간다
+//    (노드당 1 GPU 전용 배치에서 정확 — 세션별 카드 귀속은 DCGM pod 매핑이 필요한데 HAMi 가 막음).
+func (s *Service) fillDCGM(ctx context.Context, out map[string]*Usage, nodes map[string]string) {
+	if len(nodes) == 0 {
 		return
 	}
-	// 워크로드 Pod 라벨은 배포에 따라 pod/exported_pod 로 갈린다 → DCGMPodSeries 로 정규화.
-	sel := strings.Join(pods, "|")
-	if v, ok := s.met.VectorByLabel(ctx,
-		fmt.Sprintf(`avg by(pod) (%s)`, metrics.DCGMPodSeries("DCGM_FI_DEV_GPU_UTIL", sel)), "pod"); ok {
-		for pod, val := range v {
-			if u := out[pod]; u != nil {
-				u.GpuUtil = ptr(val)
-			}
+	const j = ` * on(pod,namespace) group_left(node) kube_pod_info`
+	util, _ := s.met.VectorByLabel(ctx, `avg by(node) (DCGM_FI_DEV_GPU_UTIL`+j+`)`, "node")
+	vramUsed, _ := s.met.VectorByLabel(ctx, `sum by(node) (DCGM_FI_DEV_FB_USED`+j+`)`, "node") // MiB
+	vramTot, _ := s.met.VectorByLabel(ctx, `sum by(node) ((DCGM_FI_DEV_FB_USED+DCGM_FI_DEV_FB_FREE)`+j+`)`, "node")
+	for iid, node := range nodes {
+		u := out[iid]
+		if u == nil || node == "" {
+			continue
 		}
-	}
-	// DCGM_FI_DEV_FB_USED 단위는 MiB.
-	if v, ok := s.met.VectorByLabel(ctx,
-		fmt.Sprintf(`sum by(pod) (%s)`, metrics.DCGMPodSeries("DCGM_FI_DEV_FB_USED", sel)), "pod"); ok {
-		for pod, val := range v {
-			if u := out[pod]; u != nil {
-				u.VramUsedMB = ptr(val)
-			}
+		if v, ok := util[node]; ok {
+			u.GpuUtil = ptr(v)
 		}
-	}
-	// 전용 세션은 vram_mb 를 안 쓴다(카드 통째) → 총량을 DB 에서 못 얻는다. 카드 용량으로 채운다.
-	// USED+FREE 는 라벨셋이 같아 기본 매칭으로 붙는다(node 별 집계와 같은 방식).
-	if v, ok := s.met.VectorByLabel(ctx, fmt.Sprintf(`sum by(pod) (%s + %s)`,
-		metrics.DCGMPodSeries("DCGM_FI_DEV_FB_USED", sel),
-		metrics.DCGMPodSeries("DCGM_FI_DEV_FB_FREE", sel)), "pod"); ok {
-		for pod, val := range v {
-			if u := out[pod]; u != nil && u.VramTotalMB == 0 {
-				u.VramTotalMB = int(val)
-			}
+		if v, ok := vramUsed[node]; ok {
+			u.VramUsedMB = ptr(v)
+		}
+		if v, ok := vramTot[node]; ok && u.VramTotalMB == 0 { // 전용은 vram_mb 미사용 → 카드 총량으로
+			u.VramTotalMB = int(v)
 		}
 	}
 }
