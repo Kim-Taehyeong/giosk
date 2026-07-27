@@ -167,7 +167,7 @@ func (s *Service) SyncUserKeys(ctx context.Context, userID int64) error {
 	if !s.containerSSH() {
 		return nil
 	}
-	list, err := s.repo.ListByUser(userID)
+	list, err := s.repo.ListByUser(userID, 0)
 	if err != nil {
 		return err
 	}
@@ -1045,8 +1045,8 @@ func (s *Service) attachMounts(sessionID, userID int64, req CreateReq) {
 }
 
 // List는 DB 세션을 라이브 Pod 상태로 갱신해 반환한다(best-effort).
-func (s *Service) List(ctx context.Context, userID int64) ([]Session, error) {
-	rows, err := s.repo.ListByUser(userID)
+func (s *Service) List(ctx context.Context, userID, groupID int64) ([]Session, error) {
+	rows, err := s.repo.ListByUser(userID, groupID)
 	if err != nil {
 		return nil, err
 	}

@@ -36,7 +36,7 @@ var ErrHardLimit = errors.New("hard resource limit exceeded")
 // Repository는 session 영속성 계약. 이미지/오퍼링 스펙은 read 프로젝션으로 조회.
 type Repository interface {
 	Create(s *Session) error
-	ListByUser(userID int64) ([]Session, error)
+	ListByUser(userID, groupID int64) ([]Session, error)
 	Get(instanceID string, userID int64) (*Session, error)
 	UpdateLive(instanceID, phase, node, ip string) error
 	SetPhase(instanceID, phase string) error
@@ -112,9 +112,15 @@ func NewRepository(db *gorm.DB) Repository { return &gormRepo{db: db} }
 
 func (r *gormRepo) Create(s *Session) error { return r.db.Create(s).Error }
 
-func (r *gormRepo) ListByUser(userID int64) ([]Session, error) {
+// ListByUser는 사용자의 세션을 반환한다. groupID>0 이면 그 팀(네임스페이스) 세션만 —
+// 그룹 단위 분리: 활성 팀 컨텍스트에선 그 팀 세션만 보이게 한다(팀 무관 전체 나열 방지).
+func (r *gormRepo) ListByUser(userID, groupID int64) ([]Session, error) {
 	var out []Session
-	return out, r.db.Where("user_id = ?", userID).Order("id DESC").Find(&out).Error
+	q := r.db.Where("user_id = ?", userID)
+	if groupID > 0 {
+		q = q.Where("group_id = ?", groupID)
+	}
+	return out, q.Order("id DESC").Find(&out).Error
 }
 
 func (r *gormRepo) Get(instanceID string, userID int64) (*Session, error) {

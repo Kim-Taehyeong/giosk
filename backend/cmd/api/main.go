@@ -249,7 +249,7 @@ func main() {
 		},
 		Wallet:   func(id int64) (any, error) { return walletSvc.MyWallet(id, 0) },
 		Volumes:  func(id int64) (any, error) { return volumeSvc.List(id) },
-		Sessions: func(ctx context.Context, id int64) (any, error) { return sessionSvc.List(ctx, id) },
+		Sessions: func(ctx context.Context, id int64) (any, error) { return sessionSvc.List(ctx, id, 0) },
 		Datasets: func(ctx context.Context, id int64) (any, error) { return datasetSvc.List(ctx, id) },
 		JoinReqs: func(id int64) (any, error) { return groupSvc.MyJoinRequests(id) },
 		Usage: func(id int64) any { // billing.ByUser 전체에서 대상 사용자 1행(누적 GPU시간·소비)
