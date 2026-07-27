@@ -231,6 +231,32 @@ func (s *Service) fillHAMi(ctx context.Context, out map[string]*Usage, pods []st
 			}
 		}
 	}
+
+	// 유휴 보정 — HAMi vGPUmonitor 는 컨테이너가 CUDA(libvgpu)를 실제로 올린 동안만
+	// 컨테이너별 시리즈를 낸다. 갓 뜬/유휴 세션은 시리즈가 아예 없어 markUnavailable 이
+	// "미가용"으로 되돌리지만, 실제로는 GPU 를 안 쓰는 0% 상태다. 모니터가 살아있음
+	// (host 시리즈 존재)을 확인했을 때만 남은 세션을 0%(유휴)로 채운다 — 모니터 자체가
+	// 죽었으면(스크레이프 실패) 그대로 "미가용"으로 남겨 관제상 구분한다.
+	needIdle := false
+	for _, p := range pods {
+		if u := out[p]; u != nil && u.GpuUtil == nil {
+			needIdle = true
+			break
+		}
+	}
+	if !needIdle {
+		return
+	}
+	if mon, ok := s.met.VectorByLabel(ctx, `hami_host_gpu_utilization_ratio`, "device_uuid"); ok && len(mon) > 0 {
+		for _, p := range pods {
+			if u := out[p]; u != nil && u.GpuUtil == nil {
+				u.GpuUtil = ptr(0)
+				if u.VramUsedMB == nil {
+					u.VramUsedMB = ptr(0)
+				}
+			}
+		}
+	}
 }
 
 // markUnavailable은 출처는 있으나 시리즈를 못 받은 세션을 "측정 불가"로 되돌린다
