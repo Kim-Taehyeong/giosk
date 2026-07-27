@@ -30,7 +30,9 @@ data:
   GIOSK_LEASE_EXTENSION_HOURS: {{ .Values.billing.dynamic.lease.extensionHours | quote }}
   GIOSK_LEASE_MAX_EXTENSIONS: {{ .Values.billing.dynamic.lease.maxExtensions | quote }}
   GIOSK_PERSISTENCE_CLASS: {{ .Values.storage.persistence.storageClass | quote }}
-  GIOSK_SHARED_HOME: {{ .Values.storage.persistence.sharedHome | default true | quote }}
+  {{/* falsy-default 금지: `false | default true` 는 false 를 빈값으로 보고 true 로 덮는다.
+       values.yaml 이 기본(false)을 제공하므로 값을 그대로 quote 한다. */}}
+  GIOSK_SHARED_HOME: {{ .Values.storage.persistence.sharedHome | quote }}
   GIOSK_NFS_CLASS: {{ .Values.storage.nfsClass | default "nfs" | quote }}
   GIOSK_STORAGE_PRICE_PER_GIB_MONTH: {{ (.Values.storage.pricePerGiBMonth | default 0) | quote }}
   GIOSK_SCRATCH_ENABLED: {{ (.Values.storage.scratch).enabled | default false | quote }}
