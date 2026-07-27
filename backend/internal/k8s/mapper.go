@@ -285,7 +285,20 @@ func nodeAffinity(prefer []string, require string, reqs []corev1.NodeSelectorReq
 	return &corev1.Affinity{NodeAffinity: na}
 }
 
-// gpuLimits는 모드별 GPU 확장 리소스 limit 을 구성한다.
+// defaultEphemeralGiB는 세션 컨테이너 ephemeral 저장소(쓰기레이어 + emptyDir) 기본 상한(GiB).
+// 안 걸면 사용자가 컨테이너 / ·/tmp·emptyDir 로 노드 루트디스크(수TB)를 무단 점유해 노드를 DoS 할 수 있다.
+// (hostPath 인 HAMi vgpulock 은 여기에 안 잡히므로 별도 대응 필요.) SessionSpec.EphemeralGiB 로 재정의.
+const defaultEphemeralGiB = 50
+
+func ephemeralLimit(s SessionSpec) resource.Quantity {
+	g := s.EphemeralGiB
+	if g <= 0 {
+		g = defaultEphemeralGiB
+	}
+	return resource.MustParse(fmt.Sprintf("%dGi", g))
+}
+
+// gpuLimits는 모드별 GPU 확장 리소스 limit + ephemeral-storage 상한을 구성한다.
 func gpuLimits(s SessionSpec) corev1.ResourceList {
 	limits := corev1.ResourceList{}
 	switch s.GpuMode {
@@ -303,9 +316,8 @@ func gpuLimits(s SessionSpec) corev1.ResourceList {
 			limits[resGPUCores] = *resource.NewQuantity(int64(s.CorePercent), resource.DecimalSI)
 		}
 	}
-	if len(limits) == 0 {
-		return nil
-	}
+	// ephemeral-storage 상한은 GPU 유무와 무관하게 항상 건다(request 는 안 걸어 스케줄 압박 없음, limit 만 강제).
+	limits[corev1.ResourceEphemeralStorage] = ephemeralLimit(s)
 	return limits
 }
 

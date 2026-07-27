@@ -22,6 +22,7 @@ type SessionSpec struct {
 	CorePercent int
 	CPUCores    int
 	MemGB       int
+	EphemeralGiB int             // 컨테이너 쓰기레이어+emptyDir 상한(GiB). 0=기본 캡. 노드 루트디스크 무단점유(DoS) 방지.
 	Labels      map[string]string
 	UID         int              // 안정 사용자 UID(uidBase+userID). 컨테이너를 이 UID 로 실행 → NFS 볼륨 파일 소유가 물리 SSH 와 일관.
 	HomePVC     string           // 홈 영속 PVC 이름(/home/work 마운트). 빈값이면 미마운트.
