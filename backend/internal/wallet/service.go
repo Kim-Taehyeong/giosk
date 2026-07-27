@@ -85,6 +85,11 @@ type RefillSpec struct {
 	Carryover    bool `json:"carryover"`
 }
 
+// SetGroupRefillVals는 원시값으로 팀 리필을 설정한다(group.Service 시더용 — RefillSpec import 회피).
+func (s *Service) SetGroupRefillVals(groupID int64, recurring, intervalDays int, carryover bool) error {
+	return s.SetGroupRefill(groupID, RefillSpec{Recurring: recurring, IntervalDays: intervalDays, Carryover: carryover})
+}
+
 // SetGroupRefill은 팀 리필을 설정한다(주기는 부모 조직 상한으로 클램프).
 func (s *Service) SetGroupRefill(groupID int64, spec RefillSpec) error {
 	iv := spec.IntervalDays

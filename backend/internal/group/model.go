@@ -148,6 +148,11 @@ type CreateReq struct {
 	Name         string `json:"name" binding:"required"`
 	DisplayName  string `json:"displayName"`
 	AdminAccount string `json:"adminAccount"` // 팀 관리자(project_admin)로 지정할 계정(username/email). 필수 권장.
+	// 생성 시 초기 크레딧/정기 리필(선택). 크레딧 모드에서 팀 지갑을 곧바로 세팅한다.
+	InitialCredit int  `json:"initialCredit"` // 조직 풀에서 팀 풀로 즉시 배분(0=생략)
+	Recurring     int  `json:"recurring"`     // 정기 리필 금액(0=없음)
+	Interval      int  `json:"interval"`      // 리필 주기(일)
+	Carryover     bool `json:"carryover"`     // 미사용분 이월 여부
 }
 
 type AddMemberReq struct {

@@ -333,6 +333,16 @@ func (s *Service) Create(ctx context.Context, userID int64, username string, req
 	if err != nil {
 		return nil, err
 	}
+	// 팀 없는 세션 금지 — 세션은 항상 팀 컨텍스트에서(크레딧이 팀 지갑에 귀속). GroupID 미지정이면
+	// 사용자의 대표 팀으로 채운다. 크레딧 모드에서 소속 팀이 전혀 없으면 거부(차감할 팀 지갑 없음).
+	if sess.GroupID == nil && s.limits != nil {
+		if _, gid := s.limits.HierOfUser(userID); gid > 0 {
+			sess.GroupID = &gid
+		}
+	}
+	if s.charger != nil && sess.GroupID == nil {
+		return nil, ErrMustJoinTeam
+	}
 	if err := s.checkHardLimits(userID, sess); err != nil {
 		return nil, err // 1차: 하드 정책(크레딧 무관 절대 벽)
 	}
