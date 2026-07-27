@@ -66,6 +66,7 @@ type Quota struct {
 	MaxVramGB             int
 	MaxConcurrentSessions int
 	VolumeQuotaGB         int
+	MaxEphemeralGiB       int // 세션 임시 디스크(ephemeral-storage) 전역 상한(GiB)
 }
 
 // K8s — 클러스터 연동 설정. GPU 타입은 노드 라벨에서 수집(운영=GFD 라벨, 개발=fake 라벨).
@@ -280,6 +281,7 @@ func Load(lookup func(string) (string, bool)) (*Config, error) {
 			MaxVramGB:             g.intv("GIOSK_QUOTA_MAX_VRAM_GB", 512),
 			MaxConcurrentSessions: g.intv("GIOSK_QUOTA_MAX_SESSIONS", 50),
 			VolumeQuotaGB:         g.intv("GIOSK_VOLUME_QUOTA_GB", 2000),
+			MaxEphemeralGiB:       g.intv("GIOSK_QUOTA_MAX_EPHEMERAL_GIB", 50),
 		},
 		PrometheusURL: g.str("GIOSK_PROMETHEUS_URL", ""),
 		SMTP: SMTP{

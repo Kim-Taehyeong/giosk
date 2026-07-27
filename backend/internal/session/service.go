@@ -936,6 +936,14 @@ func (s *Service) applyOffering(sess *Session, offeringID int64) error {
 	return nil
 }
 
+// ephemeralGiB는 세션 임시 디스크(ephemeral-storage) 상한을 정책에서 해석한다(0=매퍼 기본 캡).
+func (s *Service) ephemeralGiB(userID int64) int {
+	if s.limits == nil {
+		return 0
+	}
+	return s.limits.Resolve(userID).MaxEphemeralGiB
+}
+
 func (s *Service) provision(ctx context.Context, ns string, sess *Session, imageRef, homePVC string, mounts []k8s.VolMountSpec, preferNodes []string, requireNode string) error {
 	if err := s.prov.EnsureNamespace(ctx, ns); err != nil {
 		return err
@@ -959,6 +967,7 @@ func (s *Service) provision(ctx context.Context, ns string, sess *Session, image
 		CorePercent: sess.CorePercent,
 		CPUCores:    sess.CPUCores,
 		MemGB:       sess.MemGB,
+		EphemeralGiB: s.ephemeralGiB(sess.UserID), // 정책 해석값(0=매퍼 기본 캡). 노드 디스크 DoS 방지.
 		Labels:      sess.labels(),
 		UID:         s.uidBase + int(sess.UserID), // 안정 UID(물리 SSH 와 동일 공식) → NFS 권한 일관
 		HomePVC:     homePVC,

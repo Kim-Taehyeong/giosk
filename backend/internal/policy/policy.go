@@ -11,6 +11,7 @@ type Limits struct {
 	MaxVramGB             *int
 	MaxVolumeGiB          *int
 	MaxConcurrentSessions *int
+	MaxEphemeralGiB       *int
 }
 
 // Resolved는 해석 완료된 구체 상한(0 = 무제한).
@@ -19,6 +20,7 @@ type Resolved struct {
 	MaxVramGB             int
 	MaxVolumeGiB          int
 	MaxConcurrentSessions int
+	MaxEphemeralGiB       int
 }
 
 // Level은 하드 제한을 설정할 계층(관리자 API 대상).
@@ -43,6 +45,7 @@ type PolicyRow struct {
 	MaxVramGB             *int   `json:"maxVramGb" gorm:"column:max_vram_gb"`
 	MaxVolumeGiB          *int   `json:"maxVolumeGib" gorm:"column:max_volume_gib"`
 	MaxConcurrentSessions *int   `json:"maxConcurrentSessions" gorm:"column:max_concurrent_sessions"`
+	MaxEphemeralGiB       *int   `json:"maxEphemeralGib" gorm:"column:max_ephemeral_gib"`
 }
 
 // Repository는 각 계층의 제한값을 조회/설정한다.
@@ -113,6 +116,9 @@ func (r *Resolver) Resolve(userID int64) Resolved {
 		if l.MaxConcurrentSessions != nil {
 			out.MaxConcurrentSessions = *l.MaxConcurrentSessions
 		}
+		if l.MaxEphemeralGiB != nil {
+			out.MaxEphemeralGiB = *l.MaxEphemeralGiB
+		}
 	}
 	return out
 }
@@ -149,6 +155,9 @@ func applyLimits(out *Resolved, l Limits) {
 	if l.MaxConcurrentSessions != nil {
 		out.MaxConcurrentSessions = *l.MaxConcurrentSessions
 	}
+	if l.MaxEphemeralGiB != nil {
+		out.MaxEphemeralGiB = *l.MaxEphemeralGiB
+	}
 }
 
 // ParentOfUser는 사용자 상한의 부모 유효 제한(전역←조직←그룹, 사용자 자신 제외).
@@ -176,5 +185,5 @@ func (r *Resolver) HierOfUser(userID int64) (orgID, groupID int64) {
 
 func (r *Resolver) globalAsLimits() Limits {
 	g := r.Global()
-	return Limits{MaxGpu: &g.MaxGpu, MaxVramGB: &g.MaxVramGB, MaxVolumeGiB: &g.MaxVolumeGiB, MaxConcurrentSessions: &g.MaxConcurrentSessions}
+	return Limits{MaxGpu: &g.MaxGpu, MaxVramGB: &g.MaxVramGB, MaxVolumeGiB: &g.MaxVolumeGiB, MaxConcurrentSessions: &g.MaxConcurrentSessions, MaxEphemeralGiB: &g.MaxEphemeralGiB}
 }
