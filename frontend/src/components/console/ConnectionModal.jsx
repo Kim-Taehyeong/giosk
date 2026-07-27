@@ -81,7 +81,7 @@ function ExpiryHint({ expiresAt, t, onRegenerate, regenerating }) {
   const tone = expired || left <= 30 ? 'var(--danger, #dc2626)' : left <= 120 ? 'var(--warn, #f59e0b)' : 'var(--free, #16a34a)';
   const urgent = !expired && left <= 30;
   return (
-    <div className="flex mt" style={{ alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+    <div className="flex" style={{ alignItems: 'center', gap: 10, flexWrap: 'wrap', marginTop: 14 }}>
       <div className="flex" style={{
         alignItems: 'center', gap: 7, padding: '6px 11px', borderRadius: 999, width: 'fit-content',
         fontSize: 12.5, fontWeight: 700, color: tone, background: `color-mix(in srgb, ${tone} 12%, transparent)`,
@@ -108,8 +108,8 @@ function WebPane({ info, urlLabel, openLabel, expiresAt, t, onRegenerate, regene
     <div className="tabpane active">
       <label className="fld" style={{ marginTop: 0 }}>{urlLabel}</label>
       <CodeRow text={info.url} />
-      <div className="mt" style={{ marginTop: 12 }}>
-        <a className="btn primary" href={info.url} target="_blank" rel="noreferrer"><ExternalLink size={14} /> {openLabel}</a>
+      <div style={{ marginTop: 16, display: 'flex' }}>
+        <a className="btn primary" href={info.url} target="_blank" rel="noreferrer" style={{ padding: '9px 16px' }}><ExternalLink size={14} /> {openLabel}</a>
       </div>
       {tokenized ? <ExpiryHint expiresAt={expiresAt} t={t} onRegenerate={onRegenerate} regenerating={regenerating} /> : null}
       {info.password && (<>
