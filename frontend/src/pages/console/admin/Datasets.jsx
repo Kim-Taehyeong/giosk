@@ -11,7 +11,7 @@ import Modal from '../../../components/console/Modal';
 import { Req } from '../../../components/console/Advanced';
 import { useToast } from '../../../components/console/Toast';
 import { useConfirm } from '../../../components/console/Confirm';
-import { getDatasets, deleteDataset, approveDatasetRequest, rejectDatasetRequest, toggleDatasetCache, uploadDataset } from '../../../api/console/datasets';
+import { getDatasets, deleteDataset, approveDatasetRequest, rejectDatasetRequest, toggleDatasetCache, chunkedUpload } from '../../../api/console/datasets';
 import { getAdminNodes } from '../../../api/console/nodes';
 
 // 사이즈 클래스 → Pill 변형.
@@ -30,6 +30,9 @@ export default function Datasets() {
   const [up, setUp] = useState({ file: null, name: '', scope: 'global' });
   const [upActive, setUpActive] = useState(null); // 진행 중 업로드 { name, size, pct } — 리스트 배너 표시
   const [drag, setDrag] = useState(false); // 드래그오버 하이라이트
+  // 새로고침 재개: 진행 중이던 업로드 메타(localStorage). 파일 객체는 새로고침에 사라지므로 재선택으로 이어간다.
+  const [pending, setPending] = useState(() => { try { return JSON.parse(localStorage.getItem('giosk_pending_upload') || 'null'); } catch { return null; } });
+  const clearPending = () => { localStorage.removeItem('giosk_pending_upload'); setPending(null); };
 
   const load = () => getDatasets().then((d) => { setData({ global: d.global.map((x) => ({ ...x })), requests: [...d.requests] }); });
   // 5초 폴링 — 적재 상태(다운로드중→완료) 라이브 갱신.
@@ -53,16 +56,28 @@ export default function Datasets() {
   };
   const reject = async (id) => { await rejectDatasetRequest(id); setData((d) => ({ ...d, requests: d.requests.filter((x) => x.id !== id) })); toast(t('datasets.rejected')); };
 
-  // 업로드는 모달을 닫고 백그라운드로 진행 — 리스트 위 배너에 진행률(브라우저→서버 %)이 뜨고,
-  // 서버 전송이 끝나면 데이터셋이 loading(해제) 상태로 목록에 나타난다. 사용자는 다른 작업을 할 수 있다.
+  // 업로드는 모달을 닫고 백그라운드 청크 전송 — 리스트 위 배너에 진행률/전송량이 뜨고, 사용자는 다른 작업 가능.
+  // 청크(16MB)라 Cloudflare 100MB 리밋을 우회하고, 중단 시 서버 offset 으로 재개된다.
+  // runUpload는 파일을 청크 업로드한다(신규 또는 재개). 진행 메타를 localStorage 에 저장해 새로고침 후 재개 가능.
+  const runUpload = (file, name, scope) => {
+    localStorage.setItem('giosk_pending_upload', JSON.stringify({ name, filename: file.name, size: file.size, scope }));
+    setPending(null);
+    setUpActive({ name, size: file.size, pct: 0, uploaded: 0 });
+    chunkedUpload({ file, name, scope }, (pct, uploaded) => setUpActive((a) => (a ? { ...a, pct, uploaded } : a)))
+      .then(() => { toast(t('datasets.upStarted', { defaultValue: '업로드 완료 — 서버에서 압축을 해제 중입니다.' })); setUpActive(null); clearPending(); load(); })
+      .catch((e) => { toast(e?.code === 'name_taken' ? t('datasets.upTaken', { defaultValue: '같은 이름의 데이터셋이 있습니다.' }) : (e?.message || t('datasets.upFail', { defaultValue: '업로드 실패' }))); setUpActive(null); });
+  };
   const startUpload = () => {
     if (!up.file || !up.name.trim()) { toast(t('datasets.upNeed', { defaultValue: '파일과 이름을 입력하세요.' })); return; }
-    const file = up.file; const name = up.name.trim(); const scope = up.scope;
-    setOpenUp(false); setUp({ file: null, name: '', scope: 'global' });
-    setUpActive({ name, size: file.size, pct: 0 });
-    uploadDataset({ file, name, scope }, (pct) => setUpActive((a) => (a ? { ...a, pct } : a)))
-      .then(() => { toast(t('datasets.upStarted', { defaultValue: '업로드 완료 — 서버에서 압축을 해제 중입니다.' })); setUpActive(null); load(); })
-      .catch((e) => { toast(e?.code === 'name_taken' ? t('datasets.upTaken', { defaultValue: '같은 이름의 데이터셋이 있습니다.' }) : (e?.message || t('datasets.upFail', { defaultValue: '업로드 실패' }))); setUpActive(null); });
+    setOpenUp(false); const file = up.file; const name = up.name.trim(); const scope = up.scope;
+    setUp({ file: null, name: '', scope: 'global' });
+    runUpload(file, name, scope);
+  };
+  // 재개: 저장된 pending 과 이름·크기가 일치하는 파일을 다시 고르면 서버 offset 부터 이어 업로드.
+  const resumeUpload = (file) => {
+    if (!pending) return;
+    if (file.name !== pending.filename || file.size !== pending.size) { toast(t('datasets.upResumeMismatch', { defaultValue: '같은 파일을 선택하세요(이름·크기 일치).' })); return; }
+    runUpload(file, pending.name, pending.scope);
   };
 
   const global = data?.global || [];
@@ -85,6 +100,22 @@ export default function Datasets() {
         <span className={`st${tab === 'registry' ? ' active' : ''}`} onClick={() => setTab('registry')}>{t('datasets.tabRegistry')}</span>
         <span className={`st${tab === 'requests' ? ' active' : ''}`} onClick={() => setTab('requests')}>{t('datasets.tabRequests')} {requests.length > 0 && <Pill variant="warn">{requests.length}</Pill>}</span>
       </div>
+
+      {/* 새로고침 재개 배너 — 이전에 진행 중이던 업로드가 있으면 같은 파일 재선택으로 이어올린다. */}
+      {pending && !upActive && (
+        <div className="card mb" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', border: '1px solid var(--primary)' }}>
+          <Upload size={18} style={{ color: 'var(--primary)', flex: '0 0 auto' }} />
+          <div style={{ flex: 1, minWidth: 0, fontSize: 13 }}>
+            <b>{pending.name}</b> <span className="muted">· {formatBytes(pending.size)}</span>
+            <div className="muted" style={{ fontSize: 12 }}>{t('datasets.upResumeHint', { defaultValue: '중단된 업로드가 있습니다. 같은 파일을 다시 선택하면 이어서 올립니다.' })}</div>
+          </div>
+          <label className="btn sm primary" style={{ flex: '0 0 auto', cursor: 'pointer' }}>
+            {t('datasets.upResume', { defaultValue: '이어올리기' })}
+            <input type="file" accept=".zip,.tar,.gz,.tgz" style={{ display: 'none' }} onChange={(e) => { const f = e.target.files?.[0]; if (f) resumeUpload(f); }} />
+          </label>
+          <button className="btn sm" style={{ flex: '0 0 auto' }} onClick={clearPending}>{t('common.cancel', { defaultValue: '취소' })}</button>
+        </div>
+      )}
 
       {/* 진행 중 업로드 배너 — 모달을 닫아도 여기서 계속 진행률이 갱신된다(백그라운드). */}
       {upActive && (

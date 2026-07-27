@@ -101,6 +101,25 @@ export function apiUploadProgress(path, formData, onProgress) {
   });
 }
 
+// apiPutRaw는 임의 바이너리 본문(Blob/청크)을 PUT 한다(청크 업로드용). JSON 이 아니라 원시 바디.
+export async function apiPutRaw(path, body) {
+  const headers = {};
+  const key = getSessionKey();
+  if (key) headers.Authorization = `Bearer ${key}`;
+  const scope = getConsoleScope();
+  if (scope) headers['X-Console-Scope'] = scope;
+  const res = await fetch(BASE + path, { method: 'PUT', headers, body });
+  const text = await res.text();
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; } catch { data = null; }
+  if (!res.ok) {
+    const err = new Error(translateError(data?.error) || res.statusText || `HTTP ${res.status}`);
+    err.code = data?.code; err.status = res.status;
+    throw err;
+  }
+  return data;
+}
+
 export const apiGet = (path) => request('GET', path);
 export const apiPost = (path, body) => request('POST', path, body);
 export const apiPut = (path, body) => request('PUT', path, body);
