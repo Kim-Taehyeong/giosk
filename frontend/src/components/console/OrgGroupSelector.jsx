@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ChevronDown, Check, Building2, FolderKanban } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useConsole } from '../../context/ConsoleContext';
+import { useAuth } from '../../context/AuthContext';
 import { useSystemConfig } from '../../context/SystemConfigContext';
 import { getMembershipContext } from '../../api/console/membership';
 
@@ -13,7 +14,16 @@ import { getMembershipContext } from '../../api/console/membership';
 export default function OrgGroupSelector({ variant, ns }) {
   const { t } = useTranslation(ns);
   const { activeGroup, setActiveGroup, activeCluster } = useConsole();
+  const { setActiveScope } = useAuth();
   const { config } = useSystemConfig();
+
+  // 팀 선택 = 표시 컨텍스트(activeGroup) + 공유 스코프(activeScope) 동시 갱신.
+  // activeScope 를 함께 바꿔야 ConsoleLayout 이 리마운트(페이지 재조회)되고 탑바 크레딧 배지가
+  // 새 팀 지갑으로 갱신된다(안 그러면 헤더만 바뀌고 화면이 그대로라 "안 바뀌는" 것처럼 보임).
+  const selectTeam = (g) => {
+    setActiveGroup({ id: g.id, name: g.name, displayName: g.displayName, orgId: g.orgId, orgName: g.orgName });
+    setActiveScope(`group:${g.id}`);
+  };
   const [ctx, setCtx] = useState(null);
   const [openOrg, setOpenOrg] = useState(false);
   const [openTeam, setOpenTeam] = useState(false);
@@ -57,7 +67,7 @@ export default function OrgGroupSelector({ variant, ns }) {
   // ctx 로드 후 활성 팀이 아직 없으면 현재 팀으로 스코프 시딩(요청이 팀 스코프를 달고 나가게).
   useEffect(() => {
     if (ctx && curTeam && (!activeGroup || activeGroup.id !== curTeam.id)) {
-      setActiveGroup({ id: curTeam.id, name: curTeam.name, displayName: curTeam.displayName, orgId: curTeam.orgId, orgName: curTeam.orgName });
+      selectTeam(curTeam);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ctx]);
@@ -67,10 +77,10 @@ export default function OrgGroupSelector({ variant, ns }) {
     setOpenOrg(false);
     // 조직을 바꾸면 그 조직의 첫 팀으로 컨텍스트 이동.
     const first = myGroups.find((g) => g.orgId === o.id);
-    if (first) setActiveGroup({ id: first.id, name: first.name, displayName: first.displayName, orgId: first.orgId, orgName: first.orgName });
+    if (first) selectTeam(first);
   };
   const pickTeam = (g) => {
-    setActiveGroup({ id: g.id, name: g.name, displayName: g.displayName, orgId: g.orgId, orgName: g.orgName });
+    selectTeam(g);
     setOpenTeam(false);
   };
 

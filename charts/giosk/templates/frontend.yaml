@@ -43,6 +43,9 @@ data:
         proxy_set_header Connection $connection_upgrade;
         proxy_read_timeout 3600s;
         proxy_send_timeout 3600s;
+        # 대용량 데이터셋 업로드: 기본 1MB 제한 해제 + 백엔드로 스트리밍(디스크 버퍼링 없이 진행률 정확).
+        client_max_body_size 0;
+        proxy_request_buffering off;
       }
     }
     {{- else }}
@@ -68,6 +71,9 @@ data:
         proxy_set_header Connection $connection_upgrade;
         proxy_read_timeout 3600s;
         proxy_send_timeout 3600s;
+        # 대용량 데이터셋 업로드: 기본 1MB 제한 해제 + 백엔드로 스트리밍(디스크 버퍼링 없이 진행률 정확).
+        client_max_body_size 0;
+        proxy_request_buffering off;
       }
     }
     {{- end }}
