@@ -46,10 +46,22 @@ export default function RoleSwitcher({ ns }) {
   if (isAdmin) {
     opts.push({ id: 'platform', icon: ShieldCheck, label: t('topbar.rolePlatform', { defaultValue: '플랫폼 전체' }), sub: t('topbar.rolePlatformSub', { defaultValue: '최고 관리자' }) });
     adminOrgs.forEach((o) => opts.push({ id: `org:${o.id}`, icon: Building2, label: o.displayName || o.name || '—', sub: t('topbar.scopeOrg', { defaultValue: '조직' }) }));
-    adminGroups.forEach((g) => opts.push({ id: `group:${g.id}`, icon: FolderKanban, label: g.displayName || g.name || '—', sub: (g.orgName ? `${t('topbar.scopeGroup', { defaultValue: '그룹' })} · ${g.orgName}` : t('topbar.scopeGroup', { defaultValue: '그룹' })) }));
+    adminGroups.forEach((g) => opts.push({ id: `group:${g.id}`, orgId: g.orgId, icon: FolderKanban, label: g.displayName || g.name || '—', sub: (g.orgName ? `${t('topbar.scopeGroup', { defaultValue: '그룹' })} · ${g.orgName}` : t('topbar.scopeGroup', { defaultValue: '그룹' })) }));
   } else {
     scopes.filter((s) => s.level === 'org').forEach((s) => opts.push({ id: keyOf(s), scope: s, icon: Building2, label: s.orgName || '—', sub: t('topbar.scopeOrg', { defaultValue: '조직' }) }));
     scopes.filter((s) => s.level === 'group').forEach((s) => opts.push({ id: keyOf(s), scope: s, icon: FolderKanban, label: s.groupName || '—', sub: t('topbar.scopeGroup', { defaultValue: '그룹' }) }));
+  }
+
+  // 최고관리자 드롭다운은 조직→그룹 2뎁스: 플랫폼 + (조직 헤더 + 그 조직의 그룹 들여쓰기).
+  // rows: [{opt, indent}]. 조직 없는(무소속) 그룹은 '기타'로 맨 끝.
+  const adminRows = [];
+  if (isAdmin) {
+    adminRows.push({ opt: opts.find((o) => o.id === 'platform'), indent: 0 });
+    adminOrgs.forEach((o) => {
+      adminRows.push({ opt: opts.find((x) => x.id === `org:${o.id}`), indent: 0 });
+      opts.filter((x) => String(x.id).startsWith('group:') && x.orgId === o.id).forEach((g) => adminRows.push({ opt: g, indent: 1 }));
+    });
+    opts.filter((x) => String(x.id).startsWith('group:') && !adminOrgs.some((o) => o.id === x.orgId)).forEach((g) => adminRows.push({ opt: g, indent: 1 }));
   }
 
   // 현재 스코프.
@@ -95,19 +107,21 @@ export default function RoleSwitcher({ ns }) {
           boxShadow: '0 8px 24px rgba(0,0,0,.12)', padding: 6, maxHeight: 380, overflowY: 'auto',
         }}>
           <div className="muted" style={{ fontSize: 11, padding: '4px 8px' }}>{t('topbar.switchScope', { defaultValue: '조직 / 스코프 전환' })}</div>
-          {opts.map((o) => {
+          {(isAdmin ? adminRows : opts.map((o) => ({ opt: o, indent: 0 }))).map(({ opt: o, indent }) => {
+            if (!o) return null;
             const active = o.id === currentId;
             const Icon = o.icon;
             return (
               <button key={o.id} className="scope-item flex gap" onClick={(e) => { e.stopPropagation(); pick(o); }}
                 style={{
-                  width: '100%', textAlign: 'left', alignItems: 'center', gap: 8, padding: '7px 8px',
+                  width: '100%', textAlign: 'left', alignItems: 'center', gap: 8,
+                  padding: '7px 8px', paddingLeft: 8 + indent * 18,
                   border: 0, borderRadius: 6, background: active ? 'var(--hover, #f3f4f6)' : 'transparent', cursor: 'pointer',
                 }}>
-                {Icon && <Icon size={14} />}
+                {Icon && <Icon size={14} style={{ opacity: indent ? 0.75 : 1 }} />}
                 <span style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600, fontSize: 13 }}>{o.label}</div>
-                  {o.sub && <div className="muted" style={{ fontSize: 11 }}>{o.sub}</div>}
+                  <div style={{ fontWeight: indent ? 500 : 600, fontSize: 13 }}>{o.label}</div>
+                  {o.sub && indent === 0 && <div className="muted" style={{ fontSize: 11 }}>{o.sub}</div>}
                 </span>
                 {active && <Check size={14} />}
               </button>
