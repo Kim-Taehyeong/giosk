@@ -13,10 +13,21 @@ export const consoleLevelOf = (user) => {
 };
 
 // activeScopeOf — 멀티롤 사용자의 현재 활성 스코프({level,orgId,groupId}). 전환기 선택 우선,
-// 없으면 기본(user.scopes[0]). platform 관리자는 항상 platform(전환 불필요).
+// 없으면 기본(user.scopes[0]).
+//  최고관리자(admin): 기본 platform 이지만, 전환기로 조직/그룹을 고르면(activeScope) 그 스코프로
+//  "내려가서" 관리한다(백엔드도 X-Console-Scope 를 존중) → nav·페이지가 그 레벨로 좁혀진다.
+//  admin 은 전권이라 보유 스코프 집합 대조 없이 activeScope 를 그대로 신뢰한다.
 export const activeScopeOf = (user, activeScope) => {
   if (!user) return null;
-  if (user.role === 'admin') return { level: 'platform' };
+  if (user.role === 'admin') {
+    if (activeScope) {
+      const [level, idStr] = activeScope.split(':');
+      const id = Number(idStr);
+      if (level === 'org' && id) return { level: 'org', orgId: id };
+      if (level === 'group' && id) return { level: 'group', groupId: id };
+    }
+    return { level: 'platform' };
+  }
   const scopes = user.scopes || [];
   if (activeScope) {
     const [level, idStr] = activeScope.split(':');

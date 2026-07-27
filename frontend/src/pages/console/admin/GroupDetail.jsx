@@ -14,6 +14,7 @@ import { useToast } from '../../../components/console/Toast';
 import { useConfirm } from '../../../components/console/Confirm';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { useAuth } from '../../../context/AuthContext';
+import { activeLevelOf } from '../../../config/consoleRoles';
 import { getGroups, getMembers, addMember, updateMember, grantGroupCredit, updateGroup, deleteGroup, setGroupRefill } from '../../../api/console/governance';
 import RefillCard from '../../../components/console/RefillCard';
 import { c } from '../../../lib/credit';
@@ -27,8 +28,8 @@ export default function GroupDetail() {
   const navigate = useNavigate();
   const { t } = useTranslation('consoleAdmin');
   const { config } = useSystemConfig();
-  const { user } = useAuth();
-  const isPlatform = user?.role === 'admin'; // 부여 회계: platform=예외(상위 백필) / org=조직 풀 차감
+  const { user, activeScope } = useAuth();
+  const isPlatform = activeLevelOf(user, activeScope) === 'platform'; // 부여 회계: platform=예외(상위 백필) / org=조직 풀 차감
   const creditMode = config.billing.mode === 'credit';
   const { toast } = useToast();
   const confirm = useConfirm();

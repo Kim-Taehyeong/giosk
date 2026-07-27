@@ -3,6 +3,10 @@ import { apiGet, apiPost, apiPut, apiDelete } from '../client';
 // 거버넌스 — 단일 /console 트리(레벨 인식형). platform/org/group 관리자가 같은 클라이언트를 쓰고
 // 백엔드가 호출자 스코프로 데이터를 필터·인가한다.
 export const getOrgs = () => apiGet('/console/orgs').then((d) => ({ items: d.items || [] }));
+// 스코프 무관 전체 목록(최고관리자 전용, /admin) — RoleSwitcher 가 현재 채택 스코프와 무관하게
+// 전체 조직/그룹을 보여줘야 하므로(스코프가 좁혀지면 /console/* 은 부분만 반환) 이걸 쓴다.
+export const getAllOrgs = () => apiGet('/admin/orgs').then((d) => ({ items: d.items || [] }));
+export const getAllGroups = () => apiGet('/admin/groups').then((d) => ({ items: d.items || [] }));
 export const createOrg = (body) => apiPost('/console/orgs', body);        // 플랫폼 전용(백엔드 가드)
 export const updateOrg = (id, body) => apiPut(`/console/orgs/${id}`, body); // 자기 조직(org admin)
 export const deleteOrg = (id) => apiDelete(`/console/orgs/${id}`);          // 플랫폼 전용

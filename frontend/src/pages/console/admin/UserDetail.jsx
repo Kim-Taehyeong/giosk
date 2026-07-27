@@ -14,6 +14,7 @@ import { useToast } from '../../../components/console/Toast';
 import { useConfirm } from '../../../components/console/Confirm';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { useAuth } from '../../../context/AuthContext';
+import { activeLevelOf } from '../../../config/consoleRoles';
 import { getUserDetail, grantUserCredit, updateUserStatus } from '../../../api/console/misc';
 import { getGroups, getOrgs, addMember, updateMember, moveMember, removeMember } from '../../../api/console/governance';
 import { c, cU } from '../../../lib/credit';
@@ -49,8 +50,8 @@ export default function UserDetail() {
   const { config } = useSystemConfig();
   const creditMode = config.billing.mode === 'credit';
 
-  const { user } = useAuth();
-  const isPlatform = user?.role === 'admin'; // 크레딧 부여·정지/복구는 플랫폼 전용
+  const { user, activeScope } = useAuth();
+  const isPlatform = activeLevelOf(user, activeScope) === 'platform'; // 크레딧 부여·정지/복구는 플랫폼 전용
   const { toast } = useToast();
   const confirm = useConfirm();
   const [grant, setGrant] = useState(null); // 크레딧 부여 모달 { amount }

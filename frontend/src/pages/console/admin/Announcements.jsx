@@ -9,7 +9,7 @@ import Modal from '../../../components/console/Modal';
 import { useToast } from '../../../components/console/Toast';
 import { useConfirm } from '../../../components/console/Confirm';
 import { useAuth } from '../../../context/AuthContext';
-import { consoleLevelOf } from '../../../config/consoleRoles';
+import { activeLevelOf } from '../../../config/consoleRoles';
 import { getOrgs, getGroups } from '../../../api/console/governance';
 import {
   getAllAnnouncements, createAnnouncement, updateAnnouncement, deleteAnnouncement, toggleAnnouncement,
@@ -26,8 +26,8 @@ export default function Announcements() {
   const { t } = useTranslation('consoleAdmin');
   const { toast } = useToast();
   const confirm = useConfirm();
-  const { user } = useAuth();
-  const lvl = user?.role === 'admin' ? 'platform' : consoleLevelOf(user); // platform | org | group
+  const { user, activeScope } = useAuth();
+  const lvl = activeLevelOf(user, activeScope); // platform | org | group
   const [rows, setRows] = useState([]);
   const [edit, setEdit] = useState(null); // { id?, ...fields }
   const [orgs, setOrgs] = useState([]);

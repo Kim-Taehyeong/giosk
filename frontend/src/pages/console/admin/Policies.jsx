@@ -14,6 +14,7 @@ import { getPolicies, setUserLimits, setGroupLimits, setOrgLimits, setGlobalLimi
   setUserLimitsScoped, setGroupLimitsScoped, setOrgLimitsScoped, getParentLimits } from '../../../api/console/limits';
 import { getOrgs, getGroups } from '../../../api/console/governance';
 import { useAuth } from '../../../context/AuthContext';
+import { activeLevelOf } from '../../../config/consoleRoles';
 
 
 // 범위별 저장 함수 — platform 은 /admin(무제한), 매니저는 /console(스코프+상위캡 강제).
@@ -32,8 +33,8 @@ export default function Policies() {
   const [targets, setTargets] = useState({ org: [], group: [] });
   const { toast } = useToast();
   const confirm = useConfirm();
-  const { user } = useAuth();
-  const isPlatform = user?.role === 'admin'; // platform=전역 편집·무제한 / 매니저=자기 스코프 편집(상위캡 강제)
+  const { user, activeScope } = useAuth();
+  const isPlatform = activeLevelOf(user, activeScope) === 'platform'; // platform=전역 편집·무제한 / 매니저=자기 스코프 편집(상위캡 강제)
   const SETTER = isPlatform ? SETTER_ADMIN : SETTER_SCOPED;
   const [caps, setCaps] = useState(null); // 매니저 편집 시 설정 가능한 최대치(상위 유효 상한)
 

@@ -16,6 +16,7 @@ import { getOpsDashboard } from '../../../api/console/dashboard';
 import { getTopupRequests, getUsers } from '../../../api/console/misc';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { useAuth } from '../../../context/AuthContext';
+import { activeLevelOf } from '../../../config/consoleRoles';
 
 // ReqCard는 승인 대기 요청 카드(가입·크레딧 충전) — 클릭하면 승인 화면으로.
 function ReqCard({ icon, label, n, tone, hint, onClick }) {
@@ -42,8 +43,8 @@ function ReqCard({ icon, label, n, tone, hint, onClick }) {
 export default function OpsDashboard() {
   const { t } = useTranslation('consoleAdmin');
   const { config } = useSystemConfig();
-  const { user } = useAuth();
-  const isPlatform = user?.role === 'admin';
+  const { user, activeScope } = useAuth();
+  const isPlatform = activeLevelOf(user, activeScope) === 'platform';
   const signupOn = config.features.signupRequest;
   const navigate = useNavigate();
   const [intervalMs, setIntervalMs] = useState(15000);
