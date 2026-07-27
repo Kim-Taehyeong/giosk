@@ -26,10 +26,10 @@ export default function Datasets() {
   const [allNodes, setAllNodes] = useState([]);
   const [tab, setTab] = useState('registry');
   const [openId, setOpenId] = useState(null); // 노드 배치 펼친 데이터셋
-  const [openUp, setOpenUp] = useState(false); // 파일 업로드 모달
+  const [openUp, setOpenUp] = useState(false); // 파일 업로드 모달(선택만; 업로드는 닫고 백그라운드)
   const [up, setUp] = useState({ file: null, name: '', scope: 'global' });
-  const [uploading, setUploading] = useState(false);
-  const [upPct, setUpPct] = useState(0); // 업로드 진행률(브라우저→서버)
+  const [upActive, setUpActive] = useState(null); // 진행 중 업로드 { name, size, pct } — 리스트 배너 표시
+  const [drag, setDrag] = useState(false); // 드래그오버 하이라이트
 
   const load = () => getDatasets().then((d) => { setData({ global: d.global.map((x) => ({ ...x })), requests: [...d.requests] }); });
   // 5초 폴링 — 적재 상태(다운로드중→완료) 라이브 갱신.
@@ -53,17 +53,16 @@ export default function Datasets() {
   };
   const reject = async (id) => { await rejectDatasetRequest(id); setData((d) => ({ ...d, requests: d.requests.filter((x) => x.id !== id) })); toast(t('datasets.rejected')); };
 
-  const submitUpload = async () => {
+  // 업로드는 모달을 닫고 백그라운드로 진행 — 리스트 위 배너에 진행률(브라우저→서버 %)이 뜨고,
+  // 서버 전송이 끝나면 데이터셋이 loading(해제) 상태로 목록에 나타난다. 사용자는 다른 작업을 할 수 있다.
+  const startUpload = () => {
     if (!up.file || !up.name.trim()) { toast(t('datasets.upNeed', { defaultValue: '파일과 이름을 입력하세요.' })); return; }
-    setUploading(true); setUpPct(0);
-    try {
-      await uploadDataset({ file: up.file, name: up.name.trim(), scope: up.scope }, setUpPct);
-      setOpenUp(false); setUp({ file: null, name: '', scope: 'global' }); setUpPct(0);
-      toast(t('datasets.upStarted', { defaultValue: '업로드 완료 — 압축 해제 중입니다.' }));
-      load(); // 이후 서버 해제 진행은 목록의 loading 상태(%)로 이어짐
-    } catch (e) {
-      toast(e?.code === 'name_taken' ? t('datasets.upTaken', { defaultValue: '같은 이름의 데이터셋이 있습니다.' }) : (e?.message || t('datasets.upFail', { defaultValue: '업로드 실패' })));
-    } finally { setUploading(false); }
+    const file = up.file; const name = up.name.trim(); const scope = up.scope;
+    setOpenUp(false); setUp({ file: null, name: '', scope: 'global' });
+    setUpActive({ name, size: file.size, pct: 0 });
+    uploadDataset({ file, name, scope }, (pct) => setUpActive((a) => (a ? { ...a, pct } : a)))
+      .then(() => { toast(t('datasets.upStarted', { defaultValue: '업로드 완료 — 서버에서 압축을 해제 중입니다.' })); setUpActive(null); load(); })
+      .catch((e) => { toast(e?.code === 'name_taken' ? t('datasets.upTaken', { defaultValue: '같은 이름의 데이터셋이 있습니다.' }) : (e?.message || t('datasets.upFail', { defaultValue: '업로드 실패' }))); setUpActive(null); });
   };
 
   const global = data?.global || [];
@@ -86,6 +85,27 @@ export default function Datasets() {
         <span className={`st${tab === 'registry' ? ' active' : ''}`} onClick={() => setTab('registry')}>{t('datasets.tabRegistry')}</span>
         <span className={`st${tab === 'requests' ? ' active' : ''}`} onClick={() => setTab('requests')}>{t('datasets.tabRequests')} {requests.length > 0 && <Pill variant="warn">{requests.length}</Pill>}</span>
       </div>
+
+      {/* 진행 중 업로드 배너 — 모달을 닫아도 여기서 계속 진행률이 갱신된다(백그라운드). */}
+      {upActive && (
+        <div className="card mb" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px' }}>
+          <Upload size={18} style={{ color: 'var(--primary)', flex: '0 0 auto' }} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="flex" style={{ justifyContent: 'space-between', fontSize: 13, marginBottom: 6 }}>
+              <span style={{ fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {upActive.name} <span className="muted" style={{ fontWeight: 500 }}>· {formatBytes(upActive.size)}</span>
+              </span>
+              <span className="muted" style={{ flex: '0 0 auto', marginLeft: 12 }}>
+                {upActive.pct < 100 ? t('datasets.upProgress', { defaultValue: '업로드 중' }) : t('datasets.upExtract', { defaultValue: '서버에서 압축 해제 중' })} <b style={{ color: 'var(--primary)' }}>{upActive.pct}%</b>
+                {upActive.size ? <span> · {formatBytes(Math.round(upActive.size * upActive.pct / 100))}</span> : null}
+              </span>
+            </div>
+            <div style={{ height: 8, borderRadius: 6, background: 'var(--surface-2)', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${upActive.pct}%`, background: 'var(--primary)', transition: 'width .2s', borderRadius: 6 }} />
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="card">
         {tab === 'registry' ? (
@@ -209,33 +229,32 @@ export default function Datasets() {
         )}
       </div>
 
-      <Modal open={openUp} title={t('datasets.upTitle', { defaultValue: '데이터셋 파일 업로드' })} onClose={() => !uploading && setOpenUp(false)} width={560}
-        footer={<button className="btn primary" disabled={uploading} onClick={submitUpload}>{uploading ? t('datasets.upBusy', { defaultValue: '업로드 중…' }) : t('datasets.upload', { defaultValue: '파일 업로드' })}</button>}>
+      <Modal open={openUp} title={t('datasets.upTitle', { defaultValue: '데이터셋 파일 업로드' })} onClose={() => setOpenUp(false)} width={560}
+        footer={<button className="btn primary" disabled={!up.file || !up.name.trim()} onClick={startUpload}>{t('datasets.upload', { defaultValue: '파일 업로드' })}</button>}>
         <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>
           {t('datasets.upHint', { defaultValue: 'zip · tar · tar.gz 아카이브를 올리면 서버가 압축을 풀어 전역 데이터셋으로 등록합니다. 단일 파일도 그대로 등록됩니다.' })}
         </p>
         <label className="fld" style={{ marginTop: 0 }}>{t('datasets.name')}<Req /></label>
-        <input type="text" value={up.name} disabled={uploading} onChange={(e) => setUp({ ...up, name: e.target.value })} placeholder="imagenet-mini" />
+        <input type="text" value={up.name} onChange={(e) => setUp({ ...up, name: e.target.value })} placeholder="imagenet-mini" />
         <label className="fld">{t('datasets.upFile', { defaultValue: '파일' })}<Req /></label>
-        <input type="file" accept=".zip,.tar,.gz,.tgz" disabled={uploading} onChange={(e) => setUp({ ...up, file: e.target.files?.[0] || null, name: up.name || (e.target.files?.[0]?.name || '').replace(/\.(zip|tar\.gz|tgz|tar)$/i, '') })} />
-        {up.file && <div className="muted" style={{ fontSize: 12.5, marginTop: 6 }}>{up.file.name} · {formatBytes(up.file.size)}</div>}
+        {/* 드래그앤드롭 영역 + 클릭 파일 선택 */}
+        <label
+          onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
+          onDragLeave={() => setDrag(false)}
+          onDrop={(e) => { e.preventDefault(); setDrag(false); const f = e.dataTransfer.files?.[0]; if (f) setUp((u) => ({ ...u, file: f, name: u.name || f.name.replace(/\.(zip|tar\.gz|tgz|tar)$/i, '') })); }}
+          style={{ display: 'block', cursor: 'pointer', border: `2px dashed ${drag ? 'var(--primary)' : 'var(--border)'}`, background: drag ? 'var(--primary-soft)' : 'var(--surface-2)', borderRadius: 12, padding: '22px 16px', textAlign: 'center', transition: 'all .12s' }}>
+          <input type="file" accept=".zip,.tar,.gz,.tgz" style={{ display: 'none' }}
+            onChange={(e) => { const f = e.target.files?.[0] || null; setUp((u) => ({ ...u, file: f, name: u.name || (f?.name || '').replace(/\.(zip|tar\.gz|tgz|tar)$/i, '') })); }} />
+          <Upload size={22} style={{ color: 'var(--muted)', marginBottom: 6 }} />
+          {up.file
+            ? <div style={{ fontWeight: 700, fontSize: 13.5 }}>{up.file.name} <span className="muted" style={{ fontWeight: 500 }}>· {formatBytes(up.file.size)}</span></div>
+            : <div className="muted" style={{ fontSize: 13 }}>{t('datasets.upDrop', { defaultValue: '파일을 여기로 끌어다 놓거나 클릭해 선택' })}</div>}
+        </label>
         <label className="fld">{t('datasets.upScope', { defaultValue: '공개 범위' })}</label>
-        <select value={up.scope} disabled={uploading} onChange={(e) => setUp({ ...up, scope: e.target.value })}>
+        <select value={up.scope} onChange={(e) => setUp({ ...up, scope: e.target.value })}>
           <option value="global">{t('datasets.scopeGlobal', { defaultValue: '전역(모든 사용자)' })}</option>
           <option value="personal">{t('datasets.scopePersonal', { defaultValue: '개인(나만)' })}</option>
         </select>
-        {/* 업로드 진행률(브라우저→서버). 대용량도 실시간으로 얼마나 올라갔는지 표시. */}
-        {uploading && (
-          <div style={{ marginTop: 16 }}>
-            <div className="flex" style={{ justifyContent: 'space-between', fontSize: 12.5, marginBottom: 5 }}>
-              <span className="muted">{upPct < 100 ? t('datasets.upProgress', { defaultValue: '업로드 중' }) : t('datasets.upExtract', { defaultValue: '서버에서 압축 해제 중' })}</span>
-              <span style={{ fontWeight: 700 }}>{upPct}%</span>
-            </div>
-            <div style={{ height: 8, borderRadius: 6, background: 'var(--surface-2)', overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${upPct}%`, background: 'var(--primary)', transition: 'width .2s', borderRadius: 6 }} />
-            </div>
-          </div>
-        )}
       </Modal>
     </div>
   );
