@@ -19,6 +19,9 @@ type Rule struct {
 	Value   int    `gorm:"column:value" json:"value"`
 	Channel string `gorm:"column:channel" json:"channel"`
 	Enabled bool   `gorm:"column:enabled" json:"on"`
+	// Target은 세션 단위 규칙의 대상 세션(instance_id). 빈값=사용자 전역 규칙(크레딧·볼륨 등).
+	// session_gpu/cpu/vram 지표는 이 대상 세션에서 평가한다.
+	Target string `gorm:"column:target" json:"target"`
 }
 
 func (Rule) TableName() string { return "notify_rules" }

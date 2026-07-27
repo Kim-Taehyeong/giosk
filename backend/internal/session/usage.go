@@ -51,6 +51,37 @@ func (s *Service) Usage(ctx context.Context, instanceID string, userID int64) (*
 	return s.usageOf(ctx, []Session{*sess})[instanceID], nil
 }
 
+// SessionMetric은 알림 엔진용 — 특정 세션의 지표 1개(session_gpu/cpu/vram, %)를 평가한다.
+// 신뢰 호출(엔진)이라 소유자 검증 없음. running 이 아니거나 측정 불가면 ok=false(발화 안 함).
+func (s *Service) SessionMetric(ctx context.Context, instanceID, metric string) (float64, bool) {
+	sess, err := s.repo.GetByInstance(instanceID)
+	if err != nil || sess.Phase != PhaseRunning {
+		return 0, false
+	}
+	u := s.usageOf(ctx, []Session{*sess})[instanceID]
+	if u == nil {
+		return 0, false
+	}
+	switch metric {
+	case "session_gpu":
+		if u.GpuUtil == nil {
+			return 0, false
+		}
+		return *u.GpuUtil, true
+	case "session_cpu":
+		if u.CPUCores == nil || u.CPULimitCores == 0 {
+			return 0, false
+		}
+		return *u.CPUCores / float64(u.CPULimitCores) * 100, true
+	case "session_vram":
+		if u.VramUsedMB == nil || u.VramTotalMB == 0 {
+			return 0, false
+		}
+		return *u.VramUsedMB / float64(u.VramTotalMB) * 100, true
+	}
+	return 0, false
+}
+
 // MyUsage는 호출자 본인의 running 세션 지표를 id→Usage 로 반환한다(세션 목록 폴링용).
 func (s *Service) MyUsage(ctx context.Context, userID int64) (map[string]*Usage, error) {
 	rows, err := s.repo.ListByUser(userID, 0)
