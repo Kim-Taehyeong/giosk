@@ -326,6 +326,11 @@ const homeSizeGiB = 10 // 세션 홈(/home/work) 영속 용량 기본값
 func (s *Service) Create(ctx context.Context, userID int64, username string, req CreateReq) (*Session, error) {
 	// 동시 세션 상한은 checkHardLimits(정책 계층 해석)에서만 강제한다.
 	// billing.credit.maxConcurrentSessions 는 폐기 — 동시세션은 정책(quota)으로 일원화.
+	// 요청이 팀을 지정하면(활성 스코프) 활성 멤버십을 먼저 검증한다(SSH·컨테이너 공통) —
+	// 임의 팀에 붙어 남의 크레딧을 소모하는 것 차단.
+	if req.GroupID != nil && !s.repo.IsGroupMember(userID, *req.GroupID) {
+		return nil, ErrMustJoinTeam
+	}
 	if req.Env == "ssh" {
 		return s.createSSH(ctx, userID, username, req)
 	}

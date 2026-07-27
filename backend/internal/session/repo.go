@@ -50,6 +50,7 @@ type Repository interface {
 	ListRunning() ([]Session, error)
 	ListActiveContainer() ([]Session, error)       // 컨테이너 활성(provisioning|running) 세션 — phase 리컨실용
 	CountActive(userID int64) int                  // 활성(provisioning|running) 세션 수
+	IsGroupMember(userID, groupID int64) bool      // 사용자가 그 팀의 활성 멤버인지(세션 팀 귀속 검증)
 	UserLeasedNode(userID int64, node string) bool // 사용자가 그 물리노드를 대여한 적 있는지(로컬 Home 접근 검증)
 	SetUserSSHKey(userID int64, key string) error
 	UserSSHKey(userID int64) string // 등록된 SSH 공개키(미등록=""). 컨테이너 SSH authorized_keys 주입용
@@ -244,6 +245,13 @@ func (r *gormRepo) CountActive(userID int64) int {
 	var n int64
 	r.db.Model(&Session{}).Where("user_id = ? AND phase IN ?", userID, []string{PhaseProvisioning, PhaseRunning}).Count(&n)
 	return int(n)
+}
+
+// IsGroupMember는 사용자가 그 팀의 활성 멤버인지 확인한다(세션이 임의 팀에 귀속·과금되는 것 방지).
+func (r *gormRepo) IsGroupMember(userID, groupID int64) bool {
+	var n int64
+	r.db.Raw(`SELECT COUNT(*) FROM memberships WHERE user_id=? AND group_id=? AND status='active'`, userID, groupID).Scan(&n)
+	return n > 0
 }
 
 // UserLeasedNode는 사용자가 그 물리노드를 대여한 적 있는지(이력 포함) 확인한다 — 로컬 Home 접근 검증.

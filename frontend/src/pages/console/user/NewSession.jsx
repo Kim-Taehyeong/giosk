@@ -15,6 +15,7 @@ import { getSshNodes } from '../../../api/console/sshNodes';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { c } from '../../../lib/credit';
 import { useAuth } from '../../../context/AuthContext';
+import { useConsole } from '../../../context/ConsoleContext';
 import { apiPut } from '../../../api/client';
 
 // SshKeyField는 위저드의 SSH 공개키 입력. 계정에 이미 등록돼 있으면 긴 키를 다시 보여주지 않고
@@ -175,6 +176,7 @@ export default function NewSession() {
   const [params] = useSearchParams();
   const { toast } = useToast();
   const { user, refreshUser } = useAuth();
+  const { activeGroup } = useConsole();
   const { config } = useSystemConfig();
   const bill = config.billing;
   const idle = config.idle;
@@ -451,6 +453,7 @@ export default function NewSession() {
     try {
       await createSession({
         instancename: name || 'session',
+        groupId: activeGroup?.id || undefined, // 활성 팀(2뎁스 선택) = 세션 소속·크레딧 귀속 팀
         imageId: image?.id,
         offeringId: wtype === 'shared' ? offeringId : undefined, // 공유는 무조건 오퍼링 기반.
         gpuMode: wtype,
@@ -910,6 +913,7 @@ function DatasetNodePicker({ t, nodes, selGpuType, selNode, setSelNode, selDs, s
 // SSH 물리노드 위저드 (하이브리드 전용) — 컨테이너와 동일한 좌측 스텝 + 우측 패널 레이아웃.
 function SSHWizard({ t, navigate, toast, nodes, vols, labels }) {
   const { user, refreshUser } = useAuth();
+  const { activeGroup } = useConsole();
   const { config } = useSystemConfig();
   const [step, setStep] = useState(0);
   const [maxReached, setMaxReached] = useState(0);
@@ -939,7 +943,7 @@ function SSHWizard({ t, navigate, toast, nodes, vols, labels }) {
     setCreating(true);
     await saveSshKey(sshKey, user?.sshPublicKey, refreshUser); // 계정에도 등록(노드 authorized_keys 주입 근거)
     try {
-      await createSession({ env: 'ssh', node: sel, instancename: name || 'ssh-session', sshpublickey: sshKey, volumes: selVols.map((v) => ({ id: v.id, mountPath: v.mountPath })) });
+      await createSession({ env: 'ssh', node: sel, instancename: name || 'ssh-session', groupId: activeGroup?.id || undefined, sshpublickey: sshKey, volumes: selVols.map((v) => ({ id: v.id, mountPath: v.mountPath })) });
     } catch (e) {
       toast(createErrMsg(e, t));
       setCreating(false);
