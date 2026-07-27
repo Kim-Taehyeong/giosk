@@ -118,7 +118,7 @@ func registerAuthed(api gin.IRouter, deps Deps) {
 	// ── 단일 거버넌스 트리(/console) — 레벨 인식형 ─────────────────────
 	// platform/org/group 관리자가 같은 프론트 콘솔에서 쓰는 스코프 인식 엔드포인트.
 	// /admin/* 은 마이그레이션 동안 병행 유지(플랫폼 기존 동작·팀원 브랜치 호환).
-	mgmt := authed.Group("/console", authz.RequireManager(deps.ScopeReader))
+	mgmt := authed.Group("/console", authz.RequireManager(deps.ScopeReader, deps.OrgOfGroup))
 	groupInScope := authz.RequireGroupInScope(deps.OrgOfGroup)
 	// 운영 대시보드(스코프) — 인프라 대시보드는 /admin/dashboard(platform) 재사용.
 	mgmt.GET("/dashboard/ops", deps.Dashboard.OpsScoped)
