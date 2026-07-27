@@ -124,7 +124,12 @@ func (p *Proxy) reverseProxy(claims *Claims) *httputil.ReverseProxy {
 	base := rp.Director
 	rp.Director = func(req *http.Request) {
 		base(req)
-		req.Host = target.Host
+		// Host 헤더는 원본(외부 서브도메인)을 그대로 둔다 — code-server·jupyter 는 WebSocket
+		// 업그레이드 때 Origin 을 Host 와 대조하는 CSRF 검사를 한다. Host 를 내부 서비스 주소로
+		// 덮으면 브라우저가 보낸 Origin(외부 호스트)과 불일치해 백엔드가 403 을 반환하고, 브라우저는
+		// 이를 ws 1006 으로 본다(HTTP 자원은 Origin 이 없어 통과 → 페이지만 뜨고 ws 만 죽는 증상).
+		// 업스트림 접속은 req.URL.Host(target)로 다이얼하므로 Host 헤더를 바꿀 필요가 없다
+		// (표준 nginx `proxy_set_header Host $host` 와 동일).
 		injectRequestAuth(claims, req) // jupyter: Authorization 헤더 주입
 	}
 	rp.ErrorHandler = func(w http.ResponseWriter, _ *http.Request, err error) {
