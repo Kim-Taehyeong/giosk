@@ -1,18 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Building2, FolderKanban, ChevronsUpDown, Check, ShieldCheck, LayoutGrid } from 'lucide-react';
+import { Building2, FolderKanban, ChevronsUpDown, Check, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 // scopeKey — 백엔드 X-Console-Scope 형식("org:10"|"group:2").
 const keyOf = (s) => `${s.level}:${s.level === 'org' ? s.orgId : s.groupId}`;
 
-// 통합 역할/뷰 전환기 — 최고관리자·조직/그룹 관리자·개인 뷰를 한 셀렉터로 묶는다.
-//   - 최고관리자(role=admin): [플랫폼 관리자] + [내 콘솔]  (백엔드가 admin 은 항상 platform 스코프로
-//     고정 → org/group 드릴인은 데이터가 안 걸려 오해만 주므로 넣지 않는다)
-//   - 조직/그룹 관리자(복수 org·복수 group 가능): [각 조직…] + [각 그룹…] + [내 콘솔]
-//   - 순수 사용자(스코프 없음): 전환 대상이 없어 렌더하지 않음(Topbar 가 OrgGroupSelector 로 대체).
-// 개인 뷰는 /console, 관리 뷰는 /console/admin(+X-Console-Scope 헤더)로 전환한다.
+// RoleSwitcher는 "조직/역할 스코프" 셀렉터다(모드 전환 아님 — 모드는 별도 ModeToggle).
+// 관리자·사용자 어느 화면에서도 항상 표시해 "지금 어느 조직 컨텍스트인가"를 보여준다
+// (멀티 org 사용자가 '내 콘솔'에서도 소속 조직을 알 수 있게). 스코프를 바꿔도 현재 모드(관리/사용자)는 유지한다.
+//   - 최고관리자(admin): [플랫폼] + 보유한 org/group
+//   - 조직/그룹 관리자(복수 org·group 가능): 보유한 org/group 전부
+// 백엔드는 admin 을 항상 platform 스코프로 고정하므로, admin 의 org/group 선택은 화면 컨텍스트 표시용이다.
 export default function RoleSwitcher({ ns }) {
   const { t } = useTranslation(ns);
   const { user, activeScope, setActiveScope } = useAuth();
@@ -29,50 +29,46 @@ export default function RoleSwitcher({ ns }) {
 
   const isAdmin = user?.role === 'admin';
   const scopes = user?.scopes || [];
-  const orgs = scopes.filter((s) => s.level === 'org');
-  const groups = scopes.filter((s) => s.level === 'group');
 
-  // 옵션 목록: [플랫폼?] + [조직들] + [그룹들] + [내 콘솔].
   const opts = [];
-  if (isAdmin) opts.push({ id: 'platform', kind: 'platform', icon: ShieldCheck, label: t('topbar.rolePlatform', { defaultValue: '플랫폼 관리자' }), sub: t('topbar.rolePlatformSub', { defaultValue: '전체 플랫폼' }) });
-  orgs.forEach((s) => opts.push({ id: keyOf(s), kind: 'scope', scope: s, icon: Building2, label: s.orgName || '—', sub: t('topbar.scopeOrg', { defaultValue: '조직 관리' }) }));
-  groups.forEach((s) => opts.push({ id: keyOf(s), kind: 'scope', scope: s, icon: FolderKanban, label: s.groupName || '—', sub: t('topbar.scopeGroup', { defaultValue: '그룹 관리' }) }));
-  opts.push({ id: 'user', kind: 'user', icon: LayoutGrid, label: t('topbar.roleUser', { defaultValue: '내 콘솔' }), sub: t('topbar.roleUserSub', { defaultValue: '사용자' }) });
+  if (isAdmin) opts.push({ id: 'platform', icon: ShieldCheck, label: t('topbar.rolePlatform', { defaultValue: '플랫폼 전체' }), sub: t('topbar.rolePlatformSub', { defaultValue: '최고 관리자' }) });
+  scopes.filter((s) => s.level === 'org').forEach((s) => opts.push({ id: keyOf(s), scope: s, icon: Building2, label: s.orgName || '—', sub: t('topbar.scopeOrg', { defaultValue: '조직' }) }));
+  scopes.filter((s) => s.level === 'group').forEach((s) => opts.push({ id: keyOf(s), scope: s, icon: FolderKanban, label: s.groupName || '—', sub: t('topbar.scopeGroup', { defaultValue: '그룹' }) }));
 
-  // 현재 활성 옵션 판정 — 경로(관리/사용자) + 활성 스코프 기준.
-  const inAdmin = location.pathname.startsWith('/console/admin');
+  if (opts.length === 0) return null; // 스코프 없는 순수 사용자 → OrgGroupSelector 가 대신 표시
+
+  // 현재 스코프.
   let currentId;
-  if (!inAdmin) currentId = 'user';
-  else if (activeScope && opts.some((o) => o.id === activeScope)) currentId = activeScope;
+  if (activeScope && opts.some((o) => o.id === activeScope)) currentId = activeScope;
   else if (isAdmin) currentId = 'platform';
-  else currentId = orgs[0] ? keyOf(orgs[0]) : (groups[0] ? keyOf(groups[0]) : 'user');
+  else currentId = opts[0].id;
   const current = opts.find((o) => o.id === currentId) || opts[0];
 
+  const inAdmin = location.pathname.startsWith('/console/admin');
   const pick = (o) => {
     setOpen(false);
-    if (o.kind === 'user') { navigate('/console'); return; }
-    setActiveScope(o.kind === 'platform' ? null : o.id); // platform=스코프 없음(admin 기본)
-    navigate('/console/admin/dashboard/ops'); // 새 스코프에 유효한 홈으로(현재 탭이 스코프 밖일 수 있음)
+    setActiveScope(o.id === 'platform' ? null : o.id); // platform=스코프 없음(admin 기본)
+    // 모드는 유지 — 관리 화면이면 그 스코프의 관리 홈으로(현재 탭이 스코프 밖일 수 있음), 사용자 화면이면 그대로.
+    if (inAdmin) navigate('/console/admin/dashboard/ops');
   };
 
-  // 전환 대상이 하나뿐이면(내 콘솔만) 셀렉터 불필요.
-  if (opts.length <= 1) return null;
-
+  const single = opts.length === 1;
   const CurIcon = current?.icon;
   return (
-    <div className="proj" ref={ref} style={{ position: 'relative', cursor: 'pointer' }} onClick={() => setOpen((o) => !o)} role="button">
+    <div className="proj" ref={single ? null : ref} style={{ position: 'relative', cursor: single ? 'default' : 'pointer' }}
+      onClick={single ? undefined : () => setOpen((o) => !o)} role={single ? undefined : 'button'}>
       <small>{current?.sub || ''}</small>
       <span className="flex gap" style={{ gap: 6, alignItems: 'center' }}>
         {CurIcon && <CurIcon size={13} />}{current?.label || '—'}
-        <ChevronsUpDown size={13} style={{ opacity: 0.6 }} />
+        {!single && <ChevronsUpDown size={13} style={{ opacity: 0.6 }} />}
       </span>
-      {open && (
+      {open && !single && (
         <div className="scope-menu" style={{
           position: 'absolute', top: '100%', left: 0, marginTop: 6, minWidth: 240, zIndex: 50,
           background: 'var(--surface, #fff)', border: '1px solid var(--border, #e5e7eb)', borderRadius: 8,
           boxShadow: '0 8px 24px rgba(0,0,0,.12)', padding: 6,
         }}>
-          <div className="muted" style={{ fontSize: 11, padding: '4px 8px' }}>{t('topbar.switchRole', { defaultValue: '역할 / 화면 전환' })}</div>
+          <div className="muted" style={{ fontSize: 11, padding: '4px 8px' }}>{t('topbar.switchScope', { defaultValue: '조직 / 스코프 전환' })}</div>
           {opts.map((o) => {
             const active = o.id === currentId;
             const Icon = o.icon;
