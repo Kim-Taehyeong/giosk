@@ -29,6 +29,7 @@ export default function Datasets() {
   const [openUp, setOpenUp] = useState(false); // 파일 업로드 모달
   const [up, setUp] = useState({ file: null, name: '', scope: 'global' });
   const [uploading, setUploading] = useState(false);
+  const [upPct, setUpPct] = useState(0); // 업로드 진행률(브라우저→서버)
 
   const load = () => getDatasets().then((d) => { setData({ global: d.global.map((x) => ({ ...x })), requests: [...d.requests] }); });
   // 5초 폴링 — 적재 상태(다운로드중→완료) 라이브 갱신.
@@ -54,12 +55,12 @@ export default function Datasets() {
 
   const submitUpload = async () => {
     if (!up.file || !up.name.trim()) { toast(t('datasets.upNeed', { defaultValue: '파일과 이름을 입력하세요.' })); return; }
-    setUploading(true);
+    setUploading(true); setUpPct(0);
     try {
-      await uploadDataset({ file: up.file, name: up.name.trim(), scope: up.scope });
-      setOpenUp(false); setUp({ file: null, name: '', scope: 'global' });
+      await uploadDataset({ file: up.file, name: up.name.trim(), scope: up.scope }, setUpPct);
+      setOpenUp(false); setUp({ file: null, name: '', scope: 'global' }); setUpPct(0);
       toast(t('datasets.upStarted', { defaultValue: '업로드 완료 — 압축 해제 중입니다.' }));
-      load();
+      load(); // 이후 서버 해제 진행은 목록의 loading 상태(%)로 이어짐
     } catch (e) {
       toast(e?.code === 'name_taken' ? t('datasets.upTaken', { defaultValue: '같은 이름의 데이터셋이 있습니다.' }) : (e?.message || t('datasets.upFail', { defaultValue: '업로드 실패' })));
     } finally { setUploading(false); }
@@ -214,15 +215,27 @@ export default function Datasets() {
           {t('datasets.upHint', { defaultValue: 'zip · tar · tar.gz 아카이브를 올리면 서버가 압축을 풀어 전역 데이터셋으로 등록합니다. 단일 파일도 그대로 등록됩니다.' })}
         </p>
         <label className="fld" style={{ marginTop: 0 }}>{t('datasets.name')}<Req /></label>
-        <input type="text" value={up.name} onChange={(e) => setUp({ ...up, name: e.target.value })} placeholder="imagenet-mini" />
+        <input type="text" value={up.name} disabled={uploading} onChange={(e) => setUp({ ...up, name: e.target.value })} placeholder="imagenet-mini" />
         <label className="fld">{t('datasets.upFile', { defaultValue: '파일' })}<Req /></label>
-        <input type="file" accept=".zip,.tar,.gz,.tgz" onChange={(e) => setUp({ ...up, file: e.target.files?.[0] || null, name: up.name || (e.target.files?.[0]?.name || '').replace(/\.(zip|tar\.gz|tgz|tar)$/i, '') })} />
+        <input type="file" accept=".zip,.tar,.gz,.tgz" disabled={uploading} onChange={(e) => setUp({ ...up, file: e.target.files?.[0] || null, name: up.name || (e.target.files?.[0]?.name || '').replace(/\.(zip|tar\.gz|tgz|tar)$/i, '') })} />
         {up.file && <div className="muted" style={{ fontSize: 12.5, marginTop: 6 }}>{up.file.name} · {formatBytes(up.file.size)}</div>}
         <label className="fld">{t('datasets.upScope', { defaultValue: '공개 범위' })}</label>
-        <select value={up.scope} onChange={(e) => setUp({ ...up, scope: e.target.value })}>
+        <select value={up.scope} disabled={uploading} onChange={(e) => setUp({ ...up, scope: e.target.value })}>
           <option value="global">{t('datasets.scopeGlobal', { defaultValue: '전역(모든 사용자)' })}</option>
           <option value="personal">{t('datasets.scopePersonal', { defaultValue: '개인(나만)' })}</option>
         </select>
+        {/* 업로드 진행률(브라우저→서버). 대용량도 실시간으로 얼마나 올라갔는지 표시. */}
+        {uploading && (
+          <div style={{ marginTop: 16 }}>
+            <div className="flex" style={{ justifyContent: 'space-between', fontSize: 12.5, marginBottom: 5 }}>
+              <span className="muted">{upPct < 100 ? t('datasets.upProgress', { defaultValue: '업로드 중' }) : t('datasets.upExtract', { defaultValue: '서버에서 압축 해제 중' })}</span>
+              <span style={{ fontWeight: 700 }}>{upPct}%</span>
+            </div>
+            <div style={{ height: 8, borderRadius: 6, background: 'var(--surface-2)', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${upPct}%`, background: 'var(--primary)', transition: 'width .2s', borderRadius: 6 }} />
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );

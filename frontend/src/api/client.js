@@ -74,6 +74,33 @@ export async function apiUpload(path, formData) {
   return data;
 }
 
+// apiUploadProgress는 업로드 진행률(%)을 실시간으로 콜백하는 multipart 전송이다.
+// fetch 는 업로드 진행 이벤트를 노출하지 않으므로 XMLHttpRequest 를 쓴다. onProgress(pct 0~100).
+// 대용량 파일을 올리는 동안 UI 가 멈춘 것처럼 보이지 않게 진행률을 준다.
+export function apiUploadProgress(path, formData, onProgress) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', BASE + path);
+    const key = getSessionKey();
+    if (key) xhr.setRequestHeader('Authorization', `Bearer ${key}`);
+    const scope = getConsoleScope();
+    if (scope) xhr.setRequestHeader('X-Console-Scope', scope);
+    xhr.upload.onprogress = (e) => {
+      if (onProgress && e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100));
+    };
+    xhr.onload = () => {
+      let data = null;
+      try { data = xhr.responseText ? JSON.parse(xhr.responseText) : null; } catch { data = null; }
+      if (xhr.status >= 200 && xhr.status < 300) { resolve(data); return; }
+      const err = new Error(translateError(data?.error) || xhr.statusText || `HTTP ${xhr.status}`);
+      err.code = data?.code; err.status = xhr.status;
+      reject(err);
+    };
+    xhr.onerror = () => reject(new Error('network error'));
+    xhr.send(formData);
+  });
+}
+
 export const apiGet = (path) => request('GET', path);
 export const apiPost = (path, body) => request('POST', path, body);
 export const apiPut = (path, body) => request('PUT', path, body);
