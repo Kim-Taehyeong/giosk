@@ -281,7 +281,7 @@ func Load(lookup func(string) (string, bool)) (*Config, error) {
 			MaxVramGB:             g.intv("GIOSK_QUOTA_MAX_VRAM_GB", 512),
 			MaxConcurrentSessions: g.intv("GIOSK_QUOTA_MAX_SESSIONS", 50),
 			VolumeQuotaGB:         g.intv("GIOSK_VOLUME_QUOTA_GB", 2000),
-			MaxEphemeralGiB:       g.intv("GIOSK_QUOTA_MAX_EPHEMERAL_GIB", 50),
+			MaxEphemeralGiB:       g.intv("GIOSK_QUOTA_MAX_EPHEMERAL_GIB", 100), // 넉넉한 기본 캡: 정상사용 무영향·노드 독점(DoS) 방지. 정책으로 티어별 조정.
 		},
 		PrometheusURL: g.str("GIOSK_PROMETHEUS_URL", ""),
 		SMTP: SMTP{
