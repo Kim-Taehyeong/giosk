@@ -16,6 +16,7 @@ import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { useAuth } from '../../../context/AuthContext';
 import { getGroups, getMembers, addMember, updateMember, grantGroupCredit, updateGroup, deleteGroup, setGroupRefill } from '../../../api/console/governance';
 import RefillCard from '../../../components/console/RefillCard';
+import { c } from '../../../lib/credit';
 
 // 멤버십 역할 — 조직/팀 권한은 전부 여기서 정해진다(플랫폼 role=member|admin 과 별개).
 const ROLES = ['org_admin', 'project_admin', 'member'];
@@ -101,7 +102,7 @@ export default function GroupDetail() {
       <div className={`grid ${creditMode ? 'cols-3' : 'cols-2'} mb`}>
         <StatCard icon={Users} tone="primary" label={t('groups.colMembers')} value={`${members.length}`} />
         <StatCard icon={Building2} tone="free" label={t('groups.colOrg')} value={group?.orgName || '—'} />
-        {creditMode && <StatCard icon={Coins} tone="gpu" label={t('groups.colWallet')} value={`${group?.balance ?? 0}`} unit="C" />}
+        {creditMode && <StatCard icon={Coins} tone="gpu" label={t('groups.colWallet')} value={c(group?.balance)} unit="C" />}
       </div>
 
       {creditMode && (

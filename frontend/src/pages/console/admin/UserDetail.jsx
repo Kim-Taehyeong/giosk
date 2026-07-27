@@ -16,6 +16,7 @@ import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { useAuth } from '../../../context/AuthContext';
 import { getUserDetail, grantUserCredit, updateUserStatus } from '../../../api/console/misc';
 import { getGroups, getOrgs, addMember, updateMember, moveMember, removeMember } from '../../../api/console/governance';
+import { c, cU } from '../../../lib/credit';
 
 const MROLES = ['org_admin', 'project_admin', 'member'];
 
@@ -92,7 +93,7 @@ export default function UserDetail() {
   const submitGrant = async () => {
     const amt = Number(grant.amount);
     if (!amt) { setGrant(null); return; }
-    try { await grantUserCredit(u.id, { amount: amt }); toast(t('userDetail.granted', { n: amt, defaultValue: `${amt} C 부여됨` })); }
+    try { await grantUserCredit(u.id, { amount: amt }); toast(t('userDetail.granted', { n: amt, defaultValue: `${c(amt)} C 부여됨` })); }
     catch { toast(t('userDetail.grantFail', { defaultValue: '부여 실패' })); }
     setGrant(null); load();
   };
@@ -137,9 +138,9 @@ export default function UserDetail() {
 
       {/* KPI — 과금 모드에 맞게(크레딧 위젯은 credit 모드만) */}
       <div className="grid cols-4 mb">
-        {creditMode && <StatCard icon={Coins} tone="gpu" label={t('userDetail.balance')} value={`${wallet.balance ?? 0}`} unit="C" />}
+        {creditMode && <StatCard icon={Coins} tone="gpu" label={t('userDetail.balance')} value={c(wallet.balance)} unit="C" />}
         <StatCard icon={Timer} tone="primary" label={t('userDetail.gpuHours')} value={`${usage.gpuHours ?? 0}`} unit="h" />
-        {creditMode && <StatCard icon={Coins} tone="warn" label={t('userDetail.consumed')} value={`${usage.consumed ?? 0}`} unit="C" />}
+        {creditMode && <StatCard icon={Coins} tone="warn" label={t('userDetail.consumed')} value={c(usage.consumed)} unit="C" />}
         <StatCard icon={Server} tone="free" label={t('userDetail.sessions')} value={`${sessions.length}`} unit={t('userDetail.total')} />
         <StatCard icon={HardDrive} tone="gpu" label={t('userDetail.volumes')} value={`${volumes.length}`} unit={t('userDetail.total')} />
       </div>
@@ -184,7 +185,7 @@ export default function UserDetail() {
             { key: 'name', header: t('userDetail.name') },
             { key: 'gpuType', header: 'GPU', className: 'mono', render: (r) => r.gpuType ? `${r.gpuType}${r.gpuCount > 1 ? ` ×${r.gpuCount}` : ''}` : '—' },
             { key: 'node', header: t('userDetail.node'), className: 'mono', render: (r) => r.node || '—' },
-            ...(creditMode ? [{ key: 'billedCredits', header: t('userDetail.billed'), render: (r) => `${r.billedCredits ?? 0} C` }] : []),
+            ...(creditMode ? [{ key: 'billedCredits', header: t('userDetail.billed'), render: (r) => cU(r.billedCredits) }] : []),
             { key: 'createdAt', header: t('userDetail.created'), className: 'mono', render: (r) => fmtDate(r.createdAt) },
           ]} />
       </Section>
@@ -226,8 +227,8 @@ export default function UserDetail() {
             columns={[
               { key: 'createdAt', header: t('userDetail.time'), className: 'mono', render: (r) => fmtDate(r.createdAt) },
               { key: 'type', header: t('userDetail.type'), render: (r) => <Pill variant={r.amount >= 0 ? 'ok' : 'pause'}>{r.type}</Pill> },
-              { key: 'amount', header: t('userDetail.amount'), render: (r) => <span style={{ fontWeight: 700, color: r.amount >= 0 ? 'var(--free)' : 'var(--warn)' }}>{r.amount >= 0 ? '+' : ''}{r.amount} C</span> },
-              { key: 'balance', header: t('userDetail.balanceAfter'), render: (r) => `${r.balance} C` },
+              { key: 'amount', header: t('userDetail.amount'), render: (r) => <span style={{ fontWeight: 700, color: r.amount >= 0 ? 'var(--free)' : 'var(--warn)' }}>{r.amount >= 0 ? '+' : ''}{c(r.amount)} C</span> },
+              { key: 'balance', header: t('userDetail.balanceAfter'), render: (r) => cU(r.balance) },
               { key: 'desc', header: t('userDetail.memo'), render: (r) => r.desc || '—' },
             ]} />
         </Section>

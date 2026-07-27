@@ -6,6 +6,7 @@ import Pill from '../../../components/console/Pill';
 import { useToast } from '../../../components/console/Toast';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { getTopupRequests, approveTopup, rejectTopup, getUsers, updateUserStatus } from '../../../api/console/misc';
+import { c } from '../../../lib/credit';
 
 export default function Approvals() {
   const { t } = useTranslation('consoleAdmin');
@@ -78,7 +79,7 @@ export default function Approvals() {
                 <Pill variant="primary">{r.targetType === 'org' ? t('approvals.tOrg') : r.targetType === 'group' ? t('dash.tGroup') : t('dash.tUser')}</Pill>
                 <strong style={{ fontSize: 14.5 }}>{r.targetName}</strong>
                 {r.orgName && <span className="muted" style={{ fontSize: 12.5 }}>· {r.orgName}</span>}
-                <span style={{ fontWeight: 800, color: 'var(--primary)', fontSize: 15 }}>+{r.amount} C</span>
+                <span style={{ fontWeight: 800, color: 'var(--primary)', fontSize: 15 }}>+{c(r.amount)} C</span>
                 {r.requesterName && <span className="muted" style={{ fontSize: 12.5 }}>{t('approvals.by', { name: r.requesterName })}{r.requesterRole ? ` · ${r.requesterRole}` : ''}</span>}
                 {r.createdAt && <span className="muted" style={{ fontSize: 12.5 }}>· {r.createdAt}</span>}
               </div>

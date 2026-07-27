@@ -13,6 +13,7 @@ import {
   getOfferings, saveOffering, deleteOffering, getGpuTypes,
   getAdminGpuTypes, getGpuPricing, setGpuPricing,
 } from '../../../api/console/resources';
+import { c } from '../../../lib/credit';
 
 function Field({ label, children, w = 150 }) {
   return (
@@ -65,7 +66,7 @@ function OfferingsTab({ creditMode, onGotoPricing, title }) {
                 <td>
                   {/* 단가는 단가 탭에서 관리 — 여기선 표시만, 클릭하면 단가 페이지로 */}
                   <button className="btn sm" onClick={() => onGotoPricing()} title={t('res.editInPricing', { defaultValue: '단가 탭에서 편집' })}>
-                    {r.pricePerHour ?? 0} C/h →
+                    {c(r.pricePerHour)} C/h →
                   </button>
                 </td>
               )}

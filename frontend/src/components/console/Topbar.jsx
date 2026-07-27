@@ -13,6 +13,7 @@ import RoleSwitcher from './RoleSwitcher';
 import UserMenu from './UserMenu';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { notifyText } from '../../utils/notify';
+import { cU } from '../../lib/credit';
 
 // 콘솔 탑바 (.topbar 그리드 영역).
 export default function Topbar({ variant, ns }) {
@@ -94,7 +95,7 @@ export default function Topbar({ variant, ns }) {
         </div>
       ) : creditMode ? (
         <div className="badge-credit" title="크레딧 잔액" onClick={() => navigate('/console/wallet')}>
-          <Coins size={14} /> {summary?.credit != null ? `${summary.credit} C` : '… C'}
+          <Coins size={14} /> {summary?.credit != null ? cU(summary.credit) : '… C'}
         </div>
       ) : null}
 

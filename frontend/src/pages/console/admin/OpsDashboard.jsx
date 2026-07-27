@@ -10,6 +10,7 @@ import DoughnutChart from '../../../components/console/DoughnutChart';
 import AlertFeed from '../../../components/console/AlertFeed';
 import ActiveUserList from '../../../components/console/ActiveUserList';
 import MonitorControls from '../../../components/console/MonitorControls';
+import { c, cU } from '../../../lib/credit';
 import usePoll from '../../../hooks/usePoll';
 import { getOpsDashboard } from '../../../api/console/dashboard';
 import { getTopupRequests, getUsers } from '../../../api/console/misc';
@@ -122,7 +123,7 @@ export default function OpsDashboard() {
         <StatCard icon={BellRing} tone={ss.idle > 0 ? 'warn' : 'free'} label={t('dash.sessionIdle')} value={`${ss.idle}`} />
         <StatCard icon={Clock} tone="gpu" label={t('dash.gpuHoursMonth')} value={`${d.gpuHours || 0}`} unit="h" />
         {creditMode
-          ? <StatCard icon={Coins} tone="gpu" label={t('dash.monthCredit')} value={`${k.monthCredit}`} unit="C" />
+          ? <StatCard icon={Coins} tone="gpu" label={t('dash.monthCredit')} value={c(k.monthCredit)} unit="C" />
           : <StatCard icon={Timer} tone="primary" label={t(`dash.mode_${mode}`)} value={t('dash.noCredit')} />}
       </div>
 
@@ -144,14 +145,14 @@ export default function OpsDashboard() {
             <h3><FolderKanban size={16} /> {t('dash.topGroups')}</h3>
             <DataTable rows={d.topGroups} columns={[
               { key: 'name', header: t('dash.group') },
-              { key: 'credit', header: t('dash.consumed'), render: (r) => `${r.credit} C` },
+              { key: 'credit', header: t('dash.consumed'), render: (r) => cU(r.credit) },
             ]} />
           </div>
           <div className="card">
             <h3><Users size={16} /> {t('dash.topUsers')}</h3>
             <DataTable rows={d.topUsers} columns={[
               { key: 'name', header: t('dash.user') },
-              { key: 'credit', header: t('dash.consumed'), render: (r) => `${r.credit} C` },
+              { key: 'credit', header: t('dash.consumed'), render: (r) => cU(r.credit) },
             ]} />
           </div>
         </div>

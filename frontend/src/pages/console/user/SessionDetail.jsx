@@ -13,6 +13,7 @@ import SessionHistoryChart from '../../../components/console/SessionHistoryChart
 import { useToast } from '../../../components/console/Toast';
 import { useConfirm } from '../../../components/console/Confirm';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
+import { c } from '../../../lib/credit';
 import { getMySessionsWithUsage, stopSession, startSession, deleteSession, extendSession, getSessionAudit, getSessionHistory } from '../../../api/console/sessions';
 import { measureRows, gpuUnmeasurable } from '../../../utils/sessionUsage';
 
@@ -87,7 +88,7 @@ export default function UserSessionDetail() {
         <StatCard icon={Clock} tone="primary" label={t('session.runtime')} value={r.runtime || '—'} />
         <StatCard icon={Server} tone="free" label={t('session.detNode')} value={r.node || '—'} />
         <StatCard icon={Activity} tone="gpu" label={t('session.offering')} value={r.offering || '—'} />
-        {creditMode && <StatCard icon={Coins} tone="warn" label={t('session.credit')} value={r.pricePerHour > 0 ? `${r.credit || 0}` : t('session.free')} unit={r.pricePerHour > 0 ? 'C' : ''} />}
+        {creditMode && <StatCard icon={Coins} tone="warn" label={t('session.credit')} value={r.pricePerHour > 0 ? c(r.credit) : t('session.free')} unit={r.pricePerHour > 0 ? 'C' : ''} />}
       </div>
 
       {/* 좌: 실사용량 + 자동 종료(세로 스택) / 우: 사용률 이력 24h — 좌우 높이를 맞춰 여백을 줄인다 */}

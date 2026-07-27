@@ -10,6 +10,7 @@ import Bar from '../../../components/console/Bar';
 import Spinner from '../../../components/console/Spinner';
 import { useToast } from '../../../components/console/Toast';
 import { useConfirm } from '../../../components/console/Confirm';
+import { c } from '../../../lib/credit';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { getAdminSession, getAdminSessionAudit, getAdminSessionLogs, getAdminSessionDescribe, getAdminSessionHistory, forceTerminate, adminStopSession, adminDeleteSession } from '../../../api/console/sessions';
 import SessionHistoryChart from '../../../components/console/SessionHistoryChart';
@@ -101,7 +102,7 @@ export default function SessionDetailPage() {
         <StatCard icon={Clock} tone="primary" label={t('sdetail.runtime')} value={s.runtime || '—'} />
         <StatCard icon={Server} tone="free" label={t('sdetail.node')} value={s.gpu || '—'} />
         <StatCard icon={Cpu} tone="gpu" label={t('sdetail.offering')} value={s.offering || '—'} />
-        {creditMode && <StatCard icon={Coins} tone="warn" label={t('sdetail.credit')} value={`${s.credit ?? 0}`} unit="C" />}
+        {creditMode && <StatCard icon={Coins} tone="warn" label={t('sdetail.credit')} value={c(s.credit)} unit="C" />}
       </div>
 
       <div className="grid cols-2" style={{ gap: 18, alignItems: 'start' }}>
@@ -114,7 +115,7 @@ export default function SessionDetailPage() {
           {!physical && <Meta label={t('sdetail.image', { defaultValue: '이미지' })}><span className="mono">{s.image || '—'}</span></Meta>}
           <Meta label={t('sdetail.offering')}>{s.offering || '—'}</Meta>
           <Meta label={t('sdetail.node')}>{s.gpu || '—'}</Meta>
-          {creditMode && <Meta label={t('sdetail.pricePerHour')}>{s.pricePerHour ?? 0} C/h</Meta>}
+          {creditMode && <Meta label={t('sdetail.pricePerHour')}>{c(s.pricePerHour)} C/h</Meta>}
         </div>
 
         {/* 사용자 / 조직 / 팀 */}

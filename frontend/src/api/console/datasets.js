@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiPatch, apiDelete } from '../client';
+import { apiGet, apiPost, apiPatch, apiDelete, apiUpload } from '../client';
 
 // 데이터셋 — 실 백엔드. 사용자(/datasets)와 관리자(/admin/dataset-requests)를 합쳐
 // 한 응답으로 제공(관리자만 전체 pending, 일반 사용자는 본인 pending).
@@ -24,6 +24,15 @@ export const registerDataset = (form) =>
     name: form.name, sizeClass: form.sizeClass, sizeGb: form.sizeGb || 0,
     sourceUrl: form.url || form.sourceUrl || '', targetScope: form.targetScope || 'global',
   });
+
+// 최고관리자: zip/tar 파일 직접 업로드. 서버가 NFS 에 스트리밍 저장 후 해제 Job → PVC 바인딩.
+export const uploadDataset = ({ file, name, scope }) => {
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('name', name);
+  fd.append('scope', scope || 'global');
+  return apiUpload('/admin/datasets/upload', fd);
+};
 
 export const deleteDataset = (id) => apiDelete(`/datasets/${id}`);
 

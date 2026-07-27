@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../context/ThemeContext';
+import { c } from '../../lib/credit';
 
 // 월별 달력. 두 가지 모드:
 //  1) 기본(표시 전용): 날짜별 소모 크레딧을 색/숫자로 표기. 표시 데이터는
@@ -65,7 +66,7 @@ export default function Calendar({ byDay = {}, byMonth = null, selectable = fals
       </div>
       {!selectable && (
         <div style={{ textAlign: 'center', marginBottom: 6, fontSize: 12 }}>
-          <span className="muted">{t('wallet.thisMonth')} </span><strong style={{ color: 'var(--primary)' }}>{monthTotal} C</strong>
+          <span className="muted">{t('wallet.thisMonth')} </span><strong style={{ color: 'var(--primary)' }}>{c(monthTotal)} C</strong>
         </div>
       )}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
@@ -92,7 +93,7 @@ export default function Calendar({ byDay = {}, byMonth = null, selectable = fals
           const v = dayMap[d] || 0;
           const lv = level(v);
           return (
-            <div key={i} title={`${ym.m + 1}/${d} · ${v} C`}
+            <div key={i} title={`${ym.m + 1}/${d} · ${c(v)} C`}
               style={{
                 height: 42, borderRadius: 7, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1,
                 border: '1px solid var(--border)',

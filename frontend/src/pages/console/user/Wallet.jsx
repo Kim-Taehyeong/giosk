@@ -11,6 +11,7 @@ import Modal from '../../../components/console/Modal';
 import { useToast } from '../../../components/console/Toast';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { getWallet, requestTopup } from '../../../api/console/wallet';
+import { cU } from '../../../lib/credit';
 
 const txVariant = { topup: 'ok', hold: 'wait', consume: 'gpu', settle: 'pause', refund: 'free' };
 
@@ -64,9 +65,9 @@ export default function Wallet() {
         actions={canRequest ? <button className="btn primary" onClick={() => setOpen(true)}>{t('wallet.topupReq')}</button> : null} />
 
       <div className={`grid ${rc.enabled ? 'cols-4' : 'cols-3'} mb`}>
-        <StatCard icon={WalletIcon} tone="gpu" label={t('wallet.balance')} value={`${w.balance} C`} unit={t('wallet.reservedIncl', { n: w.reserved })} bar={{ value: w.balance, max: w.cap, variant: 'gpu' }} />
+        <StatCard icon={WalletIcon} tone="gpu" label={t('wallet.balance')} value={cU(w.balance)} unit={t('wallet.reservedIncl', { n: w.reserved })} bar={{ value: w.balance, max: w.cap, variant: 'gpu' }} />
         <StatCard icon={Hourglass} tone="warn" label={t('wallet.eta')} value={t('wallet.etaDays', { n: w.etaDays, burn: w.burn })} />
-        <StatCard icon={CalendarDays} tone="primary" label={t('wallet.monthUsed')} value={`${w.monthUsed} C`} />
+        <StatCard icon={CalendarDays} tone="primary" label={t('wallet.monthUsed')} value={cU(w.monthUsed)} />
         {rc.enabled && <StatCard icon={CalendarDays} tone="free" label={t('wallet.nextRecharge', { defaultValue: '다음 리필' })} value={nextRecharge} sub={t('wallet.rechargeEvery', { n: rc.intervalDays, defaultValue: `${rc.intervalDays}일 주기` })} />}
       </div>
 
@@ -113,7 +114,7 @@ export default function Wallet() {
               <div key={i} style={{ padding: '12px 0', borderBottom: '1px solid var(--border)' }}>
                 <div className="flex" style={{ justifyContent: 'space-between', marginBottom: 7 }}>
                   <span style={{ fontWeight: 600, fontSize: 13.5 }}>{s.name}</span>
-                  <span style={{ fontWeight: 800, fontSize: 14 }}>{s.credit ? `${s.credit} C` : t('wallet.free')}</span>
+                  <span style={{ fontWeight: 800, fontSize: 14 }}>{s.credit ? cU(s.credit) : t('wallet.free')}</span>
                 </div>
                 <div style={{ height: 12, borderRadius: 6, background: 'var(--surface-2)', overflow: 'hidden' }}>
                   <div style={{ height: '100%', width: `${pct}%`, borderRadius: 6, background: s.credit ? 'var(--gpu)' : 'var(--free)' }} />

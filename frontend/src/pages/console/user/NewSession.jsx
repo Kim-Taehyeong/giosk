@@ -13,6 +13,7 @@ import { getVolumes } from '../../../api/console/volumes';
 import { createSession } from '../../../api/console/sessions';
 import { getSshNodes } from '../../../api/console/sshNodes';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
+import { c } from '../../../lib/credit';
 import { useAuth } from '../../../context/AuthContext';
 import { apiPut } from '../../../api/client';
 
@@ -377,7 +378,7 @@ export default function NewSession() {
   const selGt = gpuTypes.find((g) => g.name === selectedGpuType) || null;
   const guarantee = guaranteeOf(selGt, wtype, { gpuCount, corePercent: cores });
   const dc = guarantee || { cpu: 0, memGb: 0 };
-  const priceText = pricePerHour ? `${pricePerHour} C/h` : t('newSession.freeC');
+  const priceText = pricePerHour ? `${c(pricePerHour)} C/h` : t('newSession.freeC');
   const resourceText = wtype === 'cpu' ? t('dash.kindCpu')
     : wtype === 'exclusive' ? `${exGpuType || ''} ${gpuCount}`
       : `${(vram / 1024).toFixed(0)}GB · ${cores}%${dc.cpu ? ` · ${t('newSession.guaranteeCpu', { n: dc.cpu })}` : ''}`;
@@ -426,7 +427,7 @@ export default function NewSession() {
     const short = balance < pricePerHour; // 1시간치도 안 되면 생성 자체가 거부된다(서버 checkAffordable)
     return (
       <>
-        <div className="row"><span>{t('newSession.balance')}</span><span>{balance} C</span></div>
+        <div className="row"><span>{t('newSession.balance')}</span><span>{c(balance)} C</span></div>
         <div className="row"><span>{t('newSession.runtimeLeft')}</span>
           <span style={{ color: short ? 'var(--danger)' : 'inherit', fontWeight: short ? 700 : 400 }}>
             {short ? t('newSession.notEnough') : t('newSession.hoursApprox', { n: hours })}
@@ -555,7 +556,7 @@ export default function NewSession() {
                 {wtype === 'cpu' && (
                   <>
                     <h3>{t('newSession.cpuSession')}</h3>
-                    <div className="cost-box"><div className="row big"><span>{t('newSession.cpuPool')}</span><span>{ppTag(`${cpuPrice} C/h`)}</span></div>
+                    <div className="cost-box"><div className="row big"><span>{t('newSession.cpuPool')}</span><span>{ppTag(`${c(cpuPrice)} C/h`)}</span></div>
                       <div className="legend">{t('newSession.cpuNote')}</div></div>
                   </>
                 )}
@@ -575,7 +576,7 @@ export default function NewSession() {
                               {x.cuda && <span style={{ fontSize: 11, fontWeight: 700, padding: '1px 6px', borderRadius: 6, background: 'var(--surface-2)', border: '1px solid var(--border)' }}>CUDA {x.cuda}</span>}
                             </div>
                             <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                              {un ? <Pill variant="err">{t('newSession.unavailable')}</Pill> : ppTag(`${x.fullPrice} C/h · 1`)}
+                              {un ? <Pill variant="err">{t('newSession.unavailable')}</Pill> : ppTag(`${c(x.fullPrice)} C/h · 1`)}
                               {un
                                 ? <button className="btn sm warn" onClick={(e) => { e.stopPropagation(); notify(); }}>{t('newSession.notifyAvail')}</button>
                                 : <span className="muted" style={{ fontSize: 12 }}>{t('newSession.availableN', { free: a.free, total: a.total })}</span>}
@@ -597,7 +598,7 @@ export default function NewSession() {
                               <SelBox key={g.n} on={gpuCount === g.n} disabled={un} onClick={() => setGpuCount(g.n)}>
                                 <div style={{ fontWeight: 800, fontSize: 18, display: 'flex', alignItems: 'center', gap: 8 }}>{gpuCount === g.n && <CheckMark />}{g.n}</div>
                                 <div className="muted" style={{ fontSize: 12.5, marginTop: 4 }}>{g.label}</div>
-                                {un ? <Pill variant="err">{t('newSession.unavailable')}</Pill> : ppTag(`${(exType?.fullPrice || 0) * g.n} C/h`)}
+                                {un ? <Pill variant="err">{t('newSession.unavailable')}</Pill> : ppTag(`${c((exType?.fullPrice || 0) * g.n)} C/h`)}
                               </SelBox>
                             );
                           })}
@@ -663,7 +664,7 @@ export default function NewSession() {
                                 </div>
                                 {cuda && <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 7px', borderRadius: 6, background: 'var(--surface-2)', border: '1px solid var(--border)', whiteSpace: 'nowrap' }}>CUDA {cuda}</span>}
                                 <div style={{ textAlign: 'right', flex: '0 0 auto', minWidth: 96 }}>
-                                  {un ? <Pill variant="err">{t('newSession.unavailable')}</Pill> : ppTag(`${o.pricePerHour} C/h`)}
+                                  {un ? <Pill variant="err">{t('newSession.unavailable')}</Pill> : ppTag(`${c(o.pricePerHour)} C/h`)}
                                   <div style={{ marginTop: 3 }}>
                                     {un
                                       ? <button className="btn sm warn" onClick={(e) => { e.stopPropagation(); notify(); }}>{t('newSession.notifyAvail')}</button>

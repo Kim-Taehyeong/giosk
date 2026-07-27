@@ -2,14 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { formatBytes, formatEta } from '../../../utils/format';
-import { Database, HardDrive, Layers, Inbox, ChevronDown, ChevronRight, Server } from 'lucide-react';
+import { Database, HardDrive, Layers, Inbox, ChevronDown, ChevronRight, Server, Upload } from 'lucide-react';
 import PageHead from '../../../components/console/PageHead';
 import StatCard from '../../../components/console/StatCard';
 import Pill from '../../../components/console/Pill';
 import DataTable from '../../../components/console/DataTable';
+import Modal from '../../../components/console/Modal';
+import { Req } from '../../../components/console/Advanced';
 import { useToast } from '../../../components/console/Toast';
 import { useConfirm } from '../../../components/console/Confirm';
-import { getDatasets, deleteDataset, approveDatasetRequest, rejectDatasetRequest, toggleDatasetCache } from '../../../api/console/datasets';
+import { getDatasets, deleteDataset, approveDatasetRequest, rejectDatasetRequest, toggleDatasetCache, uploadDataset } from '../../../api/console/datasets';
 import { getAdminNodes } from '../../../api/console/nodes';
 
 // 사이즈 클래스 → Pill 변형.
@@ -24,6 +26,9 @@ export default function Datasets() {
   const [allNodes, setAllNodes] = useState([]);
   const [tab, setTab] = useState('registry');
   const [openId, setOpenId] = useState(null); // 노드 배치 펼친 데이터셋
+  const [openUp, setOpenUp] = useState(false); // 파일 업로드 모달
+  const [up, setUp] = useState({ file: null, name: '', scope: 'global' });
+  const [uploading, setUploading] = useState(false);
 
   const load = () => getDatasets().then((d) => { setData({ global: d.global.map((x) => ({ ...x })), requests: [...d.requests] }); });
   // 5초 폴링 — 적재 상태(다운로드중→완료) 라이브 갱신.
@@ -47,13 +52,27 @@ export default function Datasets() {
   };
   const reject = async (id) => { await rejectDatasetRequest(id); setData((d) => ({ ...d, requests: d.requests.filter((x) => x.id !== id) })); toast(t('datasets.rejected')); };
 
+  const submitUpload = async () => {
+    if (!up.file || !up.name.trim()) { toast(t('datasets.upNeed', { defaultValue: '파일과 이름을 입력하세요.' })); return; }
+    setUploading(true);
+    try {
+      await uploadDataset({ file: up.file, name: up.name.trim(), scope: up.scope });
+      setOpenUp(false); setUp({ file: null, name: '', scope: 'global' });
+      toast(t('datasets.upStarted', { defaultValue: '업로드 완료 — 압축 해제 중입니다.' }));
+      load();
+    } catch (e) {
+      toast(e?.code === 'name_taken' ? t('datasets.upTaken', { defaultValue: '같은 이름의 데이터셋이 있습니다.' }) : (e?.message || t('datasets.upFail', { defaultValue: '업로드 실패' })));
+    } finally { setUploading(false); }
+  };
+
   const global = data?.global || [];
   const requests = data?.requests || [];
   const totalGb = global.reduce((a, x) => a + x.sizeGb, 0);
 
   return (
     <div>
-      <PageHead icon={Database} title={t('datasets.title')} subtitle={t('datasets.subtitle')} />
+      <PageHead icon={Database} title={t('datasets.title')} subtitle={t('datasets.subtitle')}
+        actions={<button className="btn primary" onClick={() => setOpenUp(true)}><Upload size={15} /> {t('datasets.upload', { defaultValue: '파일 업로드' })}</button>} />
 
       <div className="grid cols-4 mb">
         <StatCard icon={Database} tone="gpu" label={t('datasets.count')} value={String(global.length)} />
@@ -188,6 +207,23 @@ export default function Datasets() {
           />
         )}
       </div>
+
+      <Modal open={openUp} title={t('datasets.upTitle', { defaultValue: '데이터셋 파일 업로드' })} onClose={() => !uploading && setOpenUp(false)} width={560}
+        footer={<button className="btn primary" disabled={uploading} onClick={submitUpload}>{uploading ? t('datasets.upBusy', { defaultValue: '업로드 중…' }) : t('datasets.upload', { defaultValue: '파일 업로드' })}</button>}>
+        <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>
+          {t('datasets.upHint', { defaultValue: 'zip · tar · tar.gz 아카이브를 올리면 서버가 압축을 풀어 전역 데이터셋으로 등록합니다. 단일 파일도 그대로 등록됩니다.' })}
+        </p>
+        <label className="fld" style={{ marginTop: 0 }}>{t('datasets.name')}<Req /></label>
+        <input type="text" value={up.name} onChange={(e) => setUp({ ...up, name: e.target.value })} placeholder="imagenet-mini" />
+        <label className="fld">{t('datasets.upFile', { defaultValue: '파일' })}<Req /></label>
+        <input type="file" accept=".zip,.tar,.gz,.tgz" onChange={(e) => setUp({ ...up, file: e.target.files?.[0] || null, name: up.name || (e.target.files?.[0]?.name || '').replace(/\.(zip|tar\.gz|tgz|tar)$/i, '') })} />
+        {up.file && <div className="muted" style={{ fontSize: 12.5, marginTop: 6 }}>{up.file.name} · {formatBytes(up.file.size)}</div>}
+        <label className="fld">{t('datasets.upScope', { defaultValue: '공개 범위' })}</label>
+        <select value={up.scope} onChange={(e) => setUp({ ...up, scope: e.target.value })}>
+          <option value="global">{t('datasets.scopeGlobal', { defaultValue: '전역(모든 사용자)' })}</option>
+          <option value="personal">{t('datasets.scopePersonal', { defaultValue: '개인(나만)' })}</option>
+        </select>
+      </Modal>
     </div>
   );
 }

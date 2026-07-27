@@ -53,6 +53,27 @@ async function request(method, path, body) {
   return data;
 }
 
+// apiUpload는 multipart/form-data(파일 업로드)를 전송한다. Content-Type 은 브라우저가
+// boundary 와 함께 자동 설정하므로 직접 지정하지 않는다(지정하면 boundary 누락으로 파싱 실패).
+export async function apiUpload(path, formData) {
+  const headers = {};
+  const key = getSessionKey();
+  if (key) headers.Authorization = `Bearer ${key}`;
+  const scope = getConsoleScope();
+  if (scope) headers['X-Console-Scope'] = scope;
+  const res = await fetch(BASE + path, { method: 'POST', headers, body: formData });
+  const text = await res.text();
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; } catch { data = null; }
+  if (!res.ok) {
+    const err = new Error(translateError(data?.error) || res.statusText || `HTTP ${res.status}`);
+    err.code = data?.code;
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
+
 export const apiGet = (path) => request('GET', path);
 export const apiPost = (path, body) => request('POST', path, body);
 export const apiPut = (path, body) => request('PUT', path, body);

@@ -10,6 +10,7 @@ import Modal from '../../../components/console/Modal';
 import UserPicker from '../../../components/console/UserPicker';
 import Advanced, { Req } from '../../../components/console/Advanced';
 import BulkImport from '../../../components/console/BulkImport';
+import { c, cU } from '../../../lib/credit';
 import { useToast } from '../../../components/console/Toast';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { useAuth } from '../../../context/AuthContext';
@@ -62,7 +63,7 @@ export default function Orgs() {
         </span>} />
       <div className={`grid ${creditMode ? 'cols-3' : 'cols-2'} mb`}>
         <StatCard icon={Building2} tone="primary" label={t('orgs.count')} value={`${(rows || []).length}`} />
-        {creditMode && <StatCard icon={Coins} tone="gpu" label={t('orgs.totalPool')} value={`${totalPool}`} unit="C" />}
+        {creditMode && <StatCard icon={Coins} tone="gpu" label={t('orgs.totalPool')} value={c(totalPool)} unit="C" />}
         <StatCard icon={Users} tone="free" label={t('orgs.totalUsers')} value={`${totalUsers}`} />
       </div>
       <div className="card">
@@ -75,9 +76,9 @@ export default function Orgs() {
             { key: 'groupCount', header: t('orgs.colGroups') },
             { key: 'userCount', header: t('orgs.colUsers') },
             ...(creditMode ? [
-              { key: 'creditPool', header: t('orgs.colPool', { defaultValue: '현재 잔여' }), render: (r) => <b>{r.creditPool} C</b> },
-              { key: 'refill', header: t('orgs.colRefill', { defaultValue: '정기 리필' }), render: (r) => (r.recurringCredit ? <span>{r.recurringCredit} C <span className="muted" style={{ fontSize: 12 }}>/ {r.refillIntervalDays || t('orgs.refillDefault', { defaultValue: '기본' })}{r.refillIntervalDays ? '일' : ''}</span></span> : <span className="muted">—</span>) },
-              { key: 'consumed', header: t('orgs.colConsumed'), render: (r) => `${r.consumed || 0} C` },
+              { key: 'creditPool', header: t('orgs.colPool', { defaultValue: '현재 잔여' }), render: (r) => <b>{cU(r.creditPool)}</b> },
+              { key: 'refill', header: t('orgs.colRefill', { defaultValue: '정기 리필' }), render: (r) => (r.recurringCredit ? <span>{c(r.recurringCredit)} C <span className="muted" style={{ fontSize: 12 }}>/ {r.refillIntervalDays || t('orgs.refillDefault', { defaultValue: '기본' })}{r.refillIntervalDays ? '일' : ''}</span></span> : <span className="muted">—</span>) },
+              { key: 'consumed', header: t('orgs.colConsumed'), render: (r) => cU(r.consumed) },
             ] : []),
             { key: 'status', header: t('orgs.colStatus'), render: (r) => <Pill variant="ok" dot>{r.status}</Pill> },
             { key: 'act', header: t('orgs.colAct'), className: 'flex', render: () => (
