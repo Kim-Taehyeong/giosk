@@ -126,7 +126,7 @@ export default function Datasets() {
                               const on = !!cache; // 캐시 행 존재(caching/cached/failed) = 토글 on
                               const st = cache?.status;
                               const badge = st === 'cached' ? <Pill variant="ok">{t('datasets.cacheDone')}</Pill>
-                                : st === 'caching' ? <Pill variant="wait" dot>{t('datasets.caching')}…</Pill>
+                                : st === 'caching' ? <Pill variant="wait" dot>{t('datasets.caching')} {cache.progress ? `${cache.progress}%` : '…'}</Pill>
                                   : st === 'failed' ? <Pill variant="err">{t('datasets.cacheFailed')}</Pill>
                                     : <span className="muted" style={{ fontSize: 12 }}>{t('datasets.notCached')}</span>;
                               return (
