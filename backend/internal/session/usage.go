@@ -53,7 +53,7 @@ func (s *Service) Usage(ctx context.Context, instanceID string, userID int64) (*
 
 // MyUsage는 호출자 본인의 running 세션 지표를 id→Usage 로 반환한다(세션 목록 폴링용).
 func (s *Service) MyUsage(ctx context.Context, userID int64) (map[string]*Usage, error) {
-	rows, err := s.repo.ListByUser(userID)
+	rows, err := s.repo.ListByUser(userID, 0)
 	if err != nil {
 		return nil, err
 	}
