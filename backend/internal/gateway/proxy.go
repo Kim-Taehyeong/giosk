@@ -154,11 +154,22 @@ func (p *Proxy) subdomain(host string) (string, bool) {
 	return sub, true
 }
 
-// denied는 접근 거부 안내(간단 HTML)를 렌더한다.
+// denied는 접근 거부 안내를 렌더한다(가입대기 페이지와 같은 톤: 아이콘·문구·콘솔 버튼).
+// ConsoleURL 이 설정돼 있으면 "콘솔에서 다시 열기" 버튼을 함께 보여준다(막다른 길 방지).
 func (p *Proxy) denied(w http.ResponseWriter, msg string) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusForbidden)
-	fmt.Fprintf(w, `<!doctype html><html><head><meta charset="utf-8"><title>Giosk</title></head>`+
-		`<body style="font-family:system-ui;max-width:520px;margin:80px auto;text-align:center;color:#333">`+
-		`<h2>접속할 수 없습니다</h2><p style="color:#666">%s</p></body></html>`, msg)
+	btn := ""
+	if p.cfg.ConsoleURL != "" {
+		btn = fmt.Sprintf(`<a href="%s" style="display:inline-flex;align-items:center;gap:8px;margin-top:24px;padding:11px 20px;background:#4f46e5;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px">`+
+			`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>`+
+			`콘솔에서 다시 열기</a>`, p.cfg.ConsoleURL)
+	}
+	fmt.Fprintf(w, `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Giosk</title></head>`+
+		`<body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:#f8fafc;color:#0f172a">`+
+		`<div style="max-width:440px;padding:40px 32px;text-align:center">`+
+		`<div style="width:64px;height:64px;margin:0 auto 20px;border-radius:16px;background:#fef2f2;display:flex;align-items:center;justify-content:center">`+
+		`<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>`+
+		`<h1 style="margin:0 0 10px;font-size:20px;font-weight:800">접속할 수 없습니다</h1>`+
+		`<p style="margin:0;color:#64748b;font-size:14px;line-height:1.6">%s</p>%s</div></body></html>`, msg, btn)
 }

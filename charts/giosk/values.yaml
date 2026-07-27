@@ -234,6 +234,7 @@ gateway:
   # 함께 보여준다. 게이트웨이는 MetalLB LB IP(사내망)로만 열리므로 밖에서는 이 경유가 필요.
   sshProxyJump: ""
   cookieTTL: 28800           # 웹 세션 쿠키 수명(초)
+  consoleURL: ""             # 접근거부 페이지의 "콘솔에서 다시 열기" 버튼 링크(예: https://console.example.org). 빈값=버튼 숨김
   secret: ""                 # API↔게이트웨이 공유 토큰키(빈값=deploy.sh 생성 / 랜덤)
   sshPrivateKey: ""          # 게이트웨이 SSH 관리 개인키(PEM). 백엔드로 재접속용.
   sshPublicKey: ""           # 위 개인키의 공개키(OpenSSH). sshd 사이드카·물리계정이 신뢰.

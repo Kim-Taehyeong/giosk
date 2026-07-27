@@ -37,6 +37,8 @@ spec:
               value: {{ .Values.gateway.sshPort | default 2222 | quote }}
             - name: GIOSK_GATEWAY_COOKIE_TTL
               value: {{ .Values.gateway.cookieTTL | default 28800 | quote }}
+            - name: GIOSK_GATEWAY_CONSOLE_URL
+              value: {{ .Values.gateway.consoleURL | default "" | quote }}
             - name: GIOSK_GATEWAY_SECRET
               valueFrom:
                 secretKeyRef: { name: {{ include "giosk.fullname" . }}-secrets, key: gateway-secret }
