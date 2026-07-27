@@ -281,7 +281,7 @@ func Load(lookup func(string) (string, bool)) (*Config, error) {
 			MaxVramGB:             g.intv("GIOSK_QUOTA_MAX_VRAM_GB", 512),
 			MaxConcurrentSessions: g.intv("GIOSK_QUOTA_MAX_SESSIONS", 50),
 			VolumeQuotaGB:         g.intv("GIOSK_VOLUME_QUOTA_GB", 2000),
-			MaxEphemeralGiB:       g.intv("GIOSK_QUOTA_MAX_EPHEMERAL_GIB", 100), // 넉넉한 기본 캡: 정상사용 무영향·노드 독점(DoS) 방지. 정책으로 티어별 조정.
+			MaxEphemeralGiB:       g.intv("GIOSK_QUOTA_MAX_EPHEMERAL_GIB", 0), // 0=무제한(기본). 캡의 강제수단이 eviction(세션 종료)이라 기본으론 안 건다 — 정책으로 티어별 opt-in. 진짜 하드캡은 ENOSPC(디스크 추가) 후.
 		},
 		PrometheusURL: g.str("GIOSK_PROMETHEUS_URL", ""),
 		SMTP: SMTP{
