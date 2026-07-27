@@ -32,8 +32,17 @@ func NewProxy(cfg Config) *Proxy {
 
 // ServeHTTP는 요청을 처리한다: ①?access=<토큰> 교환 → 쿠키 발급·리다이렉트, ②쿠키 검증 → 대상 세션으로 프록시.
 func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// 진단 로그(임시) — 브라우저 ws 1006 원인 규명용. 요청이 게이트웨이에 도달했는지,
+	// Upgrade 헤더/gw_sess 쿠키가 실렸는지, 무슨 판정을 받는지 그라운드트루스를 남긴다.
+	isWS := strings.EqualFold(r.Header.Get("Upgrade"), "websocket")
+	_, ckErr := r.Cookie(cookieName)
+	log.Printf("[gateway] REQ host=%s path=%s method=%s ws=%v hasCookie=%v hasAccess=%v xfProto=%q ua=%.30q",
+		r.Host, r.URL.Path, r.Method, isWS, ckErr == nil, r.URL.Query().Get("access") != "",
+		r.Header.Get("X-Forwarded-Proto"), r.Header.Get("User-Agent"))
+
 	sub, ok := p.subdomain(r.Host)
 	if !ok {
+		log.Printf("[gateway] DENY host=%s reason=unknown-host", r.Host)
 		http.Error(w, "Giosk gateway: unknown host", http.StatusNotFound)
 		return
 	}
@@ -47,15 +56,20 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// ② 세션 쿠키 검증.
 	ck, err := r.Cookie(cookieName)
 	if err != nil {
+		log.Printf("[gateway] DENY host=%s reason=no-cookie ws=%v cookies=%q", r.Host, isWS, r.Header.Get("Cookie"))
 		p.denied(w, "세션이 만료되었거나 접속 링크가 필요합니다. 콘솔에서 다시 열어주세요.")
 		return
 	}
 	claims, err := Verify(ck.Value, p.cfg.Secret, p.now())
 	if err != nil || claims.Typ != TypCookie || sub != claims.IID+"-"+claims.Ch {
+		log.Printf("[gateway] DENY host=%s reason=bad-cookie verifyErr=%v typ=%v subMatch=%v",
+			r.Host, err, func() any { if claims != nil { return claims.Typ }; return "nil" }(),
+			claims != nil && sub == claims.IID+"-"+claims.Ch)
 		p.denied(w, "세션 쿠키가 유효하지 않습니다. 콘솔에서 다시 열어주세요.")
 		return
 	}
 
+	log.Printf("[gateway] PROXY host=%s -> %s:%d ws=%v", r.Host, claims.ServiceHost(), claims.Port, isWS)
 	p.reverseProxy(claims).ServeHTTP(w, r)
 }
 
