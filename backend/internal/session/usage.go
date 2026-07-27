@@ -202,28 +202,29 @@ func (s *Service) fillHAMi(ctx context.Context, out map[string]*Usage, pods []st
 		return
 	}
 	sel := strings.Join(pods, "|")
-	// smUtil(%) — vGPU 여러 개면 평균.
+	// HAMi v2.9.0 vGPUmonitor 메트릭(hami_* 접두). 세션 Pod 이름은 exported_pod 라벨이다
+	// (Prometheus 가 스크레이프 대상 pod 라벨과 충돌을 피해 워크로드 pod 을 exported_pod 로 옮긴다).
+	// util 은 이름이 ratio 지만 0-100(%). vGPU 여러 개면 평균.
 	if v, ok := s.met.VectorByLabel(ctx,
-		fmt.Sprintf(`avg by(podname) (Device_utilization_desc_of_container{podname=~"%s"})`, sel), "podname"); ok {
+		fmt.Sprintf(`avg by(exported_pod) (hami_container_device_utilization_ratio{exported_pod=~"%s"})`, sel), "exported_pod"); ok {
 		for pod, val := range v {
 			if u := out[pod]; u != nil {
 				u.GpuUtil = ptr(val)
 			}
 		}
 	}
-	// 사용량은 vGPU_device_memory_usage_in_bytes(바이트)다.
-	// Device_memory_desc_of_container 는 이름과 달리 "총량"이라 사용량이 아니다.
+	// 사용 VRAM(바이트) → MB. vGPU 여러 개면 합.
 	if v, ok := s.met.VectorByLabel(ctx,
-		fmt.Sprintf(`sum by(podname) (vGPU_device_memory_usage_in_bytes{podname=~"%s"})`, sel), "podname"); ok {
+		fmt.Sprintf(`sum by(exported_pod) (hami_vgpu_memory_used_bytes{exported_pod=~"%s"})`, sel), "exported_pod"); ok {
 		for pod, val := range v {
 			if u := out[pod]; u != nil {
 				u.VramUsedMB = ptr(val / (1024 * 1024))
 			}
 		}
 	}
-	// 총량은 DB(vram_mb)가 권위지만, 오퍼링 없이 만든 세션 등 0 이면 HAMi 가 강제한 한도로 채운다.
+	// 총량은 DB(vram_mb)가 권위지만, 오퍼링 없이 만든 세션 등 0 이면 HAMi 강제 한도(바이트)로 채운다.
 	if v, ok := s.met.VectorByLabel(ctx,
-		fmt.Sprintf(`sum by(podname) (vGPU_device_memory_limit_in_bytes{podname=~"%s"})`, sel), "podname"); ok {
+		fmt.Sprintf(`sum by(exported_pod) (hami_vgpu_memory_limit_bytes{exported_pod=~"%s"})`, sel), "exported_pod"); ok {
 		for pod, val := range v {
 			if u := out[pod]; u != nil && u.VramTotalMB == 0 {
 				u.VramTotalMB = int(val / (1024 * 1024))
