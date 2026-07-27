@@ -19,7 +19,7 @@ type crediter struct {
 func (c crediter) Credit(targetType string, targetID int64, amount int, actor int64) error {
 	switch targetType {
 	case topup.TargetUser:
-		return c.wallet.CreditUser(targetID, amount, "topup approved", &actor)
+		return c.wallet.CreditUser(targetID, 0, amount, "topup approved", &actor)
 	case topup.TargetGroup:
 		return c.wallet.CreditGroup(targetID, amount, &actor)
 	case topup.TargetOrg:

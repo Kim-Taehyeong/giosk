@@ -28,11 +28,11 @@ type AuditReader interface {
 	Insert(l *audit.Log) error
 }
 
-// Charger는 세션 사용량을 사용자 지갑에서 차감한다(wallet.Service 가 구현).
-// 잔액 부족이면 (false, nil).
+// Charger는 세션 사용량을 (user,team) 멤버십 지갑에서 차감한다(wallet.Service 가 구현).
+// groupID=세션이 뜬 팀(네임스페이스). 잔액 부족이면 (false, nil).
 type Charger interface {
-	Consume(userID int64, credits int, ref string) (bool, error)
-	Balance(userID int64) int // 세션 생성 전 잔액 검사용
+	Consume(userID, groupID int64, credits int, ref string) (bool, error)
+	Balance(userID, groupID int64) int // 세션 생성 전 잔액 검사용
 }
 
 // NodeLeaser는 물리노드 임대 생성/해제(node.Service 가 구현).
@@ -230,11 +230,19 @@ func (s *Service) WithCharger(c Charger) *Service { s.charger = c; return s }
 // checkAffordable는 크레딧 모드에서 잔액이 최소 1시간 단가 이상인지 검사한다.
 // 비크레딧 모드(charger nil)·무료(단가 0) 세션은 통과. 부족하면 ErrInsufficientCredit.
 // (생성 시 막지 않으면 1크레딧 누적 전까지 0잔액으로도 잠시 돌아가는 구멍이 생김.)
-func (s *Service) checkAffordable(userID int64, pricePerHour int) error {
+// gidOf는 세션의 팀 id(nil=0)를 반환한다(정산/잔액검사 대상 팀 지갑).
+func gidOf(sess *Session) int64 {
+	if sess.GroupID != nil {
+		return *sess.GroupID
+	}
+	return 0
+}
+
+func (s *Service) checkAffordable(userID, groupID int64, pricePerHour int) error {
 	if s.charger == nil || pricePerHour <= 0 {
 		return nil
 	}
-	if s.charger.Balance(userID) < pricePerHour {
+	if s.charger.Balance(userID, groupID) < pricePerHour {
 		return ErrInsufficientCredit
 	}
 	return nil
@@ -328,7 +336,7 @@ func (s *Service) Create(ctx context.Context, userID int64, username string, req
 	if err := s.checkHardLimits(userID, sess); err != nil {
 		return nil, err // 1차: 하드 정책(크레딧 무관 절대 벽)
 	}
-	if err := s.checkAffordable(userID, sess.PricePerHour); err != nil {
+	if err := s.checkAffordable(userID, gidOf(sess), sess.PricePerHour); err != nil {
 		return nil, err // 2차: 크레딧 모드 잔액 부족 → 생성 거부
 	}
 	imageRef, err := s.repo.ImageRef(req.ImageID)
@@ -412,7 +420,7 @@ func (s *Service) createSSH(ctx context.Context, userID int64, username string, 
 	if err := s.checkHardLimits(userID, sess); err != nil {
 		return nil, err // 1차: 하드 정책(노드 GPU수가 상한 초과면 임대 거부)
 	}
-	if err := s.checkAffordable(userID, sess.PricePerHour); err != nil {
+	if err := s.checkAffordable(userID, gidOf(sess), sess.PricePerHour); err != nil {
 		return nil, err // 2차: 크레딧 모드 잔액 부족 → 물리 임대 거부
 	}
 	if err := s.leaser.CreateLeaseFor(ctx, req.Node, userID, sess.InstanceID); err != nil {
@@ -1572,7 +1580,11 @@ func (s *Service) settle(ctx context.Context, sess *Session, final bool) {
 	if due <= 0 {
 		return
 	}
-	ok, err := s.charger.Consume(sess.UserID, due, sess.InstanceID)
+	gid := int64(0) // 세션이 뜬 팀 지갑에서 차감(팀 없는 세션은 금지 → 항상 팀). 0이면 wallet 이 대표 팀으로.
+	if sess.GroupID != nil {
+		gid = *sess.GroupID
+	}
+	ok, err := s.charger.Consume(sess.UserID, gid, due, sess.InstanceID)
 	if err != nil {
 		return
 	}
@@ -1587,10 +1599,6 @@ func (s *Service) settle(ctx context.Context, sess *Session, final bool) {
 	_ = s.repo.SetBilled(sess.InstanceID, totalDue)
 	// 사용시간 원장 적립 — 이번 틱에 과금된 크레딧이 나타내는 시간(초). 세션 삭제와 무관하게 누적 보존.
 	if secs := int(float64(due) / float64(sess.PricePerHour) * 3600.0); secs > 0 {
-		gid := int64(0)
-		if sess.GroupID != nil {
-			gid = *sess.GroupID
-		}
 		_ = s.repo.RecordGpuUsage(sess.UserID, gid, sess.InstanceID, secs, sess.GpuCount)
 	}
 }

@@ -110,7 +110,8 @@ func (r *repo) List(f ListFilter) ([]Summary, int, error) {
 		    ORDER BY FIELD(m2.role,'org_admin','project_admin','billing_admin','member','guest') LIMIT 1)
 		LEFT JOIN ` + "`groups`" + ` g ON g.id=m.group_id
 		LEFT JOIN organizations o ON o.id=g.org_id
-		LEFT JOIN user_wallets uw ON uw.user_id=u.id`
+		LEFT JOIN (SELECT user_id, SUM(balance) AS balance, 0 AS recurring_credit, 0 AS refill_interval_days
+		           FROM user_wallets GROUP BY user_id) uw ON uw.user_id=u.id`
 
 	// 조건은 조인 이후에 걸어야 그룹/조직 표시명으로 거를 수 있다(대표 멤버십 기준).
 	where := []string{}

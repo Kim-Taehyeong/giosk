@@ -19,10 +19,19 @@ var ErrQuotaExceeded = errors.New("volume quota exceeded")
 // ErrInsufficientCredit는 크레딧 모드에서 볼륨 최소 비용(≈1일)을 감당할 잔액이 없어 생성 거부.
 var ErrInsufficientCredit = errors.New("insufficient credit")
 
-// Charger는 스토리지 사용료를 사용자 지갑에서 차감한다(wallet.Service 가 구현).
+// Charger는 스토리지 사용료를 (user,team) 멤버십 지갑에서 차감한다(wallet.Service 가 구현).
+// 그룹 볼륨이면 그 팀, 개인 볼륨이면 0(소유자 대표 팀으로 resolve).
 type Charger interface {
-	Consume(userID int64, credits int, ref string) (bool, error)
-	Balance(userID int64) int
+	Consume(userID, groupID int64, credits int, ref string) (bool, error)
+	Balance(userID, groupID int64) int
+}
+
+// gidPtr는 *int64 그룹 id 를 값(nil=0)으로.
+func gidPtr(p *int64) int64 {
+	if p != nil {
+		return *p
+	}
+	return 0
 }
 
 // hoursPerMonth는 스토리지 단가(GiB·월) 기준 시간(30일).
@@ -211,7 +220,7 @@ func (s *Service) Create(ctx context.Context, userID int64, req CreateReq) (*Vol
 	// 기존 볼륨은 잔액 부족이어도 유예(빌러가 즉시 삭제하지 않음).
 	if s.charger != nil && s.price() > 0 {
 		dayCost := s.monthlyCost(req.SizeGiB) / 30
-		if s.charger.Balance(userID) < dayCost {
+		if s.charger.Balance(userID, 0) < dayCost {
 			return nil, ErrInsufficientCredit
 		}
 	}
@@ -375,7 +384,7 @@ func (s *Service) billStorageOnce(ctx context.Context) {
 			continue
 		}
 		ref := fmt.Sprintf("vol-%d", v.ID)
-		ok, err := s.charger.Consume(*v.OwnerUserID, due, ref)
+		ok, err := s.charger.Consume(*v.OwnerUserID, gidPtr(v.GroupID), due, ref)
 		if err != nil || !ok {
 			continue // 잔액 부족 → 유예(다음 틱 재시도; 삭제하지 않음)
 		}

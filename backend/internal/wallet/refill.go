@@ -55,11 +55,11 @@ func (r *gormRepo) SetGroupRefill(groupID int64, recurring, intervalDays int, ca
 		recurring, intervalDays, carryover, groupID).Error
 }
 
-// SetUserRefill은 개인 지갑의 정기 리필(양·주기·이월)을 설정한다. 지갑 없으면 생성.
-func (r *gormRepo) SetUserRefill(userID int64, recurring, intervalDays int, carryover bool) error {
-	r.db.Exec("INSERT IGNORE INTO user_wallets (user_id) VALUES (?)", userID)
-	return r.db.Exec("UPDATE user_wallets SET recurring_credit=?, refill_interval_days=?, carryover=? WHERE user_id=?",
-		recurring, intervalDays, carryover, userID).Error
+// SetUserRefill은 (user,group) 멤버십 지갑의 정기 리필(양·주기·이월)을 설정한다. 지갑 없으면 생성.
+func (r *gormRepo) SetUserRefill(userID, groupID int64, recurring, intervalDays int, carryover bool) error {
+	r.db.Exec("INSERT IGNORE INTO user_wallets (user_id, group_id) VALUES (?, ?)", userID, groupID)
+	return r.db.Exec("UPDATE user_wallets SET recurring_credit=?, refill_interval_days=?, carryover=? WHERE user_id=? AND group_id=?",
+		recurring, intervalDays, carryover, userID, groupID).Error
 }
 
 // GroupRefillCap은 팀 주기 상한(부모 조직의 실효 주기). 없으면 platDefault.
@@ -72,13 +72,12 @@ func (r *gormRepo) GroupRefillCap(groupID int64, platDefault int) int {
 	return platDefault
 }
 
-// UserRefillCap은 개인 주기 상한(대표 팀의 실효 주기 = 팀>0 ? 팀 : 조직>0 ? 조직 : platDefault).
-func (r *gormRepo) UserRefillCap(userID int64, platDefault int) int {
+// UserRefillCap은 멤버십 지갑의 주기 상한(그 지갑의 팀 실효 주기 = 팀>0 ? 팀 : 조직>0 ? 조직 : platDefault).
+func (r *gormRepo) UserRefillCap(groupID int64, platDefault int) int {
 	var row struct{ GroupIV, OrgIV int }
 	r.db.Raw("SELECT COALESCE(gw.refill_interval_days,0) AS group_iv, o.refill_interval_days AS org_iv "+
-		"FROM memberships m JOIN `groups` g ON g.id=m.group_id "+
-		"LEFT JOIN group_wallets gw ON gw.group_id=g.id JOIN organizations o ON o.id=g.org_id "+
-		"WHERE m.user_id=? AND m.status='active' ORDER BY m.id LIMIT 1", userID).Scan(&row)
+		"FROM `groups` g LEFT JOIN group_wallets gw ON gw.group_id=g.id JOIN organizations o ON o.id=g.org_id "+
+		"WHERE g.id=?", groupID).Scan(&row)
 	if row.GroupIV > 0 {
 		return row.GroupIV
 	}
@@ -197,12 +196,11 @@ func (r *gormRepo) RefillDue(plat PlatformRefill) (int, error) {
 			Balance      int
 		}
 		var usrs []usrRow
-		// 다중 소속이면 대표 멤버십(가장 작은 id) 하나로 상위(팀/조직)를 결정한다.
-		// GROUP BY 대신 대표 멤버십 서브쿼리 조인 — only_full_group_by 호환.
-		tx.Raw(`SELECT uw.user_id, m.group_id, g.org_id, uw.recurring_credit AS recurring, uw.refill_interval_days AS interval_days, uw.carryover, uw.cycle_started_at AS cycle, uw.balance
+		// 멤버십 지갑((user,group))마다 그 지갑의 팀(group)으로 상위(조직)를 결정한다.
+		// group_id=0(미귀속) 지갑은 groups 조인이 없어 제외(리필 대상 아님).
+		tx.Raw(`SELECT uw.user_id, uw.group_id, g.org_id, uw.recurring_credit AS recurring, uw.refill_interval_days AS interval_days, uw.carryover, uw.cycle_started_at AS cycle, uw.balance
 			FROM user_wallets uw
-			JOIN memberships m ON m.id = (SELECT MIN(m2.id) FROM memberships m2 WHERE m2.user_id=uw.user_id AND m2.status='active')
-			JOIN ` + "`groups`" + ` g ON g.id=m.group_id
+			JOIN ` + "`groups`" + ` g ON g.id = uw.group_id
 			WHERE uw.recurring_credit > 0`).Scan(&usrs)
 		for _, us := range usrs {
 			iv := us.IntervalDays
@@ -221,10 +219,10 @@ func (r *gormRepo) RefillDue(plat PlatformRefill) (int, error) {
 			if !wipe {
 				bal = us.Balance + us.Recurring
 			}
-			tx.Exec(`UPDATE user_wallets SET balance=?, cycle_started_at=? WHERE user_id=?`, bal, now, us.UserID)
-			// 개인 리필은 크레딧 원장에 남긴다(대시보드 내역).
-			tx.Exec(`INSERT INTO credit_transactions (user_id, type, amount, balance_after, description, created_at)
-				VALUES (?, 'recharge', ?, ?, '정기 리필', NOW())`, us.UserID, us.Recurring, bal)
+			tx.Exec(`UPDATE user_wallets SET balance=?, cycle_started_at=? WHERE user_id=? AND group_id=?`, bal, now, us.UserID, us.GroupID)
+			// 개인(멤버십) 리필은 크레딧 원장에 남긴다(팀 귀속).
+			tx.Exec(`INSERT INTO credit_transactions (user_id, group_id, type, amount, balance_after, description, created_at)
+				VALUES (?, ?, 'recharge', ?, ?, '정기 리필', NOW())`, us.UserID, us.GroupID, us.Recurring, bal)
 			n++
 		}
 		return nil

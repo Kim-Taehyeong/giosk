@@ -242,7 +242,7 @@ func main() {
 			}
 			return u, e
 		},
-		Wallet:   func(id int64) (any, error) { return walletSvc.MyWallet(id) },
+		Wallet:   func(id int64) (any, error) { return walletSvc.MyWallet(id, 0) },
 		Volumes:  func(id int64) (any, error) { return volumeSvc.List(id) },
 		Sessions: func(ctx context.Context, id int64) (any, error) { return sessionSvc.List(ctx, id) },
 		Datasets: func(ctx context.Context, id int64) (any, error) { return datasetSvc.List(ctx, id) },

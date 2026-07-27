@@ -81,7 +81,7 @@ func NewRepository(db *gorm.DB) Repository { return &gormRepo{db: db} }
 // UserWallet은 (잔액, 전체) 를 반환한다. 전체 = 현재 잔액 + 누적 소모(= 지금까지 부여받은 총 크레딧).
 // monthly_cap 은 별도 한도 개념이라 대시보드의 "전체/남은" 표시엔 쓰지 않는다.
 func (r *gormRepo) UserWallet(userID int64) (balance, total int) {
-	r.db.Raw(`SELECT COALESCE(balance,0) FROM user_wallets WHERE user_id = ?`, userID).Scan(&balance)
+	r.db.Raw(`SELECT COALESCE(SUM(balance),0) FROM user_wallets WHERE user_id = ?`, userID).Scan(&balance)
 	var consumed int
 	r.db.Raw(`SELECT COALESCE(SUM(-amount),0) FROM credit_transactions WHERE user_id = ? AND type = 'consume'`, userID).Scan(&consumed)
 	return balance, balance + consumed
@@ -176,9 +176,10 @@ func (r *gormRepo) NameCreditsScoped(kind string, orgID, groupID int64, limit in
 		return out
 	}
 	cl, args := userScopeClause("w.user_id", orgID, groupID)
-	r.db.Raw(`SELECT u.username AS name, w.balance AS credit
+	// 멤버십 지갑((user,group))이라 유저별 합산 — 안 그러면 한 유저가 팀 수만큼 중복.
+	r.db.Raw(`SELECT u.username AS name, CAST(SUM(w.balance) AS SIGNED) AS credit
 		FROM user_wallets w JOIN users u ON u.id=w.user_id
-		WHERE `+cl+` ORDER BY w.balance DESC LIMIT ?`, append(args, limit)...).Scan(&out)
+		WHERE `+cl+` GROUP BY u.id, u.username ORDER BY credit DESC LIMIT ?`, append(args, limit)...).Scan(&out)
 	return out
 }
 
@@ -190,9 +191,9 @@ func (r *gormRepo) NameCredits(scope string, limit int) []NameCredit {
 			FROM group_wallets w JOIN `+"`groups`"+` g ON g.id = w.group_id
 			ORDER BY w.balance DESC LIMIT ?`, limit).Scan(&out)
 	case "org":
-		r.db.Raw(`SELECT u.username AS name, w.balance AS credit
+		r.db.Raw(`SELECT u.username AS name, CAST(SUM(w.balance) AS SIGNED) AS credit
 			FROM user_wallets w JOIN users u ON u.id = w.user_id
-			ORDER BY w.balance DESC LIMIT ?`, limit).Scan(&out)
+			GROUP BY u.id, u.username ORDER BY credit DESC LIMIT ?`, limit).Scan(&out)
 	}
 	return out
 }
