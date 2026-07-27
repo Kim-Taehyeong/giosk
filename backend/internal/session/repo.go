@@ -190,7 +190,8 @@ const adminRowSelect = `
 	       DATE_FORMAT(s.started_at, '%Y-%m-%dT%H:%i:%sZ') AS started_at,
 	       s.price_per_hour, s.billed_credits AS consumed
 	FROM sessions s JOIN users u ON u.id = s.user_id
-	LEFT JOIN ` + "`groups`" + ` g ON g.id = s.group_id
+	LEFT JOIN ` + "`groups`" + ` g ON g.id = COALESCE(s.group_id,
+	    (SELECT m.group_id FROM memberships m WHERE m.user_id = s.user_id AND m.status = 'active' ORDER BY m.id LIMIT 1))
 	LEFT JOIN organizations o ON o.id = g.org_id
 	LEFT JOIN images img ON img.id = s.image_id`
 
