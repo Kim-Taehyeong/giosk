@@ -75,13 +75,15 @@ export default function Topbar({ variant, ns }) {
       .then((w) => setSummary((s) => ({ ...s, credit: w.balance })))
       .catch(() => {});
   }, [variant, isAdmin, creditMode, setSummary]);
-  // 역할/뷰 전환기: 관리 권한(플랫폼 admin 또는 org/group 스코프 보유)이 있으면 통합 RoleSwitcher,
-  // 순수 사용자는 소속 조직/그룹 정적 표시(OrgGroupSelector).
+  // 모드 토글 노출 여부: 관리 권한(플랫폼 admin 또는 org/group 스코프)이 있어야 관리자↔사용자 전환 가능.
   const hasRoles = isAdmin || (user?.scopes?.length > 0);
 
   return (
     <div className="topbar">
-      {hasRoles ? (
+      {/* 좌측 셀렉터는 '뷰'로 분리 —
+          · 관리자 뷰: 역할 설정(RoleSwitcher). 어떤 역할/스코프로 관리하는지(플랫폼/조직/그룹) 선택.
+          · 사용자 뷰: 조직→팀 2뎁스(OrgGroupSelector). 선택 팀이 세션·크레딧 컨텍스트. */}
+      {variant === 'admin' ? (
         <RoleSwitcher ns={ns} />
       ) : (
         <OrgGroupSelector variant={variant} ns={ns} />
