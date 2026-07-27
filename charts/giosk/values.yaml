@@ -69,8 +69,10 @@ storage:
   #    (deployment.mode=container/hybrid 와 무관 — home 은 항상 RWX 로 생성된다.)
   persistence:
     # sharedHome=true: 사용자별 영속 home(~/nfs) PVC 를 만들어 모든 세션이 공유(노드 무관). storageClass 는 RWX 필수.
-    # sharedHome=false: 영속 home 미사용 → 세션은 emptyDir 로컬 임시만(데이터 비영속, RWX 불필요). 영속이 필요하면 사용자가 볼륨을 따로 생성.
-    sharedHome: true
+    # sharedHome=false(기본): 컨테이너 세션은 영속 home 미사용 → emptyDir 로컬 임시 home 만(비영속, RWX 불필요).
+    #   영속이 필요하면 사용자가 볼륨을 따로 만들어 붙인다(opt-in). 물리노드 모드는 이 값과 무관하게 노드 로컬 홈을
+    #   자동 제공한다(비영속). 컨테이너 세션에 지속 저장을 자동으로 붙이지 않는 것이 기본 정책.
+    sharedHome: false
     # RWX StorageClass 이름. nfsProvisioner.install=true 면 그 provisioner 가 만드는
     # nfsProvisioner.storageClassName(기본 nfs)와 일치시킨다. 기존 RWX SC 를 쓰면 그 이름으로.
     storageClass: nfs
