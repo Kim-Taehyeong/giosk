@@ -65,6 +65,7 @@ type Quota struct {
 	MaxGpuCount           int
 	MaxVramGB             int
 	MaxConcurrentSessions int
+	MaxStoppedSessions    int // 사용자당 중단(대기) 세션 상한(0=무제한). 중단 세션은 로컬 홈 PVC 로 노드 디스크 점유.
 	VolumeQuotaGB         int
 	MaxEphemeralGiB       int // 세션 임시 디스크(ephemeral-storage) 전역 상한(GiB)
 }
@@ -129,6 +130,7 @@ type DynamicPolicy struct {
 type Storage struct {
 	PersistenceClass string  // 영속 home(~/nfs) 스토리지클래스 (RWX·노드독립 필수, 예: nfs/longhorn)
 	SharedHome       bool    // 사용자 영속 home(~/nfs) 사용 여부. false 면 세션은 순수 로컬 임시(emptyDir)만 — RWX 불필요
+	LocalClass       string  // 세션 전용 홈(/home/work) 로컬 스토리지클래스(노드로컬 디스크·WFFC, 예: local-path). 속도 위해 NFS 아님.
 	NFSClass         string  // RWX NFS 스토리지클래스(데이터셋·공유 볼륨용 — 항상 NFS 고정)
 	VolumeQuotaGB    int     // 플랫폼 전역 볼륨 쿼터
 	PricePerGiBMonth int     // 스토리지 크레딧 단가(GiB·월). 0=무료. 크레딧 모드에서만 과금.
@@ -208,6 +210,7 @@ func Load(lookup func(string) (string, bool)) (*Config, error) {
 		Storage: Storage{
 			PersistenceClass: g.str("GIOSK_PERSISTENCE_CLASS", "longhorn"),
 			SharedHome:       g.boolv("GIOSK_SHARED_HOME", true),
+			LocalClass:       g.str("GIOSK_LOCAL_CLASS", "local-path"),
 			NFSClass:         g.str("GIOSK_NFS_CLASS", "nfs"),
 			VolumeQuotaGB:    g.intv("GIOSK_VOLUME_QUOTA_GB", 2000),
 			PricePerGiBMonth: g.intv("GIOSK_STORAGE_PRICE_PER_GIB_MONTH", 0), // 0=스토리지 무료(크레딧 모드에서만 과금)
@@ -284,6 +287,7 @@ func Load(lookup func(string) (string, bool)) (*Config, error) {
 			MaxGpuCount:           g.intv("GIOSK_QUOTA_MAX_GPU", 64),
 			MaxVramGB:             g.intv("GIOSK_QUOTA_MAX_VRAM_GB", 512),
 			MaxConcurrentSessions: g.intv("GIOSK_QUOTA_MAX_SESSIONS", 50),
+			MaxStoppedSessions:    g.intv("GIOSK_QUOTA_MAX_STOPPED", 5),
 			VolumeQuotaGB:         g.intv("GIOSK_VOLUME_QUOTA_GB", 2000),
 			MaxEphemeralGiB:       g.intv("GIOSK_QUOTA_MAX_EPHEMERAL_GIB", 0), // 0=무제한(기본). 캡의 강제수단이 eviction(세션 종료)이라 기본으론 안 건다 — 정책으로 티어별 opt-in. 진짜 하드캡은 ENOSPC(디스크 추가) 후.
 		},

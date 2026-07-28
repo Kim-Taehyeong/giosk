@@ -13,6 +13,10 @@ var ErrNotFound = errors.New("not found")
 // ErrSessionLimit는 사용자 동시 활성 세션 상한 초과.
 var ErrSessionLimit = errors.New("session limit reached")
 
+// ErrStoppedLimit는 중단(대기) 세션 상한 초과 — 중단 세션은 로컬 홈 PVC 를 물고 있어(노드 디스크 점유)
+// 무한정 쌓이면 안 된다. 새 세션을 만들려면 기존 중단 세션을 삭제해야 한다.
+var ErrStoppedLimit = errors.New("stopped session limit reached")
+
 // 물리(SSH) 세션 관련 오류.
 var (
 	ErrLeaseUnavailable     = errors.New("physical lease unavailable")
@@ -50,6 +54,7 @@ type Repository interface {
 	ListRunning() ([]Session, error)
 	ListActiveContainer() ([]Session, error)       // 컨테이너 활성(provisioning|running) 세션 — phase 리컨실용
 	CountActive(userID int64) int                  // 활성(provisioning|running) 세션 수
+	CountStopped(userID int64) int                 // 중단(stopped) 세션 수 — 로컬 홈 PVC 점유로 상한 대상
 	IsGroupMember(userID, groupID int64) bool      // 사용자가 그 팀의 활성 멤버인지(세션 팀 귀속 검증)
 	UserLeasedNode(userID int64, node string) bool // 사용자가 그 물리노드를 대여한 적 있는지(로컬 Home 접근 검증)
 	SetUserSSHKey(userID int64, key string) error
@@ -250,6 +255,13 @@ func (r *gormRepo) Username(userID int64) string {
 func (r *gormRepo) CountActive(userID int64) int {
 	var n int64
 	r.db.Model(&Session{}).Where("user_id = ? AND phase IN ?", userID, []string{PhaseProvisioning, PhaseRunning}).Count(&n)
+	return int(n)
+}
+
+// CountStopped는 사용자의 중단(대기) 세션 수 — 각 세션이 로컬 홈 PVC 를 점유하므로 상한을 건다.
+func (r *gormRepo) CountStopped(userID int64) int {
+	var n int64
+	r.db.Model(&Session{}).Where("user_id = ? AND phase = ?", userID, PhaseStopped).Count(&n)
 	return int(n)
 }
 

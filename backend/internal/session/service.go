@@ -55,6 +55,7 @@ type Provisioner interface {
 	PodLogs(ctx context.Context, ns, name string, tail int64) (string, error)
 	PodDescribe(ctx context.Context, ns, name string) (*k8s.PodDescribe, error)
 	CreatePVC(ctx context.Context, spec k8s.PVCSpec) error
+	DeletePVC(ctx context.Context, ns, name string) error
 	PVCPhase(ctx context.Context, ns, name string) (string, error)
 	PVCBackingNFS(ctx context.Context, ns, name string) (server, path string, ok bool)
 	EnsureSharedNFSPVC(ctx context.Context, spec k8s.SharedNFSSpec) error
@@ -63,8 +64,8 @@ type Provisioner interface {
 	DeleteSessionService(ctx context.Context, ns, name string) error
 	SessionServiceAccess(ctx context.Context, ns, name, mode string) (k8s.SvcAccess, error)
 	FirstNodeIP(ctx context.Context) string
-	NodeIP(ctx context.Context, node string) string        // 노드 이름→InternalIP(클러스터 DNS 에 노드명 없음 → SSH/웹터미널 IP 필요)
-	ListNodes(ctx context.Context) ([]k8s.LiveNode, error) // 데이터셋 캐시 노드↔GPU타입 매칭용
+	NodeIP(ctx context.Context, node string) string                                                  // 노드 이름→InternalIP(클러스터 DNS 에 노드명 없음 → SSH/웹터미널 IP 필요)
+	ListNodes(ctx context.Context) ([]k8s.LiveNode, error)                                           // 데이터셋 캐시 노드↔GPU타입 매칭용
 	ExecTerminal(ctx context.Context, ns, pod, container string, cmd []string, tio k8s.ExecIO) error // 웹터미널(컨테이너 exec)
 }
 
@@ -80,7 +81,8 @@ type Service struct {
 	prov         Provisioner
 	nsPrefix     string
 	gateway      string
-	storageClass string // 홈 PVC 스토리지클래스(스토리지 단일화: NFS RWX)
+	storageClass string // 영속 home(~/nfs)·공유 PVC 스토리지클래스(NFS RWX, 노드독립)
+	localClass   string // 세션 전용 홈(/home/work) 로컬 스토리지클래스(노드로컬·WFFC, 예: local-path). 속도 위해 NFS 아님.
 	audit        AuditReader
 	met          *metrics.Client
 	leaser       NodeLeaser
@@ -99,6 +101,7 @@ type Service struct {
 	localHomeHost string // 물리노드 로컬 home 루트(hostPath). 계정폴더 = <root>/<username>
 	uidBase       int    // 컨테이너 안정 UID = uidBase + userID(물리 SSH 와 동일 공식). 기본 100000.
 	sharedHome    bool   // 영속 home(~/nfs) 사용. false 면 세션은 emptyDir 로컬 임시만(RWX 불필요).
+	maxStopped    int    // 사용자당 중단(대기) 세션 상한(0=무제한). 중단 세션은 로컬 홈 PVC 를 물고 있어 방치 시 노드 디스크 잠식.
 
 	datasetCache DatasetCacheReader // 데이터셋 노드 로컬 캐시 배치 조회(nil=항상 NFS)
 
@@ -256,13 +259,17 @@ func (s *Service) WithLeaser(l NodeLeaser) *Service { s.leaser = l; return s }
 // WithMetrics는 유휴 판정용 Prometheus 클라이언트를 주입한다.
 func (s *Service) WithMetrics(m *metrics.Client) *Service { s.met = m; return s }
 
-
 // WithLimits는 하드 리소스 상한(계층 해석)을 주입한다. 크레딧과 무관하게 항상 강제되는 1차 정책.
 func (s *Service) WithLimits(r *policy.Resolver) *Service { s.limits = r; return s }
 
 // checkHardLimits는 계층 해석된 하드 상한(GPU 개수·VRAM·동시 세션)을 강제한다(모든 과금 모드 공통).
 // 0 = 무제한. 크레딧 검사(checkAffordable)보다 먼저 호출되는 절대 벽.
 func (s *Service) checkHardLimits(userID int64, sess *Session) error {
+	// 중단(대기) 세션 상한 — 각 중단 세션이 로컬 홈 PVC(노드 디스크)를 점유하므로 무한정 쌓이면 안 된다.
+	// 초과 시 새 세션 생성을 막아 기존 중단 세션 삭제를 유도한다. (물리 SSH 는 로컬 PVC 없음 → 제외)
+	if s.maxStopped > 0 && sess.Env != "ssh" && s.repo.CountStopped(userID) >= s.maxStopped {
+		return ErrStoppedLimit
+	}
 	if s.limits == nil {
 		return nil
 	}
@@ -302,11 +309,22 @@ func (s *Service) Extend(ctx context.Context, instanceID string, userID int64) e
 }
 
 func NewService(repo Repository, prov Provisioner, nsPrefix, gateway, storageClass string) *Service {
-	return &Service{repo: repo, prov: prov, nsPrefix: nsPrefix, gateway: gateway, storageClass: storageClass, uidBase: 100000, sharedHome: true}
+	return &Service{repo: repo, prov: prov, nsPrefix: nsPrefix, gateway: gateway, storageClass: storageClass, localClass: "local-path", uidBase: 100000, sharedHome: true}
 }
 
 // WithSharedHome은 영속 home(~/nfs) 사용 여부를 설정한다(설치시 고정). false=세션 순수 로컬 임시.
 func (s *Service) WithSharedHome(on bool) *Service { s.sharedHome = on; return s }
+
+// WithLocalClass는 세션 전용 홈(/home/work) 로컬 스토리지클래스를 설정한다(설치시 고정, 예: local-path).
+func (s *Service) WithLocalClass(sc string) *Service {
+	if sc != "" {
+		s.localClass = sc
+	}
+	return s
+}
+
+// WithMaxStopped는 사용자당 중단(대기) 세션 상한을 설정한다(0=무제한).
+func (s *Service) WithMaxStopped(n int) *Service { s.maxStopped = n; return s }
 
 // WithAudit는 세션 감사 로그 조회용 리더를 주입한다.
 func (s *Service) WithAudit(r AuditReader) *Service { s.audit = r; return s }
@@ -374,10 +392,15 @@ func (s *Service) Create(ctx context.Context, userID int64, username string, req
 		if err != nil {
 			return nil, err
 		}
-		mounts = append(mounts, lh) // 물리노드 로컬 디스크 home → /home/work (노드핀)
+		mounts = append(mounts, lh) // 물리노드 로컬 디스크 home → /home/work (노드핀, 노드 디스크에 영속)
 		requireNode = req.LocalHomeNode
 	} else {
-		mounts = append(mounts, k8s.VolMountSpec{EmptyDir: true, MountPath: homeMount}) // 노드 로컬 임시 home
+		// 세션 전용 영속 홈: 중단해도 데이터 유지, 삭제 시 함께 제거. (예전 emptyDir=중단 시 유실이었음)
+		homePVC, err := s.ensureSessionHome(ctx, ns, sess.InstanceID)
+		if err != nil {
+			return nil, err
+		}
+		mounts = append(mounts, k8s.VolMountSpec{PVCName: homePVC, MountPath: homeMount})
 	}
 	// 개인 영속 NFS 저장소 → ~/nfs (세션이 사라져도 유지; 노드 무관 이식성).
 	// sharedHome=false 면 영속 home 미사용 → ~/nfs 마운트 생략(세션은 emptyDir 로컬 임시만).
@@ -460,6 +483,24 @@ func (s *Service) recordCreate(userID int64, username, instanceID string) {
 	}
 	uid := userID
 	_ = s.audit.Insert(&audit.Log{ActorID: &uid, ActorUsername: username, Action: "session_create", Target: instanceID, Result: "success"})
+}
+
+// sessionHomePVC는 세션 전용 영속 홈(/home/work) PVC 이름(세션 인스턴스에 귀속).
+func sessionHomePVC(instanceID string) string { return "sh-" + instanceID }
+
+// ensureSessionHome은 세션 전용 영속 홈(/home/work) PVC 를 멱등 생성한다.
+// 중단(Stop)해도 유지 → 재개 시 그대로 복원, 삭제(Delete) 시 함께 제거 = "중단은 보존, 삭제는 제거".
+// 로컬 스토리지클래스(local-path, RWO·WFFC): 노드 로컬 디스크라 빠르다(홈 I/O 를 NFS 로 보내면 느림).
+// WFFC 라 Pod 스케줄 시점에 그 노드에 바인딩되고, 이후 PV 노드 어피니티가 재시작을 같은 노드로 되돌린다.
+func (s *Service) ensureSessionHome(ctx context.Context, ns, instanceID string) (string, error) {
+	name := sessionHomePVC(instanceID)
+	if err := s.prov.CreatePVC(ctx, k8s.PVCSpec{
+		Namespace: ns, Name: name, SizeGiB: homeSizeGiB,
+		StorageClass: s.localClass, AccessMode: "RWO",
+	}); err != nil {
+		return "", err
+	}
+	return name, nil
 }
 
 // ensureHome은 사용자 홈 PVC(/home/work 영속)를 멱등 생성하고 이름을 반환한다.
@@ -998,29 +1039,29 @@ func (s *Service) provision(ctx context.Context, ns string, sess *Session, image
 
 	channels := s.sessionChannels(sess.ImageID, sess.WebPassword)
 	if err := s.prov.CreateSessionPod(ctx, k8s.SessionSpec{
-		Namespace:   ns,
-		Name:        sess.InstanceID,
-		Image:       imageRef,
-		GpuType:     sess.GpuType,
-		GpuMode:     sess.GpuMode,
-		GpuCount:    sess.GpuCount,
-		VramMB:      sess.VramMB,
-		CorePercent: sess.CorePercent,
-		CPUCores:    sess.CPUCores,
-		MemGB:       sess.MemGB,
+		Namespace:    ns,
+		Name:         sess.InstanceID,
+		Image:        imageRef,
+		GpuType:      sess.GpuType,
+		GpuMode:      sess.GpuMode,
+		GpuCount:     sess.GpuCount,
+		VramMB:       sess.VramMB,
+		CorePercent:  sess.CorePercent,
+		CPUCores:     sess.CPUCores,
+		MemGB:        sess.MemGB,
 		EphemeralGiB: s.ephemeralGiB(sess.UserID), // 정책 해석값(0=매퍼 기본 캡). 노드 디스크 DoS 방지.
-		Labels:      sess.labels(),
-		UID:         s.uidBase + int(sess.UserID), // 안정 UID(물리 SSH 와 동일 공식) → NFS 권한 일관
-		HomePVC:     homePVC,
-		Volumes:     mounts,
-		WebChannels: channels,     // 이미지 channels 기반(vscode/jupyter)
-		SSHDImage:   s.sshdImage,  // 컨테이너 SSH 사이드카(빈값=비활성)
-		SSHDPubKey:  s.sshdPubKey, // 사이드카가 신뢰할 게이트웨이 공개키(게이트웨이 off 면 빈값)
-			// 사용자 등록 공개키 Secret(위에서 upsert). Optional 마운트라 키 미등록이어도 세션은 뜬다.
-			UserKeysSecret: k8s.UserKeysSecretName(sess.UserID),
-		ScratchHost: s.scratchHostOf(sess.UserID),
-		PreferNodes: preferNodes, // 이미지 캐시 노드 소프트 선호(빠른 시작)
-		RequireNode: requireNode, // 데이터셋 로컬 캐시 노드 하드 핀(hostPath 마운트)
+		Labels:       sess.labels(),
+		UID:          s.uidBase + int(sess.UserID), // 안정 UID(물리 SSH 와 동일 공식) → NFS 권한 일관
+		HomePVC:      homePVC,
+		Volumes:      mounts,
+		WebChannels:  channels,     // 이미지 channels 기반(vscode/jupyter)
+		SSHDImage:    s.sshdImage,  // 컨테이너 SSH 사이드카(빈값=비활성)
+		SSHDPubKey:   s.sshdPubKey, // 사이드카가 신뢰할 게이트웨이 공개키(게이트웨이 off 면 빈값)
+		// 사용자 등록 공개키 Secret(위에서 upsert). Optional 마운트라 키 미등록이어도 세션은 뜬다.
+		UserKeysSecret: k8s.UserKeysSecretName(sess.UserID),
+		ScratchHost:    s.scratchHostOf(sess.UserID),
+		PreferNodes:    preferNodes, // 이미지 캐시 노드 소프트 선호(빠른 시작)
+		RequireNode:    requireNode, // 데이터셋 로컬 캐시 노드 하드 핀(hostPath 마운트)
 	}); err != nil {
 		return err
 	}
@@ -1434,9 +1475,13 @@ func (s *Service) Start(ctx context.Context, instanceID string, userID int64) er
 		return err
 	}
 	ns := s.namespaceOf(sess)
-	// 재시작도 통합 home 모델: 로컬(임시) home + (sharedHome 시) ~/nfs 영속.
+	// 재시작도 동일: 세션 전용 영속 홈 재마운트(중단 전 데이터 그대로 복원) + (sharedHome 시) ~/nfs 영속.
 	mounts := s.restartMounts(ctx, ns, sess.UserID, sess.ID)
-	mounts = append(mounts, k8s.VolMountSpec{EmptyDir: true, MountPath: homeMount})
+	homePVC, err := s.ensureSessionHome(ctx, ns, sess.InstanceID)
+	if err != nil {
+		return err
+	}
+	mounts = append(mounts, k8s.VolMountSpec{PVCName: homePVC, MountPath: homeMount})
 	if s.sharedHome {
 		persistPVC, err := s.ensureHome(ctx, ns, sess.UserID)
 		if err != nil {
@@ -1487,6 +1532,7 @@ func (s *Service) Delete(ctx context.Context, instanceID string, userID int64) e
 	_ = s.prov.DeleteSessionPod(ctx, ns, instanceID)
 	_ = s.prov.DeleteSessionService(ctx, ns, instanceID)
 	s.cleanupSharedMounts(ctx, ns, sess.UserID, sess.ID, instanceID)
+	_ = s.prov.DeletePVC(ctx, ns, sessionHomePVC(instanceID)) // 삭제=세션 홈 데이터 제거(중단 때는 보존)
 	return s.repo.Delete(instanceID)
 }
 
@@ -1557,6 +1603,7 @@ func (s *Service) AdminDelete(ctx context.Context, instanceID string) error {
 		_ = s.prov.DeleteSessionPod(ctx, ns, instanceID)
 		_ = s.prov.DeleteSessionService(ctx, ns, instanceID)
 		s.cleanupSharedMounts(ctx, ns, sess.UserID, sess.ID, instanceID)
+		_ = s.prov.DeletePVC(ctx, ns, sessionHomePVC(instanceID)) // 삭제=세션 홈 데이터 제거
 	}
 	return s.repo.Delete(instanceID)
 }

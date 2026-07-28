@@ -27,14 +27,14 @@ type Service struct {
 	met             *metrics.Client
 	nfsServer       string
 	nfsPath         string
-	scratchHostPath string // 노드로컬 스크래치 루트(/scratch). 노드별 활성은 DB scratch_enabled
-	localHomeHost   string // 물리 로컬 home 루트(/home/giosk). 물리 SSH home = <root>/<user> (노드 로컬 디스크)
-	uidBase         int    // 물리 계정 UID = uidBase + userID(전역 안정, 재사용 안 함)
-	dpConfigNS      string // device plugin 설정 ConfigMap 네임스페이스(빈값=자동적용 비활성 → 수동 운영)
-	dpConfigName    string // device plugin 설정 ConfigMap 이름
-	freeMode        bool   // 자유 모드: 임대 영속(cordon 없음·만료 없음·해제 안 함) → 계정 재사용·동시접속
+	scratchHostPath string                            // 노드로컬 스크래치 루트(/scratch). 노드별 활성은 DB scratch_enabled
+	localHomeHost   string                            // 물리 로컬 home 루트(/home/giosk). 물리 SSH home = <root>/<user> (노드 로컬 디스크)
+	uidBase         int                               // 물리 계정 UID = uidBase + userID(전역 안정, 재사용 안 함)
+	dpConfigNS      string                            // device plugin 설정 ConfigMap 네임스페이스(빈값=자동적용 비활성 → 수동 운영)
+	dpConfigName    string                            // device plugin 설정 ConfigMap 이름
+	freeMode        bool                              // 자유 모드: 임대 영속(cordon 없음·만료 없음·해제 안 함) → 계정 재사용·동시접속
 	cachedProvider  func() map[string][]CachedDataset // 노드별 캐시 데이터셋(세션 생성 노드 선호 표시). nil=빈 목록.
-	physicalLabel   string // 물리노드 식별 라벨(기본 giosk.io/physical). 토글 시 이 라벨을 노드에 적용.
+	physicalLabel   string                            // 물리노드 식별 라벨(기본 giosk.io/physical). 토글 시 이 라벨을 노드에 적용.
 }
 
 // WithPhysicalLabel은 물리노드 식별 라벨을 설정한다(물리 임대 토글이 이 라벨을 k8s 노드에 붙인다).

@@ -34,6 +34,7 @@ data:
        values.yaml 이 기본(false)을 제공하므로 값을 그대로 quote 한다. */}}
   GIOSK_SHARED_HOME: {{ .Values.storage.persistence.sharedHome | quote }}
   GIOSK_NFS_CLASS: {{ .Values.storage.nfsClass | default "nfs" | quote }}
+  GIOSK_LOCAL_CLASS: {{ .Values.storage.localClass | default "local-path" | quote }}
   GIOSK_STORAGE_PRICE_PER_GIB_MONTH: {{ (.Values.storage.pricePerGiBMonth | default 0) | quote }}
   GIOSK_SCRATCH_ENABLED: {{ (.Values.storage.scratch).enabled | default false | quote }}
   GIOSK_SCRATCH_HOSTPATH: {{ (.Values.storage.scratch).hostPath | default "/scratch" | quote }}
@@ -71,6 +72,7 @@ data:
   GIOSK_QUOTA_MAX_GPU: {{ .Values.quota.maxGpuCount | quote }}
   GIOSK_QUOTA_MAX_VRAM_GB: {{ .Values.quota.maxVramGb | quote }}
   GIOSK_QUOTA_MAX_SESSIONS: {{ .Values.quota.maxConcurrentSessions | quote }}
+  GIOSK_QUOTA_MAX_STOPPED: {{ .Values.quota.maxStoppedSessions | default 5 | quote }}
   GIOSK_VOLUME_QUOTA_GB: {{ .Values.quota.volumeQuotaGb | quote }}
   # 세션 웹(VSCode) 노출 모드: nodeport(기본) | loadbalancer(MetalLB)
   GIOSK_SESSION_EXPOSE: {{ .Values.session.expose | quote }}
