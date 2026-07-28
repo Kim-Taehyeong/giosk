@@ -421,7 +421,7 @@ func (s *Service) Create(ctx context.Context, userID int64, username string, req
 	req.Datasets = s.repo.MountableDatasetIDs()
 	dsTarget, dsCached, dsHostPath := requireNode, map[int64][]string(nil), map[int64]string(nil)
 	if requireNode == "" {
-		dsTarget, dsCached, dsHostPath = s.pickDatasetNode(ctx, req.Datasets, sess.GpuType, sess.GpuMode)
+		dsTarget, dsCached, dsHostPath = s.pickDatasetNode(ctx, req.Datasets, sess.GpuType, sess.GpuMode, sess.GpuCount)
 		requireNode = dsTarget
 	} else if s.datasetCache != nil {
 		dsCached, dsHostPath = s.datasetCache.DatasetCachePlacement(req.Datasets)
@@ -621,7 +621,7 @@ func (s *Service) mountFor(ctx context.Context, ns string, userID, volID int64, 
 // pickDatasetNode는 요청 데이터셋들의 로컬 캐시 배치를 보고, 가장 많이 캐시된(GPU타입 일치) 노드를 고른다.
 // 반환 node!="" 이면 그 노드에 핀하고, 그 노드에 캐시된 데이터셋은 hostPath 로 마운트한다(나머지는 NFS).
 // 캐시 비활성/후보 없음이면 node="" (전부 NFS).
-func (s *Service) pickDatasetNode(ctx context.Context, ids []int64, gpuType, gpuMode string) (string, map[int64][]string, map[int64]string) {
+func (s *Service) pickDatasetNode(ctx context.Context, ids []int64, gpuType, gpuMode string, gpuCount int) (string, map[int64][]string, map[int64]string) {
 	if s.datasetCache == nil || len(ids) == 0 {
 		return "", nil, nil
 	}
@@ -630,12 +630,23 @@ func (s *Service) pickDatasetNode(ctx context.Context, ids []int64, gpuType, gpu
 		return "", nil, nil
 	}
 	typeNodes := s.nodesOfType(ctx, gpuType, gpuMode) // 후보를 GPU 타입 일치 노드로 제한
+	// 사용자가 노드를 직접 고르지 않은 경우, 데이터셋 캐시 노드로 "하드핀"하면 그 노드가 만석일 때
+	// 다른 빈 노드가 있어도 영구 Pending 이 된다. 그러니 GPU 여유가 있는 캐시 노드만 후보로 삼고,
+	// 여유 있는 캐시 노드가 없으면 핀하지 않는다("" → 데이터셋은 NFS, 스케줄러가 빈 노드로 배치).
+	freeGpu := s.freeGpuByNode(ctx)
+	need := 1
+	if gpuMode == "exclusive" {
+		need = max1(gpuCount)
+	}
 	best, bestN := "", 0
 	score := map[string]int{}
 	for _, nodes := range cached {
 		for _, n := range nodes {
 			if typeNodes != nil && !typeNodes[n] {
 				continue
+			}
+			if freeGpu != nil && freeGpu[n] < need {
+				continue // 캐시돼 있어도 GPU 여유 없음 → 핀 후보 제외(만석 노드에 핀 금지)
 			}
 			score[n]++
 			if score[n] > bestN {
@@ -644,9 +655,34 @@ func (s *Service) pickDatasetNode(ctx context.Context, ids []int64, gpuType, gpu
 		}
 	}
 	if bestN == 0 {
-		return "", nil, nil // 캐시된 노드 중 타입 일치 없음 → 전부 NFS
+		return "", nil, nil // 여유 있는 캐시 노드 없음 → 핀 없이 NFS(빈 노드로 스케줄)
 	}
 	return best, cached, hostPaths
+}
+
+// freeGpuByNode는 노드별 남은 GPU 수를 근사한다(데이터셋 캐시 핀의 여유 판정용).
+// 전용 세션은 GPU 개수만큼 점유로 계산, 분할/타임셰어는 한 장을 나눠 쓰므로 여유를 깎지 않는다(패킹 가능).
+func (s *Service) freeGpuByNode(ctx context.Context) map[string]int {
+	live, err := s.prov.ListNodes(ctx)
+	if err != nil || len(live) == 0 {
+		return nil
+	}
+	free := map[string]int{}
+	for _, n := range live {
+		free[n.Name] = atoiCap(n.GpuCapacity)
+	}
+	running, err := s.repo.ListRunning()
+	if err != nil {
+		return free
+	}
+	for i := range running {
+		r := running[i]
+		if r.Node == "" || r.Env == "ssh" || r.GpuMode != "exclusive" {
+			continue
+		}
+		free[r.Node] -= max1(r.GpuCount)
+	}
+	return free
 }
 
 // nodesOfType는 GPU 타입이 일치하는(또는 CPU면 전체) Ready 노드 집합을 반환한다(미가용 시 nil=제한없음).
@@ -1494,7 +1530,7 @@ func (s *Service) Start(ctx context.Context, instanceID string, userID int64) er
 		mounts = append(mounts, k8s.VolMountSpec{PVCName: persistPVC, MountPath: homeMount + "/nfs"})
 	}
 	dsIDs := s.repo.SessionDatasetIDs(sess.ID)
-	dsNode, dsCached, dsHostPath := s.pickDatasetNode(ctx, dsIDs, sess.GpuType, sess.GpuMode)
+	dsNode, dsCached, dsHostPath := s.pickDatasetNode(ctx, dsIDs, sess.GpuType, sess.GpuMode, sess.GpuCount)
 	mounts = append(mounts, s.resolveDatasets(ctx, ns, dsIDs, dsNode, dsCached, dsHostPath)...) // 데이터셋 RO 복원
 	var preferNodes []string
 	if sess.ImageID != nil {
