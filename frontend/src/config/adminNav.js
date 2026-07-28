@@ -24,7 +24,7 @@ export const adminNavGroups = [
       { key: 'approvals', icon: BadgeCheck, path: 'approvals', levels: ALL },
       { key: 'users', icon: Users, path: 'users', levels: ALL },
       { key: 'groups', icon: FolderKanban, path: 'groups', levels: ['platform', 'org'] }, // 팀장은 전체 팀 목록 없음
-      { key: 'orgs', icon: Building2, path: 'orgs', levels: ALL }, // 매니저는 자기(부모) 조직만
+      { key: 'orgs', icon: Building2, path: 'orgs', levels: ['platform', 'org'] }, // 조직 관리는 최고/조직관리자만. 팀장은 조직 안 봄.
       { key: 'policies', icon: ShieldCheck, path: 'policies', levels: ALL }, // 자기 범위 정책(읽기), 편집은 platform
 
       { key: 'resources', icon: Boxes, path: 'resources' },
