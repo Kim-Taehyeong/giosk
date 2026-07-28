@@ -40,7 +40,14 @@ export default function UserSessionDetail() {
     if (!found) setNotFound(true); else setR(found);
   }).catch(() => setNotFound(true));
   useEffect(() => { load(); getSessionAudit(id).then(setActivity).catch(() => {}); /* eslint-disable-next-line */ }, [id]);
-  useEffect(() => { if (r?.status !== 'running') return undefined; const t = setInterval(load, 4000); return () => clearInterval(t); /* eslint-disable-next-line */ }, [r?.status]);
+  // 종료 상태가 아니면 폴링해 준비중→실행 전이를 라이브로 반영(준비중엔 더 촘촘히).
+  useEffect(() => {
+    const terminal = ['stopped', 'failed', 'terminated', 'deleted', 'error'].includes(r?.status);
+    if (!r || terminal) return undefined;
+    const t = setInterval(load, r.status === 'running' ? 4000 : 2000);
+    return () => clearInterval(t);
+    /* eslint-disable-next-line */
+  }, [r?.status]);
 
   if (notFound) return <div className="card">{t('sdetail.notFound', { defaultValue: '세션을 찾을 수 없습니다.' })}</div>;
   if (!r) return <Spinner pad label={t('sdetail.loading', { defaultValue: '…' })} />;
@@ -61,8 +68,8 @@ export default function UserSessionDetail() {
   };
   const rows = measureRows(r, true);
   const isGpu = r.mode !== 'cpu' && r.mode !== 'ssh';
-  const idlePct = r.autoStopIdleMin ? Math.min(100, Math.round((r.idleMin / r.autoStopIdleMin) * 100)) : 0;
-  const idleClose = idlePct >= 70;
+  // 자동 종료 임계 = 전역 유휴 정책(config.idle.timeoutMin). 유휴 리퍼는 GPU 세션만 회수(CPU 제외).
+  const autoStopMin = isGpu ? (r.autoStopIdleMin || config.idle?.timeoutMin || 0) : 0;
   const canConnect = r.status === 'running' && (r.conn || []).length > 0;
 
   return (
@@ -115,19 +122,11 @@ export default function UserSessionDetail() {
           </div>
 
           <div className="card">
-            <h3 style={{ marginTop: 0 }}><Power size={16} style={{ color: idleClose ? 'var(--danger)' : undefined }} /> {t('session.detAutoStop')}</h3>
-            {isGpu && r.autoStopIdleMin ? (
+            <h3 style={{ marginTop: 0 }}><Power size={16} /> {t('session.detAutoStop')}</h3>
+            {autoStopMin ? (
               <>
-                <div className="muted" style={{ fontSize: 12.5, marginBottom: 7 }}>{t('session.detAutoStopDesc', { n: r.autoStopIdleMin })}</div>
-                {r.status === 'running' && (
-                  <>
-                    <Bar value={r.idleMin} max={r.autoStopIdleMin} variant={idleClose ? 'warn' : 'free'} />
-                    <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
-                      {idleClose ? t('session.detIdleWarn', { cur: r.idleMin, max: r.autoStopIdleMin }) : t('session.detIdleNow', { cur: r.idleMin, max: r.autoStopIdleMin })}
-                    </div>
-                  </>
-                )}
-                {r.status === 'stopped' && <div style={{ fontSize: 12.5, color: 'var(--danger)', fontWeight: 600 }}>{t('session.detStoppedIdle')}</div>}
+                <div className="muted" style={{ fontSize: 12.5 }}>{t('session.detAutoStopDesc', { n: autoStopMin, defaultValue: `GPU 유휴가 ${autoStopMin}분 이상 지속되면 세션이 자동 종료됩니다.` })}</div>
+                {r.status === 'stopped' && <div style={{ fontSize: 12.5, color: 'var(--danger)', fontWeight: 600, marginTop: 6 }}>{t('session.detStoppedIdle')}</div>}
               </>
             ) : <div className="muted" style={{ fontSize: 12.5 }}>{t('session.detNoAutoStop')}</div>}
           </div>
