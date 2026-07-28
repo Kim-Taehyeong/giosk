@@ -117,13 +117,25 @@ export default function Datasets() {
               {global.length === 0 && <tr><td colSpan={7} style={{ textAlign: 'center', color: 'var(--muted)' }}>{t('datasets.none')}</td></tr>}
               {global.map((r) => (
                 <React.Fragment key={r.id}>
-                  <tr className="row-link" style={{ cursor: 'pointer' }}
-                    onClick={(e) => { if (e.target.closest('button, a, input, select, label')) return; navigate(`/console/admin/datasets/${r.id}`); }}>
+                  <tr className={r.loadStatus === 'loading' ? '' : 'row-link'} style={{ cursor: r.loadStatus === 'loading' ? 'default' : 'pointer' }}
+                    onClick={(e) => { if (r.loadStatus === 'loading') return; if (e.target.closest('button, a, input, select, label')) return; navigate(`/console/admin/datasets/${r.id}`); }}>
                     <td style={{ fontWeight: 600 }}>
                       <span style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>{r.name}
-                        {r.loadStatus === 'loading' && <Pill variant="wait" dot>{phaseLabel(r.phase)} {r.progress || 0}%</Pill>}
+                        {r.loadStatus === 'loading' && <Pill variant="wait" dot>{t('datasets.registering', { defaultValue: '등록중' })}</Pill>}
                         {r.loadStatus === 'failed' && <Pill variant="err">{t('datasets.loadFailed')}</Pill>}
                       </span>
+                      {/* 등록중 = 다운로드/압축해제 하위단계 + 프로그레스 바(숫자만이 아니라 바). 등록중엔 상세 진입/캐싱 불가. */}
+                      {r.loadStatus === 'loading' && (
+                        <div style={{ marginTop: 6, maxWidth: 280 }}>
+                          <div className="flex" style={{ justifyContent: 'space-between', fontSize: 11.5, marginBottom: 3 }}>
+                            <span className="muted">{phaseLabel(r.phase)}</span>
+                            <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{r.progress || 0}%</span>
+                          </div>
+                          <div style={{ height: 7, borderRadius: 4, background: 'var(--surface-2)', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${r.progress || 0}%`, background: 'var(--primary)', transition: 'width .5s' }} />
+                          </div>
+                        </div>
+                      )}
                     </td>
                     <td><Pill variant={sizeVariant[r.sizeClass]}>{r.sizeClass}</Pill></td>
                     <td>{formatBytes(r.sizeBytes)}</td>

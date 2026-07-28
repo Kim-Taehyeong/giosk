@@ -189,7 +189,7 @@ pid=$!
 while kill -0 "$pid" 2>/dev/null; do
   du=$(du -sb "` + dir + `" 2>/dev/null | awk '{print $1}')
   ex=$(( ${du:-0} - base )); [ "$ex" -lt 0 ] && ex=0
-  echo "EXPROGRESS $ex"
+  echo "EXPROGRESS $ex $total"
   sleep 2
 done
 wait "$pid" || echo "extract failed(아카이브만 보관)"

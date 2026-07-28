@@ -273,6 +273,21 @@ func lastMarker(toks []string, key string) (int64, bool) {
 	return v, found
 }
 
+// lastPair는 로그에서 "<key> <int> <int>" 마지막 쌍을 찾는다(해제 진행률 EXPROGRESS <ex> <total> 용).
+func lastPair(toks []string, key string) (a, b int64, ok bool) {
+	for i := 0; i+2 < len(toks); i++ {
+		if toks[i] != key {
+			continue
+		}
+		x, e1 := strconv.ParseInt(toks[i+1], 10, 64)
+		y, e2 := strconv.ParseInt(toks[i+2], 10, 64)
+		if e1 == nil && e2 == nil {
+			a, b, ok = x, y, true
+		}
+	}
+	return
+}
+
 func capPct(v int) int {
 	if v > 99 {
 		return 99
@@ -294,18 +309,17 @@ func (s *Service) loadProgress(ctx context.Context, id int64, total int64) (phas
 		return "download", 0, 0, 0
 	}
 	toks := strings.Fields(logs)
-	// 해제 단계 — EXTRACT 마커가 보이면 다운로드는 끝난 것.
+	// 해제 단계 — EXPROGRESS <ex> <total> 로 판정(로그 tail 밖으로 EXTOTAL 이 밀려나도 견고).
 	if strings.Contains(logs, "EXTRACT DONE") {
 		return "extract", 99, 0, 0
 	}
-	if exTotal, ok := lastMarker(toks, "EXTOTAL"); ok {
-		exProg, _ := lastMarker(toks, "EXPROGRESS")
-		if exTotal > 0 {
-			return "extract", capPct(int(exProg * 100 / exTotal)), 0, 0
+	if ex, total, ok := lastPair(toks, "EXPROGRESS"); ok {
+		if total > 0 {
+			return "extract", capPct(int(ex * 100 / total)), 0, 0
 		}
 		return "extract", 0, 0, 0
 	}
-	if strings.Contains(logs, "EXTRACT") { // 해제 시작(총량 미산출)
+	if strings.Contains(logs, "EXTRACT") || strings.Contains(logs, "EXTOTAL") { // 해제 시작(진행표본 전)
 		return "extract", 0, 0, 0
 	}
 	// 다운로드 단계.
@@ -350,14 +364,13 @@ func (s *Service) cacheProgress(ctx context.Context, id int64, node string) (pha
 	if strings.Contains(logs, "EXTRACT DONE") {
 		return "extract", 99
 	}
-	if exTotal, ok := lastMarker(toks, "EXTOTAL"); ok { // 해제 단계
-		exProg, _ := lastMarker(toks, "EXPROGRESS")
-		if exTotal > 0 {
-			return "extract", capPct(int(exProg * 100 / exTotal))
+	if ex, total, ok := lastPair(toks, "EXPROGRESS"); ok { // 해제 단계
+		if total > 0 {
+			return "extract", capPct(int(ex * 100 / total))
 		}
 		return "extract", 0
 	}
-	if strings.Contains(logs, "EXTRACT") {
+	if strings.Contains(logs, "EXTRACT") || strings.Contains(logs, "EXTOTAL") {
 		return "extract", 0
 	}
 	// 복사 단계 — "PROGRESS <cur> <total>".
@@ -573,7 +586,24 @@ func safeArchiveName(fn string) string {
 	return base
 }
 
-func (s *Service) Delete(id int64) error { return s.repo.Delete(id) }
+// Delete는 데이터셋을 삭제하며 노드 로컬 캐시(hostPath)와 NFS 데이터도 함께 정리한다.
+func (s *Service) Delete(ctx context.Context, id int64) error {
+	d, err := s.repo.Get(id)
+	if err == nil {
+		// 캐시된 노드의 로컬 디렉터리 정리 Job(best-effort).
+		if s.prov != nil && s.cacheHost != "" {
+			for _, node := range s.repo.CachedNodesOf(id) {
+				_ = s.prov.RunDatasetUncache(ctx, s.namespace, fmt.Sprintf("rm-dc-%d-%s", id, node), node, s.cacheHost, d.Name)
+			}
+		}
+		_ = s.repo.CacheDeleteAll(id)
+		// NFS 정규경로 데이터(dataset/<name>) 정리.
+		if s.nfsMount != "" && d.Name != "" {
+			_ = os.RemoveAll(filepath.Join(s.nfsMount, "dataset", d.Name))
+		}
+	}
+	return s.repo.Delete(id)
+}
 
 // UpdateDescription은 데이터셋 설명을 수정한다(관리자).
 func (s *Service) UpdateDescription(id int64, desc string) error { return s.repo.SetDescription(id, desc) }
@@ -632,6 +662,11 @@ func (s *Service) ToggleCache(ctx context.Context, datasetID int64, node string)
 		return err
 	}
 	jobBase := fmt.Sprintf("dc-%d-%s", datasetID, node)
+	// 등록중(loading) 데이터셋은 캐시할 수 없다 — NFS 해제가 끝나야 노드로 복사 가능.
+	// 단 이미 캐시 행이 있으면(해제/취소) 통과시킨다.
+	if _, exists := s.repo.CacheStatus(datasetID, node); !exists && d.LoadStatus != "ready" {
+		return fmt.Errorf("등록이 완료된 뒤에 캐시할 수 있습니다(현재 %s)", d.LoadStatus)
+	}
 	if _, exists := s.repo.CacheStatus(datasetID, node); exists {
 		_ = s.repo.CacheDelete(datasetID, node)
 		if s.prov != nil && s.cacheHost != "" {

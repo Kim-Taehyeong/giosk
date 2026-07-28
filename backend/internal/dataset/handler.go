@@ -100,7 +100,7 @@ func (h *Handler) registerErr(c *gin.Context, err error) {
 }
 
 func (h *Handler) Delete(c *gin.Context) {
-	if err := h.svc.Delete(idParam(c)); err != nil {
+	if err := h.svc.Delete(c.Request.Context(), idParam(c)); err != nil {
 		httpx.Internal(c, "삭제 실패")
 		return
 	}
