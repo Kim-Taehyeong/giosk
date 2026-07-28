@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import PageHead from '../../../components/console/PageHead';
 import Pill from '../../../components/console/Pill';
+import { formatBytes } from '../../../utils/format';
 import { useToast } from '../../../components/console/Toast';
 import { getOfferings, getGpuTypes, getImages, getAvailability } from '../../../api/console/resources';
 import { getWallet } from '../../../api/console/wallet';
