@@ -610,7 +610,7 @@ func (s *Service) Delete(ctx context.Context, id int64) error {
 		}
 		// 캐시된/진행중 노드의 로컬 디렉터리 정리 + 캐시 Job 정리(best-effort).
 		if s.prov != nil && s.cacheHost != "" {
-			for _, node := range s.repo.CachedNodesOf(id) {
+			for _, node := range s.repo.AllCacheNodesOf(id) { // cached + 진행중(caching) 모두
 				_ = s.prov.DeleteBuildJob(ctx, s.namespace, fmt.Sprintf("dc-%d-%s", id, node)) // 복사 중이면 중단
 				_ = s.prov.RunDatasetUncache(ctx, s.namespace, fmt.Sprintf("rm-dc-%d-%s", id, node), node, s.cacheHost, d.Name)
 			}

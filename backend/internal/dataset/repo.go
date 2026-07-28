@@ -37,6 +37,7 @@ type Repository interface {
 	CacheDelete(datasetID int64, node string) error
 	ListCaching() []DatasetCacheRow      // 복사중 캐시 행(리컨실러)
 	CachedNodesOf(datasetID int64) []string // 캐시 완료(cached) 노드(세션 마운트 판정)
+	AllCacheNodesOf(datasetID int64) []string // 캐시 행이 있는 모든 노드(cached+caching+failed) — 삭제 정리용
 	CacheDeleteAll(datasetID int64) error   // 데이터셋 삭제 시 그 데이터셋의 모든 캐시 행 정리
 	CachedDatasetsByNode() []NodeCachedDataset // 노드별 캐시 완료 데이터셋(세션 생성 노드 선호 UI)
 	NameTaken(name string) bool             // 동일 이름의 데이터셋/대기 신청 존재 여부(정규경로 충돌 방지)
@@ -222,6 +223,13 @@ func (r *gormRepo) NameTaken(name string) bool {
 func (r *gormRepo) CachedNodesOf(datasetID int64) []string {
 	var nodes []string
 	r.db.Raw(`SELECT node FROM dataset_node_cache WHERE dataset_id=? AND status='cached'`, datasetID).Scan(&nodes)
+	return nodes
+}
+
+// AllCacheNodesOf는 캐시 행이 있는 모든 노드를 반환한다(상태 무관) — 데이터셋 삭제 시 진행중 캐시도 정리.
+func (r *gormRepo) AllCacheNodesOf(datasetID int64) []string {
+	var nodes []string
+	r.db.Raw(`SELECT node FROM dataset_node_cache WHERE dataset_id=?`, datasetID).Scan(&nodes)
 	return nodes
 }
 
