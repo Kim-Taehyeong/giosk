@@ -27,6 +27,7 @@ type Repository interface {
 	SetPVC(id int64, name, ns string) error      // RWX NFS 실체 PVC 좌표 기록
 	SetLoadStatus(id int64, status string) error // loading|ready|failed
 	SetHash(id int64, hash string) error         // 해제 잡이 계산한 아카이브 해시 저장
+	SetSize(id int64, bytes int64) error         // 해제 완료 후 실제 콘텐츠 크기로 교정
 	SetDescription(id int64, desc string) error
 	ListLoading() []Dataset                      // 적재중 데이터셋(리컨실러)
 
@@ -133,6 +134,13 @@ func (r *gormRepo) SetHash(id int64, hash string) error {
 		return nil
 	}
 	return r.db.Exec(`UPDATE datasets SET hash = ? WHERE id = ?`, hash, id).Error
+}
+
+func (r *gormRepo) SetSize(id int64, bytes int64) error {
+	if bytes <= 0 {
+		return nil
+	}
+	return r.db.Exec(`UPDATE datasets SET size_bytes = ? WHERE id = ?`, bytes, id).Error
 }
 
 func (r *gormRepo) SetLoadStatus(id int64, status string) error {

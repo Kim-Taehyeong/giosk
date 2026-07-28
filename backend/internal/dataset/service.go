@@ -168,6 +168,12 @@ func (s *Service) RunReconciler(ctx context.Context, interval time.Duration) {
 	}
 }
 
+// parseExtracted는 해제 잡 로그에서 마지막 "EXTRACTED <bytes>"(실제 콘텐츠 크기)를 뽑는다.
+func parseExtracted(logs string) int64 {
+	v, _ := lastMarker(strings.Fields(logs), "EXTRACTED")
+	return v
+}
+
 // parseHash는 해제 잡 로그에서 마지막 "HASH <값>" 을 뽑는다(없으면 "").
 func parseHash(logs string) string {
 	toks := strings.Fields(logs)
@@ -203,11 +209,15 @@ func (s *Service) reconcileOnce(ctx context.Context) {
 			continue
 		}
 		_ = s.repo.SetPVC(d.ID, pvc, s.namespace)
-		// 해제 잡이 남긴 "HASH <sum>" 을 저장(아카이브 sha256 앞 16자). Job 삭제 전에 읽는다.
+		// 해제 잡 로그에서 HASH(아카이브 sha256 16자) + EXTRACTED(실제 콘텐츠 크기)를 읽어 저장/교정. Job 삭제 전에.
+		logs := s.prov.BuildLogs(ctx, s.namespace, job, 80)
 		if d.Hash == "" {
-			if h := parseHash(s.prov.BuildLogs(ctx, s.namespace, job, 60)); h != "" {
+			if h := parseHash(logs); h != "" {
 				_ = s.repo.SetHash(d.ID, h)
 			}
+		}
+		if sz := parseExtracted(logs); sz > 0 {
+			_ = s.repo.SetSize(d.ID, sz) // 아카이브 추정 → 실제 해제 크기로 교정(용량 뻥튀기 해소)
 		}
 		_ = s.repo.SetLoadStatus(d.ID, "ready")
 		_ = s.prov.DeleteBuildJob(ctx, s.namespace, job)
@@ -548,7 +558,8 @@ func (s *Service) createLoadingAndExtract(ctx context.Context, userID int64, nam
 	if scope == ScopePersonal {
 		status = StatusPrivate
 	}
-	d := &Dataset{Name: name, Scope: scope, Owner: ownerName, OwnerUserID: &userID, SizeBytes: bytes * 3, Status: status, LoadStatus: "loading"}
+	// 초기 용량 = 아카이브 크기(정직한 하한). 해제 완료 시 리컨실러가 실제 해제 콘텐츠 크기로 교정한다.
+	d := &Dataset{Name: name, Scope: scope, Owner: ownerName, OwnerUserID: &userID, SizeBytes: bytes, Status: status, LoadStatus: "loading"}
 	if err := s.repo.CreateDataset(d); err != nil {
 		return err
 	}

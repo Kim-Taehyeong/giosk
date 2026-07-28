@@ -193,6 +193,8 @@ while kill -0 "$pid" 2>/dev/null; do
   sleep 2
 done
 wait "$pid" || echo "extract failed(아카이브만 보관)"
+fin=$(( $(du -sb "` + dir + `" 2>/dev/null | awk '{print $1}') - base )); [ "$fin" -lt 0 ] && fin=0
+echo "EXTRACTED $fin"
 echo "HASH $(sha256sum "$a" 2>/dev/null | cut -c1-16)"
 echo "EXTRACT DONE"`
 }
