@@ -126,6 +126,8 @@ export default function NotificationCenter() {
   const CHANNELS = [{ key: 'email', label: t('notify.chEmail') }, { key: 'webhook', label: t('notify.chWebhook') }];
 
   const metricUnit = (m) => METRICS.find((x) => x.key === m)?.unit || '';
+  // 세션 instance_id → 표시 이름(현재 내 세션 목록 기준). 없으면 id 그대로.
+  const sessName = (id) => mySessions.find((s) => s.id === id)?.name || id;
   // 신규 규칙 기본값: 세션 GPU 유휴(≤10%) 알림 — 첫 세션 대상(있으면). 크레딧 모드 무관하게 세션 지표는 항상 가능.
   const addRule = () => setRules([...rules, { id: Date.now(), metric: 'session_gpu', op: 'lte', value: 10, channel: 'email', on: true, target: mySessions[0]?.id || '' }]);
   // 지표를 세션↔전역으로 바꾸면 target 을 맞춰 초기화(세션 지표인데 target 없으면 첫 세션).
@@ -141,8 +143,7 @@ export default function NotificationCenter() {
 
   return (
     <div>
-      <PageHead title={t('notify.title')} subtitle={t('notify.subtitle')}
-        actions={<button className="btn primary" onClick={addRule}><Plus size={15} /> {t('notify.addRule')}</button>} />
+      <PageHead title={t('notify.title')} subtitle={t('notify.subtitle')} />
 
       {/* 받은 알림(인앱 수신함) */}
       <div className="card mb">
@@ -163,8 +164,12 @@ export default function NotificationCenter() {
                   cursor: n.read ? 'default' : 'pointer', opacity: n.read ? 0.6 : 1 }}>
                 {!n.read && <span style={{ marginTop: 6, flex: '0 0 auto', width: 8, height: 8, borderRadius: 4, background: 'var(--danger)' }} />}
                 <div style={{ minWidth: 0, flex: 1 }}>
-                  <div className="flex" style={{ gap: 8, alignItems: 'center', marginBottom: 3 }}>
+                  <div className="flex" style={{ gap: 8, alignItems: 'center', marginBottom: 3, flexWrap: 'wrap' }}>
                     <Pill variant={sevVariant[n.severity] || 'primary'}>{t(`notify.sev_${n.severity}`, { defaultValue: n.severity })}</Pill>
+                    {/* 대상 구분: 세션 알림은 어느 세션인지, 그 외는 계정 전체 */}
+                    {n.target
+                      ? <Pill variant="gpu"><Server size={11} /> {sessName(n.target)}</Pill>
+                      : <Pill variant="primary">{t('notify.scopeAccount', { defaultValue: '계정 전체' })}</Pill>}
                     <span style={{ fontWeight: 700, fontSize: 13.5 }}>{txt.title}</span>
                   </div>
                   <div className="muted" style={{ fontSize: 12.5 }}>{txt.body}</div>
@@ -207,7 +212,11 @@ export default function NotificationCenter() {
       )}
 
       <div className="card mb">
-        <h3><BellRing size={16} /> {t('notify.rules')}</h3>
+        <h3 className="flex" style={{ justifyContent: 'space-between' }}>
+          <span className="flex gap"><BellRing size={16} /> {t('notify.rules')}</span>
+          <button className="btn sm primary" onClick={addRule}><Plus size={14} /> {t('notify.addRule')}</button>
+        </h3>
+        <div className="legend mb">{t('notify.rulesHint', { defaultValue: '알림 규칙과 받은 알림은 계정 단위입니다(모든 팀 공통). 세션 지표는 대상 세션에서 평가됩니다.' })}</div>
         {rules.length === 0 && <div className="muted" style={{ padding: '12px 0' }}>{t('notify.noRules')}</div>}
         {rules.map((r) => (
           <div key={r.id} className="flex gap wrap" style={{ padding: '14px 0', borderBottom: '1px solid var(--border)' }}>
