@@ -152,7 +152,7 @@ pid=$!
 while kill -0 "$pid" 2>/dev/null; do
   sz=$(stat -c %s "` + dir + `/$fn" 2>/dev/null || echo 0)
   echo "PROGRESS $sz"
-  sleep 2
+  sleep 1
 done
 wait "$pid"
 echo "PROGRESS DONE"
@@ -192,7 +192,7 @@ while kill -0 "$pid" 2>/dev/null; do
   du=$(du -sb "` + dir + `" 2>/dev/null | awk '{print $1}')
   ex=$(( ${du:-0} - base )); [ "$ex" -lt 0 ] && ex=0
   echo "EXPROGRESS $ex $total"
-  sleep 2
+  sleep 1
 done
 wait "$pid" || echo "extract failed(아카이브만 보관)"
 fin=$(( $(du -sb "` + dir + `" 2>/dev/null | awk '{print $1}') - base )); [ "$fin" -lt 0 ] && fin=0
@@ -245,7 +245,7 @@ if [ -n "$arc" ]; then
   pid=$!
   while kill -0 "$pid" 2>/dev/null; do
     cur=$(stat -c %s '` + dst + `/'"$bn" 2>/dev/null || echo 0)
-    echo "PROGRESS $cur $total"; sleep 2
+    echo "PROGRESS $cur $total"; sleep 1
   done
   wait "$pid"
   echo "PROGRESS $total $total"
