@@ -590,9 +590,14 @@ func safeArchiveName(fn string) string {
 func (s *Service) Delete(ctx context.Context, id int64) error {
 	d, err := s.repo.Get(id)
 	if err == nil {
-		// 캐시된 노드의 로컬 디렉터리 정리 Job(best-effort).
+		// 처리 중이면 적재/해제 Job 을 먼저 죽인다(고아 Job 방지).
+		if s.prov != nil {
+			_ = s.prov.DeleteBuildJob(ctx, s.namespace, fmt.Sprintf("dl-ds-%d", id))
+		}
+		// 캐시된/진행중 노드의 로컬 디렉터리 정리 + 캐시 Job 정리(best-effort).
 		if s.prov != nil && s.cacheHost != "" {
 			for _, node := range s.repo.CachedNodesOf(id) {
+				_ = s.prov.DeleteBuildJob(ctx, s.namespace, fmt.Sprintf("dc-%d-%s", id, node)) // 복사 중이면 중단
 				_ = s.prov.RunDatasetUncache(ctx, s.namespace, fmt.Sprintf("rm-dc-%d-%s", id, node), node, s.cacheHost, d.Name)
 			}
 		}
