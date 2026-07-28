@@ -1720,11 +1720,10 @@ func (s *Service) CountIdleRunning(ctx context.Context) int {
 //   - GPU 세션(exclusive/shared): GPU 사용률(DCGM)이 idleGPUThreshold% 미만이면 유휴.
 //   - CPU 세션(cpu): CPU rate 가 idleCPUThreshold 코어 미만이면 유휴.
 //
-// ok=false 면 판정 불가(메트릭 없음/물리 세션) → 보수적으로 정지하지 않는다.
+// ok=false 면 판정 불가(메트릭 없음) → 보수적으로 정지하지 않는다.
+// 물리(SSH) 세션은 GpuMode="exclusive" 라 아래 전용 분기(노드 GPU 사용률)로 흐른다 — 노드를 통째
+// 점유하므로 노드 GPU 사용률이 곧 임대 사용량이고, 유휴면 회수해 다른 세션이 들어오게 한다.
 func (s *Service) isIdle(ctx context.Context, sess *Session, windowMin int) (idle, ok bool) {
-	if sess.Env == "ssh" {
-		return false, false // 물리(SSH) 세션은 Pod 메트릭이 없어 유휴 리퍼 대상 아님
-	}
 	if sess.GpuMode == "cpu" {
 		// CPU 세션은 유휴로 종료하지 않는다(사용자 정책: "CPU 유휴로 끄면 안 됨").
 		// 유휴 리퍼는 희소 자원인 GPU 세션만 회수한다.
@@ -1791,8 +1790,14 @@ func (s *Service) idleStop(ctx context.Context, sess *Session, windowMin int) {
 // autoStop은 세션 Pod/Service 를 정리하고 최종 정산 후 stopped 로 전이한다(소유자 무관, 시스템 동작).
 func (s *Service) autoStop(ctx context.Context, sess *Session, action, logMsg string) {
 	s.settle(ctx, sess, true) // 정지 전 사용분 최종 정산
-	_ = s.prov.DeleteSessionPod(ctx, s.namespaceOf(sess), sess.InstanceID)
-	_ = s.prov.DeleteSessionService(ctx, s.namespaceOf(sess), sess.InstanceID)
+	if sess.Env == "ssh" {
+		if s.leaser != nil {
+			_ = s.leaser.ReleaseLeaseFor(ctx, sess.InstanceID) // 물리 임대 반납(uncordon); 홈(NFS)은 유지
+		}
+	} else {
+		_ = s.prov.DeleteSessionPod(ctx, s.namespaceOf(sess), sess.InstanceID)
+		_ = s.prov.DeleteSessionService(ctx, s.namespaceOf(sess), sess.InstanceID)
+	}
 	if err := s.repo.SetPhase(sess.InstanceID, PhaseStopped); err != nil {
 		return
 	}
