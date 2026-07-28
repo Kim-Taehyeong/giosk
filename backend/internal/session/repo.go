@@ -195,7 +195,7 @@ func (r *gormRepo) ListAll() ([]AdminRow, error) {
 const adminRowSelect = `
 	SELECT s.instance_id AS id, s.name, s.user_id,
 	       COALESCE(NULLIF(CONCAT(img.name, IF(img.tag IS NULL OR img.tag='','',CONCAT(':',img.tag))), ''), '') AS image,
-	       TRIM(CONCAT(COALESCE(u.last_name,''),COALESCE(u.first_name,''))) AS owner,
+	       COALESCE(NULLIF(TRIM(CONCAT(COALESCE(u.last_name,''),COALESCE(u.first_name,''))),''), u.username) AS owner,
 	       COALESCE(o.display_name,'') AS org, COALESCE(g.display_name,'') AS ` + "`group`" + `,
 	       s.gpu_type, s.gpu_mode, s.env, s.node, s.phase AS status,
 	       DATE_FORMAT(s.created_at, '%Y-%m-%dT%H:%i:%sZ') AS created_at,
