@@ -150,7 +150,9 @@ func (s *Service) runPhysicalTerminal(ctx context.Context, sess *Session, userID
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // 사내망 노드, 키 고정 목록 없음
 		Timeout:         10 * time.Second,
 	}
-	client, err := ssh.Dial("tcp", sess.Node+":22", cfg)
+	// 노드 이름은 클러스터 DNS 에 없어 lookup 실패 → InternalIP 로 접속.
+	nodeIP := s.prov.NodeIP(ctx, sess.Node)
+	client, err := ssh.Dial("tcp", nodeIP+":22", cfg)
 	if err != nil {
 		_, _ = io.WriteString(stdout, "노드 접속 실패: "+err.Error()+"\r\n")
 		return nil

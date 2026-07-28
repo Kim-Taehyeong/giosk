@@ -62,6 +62,7 @@ type Provisioner interface {
 	DeleteSessionService(ctx context.Context, ns, name string) error
 	SessionServiceAccess(ctx context.Context, ns, name, mode string) (k8s.SvcAccess, error)
 	FirstNodeIP(ctx context.Context) string
+	NodeIP(ctx context.Context, node string) string        // 노드 이름→InternalIP(클러스터 DNS 에 노드명 없음 → SSH/웹터미널 IP 필요)
 	ListNodes(ctx context.Context) ([]k8s.LiveNode, error) // 데이터셋 캐시 노드↔GPU타입 매칭용
 	ExecTerminal(ctx context.Context, ns, pod, container string, cmd []string, tio k8s.ExecIO) error // 웹터미널(컨테이너 exec)
 }
@@ -1109,9 +1110,9 @@ func (s *Service) Connection(ctx context.Context, instanceID string, userID int6
 		return nil, err
 	}
 	if sess.Env == "ssh" {
-		// 물리노드 임대 — 노드로 직접 SSH(계정=username, node-agent 가 생성).
+		// 물리노드 임대 — 노드 IP 로 직접 SSH(노드 이름은 클러스터/외부 DNS 에 없어 lookup 실패).
 		return &Connection{
-			SSH: map[string]string{"cmd": fmt.Sprintf("ssh %s@%s", s.usernameOf(userID), sess.Node)},
+			SSH: map[string]string{"cmd": fmt.Sprintf("ssh %s@%s", s.usernameOf(userID), s.prov.NodeIP(ctx, sess.Node))},
 		}, nil
 	}
 	channels := s.sessionChannels(sess.ImageID, sess.WebPassword)
@@ -1235,8 +1236,8 @@ func (s *Service) Access(ctx context.Context, instanceID string, userID int64) (
 		return nil, err
 	}
 	info := &AccessInfo{ExpiresAt: s.now().Add(webAccessTTL)}
-	if sess.Env == "ssh" { // 물리노드 임대 — SSH 만.
-		info.SSH = s.sshAccess(sess.InstanceID, userID, "", sess.Node, gateway.TgtPhysical, s.usernameOf(userID))
+	if sess.Env == "ssh" { // 물리노드 임대 — SSH 만. 노드 이름은 DNS 미해석 → IP 로 접속.
+		info.SSH = s.sshAccess(sess.InstanceID, userID, "", s.prov.NodeIP(ctx, sess.Node), gateway.TgtPhysical, s.usernameOf(userID))
 		info.ExpiresAt = s.now().Add(sshAccessTTL)
 		return info, nil
 	}
