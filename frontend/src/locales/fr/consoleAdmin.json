@@ -115,7 +115,10 @@
     "noAlerts": "Aucune alerte",
     "noActiveUsers": "Aucune session en cours d'exécution pour le moment",
     "modeHint_free": "Mode gratuit – aucune limite de crédit. Surveillez l’utilisation via les statistiques de session/inactivité et les heures GPU.",
-    "modeHint_dynamic": "Mode premier arrivé – pas de crédits ; saisir la capacité lorsqu’elle est disponible. Surveillez via les statistiques et alertes de session/inactivité."
+    "modeHint_dynamic": "Mode premier arrivé – pas de crédits ; saisir la capacité lorsqu’elle est disponible. Surveillez via les statistiques et alertes de session/inactivité.",
+    "metricsOffTitle": "La pile de supervision n'est pas installée",
+    "metricsOffAll": "Sans Prometheus ni l'exportateur DCGM, l'utilisation GPU, la VRAM et la température ne peuvent pas être affichées. Activez la supervision pour voir les métriques en direct.",
+    "metricsOffDcgm": "Prometheus est connecté mais aucune métrique de l'exportateur DCGM n'a été trouvée. Installez dcgm-exporter pour voir en direct l'utilisation GPU, la VRAM et la température."
   },
   "approvals": {
     "title": "Approbations",
@@ -470,7 +473,10 @@
     "impMissing": "Entrez le nom, le propriétaire, le serveur NFS et le chemin.",
     "nfsNoMetrics": "Métriques d'utilisation NFS indisponibles (nécessite Prometheus)",
     "impDone": "Volume importé {{name}} vers {{user}}.",
-    "impNoUser": "Compte introuvable."
+    "impNoUser": "Compte introuvable.",
+    "impOwnerHint": "Choisissez un compte dans la liste pour importer.",
+    "impOwnerPicked": "Sélectionné : {{name}} ({{id}})",
+    "metricsOffNotice": "La supervision (DCGM/Prometheus) n'est pas installée, l'utilisation GPU et la VRAM ne peuvent donc pas être affichées. Activez la supervision pour voir les métriques en direct."
   },
   "mset": {
     "title": "Paramètres",
@@ -838,7 +844,9 @@
     "hint": "Plafonds absolus indépendants des crédits. Les champs vides héritent du parent (groupe → org → global).",
     "saved": "Limites enregistrées pour {{name}}",
     "maxVolumeGib": "Volume maximum",
-    "maxGpu": "GPU maximum"
+    "maxGpu": "GPU maximum",
+    "maxStoppedSessions": "Sessions arrêtées max.",
+    "maxEphemeralGib": "Disque temporaire max."
   },
   "settings": {
     "mode": {

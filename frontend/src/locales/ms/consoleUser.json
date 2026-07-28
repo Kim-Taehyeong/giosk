@@ -309,7 +309,8 @@
     "guaranteed": "Sumber terjamin",
     "hoursApprox": "~{{n}} jam",
     "runtimeLeft": "Masa tayangan pada kadar ini",
-    "guaranteeCpu": "{{n}} vCPU dijamin"
+    "guaranteeCpu": "{{n}} vCPU dijamin",
+    "sshKeyChange": "Tukar"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "detNoActivity": "Tiada aktiviti lagi",
     "detIdleNow": "{{cur}} terbiar / {{max}} min",
     "idlePolicy": "Sesi dituntut semula secara automatik selepas {{n}} min melahu.",
-    "detAutoStopDesc": "Berhenti secara automatik selepas {{n}} min GPU melahu (menjimatkan kredit)."
+    "detAutoStopDesc": "Berhenti secara automatik selepas {{n}} min GPU melahu (menjimatkan kredit).",
+    "detReclaimTitle": "Simpanan sesi terhenti",
+    "reclaimIn": "Boleh dituntut dalam {{n}} hr",
+    "reclaimDue": "Boleh dituntut",
+    "reclaimKept": "Disimpan",
+    "reclaimHint": "Sesi yang dihentikan masih menggunakan cakera home. Selepas {{n}} hari terhenti, ia boleh dituntut semula, dan yang paling lama tidak digunakan mungkin dipadam apabila cakera sesebuah nod semakin berkurangan.",
+    "reclaimKeptHint": "Sesi terhenti terbaharu anda tidak pernah dituntut semula.",
+    "reclaimResumeHint": "Memulakan semula akan menetapkan semula kiraan. Padamkan sesi yang tidak perlu anda simpan lagi."
   },
   "conn": {
     "loading": "Memuatkan maklumat sambungan…",
@@ -412,7 +420,9 @@
     "regenerated": "Mengeluarkan pautan akses baharu.",
     "sshExternalHint": "Dari luar rangkaian kampus, gunakan arahan ini (melompat melalui hos proksi ke get laluan).",
     "sshDirectHint": "Menyambung terus ke nod dengan kunci awam berdaftar anda (rangkaian kampus / VPN diperlukan).",
-    "sshUnavailable": "SSH tidak tersedia untuk sesi ini (pentadbir mesti mendayakan bekas SSH)."
+    "sshUnavailable": "SSH tidak tersedia untuk sesi ini (pentadbir mesti mendayakan bekas SSH).",
+    "sshNeedKey": "Tiada kunci awam SSH didaftarkan",
+    "sshNeedKeyHint": "Daftar atau jana satu di bawah — sesi yang sedang berjalan menerimanya serta-merta."
   },
   "account": {
     "title": "Tetapan Saya",
@@ -448,7 +458,13 @@
     "pwChanged": "Kata laluan ditukar",
     "pwFail": "Penukaran kata laluan gagal",
     "localAcctNote": "Akaun setempat disediakan untuk anda pada setiap nod fizikal.",
-    "homeHint": "Penggunaan direktori rumah nod fizikal anda dalam mod hibrid (SSH)."
+    "homeHint": "Penggunaan direktori rumah nod fizikal anda dalam mod hibrid (SSH).",
+    "sshBad": "Kunci awam tidak sah. Tampal satu baris seperti “ssh-ed25519 AAAA…”.",
+    "sshFail": "Gagal menyimpan kunci awam SSH.",
+    "sshGenerate": "Jana & muat turun kunci",
+    "sshGenerated": "Kunci dijana. Simpan kunci persendirian yang dimuat turun dengan selamat — ia tidak boleh dimuat turun semula.",
+    "sshGenFail": "Gagal menjana kunci SSH.",
+    "sshGenerateHint": "Belum ada kunci? Klik “Jana & muat turun kunci”. Kunci persendirian (.pem) dimuat turun sekali sahaja dan kunci awam didaftarkan secara automatik. Sambungan: ssh -i kunci-dimuat-turun.pem …"
   },
   "notify": {
     "title": "Pemberitahuan",

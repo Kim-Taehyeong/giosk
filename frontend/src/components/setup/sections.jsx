@@ -192,6 +192,10 @@ export function LeaseSection({ config, update }) {
 /* ---------------- 3. 유휴 핸들링 ---------------- */
 export function IdleSection({ config, update }) {
   const { t } = useTranslation('common');
+  // 회수는 두 축이다: 실행 중 세션의 GPU 회수(유휴 정지)와, 중단 세션의 디스크 회수(홈 회수).
+  // 중단 세션은 GPU 를 안 쓰지만 홈 PVC 로 노드 로컬 디스크를 계속 문다.
+  const rc = config.reclaim || {};
+  const ttl = rc.stoppedTtlDays ?? 14;
   return (
     <div>
       <Field label={t('setup.idle.timeout')} hint={t('setup.idle.timeoutHint')} w={220}>
@@ -200,6 +204,18 @@ export function IdleSection({ config, update }) {
       <div className="legend" style={{ marginTop: 14, lineHeight: 1.7 }}>
         • {t('setup.idle.containerNote')}<br />
         • {t('setup.idle.sshNote')}
+      </div>
+
+      <div style={{ height: 1, background: 'var(--border)', margin: '18px 0' }} />
+
+      <Field label={t('setup.reclaim.stoppedTtl')} hint={t('setup.reclaim.stoppedTtlHint')} w={220}>
+        <NumInput value={ttl} min={0} w={140} onChange={(v) => update({ reclaim: { stoppedTtlDays: v } })} suffix={t('setup.unit.day')} />
+      </Field>
+      <Field label={t('setup.reclaim.diskThreshold')} hint={t('setup.reclaim.diskThresholdHint')} w={220}>
+        <NumInput value={rc.homeReapPct ?? 88} min={50} max={99} w={140} onChange={(v) => update({ reclaim: { homeReapPct: v } })} suffix="%" />
+      </Field>
+      <div className="legend" style={{ marginTop: 14, lineHeight: 1.7 }}>
+        {ttl > 0 ? <>• {t('setup.reclaim.note')}<br />• {t('setup.reclaim.exemptNote')}</> : <>• {t('setup.reclaim.offNote')}</>}
       </div>
     </div>
   );

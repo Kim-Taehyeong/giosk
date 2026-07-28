@@ -115,7 +115,10 @@
     "noAlerts": "Sin alertas",
     "noCredit": "Sin crédito",
     "gpuTempMax": "Temperatura máxima de la GPU",
-    "alertFeed": "Feed de alerta"
+    "alertFeed": "Feed de alerta",
+    "metricsOffTitle": "La pila de monitorización no está instalada",
+    "metricsOffAll": "Sin Prometheus y el exportador DCGM no se pueden mostrar el uso de GPU, la VRAM ni la temperatura. Active la monitorización para ver métricas en vivo.",
+    "metricsOffDcgm": "Prometheus está conectado pero no se encontraron métricas del exportador DCGM. Instale dcgm-exporter para ver en vivo el uso de GPU, la VRAM y la temperatura."
   },
   "approvals": {
     "title": "Aprobaciones",
@@ -470,7 +473,10 @@
     "impName": "Nombre del volumen",
     "impSize": "Tamaño mostrado (GiB)",
     "impPath": "Ruta NFS (exportación)",
-    "impDone": "Volumen importado {{name}} a {{user}}."
+    "impDone": "Volumen importado {{name}} a {{user}}.",
+    "impOwnerHint": "Elija una cuenta de la lista para importar.",
+    "impOwnerPicked": "Seleccionado: {{name}} ({{id}})",
+    "metricsOffNotice": "La monitorización (DCGM/Prometheus) no está instalada, por lo que no se pueden mostrar el uso de GPU ni la VRAM. Active la monitorización para ver métricas en vivo."
   },
   "mset": {
     "title": "Ajustes",
@@ -838,7 +844,9 @@
     "hint": "Límites absolutos independientes de los créditos. Los campos vacíos heredan del padre (grupo → organización → global).",
     "saved": "Límites guardados para {{name}}",
     "orgHint": "Límites estrictos para miembros de esta organización. Los campos vacíos heredan de global.",
-    "maxGpu": "GPU máximas"
+    "maxGpu": "GPU máximas",
+    "maxStoppedSessions": "Máx. sesiones detenidas",
+    "maxEphemeralGib": "Máx. disco temporal"
   },
   "settings": {
     "mode": {

@@ -62,6 +62,7 @@ type Provisioner interface {
 	DeletePVC(ctx context.Context, ns, name string) error
 	PVCPhase(ctx context.Context, ns, name string) (string, error)
 	PVCBackingNFS(ctx context.Context, ns, name string) (server, path string, ok bool)
+	ListPVCsByPrefix(ctx context.Context, prefix string) ([]k8s.PVCRef, error) // 고아 세션 홈 PVC 탐지(T0)
 	EnsureSharedNFSPVC(ctx context.Context, spec k8s.SharedNFSSpec) error
 	DeleteSharedNFSPVC(ctx context.Context, ns, name string) error
 	EnsureSessionService(ctx context.Context, s k8s.SvcSpec) error
@@ -106,6 +107,15 @@ type Service struct {
 	uidBase       int    // 컨테이너 안정 UID = uidBase + userID(물리 SSH 와 동일 공식). 기본 100000.
 	sharedHome    bool   // 영속 home(~/nfs) 사용. false 면 세션은 emptyDir 로컬 임시만(RWX 불필요).
 	maxStopped    int    // 사용자당 중단(대기) 세션 상한(0=무제한). 중단 세션은 로컬 홈 PVC 를 물고 있어 방치 시 노드 디스크 잠식.
+
+	// 중단 세션의 홈 PVC 회수 — 개수 상한(maxStopped)이 "새로 못 만들게" 막는 벽이라면,
+	// 아래 둘은 "이미 쌓인 것"을 가격과 회수로 푸는 축이다.
+	storagePrice func() int // 스토리지 GiB·월 단가(런타임 라이브 read). nil/0 이면 중단 세션 과금 없음.
+	// 홈 회수(T1) 조건: (방치 일수, 노드 디스크 사용률 임계%). 유휴 타임아웃과 마찬가지로
+	// 운영 중 조정되는 정책이라 매 틱 라이브 read 한다(nil=회수 비활성).
+	homeReap func() (ttlDays, thresholdPct int)
+
+	memBurst int // 메모리 limit 배수(limit = 보장 request × 배수). 1 이하 = 상한 없음.
 
 	datasetCache DatasetCacheReader // 데이터셋 노드 로컬 캐시 배치 조회(nil=항상 NFS)
 
@@ -335,6 +345,22 @@ func (s *Service) WithLocalClass(sc string) *Service {
 // WithMaxStopped는 사용자당 중단(대기) 세션 상한을 설정한다(0=무제한).
 func (s *Service) WithMaxStopped(n int) *Service { s.maxStopped = n; return s }
 
+// WithStoragePrice는 중단 세션 홈 스토리지 과금 단가(GiB·월)를 라이브 getter 로 주입한다.
+// 볼륨 과금과 같은 단가를 쓴다 — 사용자 입장에서 "디스크는 어디에 두든 같은 값"이어야 하므로.
+func (s *Service) WithStoragePrice(f func() int) *Service { s.storagePrice = f; return s }
+
+// WithMemBurst는 메모리 limit 배수를 설정한다(1 이하=상한 없음).
+// request 는 GPU 지분 비례 최소 보장이고, limit 은 그 배수까지만 버스트를 허용하는 천장이다.
+func (s *Service) WithMemBurst(n int) *Service { s.memBurst = n; return s }
+
+// WithHomeReap는 중단 세션 홈 회수(T1) 조건을 라이브 getter 로 주입한다.
+// 매 틱 다시 읽으므로 관리자가 운영 중 바꾼 값이 다음 틱부터 반영된다(재배포 불필요).
+// getter 가 (0, _) 를 주면 그 틱은 회수하지 않는다.
+func (s *Service) WithHomeReap(f func() (ttlDays, thresholdPct int)) *Service {
+	s.homeReap = f
+	return s
+}
+
 // WithAudit는 세션 감사 로그 조회용 리더를 주입한다.
 func (s *Service) WithAudit(r AuditReader) *Service { s.audit = r; return s }
 
@@ -494,8 +520,11 @@ func (s *Service) recordCreate(userID int64, username, instanceID string) {
 	_ = s.audit.Insert(&audit.Log{ActorID: &uid, ActorUsername: username, Action: "session_create", Target: instanceID, Result: "success"})
 }
 
+// homePVCPrefix는 세션 전용 홈 PVC 이름 접두사. 고아 탐지(T0)가 이 접두사로 훑는다.
+const homePVCPrefix = "sh-"
+
 // sessionHomePVC는 세션 전용 영속 홈(/home/work) PVC 이름(세션 인스턴스에 귀속).
-func sessionHomePVC(instanceID string) string { return "sh-" + instanceID }
+func sessionHomePVC(instanceID string) string { return homePVCPrefix + instanceID }
 
 // ensureSessionHome은 세션 전용 영속 홈(/home/work) PVC 를 멱등 생성한다.
 // 중단(Stop)해도 유지 → 재개 시 그대로 복원, 삭제(Delete) 시 함께 제거 = "중단은 보존, 삭제는 제거".
@@ -1095,6 +1124,7 @@ func (s *Service) provision(ctx context.Context, ns string, sess *Session, image
 		CPUCores:     sess.CPUCores,
 		MemGB:        sess.MemGB,
 		EphemeralGiB: s.ephemeralGiB(sess.UserID), // 정책 해석값(0=매퍼 기본 캡). 노드 디스크 DoS 방지.
+		MemBurst:     s.memBurst,                  // 메모리 limit 배수 — 노드 RAM 고갈로 남의 세션이 축출되는 것 차단
 		Labels:       sess.labels(),
 		UID:          s.uidBase + int(sess.UserID), // 안정 UID(물리 SSH 와 동일 공식) → NFS 권한 일관
 		HomePVC:      homePVC,
@@ -1154,9 +1184,12 @@ func (s *Service) List(ctx context.Context, userID, groupID int64) ([]Session, e
 	if err != nil {
 		return nil, err
 	}
+	// 회수 면책 대상은 사용자 전체 기준으로 한 번만 조회한다(목록은 팀 스코프로 걸러져 있을 수 있다).
+	exempt := s.repo.NewestStoppedInstance(userID)
 	for i := range rows {
 		s.refreshLive(ctx, &rows[i])
 		s.fillChannels(&rows[i])
+		rows[i].ReclaimExempt = exempt != "" && rows[i].InstanceID == exempt
 	}
 	return rows, nil
 }
@@ -1493,6 +1526,9 @@ func (s *Service) stopSession(ctx context.Context, sess *Session) error {
 		return err
 	}
 	_ = s.prov.DeleteSessionService(ctx, s.namespaceOf(sess), sess.InstanceID)
+	// 중단 구간 시작 — 여기서부터 홈 PVC 는 GPU 과금 없이 노드 디스크만 점유한다.
+	// 스토리지 과금과 회수(T1) 방치기간이 모두 이 시각을 기준으로 센다.
+	_ = s.repo.MarkStopped(sess.InstanceID, s.now())
 	return s.repo.SetPhase(sess.InstanceID, PhaseStopped)
 }
 
@@ -1544,6 +1580,10 @@ func (s *Service) Start(ctx context.Context, instanceID string, userID int64) er
 	if err := s.provision(ctx, ns, sess, imageRef, "", mounts, preferNodes, dsNode); err != nil {
 		return err
 	}
+	// 중단 구간 종료 — 마지막 델타까지 스토리지 정산한 뒤 시작점을 비운다.
+	// ResetBilling 은 billed_credits 만 0으로 되돌리므로 스토리지 누적(storage_billed_credits)은 보존된다.
+	s.settleStorage(ctx, sess)
+	_ = s.repo.ClearStopped(instanceID, 0)
 	_ = s.repo.ResetBilling(instanceID, s.now()) // 재개 = 새 가동분
 	return s.repo.SetPhase(instanceID, PhaseProvisioning)
 }
@@ -1563,6 +1603,15 @@ func (s *Service) Delete(ctx context.Context, instanceID string, userID int64) e
 	sess, err := s.repo.Get(instanceID, userID)
 	if err != nil {
 		return err
+	}
+	return s.deleteSession(ctx, sess)
+}
+
+// deleteSession은 소유자 검증을 마친 세션의 실제 삭제 절차다(회수 리퍼도 이 경로를 쓴다).
+func (s *Service) deleteSession(ctx context.Context, sess *Session) error {
+	instanceID := sess.InstanceID
+	if sess.Phase == PhaseStopped {
+		s.settleStorage(ctx, sess) // 삭제 전 중단 스토리지 최종 정산(남은 델타 청구)
 	}
 	if sess.Phase == PhaseRunning {
 		s.settle(ctx, sess, true) // 삭제 전 사용분 최종 정산
@@ -1692,6 +1741,81 @@ func (s *Service) billOnce(ctx context.Context) {
 	for i := range rows {
 		s.settle(ctx, &rows[i], false)
 	}
+	s.billStoppedStorageOnce(ctx)
+}
+
+// secondsPerMonth는 스토리지 GiB·월 단가를 초 단위로 환산하는 분모(730시간 = 볼륨 과금과 동일 기준).
+const secondsPerMonth = 730 * 3600
+
+// billStoppedStorageOnce는 중단 세션이 점유 중인 홈 PVC 를 정산한다.
+// 중단 세션은 GPU 과금이 멈춰 "공짜 보관소"가 되기 쉬운데, 실제로는 노드 로컬 디스크를 계속 문다.
+// 정책(TTL 삭제)보다 가격이 먼저 작동하게 해서 대부분의 방치가 자발적으로 정리되도록 한다.
+func (s *Service) billStoppedStorageOnce(ctx context.Context) {
+	rows, err := s.repo.ListStopped()
+	if err != nil {
+		return
+	}
+	now := s.now()
+	for i := range rows {
+		sess := &rows[i]
+		if sess.StoppedSince == nil {
+			// 이 기능 도입 전에 중단됐던 세션 — 소급 과금 없이 지금부터 구간을 연다.
+			_ = s.repo.MarkStopped(sess.InstanceID, now)
+			continue
+		}
+		s.settleStorage(ctx, sess)
+	}
+}
+
+// settleStorage는 세션의 미정산 중단 스토리지 사용분을 차감한다.
+// 세션 과금(settle)과 동일한 델타 회계: 누적 총액(내림) − 이미 청구액.
+// 잔액 부족이면 유예한다 — 누적 시간(stopped_seconds)만 전진하고 청구액은 그대로라,
+// 밀린 만큼이 다음 틱에 자동으로 다시 청구된다. 잔액 부족으로 홈을 지우는 일은 없다(회수는 T1 의 몫).
+func (s *Service) settleStorage(ctx context.Context, sess *Session) {
+	if sess.StoppedSince == nil {
+		return // 실행 중 = 열린 중단 구간 없음
+	}
+	now := s.now()
+	elapsed := int(now.Sub(*sess.StoppedSince).Seconds())
+	if elapsed < 0 {
+		elapsed = 0 // 시계 역행 방어(음수 누적 금지)
+	}
+	total := sess.StoppedSeconds + elapsed
+	billed := sess.StorageBilledCredits
+	if price := s.storagePriceOf(); price > 0 && s.charger != nil {
+		totalDue := storageDueOf(total, price)
+		if due := totalDue - billed; due > 0 {
+			gid := int64(0)
+			if sess.GroupID != nil {
+				gid = *sess.GroupID
+			}
+			if ok, err := s.charger.Consume(sess.UserID, gid, due, "sh-"+sess.InstanceID); err == nil && ok {
+				billed = totalDue
+			}
+		}
+	}
+	sess.StoppedSeconds, sess.StorageBilledCredits = total, billed
+	sess.StoppedSince = &now
+	_ = s.repo.SetStorageBilled(sess.InstanceID, total, billed, now)
+}
+
+// storageDueOf는 누적 중단 시간에 대한 총 청구액(크레딧, 내림)을 구한다.
+// 이 값에서 이미 청구한 액수를 뺀 것이 이번 틱의 차감분이라, 내림에서 잘린 소수가
+// 다음 틱으로 이월된다(매 틱 내림 → 영구 손실, 이 방식 → 손실 없음).
+// int64 로 계산 — 장기 방치(수천만 초) × 단가에서 32비트 폭을 넘길 수 있다.
+func storageDueOf(stoppedSeconds, priceGiBMonth int) int {
+	if stoppedSeconds <= 0 || priceGiBMonth <= 0 {
+		return 0
+	}
+	return int(int64(homeSizeGiB) * int64(priceGiBMonth) * int64(stoppedSeconds) / int64(secondsPerMonth))
+}
+
+// storagePriceOf는 스토리지 GiB·월 단가를 읽는다(미주입=0=과금 없음).
+func (s *Service) storagePriceOf() int {
+	if s.storagePrice == nil {
+		return 0
+	}
+	return s.storagePrice()
 }
 
 // settle은 세션의 미정산 사용분을 차감한다. 잔액 부족이면 세션 중단(final=true 면 중단 생략).
@@ -1737,6 +1861,7 @@ func (s *Service) stopForBilling(ctx context.Context, sess *Session) {
 	} else {
 		_ = s.prov.DeleteSessionPod(ctx, s.namespaceOf(sess), sess.InstanceID)
 		_ = s.prov.DeleteSessionService(ctx, s.namespaceOf(sess), sess.InstanceID)
+		_ = s.repo.MarkStopped(sess.InstanceID, s.now()) // 중단 구간 시작(스토리지 과금·회수 기준)
 	}
 	_ = s.repo.SetPhase(sess.InstanceID, PhaseStopped)
 	log.Printf("[biller] stopped %s (크레딧 소진)", sess.InstanceID)
@@ -1899,6 +2024,7 @@ func (s *Service) autoStop(ctx context.Context, sess *Session, action, logMsg st
 	} else {
 		_ = s.prov.DeleteSessionPod(ctx, s.namespaceOf(sess), sess.InstanceID)
 		_ = s.prov.DeleteSessionService(ctx, s.namespaceOf(sess), sess.InstanceID)
+		_ = s.repo.MarkStopped(sess.InstanceID, s.now()) // 중단 구간 시작(스토리지 과금·회수 기준)
 	}
 	if err := s.repo.SetPhase(sess.InstanceID, PhaseStopped); err != nil {
 		return

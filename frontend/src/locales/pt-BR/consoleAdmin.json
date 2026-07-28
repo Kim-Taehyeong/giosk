@@ -115,7 +115,10 @@
     "mode_free": "Livre",
     "opsHint": "Operações",
     "modeHint_dynamic": "Modo por ordem de chegada – sem créditos; capacidade de captura quando disponível. Monitore através de estatísticas e alertas de sessão/inatividade.",
-    "modeHint_free": "Modo gratuito – sem limites de crédito. Monitore a utilização por meio de estatísticas de sessão/inatividade e horas de GPU."
+    "modeHint_free": "Modo gratuito – sem limites de crédito. Monitore a utilização por meio de estatísticas de sessão/inatividade e horas de GPU.",
+    "metricsOffTitle": "A stack de monitoramento não está instalada",
+    "metricsOffAll": "Sem o Prometheus e o exportador DCGM não é possível exibir uso da GPU, VRAM e temperatura. Ative o monitoramento para ver métricas ao vivo.",
+    "metricsOffDcgm": "O Prometheus está conectado, mas nenhuma métrica do exportador DCGM foi encontrada. Instale o dcgm-exporter para ver ao vivo o uso da GPU, VRAM e temperatura."
   },
   "approvals": {
     "title": "Aprovações",
@@ -470,7 +473,10 @@
     "impMissing": "Insira o nome, proprietário, servidor NFS e caminho.",
     "impNoUser": "Conta não encontrada.",
     "impDone": "Volume importado de {{name}} para {{user}}.",
-    "impFail": "Falha na importação"
+    "impFail": "Falha na importação",
+    "impOwnerHint": "Escolha uma conta da lista para importar.",
+    "impOwnerPicked": "Selecionado: {{name}} ({{id}})",
+    "metricsOffNotice": "O monitoramento (DCGM/Prometheus) não está instalado, então uso da GPU e VRAM não podem ser exibidos. Ative o monitoramento para ver métricas ao vivo."
   },
   "mset": {
     "title": "Configurações",
@@ -838,7 +844,9 @@
     "maxConcurrentSessions": "Máximo de sessões simultâneas",
     "effective": "Eficaz",
     "saved": "Limites salvos para {{name}}",
-    "save": "Salvar"
+    "save": "Salvar",
+    "maxStoppedSessions": "Máx. de sessões paradas",
+    "maxEphemeralGib": "Máx. de disco temporário"
   },
   "settings": {
     "mode": {

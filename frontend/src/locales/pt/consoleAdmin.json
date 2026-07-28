@@ -115,7 +115,10 @@
     "sessionProvisioning": "Provisionamento",
     "modeHint_dynamic": "Modo por ordem de chegada – sem créditos; capacidade de captura quando disponível. Monitore através de estatísticas e alertas de sessão/inatividade.",
     "noActiveUsers": "Nenhuma sessão em execução no momento",
-    "modeHint_free": "Modo gratuito – sem limites de crédito. Monitore a utilização por meio de estatísticas de sessão/inatividade e horas de GPU."
+    "modeHint_free": "Modo gratuito – sem limites de crédito. Monitore a utilização por meio de estatísticas de sessão/inatividade e horas de GPU.",
+    "metricsOffTitle": "A stack de monitorização não está instalada",
+    "metricsOffAll": "Sem o Prometheus e o exportador DCGM não é possível mostrar utilização da GPU, VRAM e temperatura. Ative a monitorização para ver métricas em tempo real.",
+    "metricsOffDcgm": "O Prometheus está ligado, mas não foram encontradas métricas do exportador DCGM. Instale o dcgm-exporter para ver em tempo real a utilização da GPU, VRAM e temperatura."
   },
   "approvals": {
     "title": "Aprovações",
@@ -470,7 +473,10 @@
     "impServer": "Servidor NFS",
     "impFail": "Falha na importação",
     "impMissing": "Insira o nome, proprietário, servidor NFS e caminho.",
-    "impDone": "Volume importado de {{name}} para {{user}}."
+    "impDone": "Volume importado de {{name}} para {{user}}.",
+    "impOwnerHint": "Escolha uma conta da lista para importar.",
+    "impOwnerPicked": "Selecionado: {{name}} ({{id}})",
+    "metricsOffNotice": "A monitorização (DCGM/Prometheus) não está instalada, pelo que a utilização da GPU e a VRAM não podem ser mostradas. Ative a monitorização para ver métricas em tempo real."
   },
   "mset": {
     "title": "Configurações",
@@ -838,7 +844,9 @@
     "hint": "Limites absolutos independentes de créditos. Os campos vazios são herdados do pai (grupo → org → global).",
     "short": "Limites",
     "maxGpu": "Máximo de GPUs",
-    "groupHint": "Limites rígidos para membros deste grupo. Os campos vazios são herdados de org → global."
+    "groupHint": "Limites rígidos para membros deste grupo. Os campos vazios são herdados de org → global.",
+    "maxStoppedSessions": "Máx. sessões paradas",
+    "maxEphemeralGib": "Máx. disco temporário"
   },
   "settings": {
     "mode": {

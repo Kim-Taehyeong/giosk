@@ -115,7 +115,10 @@
     "noAlerts": "Hakuna arifa",
     "modeHint_dynamic": "Njia ya kwanza - hakuna mikopo; kunyakua uwezo wakati inapatikana. Fuatilia kupitia kipindi/takwimu na arifa zisizo na kazi.",
     "modeHint_free": "Hali ya bure - hakuna kikomo cha mkopo. Fuatilia utumiaji kupitia takwimu za kipindi/kutofanya kazi na saa za GPU.",
-    "alertFeed": "Mlisho wa tahadhari"
+    "alertFeed": "Mlisho wa tahadhari",
+    "metricsOffTitle": "Rundo la ufuatiliaji halijasakinishwa",
+    "metricsOffAll": "Bila Prometheus na kisafirishaji cha DCGM, matumizi ya GPU, VRAM na halijoto haviwezi kuonyeshwa. Washa ufuatiliaji ili kuona vipimo vya moja kwa moja.",
+    "metricsOffDcgm": "Prometheus imeunganishwa lakini hakuna vipimo vya kisafirishaji cha DCGM vilivyopatikana. Sakinisha dcgm-exporter ili kuona matumizi ya GPU, VRAM na halijoto moja kwa moja."
   },
   "approvals": {
     "title": "Vibali",
@@ -470,7 +473,10 @@
     "impPath": "Njia ya NFS (kuuza nje)",
     "impServer": "Seva ya NFS",
     "impSize": "Ukubwa ulioonyeshwa (GiB)",
-    "impDone": "Kiasi kilichoingizwa {{name}} hadi {{user}}."
+    "impDone": "Kiasi kilichoingizwa {{name}} hadi {{user}}.",
+    "impOwnerHint": "Chagua akaunti kutoka kwenye orodha ili kuingiza.",
+    "impOwnerPicked": "Imechaguliwa: {{name}} ({{id}})",
+    "metricsOffNotice": "Ufuatiliaji (DCGM/Prometheus) haujasakinishwa, hivyo matumizi ya GPU na VRAM haviwezi kuonyeshwa. Washa ufuatiliaji ili kuona vipimo vya moja kwa moja."
   },
   "mset": {
     "title": "Mipangilio",
@@ -838,7 +844,9 @@
     "groupHint": "Kofia ngumu kwa washiriki wa kikundi hiki. Sehemu tupu zinarithi kutoka kwa org → kimataifa.",
     "short": "Mipaka",
     "hint": "Vikomo kamili visivyotegemea mikopo. Sehemu tupu hurithi kutoka kwa mzazi (kikundi → org → kimataifa).",
-    "maxGpu": "GPU za juu zaidi"
+    "maxGpu": "GPU za juu zaidi",
+    "maxStoppedSessions": "Kiwango cha juu cha vipindi vilivyosimamishwa",
+    "maxEphemeralGib": "Kiwango cha juu cha diski ya muda"
   },
   "settings": {
     "mode": {

@@ -115,7 +115,10 @@
     "byGpuType": "Sessioner efter GPU-type",
     "noActiveUsers": "Ingen løbesessioner lige nu",
     "modeHint_dynamic": "Først til mølle-tilstand — ingen kreditter; gribekapacitet, når den er tilgængelig. Overvåg via session/tomgangsstatistik og advarsler.",
-    "modeHint_free": "Fri tilstand — ingen kreditgrænser. Overvåg brugen via session/tomgangsstatistik og GPU-timer."
+    "modeHint_free": "Fri tilstand — ingen kreditgrænser. Overvåg brugen via session/tomgangsstatistik og GPU-timer.",
+    "metricsOffTitle": "Overvågningsstakken er ikke installeret",
+    "metricsOffAll": "Uden Prometheus og DCGM-exporteren kan GPU-forbrug, VRAM og temperatur ikke vises. Aktivér overvågning for at se live-målinger.",
+    "metricsOffDcgm": "Prometheus er forbundet, men der blev ikke fundet målinger fra DCGM-exporteren. Installér dcgm-exporter for at se GPU-forbrug, VRAM og temperatur live."
   },
   "approvals": {
     "title": "Godkendelser",
@@ -470,7 +473,10 @@
     "impName": "Bind navn",
     "importNfs": "Importer NFS-volumen",
     "impDone": "Importeret bind {{name}} til {{user}}.",
-    "impFail": "Import mislykkedes"
+    "impFail": "Import mislykkedes",
+    "impOwnerHint": "Vælg en konto på listen for at importere.",
+    "impOwnerPicked": "Valgt: {{name}} ({{id}})",
+    "metricsOffNotice": "Overvågning (DCGM/Prometheus) er ikke installeret, så GPU-forbrug og VRAM kan ikke vises. Aktivér overvågning for at se live-målinger."
   },
   "mset": {
     "title": "Indstillinger",
@@ -838,7 +844,9 @@
     "groupHint": "Hårde kasketter til medlemmer af denne gruppe. Tomme felter arver fra org → global.",
     "maxGpu": "Max GPU'er",
     "maxVolumeGib": "Max lydstyrke",
-    "saved": "Gemte grænser for {{name}}"
+    "saved": "Gemte grænser for {{name}}",
+    "maxStoppedSessions": "Maks. stoppede sessioner",
+    "maxEphemeralGib": "Maks. midlertidig disk"
   },
   "settings": {
     "mode": {

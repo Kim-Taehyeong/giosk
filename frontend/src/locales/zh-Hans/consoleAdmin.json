@@ -115,7 +115,10 @@
     "modeHint_free": "免费模式——没有信用限制。通过会话/空闲统计数据和 GPU 时间监控利用率。",
     "modeHint_dynamic": "先到先得模式——无积分；抢占可用容量。通过会话/空闲统计数据和警报进行监控。",
     "alertFeed": "警报源",
-    "noCredit": "没有信用"
+    "noCredit": "没有信用",
+    "metricsOffTitle": "未安装监控组件",
+    "metricsOffAll": "缺少 Prometheus 与 DCGM exporter，无法显示 GPU 利用率、显存和温度。启用监控后即可看到实时指标。",
+    "metricsOffDcgm": "Prometheus 已连接，但未找到 DCGM exporter 的指标。安装 dcgm-exporter 后即可实时查看 GPU 利用率、显存和温度。"
   },
   "approvals": {
     "title": "批准",
@@ -470,7 +473,10 @@
     "importTitle": "将现有 NFS 路径导入为卷",
     "nfsNoMetrics": "NFS 使用指标不可用（需要 Prometheus）",
     "impDone": "导入卷 {{name}} 至 {{user}}。",
-    "impMissing": "输入名称、所有者、NFS 服务器和路径。"
+    "impMissing": "输入名称、所有者、NFS 服务器和路径。",
+    "impOwnerHint": "请从列表中选择一个账号以导入。",
+    "impOwnerPicked": "已选择：{{name}}（{{id}}）",
+    "metricsOffNotice": "未安装监控（DCGM/Prometheus），因此无法显示 GPU 利用率和显存。启用监控后即可看到实时指标。"
   },
   "mset": {
     "title": "设置",
@@ -838,7 +844,9 @@
     "userTitle": "{{name}} — 资源限制",
     "groupHint": "该组成员的硬上限。空字段继承自 org → global。",
     "saved": "已保存 {{name}} 的限制",
-    "orgHint": "该组织成员的硬性上限。空字段继承自全局。"
+    "orgHint": "该组织成员的硬性上限。空字段继承自全局。",
+    "maxStoppedSessions": "最大已停止会话数",
+    "maxEphemeralGib": "最大临时磁盘"
   },
   "settings": {
     "mode": {

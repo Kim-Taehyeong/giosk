@@ -115,7 +115,10 @@
     "noActiveUsers": "Ingen løpeøkter akkurat nå",
     "activeUsers": "Aktive brukere",
     "modeHint_dynamic": "Første-til-mølla-modus - ingen studiepoeng; gripekapasitet når tilgjengelig. Overvåk via økt-/tomgangsstatistikk og varsler.",
-    "modeHint_free": "Gratis modus - ingen kredittgrenser. Overvåk bruken via økt-/tomgangsstatistikk og GPU-timer."
+    "modeHint_free": "Gratis modus - ingen kredittgrenser. Overvåk bruken via økt-/tomgangsstatistikk og GPU-timer.",
+    "metricsOffTitle": "Overvåkingsstakken er ikke installert",
+    "metricsOffAll": "Uten Prometheus og DCGM-eksportøren kan ikke GPU-bruk, VRAM og temperatur vises. Slå på overvåking for å se sanntidsmålinger.",
+    "metricsOffDcgm": "Prometheus er tilkoblet, men ingen målinger fra DCGM-eksportøren ble funnet. Installer dcgm-exporter for å se GPU-bruk, VRAM og temperatur i sanntid."
   },
   "approvals": {
     "title": "Godkjenninger",
@@ -470,7 +473,10 @@
     "impNoUser": "Finner ikke kontoen.",
     "impMissing": "Skriv inn navn, eier, NFS-server og bane.",
     "impDone": "Importert volum {{name}} til {{user}}.",
-    "impFail": "Import mislyktes"
+    "impFail": "Import mislyktes",
+    "impOwnerHint": "Velg en konto fra listen for å importere.",
+    "impOwnerPicked": "Valgt: {{name}} ({{id}})",
+    "metricsOffNotice": "Overvåking (DCGM/Prometheus) er ikke installert, så GPU-bruk og VRAM kan ikke vises. Slå på overvåking for å se sanntidsmålinger."
   },
   "mset": {
     "title": "Innstillinger",
@@ -838,7 +844,9 @@
     "short": "Grenser",
     "saved": "Lagrede grenser for {{name}}",
     "maxGpu": "Maks GPUer",
-    "maxVolumeGib": "Maks volum"
+    "maxVolumeGib": "Maks volum",
+    "maxStoppedSessions": "Maks stoppede økter",
+    "maxEphemeralGib": "Maks midlertidig disk"
   },
   "settings": {
     "mode": {

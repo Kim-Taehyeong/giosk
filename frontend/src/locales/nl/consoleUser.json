@@ -309,7 +309,8 @@
     "guaranteed": "Gegarandeerde middelen",
     "hoursApprox": "~{{n}} uur",
     "tsSlotN": "1 van {{n}}-slots",
-    "runtimeLeft": "Runtime in dit tempo"
+    "runtimeLeft": "Runtime in dit tempo",
+    "sshKeyChange": "Wijzigen"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "detNoActivity": "Nog geen activiteit",
     "detLogs": "Recente logboeken",
     "detAutoStopDesc": "Stopt automatisch na {{n}} min. GPU-inactiviteit (bespaart credits).",
-    "idlePolicy": "Sessies worden automatisch teruggevorderd na {{n}} min. inactiviteit."
+    "idlePolicy": "Sessies worden automatisch teruggevorderd na {{n}} min. inactiviteit.",
+    "detReclaimTitle": "Bewaartermijn gestopte sessies",
+    "reclaimIn": "Terugvorderbaar over {{n}} d",
+    "reclaimDue": "Terugvorderbaar",
+    "reclaimKept": "Behouden",
+    "reclaimHint": "Gestopte sessies gebruiken nog steeds home-schijfruimte. Na {{n}} dagen gestopt worden ze terugvorderbaar, en de langst inactieve kunnen worden verwijderd wanneer een node weinig schijfruimte overhoudt.",
+    "reclaimKeptHint": "Je meest recent gestopte sessie wordt nooit teruggevorderd.",
+    "reclaimResumeHint": "Opnieuw starten zet de teller terug. Verwijder sessies die je niet meer hoeft te bewaren."
   },
   "conn": {
     "title": "Verbinden — {{name}}",
@@ -412,7 +420,9 @@
     "sshProxy": "Proxy (gateway)",
     "sshDirect": "Direct (intranet)",
     "regenerate": "Regenereer",
-    "sshDirectInHint": "Maak rechtstreeks verbinding met het knooppunt vanuit het kantoornetwerk, waarbij u de gateway omzeilt."
+    "sshDirectInHint": "Maak rechtstreeks verbinding met het knooppunt vanuit het kantoornetwerk, waarbij u de gateway omzeilt.",
+    "sshNeedKey": "Geen openbare SSH-sleutel geregistreerd",
+    "sshNeedKeyHint": "Registreer of genereer er hieronder een — actieve sessies nemen hem direct over."
   },
   "account": {
     "title": "Mijn instellingen",
@@ -448,7 +458,13 @@
     "localAcctNote": "Op elk fysiek knooppunt wordt een lokaal account voor u ingericht.",
     "pwFail": "Wachtwoordwijziging mislukt",
     "homeTitle": "SSH-thuisquotum",
-    "homeHint": "Het gebruik van de thuismap van uw fysieke knooppunt in de hybride modus (SSH)."
+    "homeHint": "Het gebruik van de thuismap van uw fysieke knooppunt in de hybride modus (SSH).",
+    "sshBad": "Ongeldige openbare sleutel. Plak één regel zoals ‘ssh-ed25519 AAAA…’.",
+    "sshFail": "Opslaan van de openbare SSH-sleutel is mislukt.",
+    "sshGenerate": "Sleutel genereren en downloaden",
+    "sshGenerated": "Sleutel gegenereerd. Bewaar de gedownloade privésleutel veilig — hij kan niet opnieuw worden gedownload.",
+    "sshGenFail": "Genereren van de SSH-sleutel is mislukt.",
+    "sshGenerateHint": "Nog geen sleutel? Klik op ‘Sleutel genereren en downloaden’. De privésleutel (.pem) wordt eenmalig gedownload en de openbare sleutel wordt automatisch geregistreerd. Verbinden met: ssh -i gedownloade-sleutel.pem …"
   },
   "notify": {
     "title": "Meldingen",

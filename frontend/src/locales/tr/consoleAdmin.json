@@ -115,7 +115,10 @@
     "alertFeed": "Uyarı feed'i",
     "activeUsers": "Aktif kullanıcılar",
     "gpuTempMax": "Maksimum GPU sıcaklığı",
-    "noCredit": "Kredi yok"
+    "noCredit": "Kredi yok",
+    "metricsOffTitle": "İzleme yığını kurulu değil",
+    "metricsOffAll": "Prometheus ve DCGM dışa aktarıcısı olmadan GPU kullanımı, VRAM ve sıcaklık gösterilemez. Canlı metrikleri görmek için izlemeyi etkinleştirin.",
+    "metricsOffDcgm": "Prometheus bağlı ancak DCGM dışa aktarıcısının metrikleri bulunamadı. GPU kullanımı, VRAM ve sıcaklığı canlı görmek için dcgm-exporter kurun."
   },
   "approvals": {
     "title": "Onaylar",
@@ -470,7 +473,10 @@
     "impFail": "İçe aktarma başarısız oldu",
     "impNoUser": "Hesap bulunamadı.",
     "nfsNoMetrics": "NFS kullanım ölçümleri kullanılamıyor (Prometheus gereklidir)",
-    "impDone": "{{name}}'den {{user}}'ye içe aktarılan hacim."
+    "impDone": "{{name}}'den {{user}}'ye içe aktarılan hacim.",
+    "impOwnerHint": "İçe aktarmak için listeden bir hesap seçin.",
+    "impOwnerPicked": "Seçildi: {{name}} ({{id}})",
+    "metricsOffNotice": "İzleme (DCGM/Prometheus) kurulu değil, bu yüzden GPU kullanımı ve VRAM gösterilemiyor. Canlı metrikleri görmek için izlemeyi etkinleştirin."
   },
   "mset": {
     "title": "Ayarlar",
@@ -838,7 +844,9 @@
     "maxVolumeGib": "Maksimum hacim",
     "saved": "{{name}} için kaydedilen sınırlar",
     "inherit": "miras almak",
-    "maxGpu": "Maksimum GPU'lar"
+    "maxGpu": "Maksimum GPU'lar",
+    "maxStoppedSessions": "Maks. durdurulmuş oturum",
+    "maxEphemeralGib": "Maks. geçici disk"
   },
   "settings": {
     "mode": {

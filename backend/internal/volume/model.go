@@ -4,23 +4,26 @@ import "time"
 
 // Volume은 volumes 테이블 매핑.
 type Volume struct {
-	ID            int64     `gorm:"primaryKey" json:"id"`
-	Name          string    `gorm:"column:name" json:"name"`
-	Kind          string    `gorm:"column:kind" json:"kind"`
-	OwnerUserID   *int64    `gorm:"column:owner_user_id" json:"-"`
-	GroupID       *int64    `gorm:"column:group_id" json:"groupId,omitempty"`
-	SizeGiB       int       `gorm:"column:size_gib" json:"capGb"`
-	UsedGiB       int       `gorm:"column:used_gib" json:"usedGb"`
-	AccessMode    string    `gorm:"column:access_mode" json:"accessMode"`
-	Perm          string    `gorm:"->;column:perm" json:"perm,omitempty"` // 공유 볼륨 권한(ro|rw) — ListShared 의 계산 컬럼. 읽기전용(->): INSERT/UPDATE 에서 제외(volumes 테이블엔 실제 perm 컬럼 없음).
-	PVCName       string    `gorm:"column:pvc_name" json:"-"`
-	PVCNamespace  string    `gorm:"column:pvc_namespace" json:"-"`
+	ID           int64  `gorm:"primaryKey" json:"id"`
+	Name         string `gorm:"column:name" json:"name"`
+	Kind         string `gorm:"column:kind" json:"kind"`
+	OwnerUserID  *int64 `gorm:"column:owner_user_id" json:"-"`
+	GroupID      *int64 `gorm:"column:group_id" json:"groupId,omitempty"`
+	SizeGiB      int    `gorm:"column:size_gib" json:"capGb"`
+	UsedGiB      int    `gorm:"column:used_gib" json:"usedGb"`
+	AccessMode   string `gorm:"column:access_mode" json:"accessMode"`
+	Perm         string `gorm:"->;column:perm" json:"perm,omitempty"` // 공유 볼륨 권한(ro|rw) — ListShared 의 계산 컬럼. 읽기전용(->): INSERT/UPDATE 에서 제외(volumes 테이블엔 실제 perm 컬럼 없음).
+	PVCName      string `gorm:"column:pvc_name" json:"-"`
+	PVCNamespace string `gorm:"column:pvc_namespace" json:"-"`
 	// NFS 임포트 볼륨: 지정한 기존 NFS 경로를 정적 PV 로 바인딩(빈값=일반 동적 볼륨).
 	NFSServer     string    `gorm:"column:nfs_server" json:"nfsServer,omitempty"`
 	NFSPath       string    `gorm:"column:nfs_path" json:"nfsPath,omitempty"`
 	Status        string    `gorm:"column:status" json:"status"`
 	BilledCredits int       `gorm:"column:billed_credits" json:"-"` // 누적 차감 크레딧(스토리지 과금, 델타 회계)
 	CreatedAt     time.Time `gorm:"column:created_at" json:"-"`
+	// 계산 컬럼(읽기전용 -> : INSERT/UPDATE 제외). List 쿼리의 JOIN 으로 채운다.
+	TeamName  string `gorm:"->;column:team_name" json:"teamName,omitempty"`   // 귀속 팀 표시명(쿼터·과금 홈)
+	OwnerName string `gorm:"->;column:owner_name" json:"ownerName,omitempty"` // 공유자(소유자) — 공유받은 볼륨용
 }
 
 func (Volume) TableName() string { return "volumes" }

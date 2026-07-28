@@ -117,7 +117,10 @@
     "mode_free": "無料",
     "opsHint": "運営",
     "modeHint_dynamic": "先着モード — クレジットなし。利用可能な場合は容量を取得します。セッション/アイドル統計とアラートを介して監視します。",
-    "modeHint_free": "無料モード — クレジット制限なし。セッション/アイドル統計と GPU 時間を介して使用率を監視します。"
+    "modeHint_free": "無料モード — クレジット制限なし。セッション/アイドル統計と GPU 時間を介して使用率を監視します。",
+    "metricsOffTitle": "監視スタックがインストールされていません",
+    "metricsOffAll": "Prometheus と DCGM エクスポーターがないため、GPU 使用率・VRAM・温度を表示できません。監視を有効にするとリアルタイム指標が表示されます。",
+    "metricsOffDcgm": "Prometheus には接続していますが、DCGM エクスポーターの指標が見つかりません。dcgm-exporter をインストールすると GPU 使用率・VRAM・温度がリアルタイムに表示されます。"
   },
   "approvals": {
     "title": "承認",
@@ -472,7 +475,10 @@
     "impMissing": "名前、所有者、NFS サーバー、およびパスを入力します。",
     "impNoUser": "アカウントが見つかりません。",
     "impDone": "輸入量 {{name}} ～ {{user}}。",
-    "impFail": "インポートに失敗しました"
+    "impFail": "インポートに失敗しました",
+    "impOwnerHint": "インポートするにはリストからアカウントを選択してください。",
+    "impOwnerPicked": "選択中: {{name}} ({{id}})",
+    "metricsOffNotice": "監視(DCGM／Prometheus)が未インストールのため、GPU 使用率と VRAM を表示できません。監視を有効にするとリアルタイム指標が表示されます。"
   },
   "mset": {
     "title": "設定",
@@ -840,7 +846,9 @@
     "maxConcurrentSessions": "最大同時セッション数",
     "effective": "効果的",
     "saved": "{{name}} の保存された制限",
-    "save": "保存"
+    "save": "保存",
+    "maxStoppedSessions": "最大停止セッション数",
+    "maxEphemeralGib": "最大一時ディスク"
   },
   "settings": {
     "title": "システム設定",

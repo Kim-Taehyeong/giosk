@@ -448,7 +448,8 @@
       "credit": "C",
       "creditPerStep": "C/etapa",
       "sessions": "sessões",
-      "times": "vezes"
+      "times": "vezes",
+      "day": "dias"
     },
     "mode": {
       "container": "Modo contêiner",
@@ -510,9 +511,19 @@
     "wizardSubtitle": "Configure o modo operacional e as políticas padrão. Tudo pode ser alterado posteriormente em Admin → Configurações do sistema.",
     "back": "Voltar",
     "next": "Próximo",
-    "finish": "Concluir configuração"
+    "finish": "Concluir configuração",
+    "reclaim": {
+      "stoppedTtl": "Retenção de sessões paradas",
+      "stoppedTtlHint": "Sessões paradas continuam ocupando seu disco pessoal. Passado esse período, elas se tornam candidatas à recuperação. 0 = nunca recuperar automaticamente.",
+      "diskThreshold": "Uso de disco para iniciar a recuperação",
+      "diskThresholdHint": "A recuperação só roda em nós acima desse uso de disco. Havendo espaço sobrando, sessões paradas antigas ficam intactas.",
+      "note": "A recuperação começa pelas sessões há mais tempo ociosas dos usuários que acumulam mais sessões paradas e para assim que o nó volta a ficar abaixo do limite.",
+      "exemptNote": "A sessão parada mais recente de cada usuário nunca é recuperada. Sessões em execução nunca são tocadas.",
+      "offNote": "A recuperação automática está desativada. Sessões paradas são contidas apenas pelo limite de quantidade e pela cobrança de armazenamento; quando os discos encherem, os administradores terão de limpar manualmente."
+    }
   },
   "topbar": {
-    "nodeBadge": "Nós {{up}}/{{total}} · GPU {{gpu}}%"
+    "nodeBadge": "Nós {{up}}/{{total}} · GPU {{gpu}}%",
+    "nodeBadgeNoGpu": "Nós {{up}}/{{total}} · GPU —"
   }
 }

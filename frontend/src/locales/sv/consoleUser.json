@@ -309,7 +309,8 @@
     "notEnough": "Inte tillräckligt med kredit – minst 1 timme krävs",
     "guaranteed": "Garanterade resurser",
     "tsSlotN": "1 av {{n}}-platser",
-    "runtimeLeft": "Körtid i denna takt"
+    "runtimeLeft": "Körtid i denna takt",
+    "sshKeyChange": "Ändra"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "detNoActivity": "Ingen aktivitet ännu",
     "detActivity": "Aktivitetslogg",
     "detNoLogs": "Inga loggar",
-    "idlePolicy": "Sessioner återvinns automatiskt efter minst {{n}} inaktiv."
+    "idlePolicy": "Sessioner återvinns automatiskt efter minst {{n}} inaktiv.",
+    "detReclaimTitle": "Lagringstid för stoppade sessioner",
+    "reclaimIn": "Återtagbar om {{n}} d",
+    "reclaimDue": "Återtagbar",
+    "reclaimKept": "Behålls",
+    "reclaimHint": "Stoppade sessioner använder fortfarande hemdisk. Efter {{n}} dagar som stoppade blir de återtagbara, och de längst inaktiva kan raderas när en nod får ont om diskutrymme.",
+    "reclaimKeptHint": "Din senast stoppade session återtas aldrig.",
+    "reclaimResumeHint": "Att starta om nollställer räknaren. Radera sessioner du inte längre behöver spara."
   },
   "conn": {
     "loading": "Laddar anslutningsinformation...",
@@ -412,7 +420,9 @@
     "sshProxyHint": "Anslut genom den enda gateway-ingångspunkten var som helst. När den har autentiserats förblir sessionen ansluten (ingen periodisk omkontroll).",
     "sshDirect": "Direkt (intranät)",
     "sshProxy": "Proxy (gateway)",
-    "regenerated": "Utfärdat en ny åtkomstlänk."
+    "regenerated": "Utfärdat en ny åtkomstlänk.",
+    "sshNeedKey": "Ingen offentlig SSH-nyckel registrerad",
+    "sshNeedKeyHint": "Registrera eller generera en nedan – körande sessioner tar den direkt."
   },
   "account": {
     "title": "Mina inställningar",
@@ -448,7 +458,13 @@
     "pwShort": "Lösenordet måste bestå av minst 8 tecken",
     "sshHint": "Injiceras i behållaren när sessionen skapades.",
     "pwHint": "Använd minst 8 tecken.",
-    "localAcctNote": "Ett lokalt konto tillhandahålls åt dig på varje fysisk nod."
+    "localAcctNote": "Ett lokalt konto tillhandahålls åt dig på varje fysisk nod.",
+    "sshBad": "Ogiltig offentlig nyckel. Klistra in en enda rad, t.ex. ”ssh-ed25519 AAAA…”.",
+    "sshFail": "Det gick inte att spara den offentliga SSH-nyckeln.",
+    "sshGenerate": "Generera och ladda ner nyckel",
+    "sshGenerated": "Nyckel genererad. Förvara den nedladdade privata nyckeln säkert – den kan inte laddas ner igen.",
+    "sshGenFail": "Det gick inte att generera en SSH-nyckel.",
+    "sshGenerateHint": "Ingen nyckel än? Klicka på ”Generera och ladda ner nyckel”. Den privata nyckeln (.pem) laddas ner en gång och den offentliga registreras automatiskt. Anslut med: ssh -i nedladdad-nyckel.pem …"
   },
   "notify": {
     "title": "Aviseringar",

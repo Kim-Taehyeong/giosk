@@ -139,6 +139,11 @@ func main() {
 	sessionSvc.WithSharedHome(cfg.Storage.SharedHome)                                                // 영속 home(~/nfs) 사용 여부(설치시 고정)
 	sessionSvc.WithLocalClass(cfg.Storage.LocalClass)                                                // 세션 전용 홈(/home/work) 로컬 스토리지클래스(속도 위해 노드로컬)
 	sessionSvc.WithMaxStopped(cfg.Quota.MaxStoppedSessions)                                          // 중단(대기) 세션 상한(로컬 홈 PVC 누적 방지)
+	sessionSvc.WithMemBurst(cfg.Quota.MemBurst)                                                      // 메모리 limit 배수(노드 RAM 고갈 → 남의 세션 축출 차단)
+	sessionSvc.WithHomeReap(func() (int, int) { // 중단 세션 홈 회수(T1) — 운영 정책이라 라이브 read
+		return cfgStore.IntOr(systemconfig.KeyStoppedTTLDays, cfg.Quota.StoppedTTLDays),
+			cfgStore.IntOr(systemconfig.KeyHomeReapPct, cfg.Quota.HomeReapPct)
+	})
 	sessionSvc.WithSurge(cfg.Billing.Credit.Pricing == "dynamic", cfg.Billing.Credit.SurgeIncrement, // 동적/서지 가격
 		func(ctx context.Context, gt string) (int, int) {
 			for _, t := range resourceSvc.Availability(ctx).ByType {
@@ -157,8 +162,16 @@ func main() {
 	})
 	go sessionSvc.RunPhaseReconciler(context.Background(), 30*time.Second)                     // 라이브 phase → DB(대시보드/관제 최신화)
 	go dashboardSvc.RunSampler(context.Background(), time.Minute, sessionSvc.CountIdleRunning) // 인프라 메트릭 스냅샷(감시 시계열)
+	// 세션 홈 회수(T0 고아 + T1 방치). 과금 모드와 무관하게 돈다 —
+	// 무료 모드엔 스토리지 과금이라는 가격 압력이 없어 오히려 회수가 유일한 억제 수단이다.
+	go sessionSvc.RunHomeReaper(context.Background(), time.Hour)
 	if cfg.IsCredit() {
 		sessionSvc.WithCharger(walletSvc) // 크레딧 소비 회계
+		// 중단 세션이 물고 있는 홈 PVC 도 스토리지 단가로 과금 — 볼륨과 같은 단가를 쓴다
+		// ("디스크는 어디에 두든 같은 값"). 방치를 정책이 아니라 가격으로 먼저 정리한다.
+		sessionSvc.WithStoragePrice(func() int {
+			return cfgStore.IntOr(systemconfig.KeyStoragePriceGiBMonth, cfg.Storage.PricePerGiBMonth)
+		})
 		go sessionSvc.RunBiller(context.Background(), time.Minute)
 		volumeSvc.WithCharger(walletSvc, func() int { // 스토리지 GiB·월 과금(런타임 단가 라이브 read)
 			return cfgStore.IntOr(systemconfig.KeyStoragePriceGiBMonth, cfg.Storage.PricePerGiBMonth)

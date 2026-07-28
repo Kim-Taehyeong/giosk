@@ -309,7 +309,8 @@
     "tsSlotN": "1 af {{n}} slots",
     "notEnough": "Ikke nok kredit - 1 time minimum påkrævet",
     "hoursApprox": "~{{n}} timer",
-    "runtimeLeft": "Kørselstid med denne hastighed"
+    "runtimeLeft": "Kørselstid med denne hastighed",
+    "sshKeyChange": "Skift"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "detStoppedIdle": "Auto-stoppet på grund af inaktiv GPU",
     "detNoActivity": "Ingen aktivitet endnu",
     "detIdleWarn": "Tomgang {{cur}} / {{max}} min — stopper snart",
-    "detNoAutoStop": "Der gælder ingen autostop-politik."
+    "detNoAutoStop": "Der gælder ingen autostop-politik.",
+    "detReclaimTitle": "Opbevaringstid for stoppede sessioner",
+    "reclaimIn": "Kan frigives om {{n}} d",
+    "reclaimDue": "Kan frigives",
+    "reclaimKept": "Bevares",
+    "reclaimHint": "Stoppede sessioner bruger stadig hjemmedisk. Efter {{n}} dage som stoppet kan de frigives, og de længst inaktive kan blive slettet, når en node løber tør for diskplads.",
+    "reclaimKeptHint": "Din senest stoppede session frigives aldrig.",
+    "reclaimResumeHint": "Genstart nulstiller tælleren. Slet de sessioner, du ikke længere behøver at gemme."
   },
   "conn": {
     "title": "Tilslut — {{name}}",
@@ -412,7 +420,9 @@
     "sshProxyHint": "Opret forbindelse gennem det enkelte gateway-indgangspunkt hvor som helst. Når den er godkendt, forbliver sessionen forbundet (ingen periodisk genkontrol).",
     "sshUnavailable": "SSH er ikke tilgængelig for denne session (en administrator skal aktivere container SSH).",
     "sshDirect": "Direkte (intranet)",
-    "regenerated": "Udstedt et nyt adgangslink."
+    "regenerated": "Udstedt et nyt adgangslink.",
+    "sshNeedKey": "Ingen offentlig SSH-nøgle registreret",
+    "sshNeedKeyHint": "Registrér eller generér en nedenfor – kørende sessioner tager den med det samme."
   },
   "account": {
     "title": "Mine indstillinger",
@@ -448,7 +458,13 @@
     "pwFail": "Adgangskodeændring mislykkedes",
     "homeTitle": "SSH hjem kvote",
     "homeHint": "Din fysiske node hjemmemappebrug i hybridtilstand (SSH).",
-    "localAcctNote": "En lokal konto er klargjort til dig på hver fysisk node."
+    "localAcctNote": "En lokal konto er klargjort til dig på hver fysisk node.",
+    "sshBad": "Ugyldig offentlig nøgle. Indsæt én enkelt linje som ”ssh-ed25519 AAAA…”.",
+    "sshFail": "Den offentlige SSH-nøgle kunne ikke gemmes.",
+    "sshGenerate": "Generér og hent nøgle",
+    "sshGenerated": "Nøgle genereret. Opbevar den hentede private nøgle sikkert – den kan ikke hentes igen.",
+    "sshGenFail": "SSH-nøglen kunne ikke genereres.",
+    "sshGenerateHint": "Ingen nøgle endnu? Klik på ”Generér og hent nøgle”. Den private nøgle (.pem) hentes én gang, og den offentlige registreres automatisk. Forbind med: ssh -i hentet-noegle.pem …"
   },
   "notify": {
     "title": "Meddelelser",

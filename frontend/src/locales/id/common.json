@@ -448,7 +448,8 @@
       "credit": "C",
       "times": "kali",
       "sessions": "sesi",
-      "creditPerStep": "C/langkah"
+      "creditPerStep": "C/langkah",
+      "day": "hari"
     },
     "mode": {
       "hybridDesc": "Menambahkan akses SSH langsung ke node fisik di atas container. Paling cocok untuk laboratorium kecil atau ketika penyewaan node fisik diperlukan.",
@@ -510,9 +511,19 @@
     "back": "Kembali",
     "next": "Berikutnya",
     "finish": "Selesaikan penyiapan",
-    "wizardSubtitle": "Konfigurasikan mode operasi dan kebijakan default. Semuanya bisa diubah nanti di Admin → Pengaturan Sistem."
+    "wizardSubtitle": "Konfigurasikan mode operasi dan kebijakan default. Semuanya bisa diubah nanti di Admin → Pengaturan Sistem.",
+    "reclaim": {
+      "stoppedTtl": "Masa simpan sesi terhenti",
+      "stoppedTtlHint": "Sesi yang dihentikan tetap memakai disk home-nya. Melewati masa ini, sesi menjadi kandidat penarikan kembali. 0 = jangan pernah menarik otomatis.",
+      "diskThreshold": "Penggunaan disk yang memulai penarikan",
+      "diskThresholdHint": "Penarikan hanya berjalan pada node di atas penggunaan disk ini. Bila ruang masih longgar, sesi terhenti yang lama pun dibiarkan.",
+      "note": "Penarikan dimulai dari sesi yang paling lama menganggur milik pengguna dengan sesi terhenti terbanyak, dan berhenti begitu node kembali di bawah ambang.",
+      "exemptNote": "Sesi terhenti terbaru milik setiap pengguna tidak pernah ditarik. Sesi yang sedang berjalan tidak pernah disentuh.",
+      "offNote": "Penarikan otomatis dimatikan. Sesi terhenti hanya dibatasi oleh batas jumlah dan biaya penyimpanan; saat disk penuh, admin harus membersihkan secara manual."
+    }
   },
   "topbar": {
-    "nodeBadge": "Node {{up}}/{{total}} · GPU {{gpu}}%"
+    "nodeBadge": "Node {{up}}/{{total}} · GPU {{gpu}}%",
+    "nodeBadgeNoGpu": "Node {{up}}/{{total}} · GPU —"
   }
 }

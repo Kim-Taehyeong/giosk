@@ -309,7 +309,8 @@
     "grpSlot": "Sdílený slot · levnější, bez záruky",
     "notEnough": "Nedostatek kreditu – je vyžadována minimálně 1 hodina",
     "runtimeLeft": "Doba běhu tímto tempem",
-    "tsSlotN": "1 ze slotů {{n}}"
+    "tsSlotN": "1 ze slotů {{n}}",
+    "sshKeyChange": "Změnit"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "idlePolicy": "Relace jsou automaticky obnoveny po minimální nečinnosti {{n}}.",
     "detNoAutoStop": "Neplatí žádná zásada automatického zastavení.",
     "detNoActivity": "Zatím žádná aktivita",
-    "detLogs": "Nedávné protokoly"
+    "detLogs": "Nedávné protokoly",
+    "detReclaimTitle": "Uchování zastavených relací",
+    "reclaimIn": "K uvolnění za {{n}} d",
+    "reclaimDue": "K uvolnění",
+    "reclaimKept": "Zachováno",
+    "reclaimHint": "Zastavené relace stále používají domovský disk. Po {{n}} dnech zastavení se stanou uvolnitelnými a nejdéle nečinné mohou být smazány, když uzlu dojde místo na disku.",
+    "reclaimKeptHint": "Vaše naposledy zastavená relace se nikdy neuvolňuje.",
+    "reclaimResumeHint": "Restart vynuluje počítadlo. Smažte relace, které už nepotřebujete uchovávat."
   },
   "conn": {
     "webConnect": "Připojte se přes web",
@@ -412,7 +420,9 @@
     "sshProxy": "Proxy (brána)",
     "sshDirect": "Přímý (intranet)",
     "regenerated": "Vydán nový přístupový odkaz.",
-    "sshDirectInHint": "Připojte se přímo k uzlu zevnitř kancelářské sítě – obejděte bránu."
+    "sshDirectInHint": "Připojte se přímo k uzlu zevnitř kancelářské sítě – obejděte bránu.",
+    "sshNeedKey": "Není zaregistrován žádný veřejný klíč SSH",
+    "sshNeedKeyHint": "Zaregistrujte nebo vygenerujte jej níže — běžící relace jej převezmou okamžitě."
   },
   "account": {
     "title": "Moje nastavení",
@@ -448,7 +458,13 @@
     "pwWrong": "Aktuální heslo je nesprávné",
     "pwMismatch": "Nová hesla se neshodují",
     "pwShort": "Heslo musí mít alespoň 8 znaků",
-    "localAcctNote": "Na každém fyzickém uzlu je pro vás zřízen místní účet."
+    "localAcctNote": "Na každém fyzickém uzlu je pro vás zřízen místní účet.",
+    "sshBad": "Neplatný veřejný klíč. Vložte jediný řádek, například „ssh-ed25519 AAAA…“.",
+    "sshFail": "Veřejný klíč SSH se nepodařilo uložit.",
+    "sshGenerate": "Vygenerovat a stáhnout klíč",
+    "sshGenerated": "Klíč vygenerován. Stažený soukromý klíč bezpečně uschovejte — znovu jej stáhnout nelze.",
+    "sshGenFail": "Klíč SSH se nepodařilo vygenerovat.",
+    "sshGenerateHint": "Ještě nemáte klíč? Klikněte na „Vygenerovat a stáhnout klíč“. Soukromý klíč (.pem) se stáhne jednou a veřejný se zaregistruje automaticky. Připojení: ssh -i stazeny-klic.pem …"
   },
   "notify": {
     "title": "Oznámení",

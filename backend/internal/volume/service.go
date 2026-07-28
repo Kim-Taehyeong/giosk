@@ -101,6 +101,17 @@ func (s *Service) quotaFor(userID int64) int {
 	return s.totalGiB
 }
 
+// quotaForTeam은 볼륨이 귀속된 팀(group)의 볼륨 상한을 반환한다(팀별로 다른 MaxVolumeGiB 지원).
+// groupID<=0(팀 미귀속)이면 사용자 단위 상한으로 폴백.
+func (s *Service) quotaForTeam(userID, groupID int64) int {
+	if groupID > 0 && s.limits != nil {
+		if g := s.limits.ResolveGroupByID(groupID).MaxVolumeGiB; g > 0 {
+			return g
+		}
+	}
+	return s.quotaFor(userID)
+}
+
 // localHomes는 사용자가 대여한 적 있는 물리노드별 "로컬 Home" 특수 볼륨을 만든다(물리 비활성 시 빈 슬라이스).
 func (s *Service) localHomes(userID int64) []LocalHome {
 	if !s.localHomeOn {
@@ -210,24 +221,33 @@ func (s *Service) nodeDisk(ctx context.Context) []NodeDisk {
 	return out
 }
 
-// Create는 쿼터 확인 후 볼륨 행 + PVC 를 만든다.
-func (s *Service) Create(ctx context.Context, userID int64, req CreateReq) (*Volume, error) {
-	alloc, _ := s.repo.AllocatedGiB(userID)
-	if alloc+req.SizeGiB > s.quotaFor(userID) {
+// Create는 쿼터 확인 후 볼륨 행 + PVC 를 만든다. groupID>0 이면 그 팀에 귀속(쿼터·과금이 그 팀 기준).
+// 소유는 항상 개인(userID) — 팀은 "용량·비용이 어느 팀에서 나가는지"만 정한다(세션 과금과 동일 관점).
+func (s *Service) Create(ctx context.Context, userID, groupID int64, req CreateReq) (*Volume, error) {
+	// 쿼터: 팀 귀속이면 그 팀 볼륨 합·그 팀 상한, 아니면 사용자 단위.
+	alloc := 0
+	if groupID > 0 {
+		alloc, _ = s.repo.AllocatedGiBInTeam(userID, groupID)
+	} else {
+		alloc, _ = s.repo.AllocatedGiB(userID)
+	}
+	if alloc+req.SizeGiB > s.quotaForTeam(userID, groupID) {
 		return nil, ErrQuotaExceeded
 	}
-	// 크레딧 모드: 최소 ~1일치 비용을 감당할 잔액이 있어야 생성 허용(0잔액 신규 생성 차단).
-	// 기존 볼륨은 잔액 부족이어도 유예(빌러가 즉시 삭제하지 않음).
+	// 크레딧 모드: 최소 ~1일치 비용을 감당할 잔액이 있어야 생성 허용(귀속 팀 지갑 기준).
 	if s.charger != nil && s.price() > 0 {
 		dayCost := s.monthlyCost(req.SizeGiB) / 30
-		if s.charger.Balance(userID, 0) < dayCost {
+		if s.charger.Balance(userID, groupID) < dayCost {
 			return nil, ErrInsufficientCredit
 		}
 	}
+	var gid *int64
+	if groupID > 0 {
+		gid = &groupID
+	}
 	v := &Volume{
-		// 스토리지 단일화: 모든 볼륨은 NFS(RWX). 교차-ns 공유가 어디서나 동작하고
-		// 물리노드에서도 직접 NFS 마운트가 가능해진다(설계: NFS 단일 백엔드).
-		Name: req.Name, Kind: "personal", OwnerUserID: &userID,
+		// 스토리지 단일화: 모든 볼륨은 NFS(RWX). 소유=개인, group_id=귀속 팀(쿼터·과금 홈).
+		Name: req.Name, Kind: "personal", OwnerUserID: &userID, GroupID: gid,
 		SizeGiB: req.SizeGiB, AccessMode: "RWX", Status: StatusPending,
 	}
 	if err := s.repo.Create(v); err != nil {
@@ -325,6 +345,25 @@ func (s *Service) Share(volumeID int64, req ShareReq) error {
 }
 
 // Delete는 소유자 확인 후 PVC + 행을 삭제한다.
+// SetVolumeTeam은 볼륨의 귀속 팀을 바꾼다(쿼터·과금 홈 이전). 소유자만, 대상 팀 쿼터 여유 확인.
+func (s *Service) SetVolumeTeam(userID, volumeID, groupID int64) error {
+	v, err := s.repo.Get(volumeID)
+	if err != nil {
+		return err
+	}
+	if v.OwnerUserID == nil || *v.OwnerUserID != userID {
+		return ErrNotFound
+	}
+	// 대상 팀 쿼터 여유 확인(그 팀에 이미 귀속된 내 볼륨 + 이 볼륨 크기 ≤ 팀 상한).
+	if groupID > 0 {
+		alloc, _ := s.repo.AllocatedGiBInTeam(userID, groupID)
+		if alloc+v.SizeGiB > s.quotaForTeam(userID, groupID) {
+			return ErrQuotaExceeded
+		}
+	}
+	return s.repo.SetGroup(volumeID, groupID)
+}
+
 func (s *Service) Delete(ctx context.Context, volumeID, userID int64) error {
 	v, err := s.repo.Get(volumeID)
 	if err != nil {

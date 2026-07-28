@@ -115,7 +115,10 @@
     "noActiveUsers": "Nicio sesiune de rulare acum",
     "noCredit": "Fără credit",
     "modeHint_free": "Modul gratuit - fără limite de credit. Monitorizați utilizarea prin statistici de sesiune/inactiv și orele GPU.",
-    "modeHint_dynamic": "Modul primul venit — fără credite; apuca capacitatea atunci când este disponibilă. Monitorizați prin statistici și alerte de sesiune/inactiv."
+    "modeHint_dynamic": "Modul primul venit — fără credite; apuca capacitatea atunci când este disponibilă. Monitorizați prin statistici și alerte de sesiune/inactiv.",
+    "metricsOffTitle": "Stiva de monitorizare nu este instalată",
+    "metricsOffAll": "Fără Prometheus și exportatorul DCGM, utilizarea GPU, VRAM și temperatura nu pot fi afișate. Activați monitorizarea pentru a vedea metrici în timp real.",
+    "metricsOffDcgm": "Prometheus este conectat, dar nu s-au găsit metrici de la exportatorul DCGM. Instalați dcgm-exporter pentru a vedea în timp real utilizarea GPU, VRAM și temperatura."
   },
   "approvals": {
     "title": "Aprobari",
@@ -470,7 +473,10 @@
     "impMissing": "Introduceți numele, proprietarul, serverul NFS și calea.",
     "impFail": "Importul nu a reușit",
     "impSize": "Dimensiunea afișată (GiB)",
-    "impNoUser": "Contul nu a fost găsit."
+    "impNoUser": "Contul nu a fost găsit.",
+    "impOwnerHint": "Alegeți un cont din listă pentru a importa.",
+    "impOwnerPicked": "Selectat: {{name}} ({{id}})",
+    "metricsOffNotice": "Monitorizarea (DCGM/Prometheus) nu este instalată, deci utilizarea GPU și VRAM nu pot fi afișate. Activați monitorizarea pentru a vedea metrici în timp real."
   },
   "mset": {
     "title": "Setări",
@@ -838,7 +844,9 @@
     "orgHint": "Limite rigide pentru membrii acestei organizații. Câmpurile goale moștenesc de la global.",
     "groupHint": "Limite rigide pentru membrii acestui grup. Câmpurile goale moștenesc de la org → global.",
     "userTitle": "{{name}} — limitele resurselor",
-    "hint": "Limite absolute independente de credite. Câmpurile goale moștenesc de la părinte (grup → org → global)."
+    "hint": "Limite absolute independente de credite. Câmpurile goale moștenesc de la părinte (grup → org → global).",
+    "maxStoppedSessions": "Max. sesiuni oprite",
+    "maxEphemeralGib": "Max. disc temporar"
   },
   "settings": {
     "mode": {

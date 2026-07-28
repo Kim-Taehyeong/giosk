@@ -309,7 +309,8 @@
     "hoursApprox": "~{{n}} ore",
     "runtimeLeft": "Autonomia a questo ritmo",
     "tsSlotN": "1 degli slot {{n}}",
-    "notEnough": "Credito insufficiente: minimo 1 ora richiesta"
+    "notEnough": "Credito insufficiente: minimo 1 ora richiesta",
+    "sshKeyChange": "Modifica"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "usageUnavailable": "Le metriche di utilizzo non sono disponibili.",
     "detActivity": "Registro delle attività",
     "detNoActivity": "Nessuna attività ancora",
-    "idlePolicy": "Le sessioni vengono recuperate automaticamente dopo {{n}} minimo di inattività."
+    "idlePolicy": "Le sessioni vengono recuperate automaticamente dopo {{n}} minimo di inattività.",
+    "detReclaimTitle": "Conservazione delle sessioni arrestate",
+    "reclaimIn": "Recuperabile tra {{n}} g",
+    "reclaimDue": "Recuperabile",
+    "reclaimKept": "Conservata",
+    "reclaimHint": "Le sessioni arrestate continuano a usare il disco home. Dopo {{n}} giorni da ferme diventano recuperabili, e quelle inattive da più tempo possono essere eliminate quando lo spazio su un nodo si esaurisce.",
+    "reclaimKeptHint": "La tua sessione arrestata più recente non viene mai recuperata.",
+    "reclaimResumeHint": "Riavviandola il conteggio riparte da zero. Elimina le sessioni che non devi più conservare."
   },
   "conn": {
     "openVscode": "Apri VSCode",
@@ -412,7 +420,9 @@
     "loadFail": "Impossibile caricare le informazioni di connessione. Per favore riprova.",
     "regenerated": "Rilasciato un nuovo collegamento di accesso.",
     "sshDirectInHint": "Connettiti direttamente al nodo dall'interno della rete aziendale, bypassando il gateway.",
-    "sshDirect": "Diretto (intranet)"
+    "sshDirect": "Diretto (intranet)",
+    "sshNeedKey": "Nessuna chiave pubblica SSH registrata",
+    "sshNeedKeyHint": "Registrane o generane una qui sotto: le sessioni in esecuzione la applicano subito."
   },
   "account": {
     "title": "Le mie impostazioni",
@@ -448,7 +458,13 @@
     "homeTitle": "Quota domestica SSH",
     "pwFail": "Modifica della password non riuscita",
     "localAcctNote": "Viene fornito un account locale su ciascun nodo fisico.",
-    "homeHint": "Utilizzo della home directory del tuo nodo fisico in modalità ibrida (SSH)."
+    "homeHint": "Utilizzo della home directory del tuo nodo fisico in modalità ibrida (SSH).",
+    "sshBad": "Chiave pubblica non valida. Incolla una singola riga come «ssh-ed25519 AAAA…».",
+    "sshFail": "Salvataggio della chiave pubblica SSH non riuscito.",
+    "sshGenerate": "Genera e scarica chiave",
+    "sshGenerated": "Chiave generata. Conserva al sicuro la chiave privata scaricata: non può essere scaricata di nuovo.",
+    "sshGenFail": "Generazione della chiave SSH non riuscita.",
+    "sshGenerateHint": "Non hai ancora una chiave? Clicca «Genera e scarica chiave». La chiave privata (.pem) viene scaricata una sola volta e quella pubblica è registrata automaticamente. Connessione: ssh -i chiave-scaricata.pem …"
   },
   "notify": {
     "title": "Notifiche",

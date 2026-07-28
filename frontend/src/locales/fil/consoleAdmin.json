@@ -115,7 +115,10 @@
     "byGpuType": "Mga session ayon sa uri ng GPU",
     "noAlerts": "Walang alerto",
     "gpuTempMax": "Max GPU temp",
-    "modeHint_free": "Libreng mode — walang limitasyon sa kredito. Subaybayan ang paggamit sa pamamagitan ng session/idle stats at GPU hours."
+    "modeHint_free": "Libreng mode — walang limitasyon sa kredito. Subaybayan ang paggamit sa pamamagitan ng session/idle stats at GPU hours.",
+    "metricsOffTitle": "Hindi naka-install ang monitoring stack",
+    "metricsOffAll": "Kung walang Prometheus at DCGM exporter, hindi maipapakita ang paggamit ng GPU, VRAM, at temperatura. I-enable ang monitoring para makita ang live na sukatan.",
+    "metricsOffDcgm": "Nakakonekta ang Prometheus pero walang nakitang sukatan mula sa DCGM exporter. Mag-install ng dcgm-exporter para makita nang live ang paggamit ng GPU, VRAM, at temperatura."
   },
   "approvals": {
     "title": "Mga pag-apruba",
@@ -470,7 +473,10 @@
     "impSize": "Laki ng ipinapakita (GiB)",
     "impFail": "Nabigo ang pag-import",
     "impPath": "NFS path (export)",
-    "importHint": "I-map ang isang umiiral na landas ng NFS (naglalaman na ng data) nang direkta bilang isang volume (para sa paggamit sa isang umiiral na kapaligiran). Sa halip na lumikha ng isang bagong walang laman na volume, ito ay nagbubuklod sa ibinigay na server:path bilang isang static na PV."
+    "importHint": "I-map ang isang umiiral na landas ng NFS (naglalaman na ng data) nang direkta bilang isang volume (para sa paggamit sa isang umiiral na kapaligiran). Sa halip na lumikha ng isang bagong walang laman na volume, ito ay nagbubuklod sa ibinigay na server:path bilang isang static na PV.",
+    "impOwnerHint": "Pumili ng account sa listahan para mag-import.",
+    "impOwnerPicked": "Napili: {{name}} ({{id}})",
+    "metricsOffNotice": "Hindi naka-install ang monitoring (DCGM/Prometheus), kaya hindi maipapakita ang paggamit ng GPU at VRAM. I-enable ang monitoring para makita ang live na sukatan."
   },
   "mset": {
     "title": "Mga setting",
@@ -838,7 +844,9 @@
     "maxGpu": "Max na mga GPU",
     "saved": "Mga naka-save na limitasyon para sa {{name}}",
     "maxVolumeGib": "Max volume",
-    "hint": "Ganap na mga cap na independyente sa mga kredito. Ang mga walang laman na field ay namamana mula sa magulang (group → org → global)."
+    "hint": "Ganap na mga cap na independyente sa mga kredito. Ang mga walang laman na field ay namamana mula sa magulang (group → org → global).",
+    "maxStoppedSessions": "Max na huminto na session",
+    "maxEphemeralGib": "Max na pansamantalang disk"
   },
   "settings": {
     "mode": {

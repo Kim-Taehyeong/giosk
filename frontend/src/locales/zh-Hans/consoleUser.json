@@ -309,7 +309,8 @@
     "runtimeLeft": "以此速度运行",
     "grpSlotDesc": "几个人轮流使用一个 GPU。内存无法得到保证——如果另一个会话耗尽了 VRAM，您的会话也可能会失败。",
     "notEnough": "学分不足 — 至少需要 1 小时",
-    "grpSlot": "共享插槽 · 更便宜，但没有保证"
+    "grpSlot": "共享插槽 · 更便宜，但没有保证",
+    "sshKeyChange": "更改"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "idlePolicy": "会话在 {{n}} 分钟空闲后自动回收。",
     "detNoActivity": "还没有活动",
     "detNoLogs": "无日志",
-    "detNoAutoStop": "不适用自动停止政策。"
+    "detNoAutoStop": "不适用自动停止政策。",
+    "detReclaimTitle": "已停止会话保留",
+    "reclaimIn": "{{n}} 天后可回收",
+    "reclaimDue": "可回收",
+    "reclaimKept": "保留中",
+    "reclaimHint": "已停止的会话仍在占用主目录磁盘。停止超过 {{n}} 天后即可被回收；当节点磁盘不足时，闲置最久的可能被删除。",
+    "reclaimKeptHint": "您最近停止的一个会话永不回收。",
+    "reclaimResumeHint": "重新启动会重置计时。不再需要保留的会话请删除。"
   },
   "conn": {
     "webConnectHint": "直接在浏览器中打开终端（无需 SSH 密钥或命令）。",
@@ -412,7 +420,9 @@
     "sshProxy": "代理（网关）",
     "regenerated": "发布了新的访问链接。",
     "sshDirectInHint": "绕过网关，从办公网络内部直接连接到节点。",
-    "sshDirect": "直接（内联网）"
+    "sshDirect": "直接（内联网）",
+    "sshNeedKey": "尚未注册 SSH 公钥",
+    "sshNeedKeyHint": "请在下方注册或生成；运行中的会话会立即生效。"
   },
   "account": {
     "title": "我的设置",
@@ -448,7 +458,13 @@
     "memberRole": "团体角色",
     "sshSaved": "SSH 密钥已保存",
     "homeTitle": "SSH 家庭配额",
-    "pwFail": "密码修改失败"
+    "pwFail": "密码修改失败",
+    "sshBad": "公钥格式无效。请粘贴形如“ssh-ed25519 AAAA…”的单行内容。",
+    "sshFail": "SSH 公钥保存失败。",
+    "sshGenerate": "生成并下载密钥",
+    "sshGenerated": "密钥已生成。请妥善保管下载的私钥——它无法再次下载。",
+    "sshGenFail": "SSH 密钥生成失败。",
+    "sshGenerateHint": "还没有密钥？点击“生成并下载密钥”。私钥（.pem）只会下载一次，公钥自动注册。连接方式：ssh -i 下载的密钥.pem …"
   },
   "notify": {
     "title": "通知",

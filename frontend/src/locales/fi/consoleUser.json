@@ -309,7 +309,8 @@
     "tsSlotN": "1 {{n}}-paikkaa",
     "runtimeLeft": "Kesto tällä nopeudella",
     "guaranteed": "Taatut resurssit",
-    "grpSlotDesc": "Useat ihmiset käyttävät vuorotellen yhtä GPU:ta. Muistia ei taata – jos toinen istunto tyhjentää VRAM-muistin, sinunkin voi epäonnistua."
+    "grpSlotDesc": "Useat ihmiset käyttävät vuorotellen yhtä GPU:ta. Muistia ei taata – jos toinen istunto tyhjentää VRAM-muistin, sinunkin voi epäonnistua.",
+    "sshKeyChange": "Vaihda"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "detLogs": "Viimeaikaiset lokit",
     "detNoLogs": "Ei lokeja",
     "detNoActivity": "Ei toimintaa vielä",
-    "idlePolicy": "Istunnot palautetaan automaattisesti {{n}} min tyhjäkäynnin jälkeen."
+    "idlePolicy": "Istunnot palautetaan automaattisesti {{n}} min tyhjäkäynnin jälkeen.",
+    "detReclaimTitle": "Pysäytettyjen istuntojen säilytys",
+    "reclaimIn": "Vapautettavissa {{n}} pv kuluttua",
+    "reclaimDue": "Vapautettavissa",
+    "reclaimKept": "Säilytetään",
+    "reclaimHint": "Pysäytetyt istunnot käyttävät edelleen kotilevyä. {{n}} päivän pysäytyksen jälkeen ne ovat vapautettavissa, ja pisimpään käyttämättöminä olleet voidaan poistaa, kun solmun levytila käy vähiin.",
+    "reclaimKeptHint": "Viimeisimmäksi pysäyttämääsi istuntoa ei koskaan vapauteta.",
+    "reclaimResumeHint": "Uudelleenkäynnistys nollaa laskurin. Poista istunnot, joita ei enää tarvitse säilyttää."
   },
   "conn": {
     "loading": "Ladataan yhteystietoja…",
@@ -412,7 +420,9 @@
     "sshProxyHint": "Yhdistä yhden yhdyskäytävän sisääntulopisteen kautta mistä tahansa. Kun istunto on todennettu, se pysyy yhteydessä (ei säännöllistä uudelleentarkistusta).",
     "sshDirectInHint": "Yhdistä suoraan solmuun toimistoverkon sisältä ohittaen yhdyskäytävän.",
     "sshExternalHint": "Käytä tätä komentoa kampusverkon ulkopuolelta (hyppää välityspalvelimen kautta yhdyskäytävään).",
-    "regenerated": "Myönnetty uusi pääsylinkki."
+    "regenerated": "Myönnetty uusi pääsylinkki.",
+    "sshNeedKey": "SSH-julkista avainta ei ole rekisteröity",
+    "sshNeedKeyHint": "Rekisteröi tai luo sellainen alta – käynnissä olevat istunnot ottavat sen heti käyttöön."
   },
   "account": {
     "title": "Omat asetukset",
@@ -448,7 +458,13 @@
     "pwChanged": "Salasana vaihdettu",
     "localAcctNote": "Jokaiselle fyysiselle solmulle on varattu paikallinen tili.",
     "homeHint": "Fyysisen solmun kotihakemiston käyttö hybriditilassa (SSH).",
-    "pwFail": "Salasanan vaihto epäonnistui"
+    "pwFail": "Salasanan vaihto epäonnistui",
+    "sshBad": "Virheellinen julkinen avain. Liitä yksi rivi, esimerkiksi ”ssh-ed25519 AAAA…”.",
+    "sshFail": "SSH-julkisen avaimen tallennus epäonnistui.",
+    "sshGenerate": "Luo ja lataa avain",
+    "sshGenerated": "Avain luotu. Säilytä ladattu yksityinen avain turvassa – sitä ei voi ladata uudelleen.",
+    "sshGenFail": "SSH-avaimen luonti epäonnistui.",
+    "sshGenerateHint": "Eikö avainta vielä ole? Napsauta ”Luo ja lataa avain”. Yksityinen avain (.pem) ladataan kerran ja julkinen rekisteröidään automaattisesti. Yhdistä: ssh -i ladattu-avain.pem …"
   },
   "notify": {
     "title": "Ilmoitukset",

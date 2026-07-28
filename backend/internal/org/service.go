@@ -166,6 +166,9 @@ func (s *Service) GroupOfUser(userID int64) (int64, bool) { return s.repo.GroupO
 // OrgOfUser는 사용자의 대표(활성 멤버십) 조직 id 를 반환한다(없으면 false).
 func (s *Service) OrgOfUser(userID int64) (int64, bool) { return s.repo.OrgOfUser(userID) }
 
+// OrgOfGroup은 그룹의 조직 id 를 반환한다(없으면 false).
+func (s *Service) OrgOfGroup(groupID int64) (int64, bool) { return s.repo.OrgOfGroup(groupID) }
+
 func orDefault(v, def string) string {
 	if v == "" {
 		return def

@@ -76,7 +76,13 @@ func (h *Handler) Config(c *gin.Context) {
 				"maxConcurrentSessions": cfg.Billing.Dynamic.MaxConcurrentSessions,
 			},
 		},
-		"idle":  gin.H{"timeoutMin": idleTimeout},
+		"idle": gin.H{"timeoutMin": idleTimeout},
+		// 중단 세션 홈 회수 정책 — 유휴 정지와 같은 회수 축이라 함께 운영 중 조정한다.
+		// stoppedTtlDays=0 이면 자동 회수 없음(개수 상한·스토리지 과금만으로 억제).
+		"reclaim": gin.H{
+			"stoppedTtlDays": atoiOr(rt[KeyStoppedTTLDays], cfg.Quota.StoppedTTLDays),
+			"homeReapPct":    atoiOr(rt[KeyHomeReapPct], cfg.Quota.HomeReapPct),
+		},
 		"lease": gin.H{"extensionHours": cfg.Billing.Dynamic.ExtensionHours, "maxExtensions": cfg.Billing.Dynamic.MaxExtensions},
 		"features": gin.H{
 			"signupRequest":    feat(KeySignupRequest, cfg.Features.SignupRequest),
@@ -119,6 +125,10 @@ type UpdateReq struct {
 	Storage *struct {
 		PricePerGiBMonth *int `json:"pricePerGiBMonth"`
 	} `json:"storage"`
+	Reclaim *struct {
+		StoppedTtlDays *int `json:"stoppedTtlDays"`
+		HomeReapPct    *int `json:"homeReapPct"`
+	} `json:"reclaim"`
 	Features map[string]bool `json:"features"`
 }
 
@@ -143,6 +153,16 @@ func (h *Handler) Update(c *gin.Context) {
 	}
 	if req.Storage != nil && req.Storage.PricePerGiBMonth != nil && *req.Storage.PricePerGiBMonth >= 0 {
 		_ = h.store.Set(KeyStoragePriceGiBMonth, itoa(*req.Storage.PricePerGiBMonth))
+	}
+	if req.Reclaim != nil {
+		// TTL 은 0 허용 = "자동 회수 끄기". 다른 값과 달리 0 이 유효한 설정이라 >=0 으로 받는다.
+		if req.Reclaim.StoppedTtlDays != nil && *req.Reclaim.StoppedTtlDays >= 0 {
+			_ = h.store.Set(KeyStoppedTTLDays, itoa(*req.Reclaim.StoppedTtlDays))
+		}
+		// 임계는 50~99%만. 너무 낮으면 상시 회수가 돌고, 100%는 이미 kubelet DiskPressure 라 늦다.
+		if p := req.Reclaim.HomeReapPct; p != nil && *p >= 50 && *p <= 99 {
+			_ = h.store.Set(KeyHomeReapPct, itoa(*p))
+		}
 	}
 	if req.Recharge != nil {
 		if req.Recharge.Enabled != nil {

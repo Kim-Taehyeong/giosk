@@ -448,7 +448,8 @@
       "credit": "C",
       "sessions": "Sitzungen",
       "creditPerStep": "C/Schritt",
-      "times": "mal"
+      "times": "mal",
+      "day": "Tage"
     },
     "mode": {
       "hybridDesc": "Fügt direkten SSH-Zugriff auf physische Knoten über Containern hinzu. Ideal für kleine Labore oder wenn das Leasing physischer Knoten erforderlich ist.",
@@ -510,9 +511,19 @@
     "next": "Nächste",
     "wizardSubtitle": "Konfigurieren Sie den Betriebsmodus und die Standardrichtlinien. Alles kann später unter Admin → Systemeinstellungen geändert werden.",
     "wizardTitle": "Giosk-Ersteinrichtung",
-    "finish": "Beenden Sie die Einrichtung"
+    "finish": "Beenden Sie die Einrichtung",
+    "reclaim": {
+      "stoppedTtl": "Aufbewahrung gestoppter Sitzungen",
+      "stoppedTtlHint": "Gestoppte Sitzungen belegen weiterhin ihre Home-Festplatte. Nach dieser Zeit werden sie zu Rückgewinnungskandidaten. 0 = nie automatisch zurückgewinnen.",
+      "diskThreshold": "Festplattennutzung für Rückgewinnung",
+      "diskThresholdHint": "Die Rückgewinnung läuft nur auf Knoten oberhalb dieser Festplattennutzung. Bei ausreichend Platz bleiben auch alte gestoppte Sitzungen unberührt.",
+      "note": "Zuerst werden die am längsten ungenutzten Sitzungen jener Nutzer zurückgewonnen, die die meisten gestoppten Sitzungen halten – und nur so viele, bis der Knoten wieder unter dem Schwellwert liegt.",
+      "exemptNote": "Die zuletzt gestoppte Sitzung jedes Nutzers wird nie zurückgewonnen. Laufende Sitzungen werden nie angetastet.",
+      "offNote": "Die automatische Rückgewinnung ist deaktiviert. Gestoppte Sitzungen werden nur durch das Anzahllimit und die Speicherkosten begrenzt; bei vollen Festplatten müssen Administratoren manuell aufräumen."
+    }
   },
   "topbar": {
-    "nodeBadge": "Knoten {{up}}/{{total}} · GPU {{gpu}}%"
+    "nodeBadge": "Knoten {{up}}/{{total}} · GPU {{gpu}}%",
+    "nodeBadgeNoGpu": "Knoten {{up}}/{{total}} · GPU —"
   }
 }

@@ -115,7 +115,10 @@
     "sessionProvisioning": "Poskytování zásob",
     "byGpuType": "Relace podle typu GPU",
     "activeUsers": "Aktivní uživatelé",
-    "modeHint_free": "Bezplatný režim — žádné úvěrové limity. Monitorujte využití pomocí statistik relace/nečinnosti a hodin GPU."
+    "modeHint_free": "Bezplatný režim — žádné úvěrové limity. Monitorujte využití pomocí statistik relace/nečinnosti a hodin GPU.",
+    "metricsOffTitle": "Monitorovací stack není nainstalován",
+    "metricsOffAll": "Bez Prometheu a exportéru DCGM nelze zobrazit využití GPU, VRAM ani teplotu. Zapněte monitoring, abyste viděli živé metriky.",
+    "metricsOffDcgm": "Prometheus je připojen, ale metriky exportéru DCGM nebyly nalezeny. Nainstalujte dcgm-exporter, abyste živě viděli využití GPU, VRAM a teplotu."
   },
   "approvals": {
     "title": "Schválení",
@@ -470,7 +473,10 @@
     "impName": "Název svazku",
     "impPath": "Cesta NFS (export)",
     "impSize": "Zobrazená velikost (GiB)",
-    "impNoUser": "Účet nenalezen."
+    "impNoUser": "Účet nenalezen.",
+    "impOwnerHint": "Pro import vyberte účet ze seznamu.",
+    "impOwnerPicked": "Vybráno: {{name}} ({{id}})",
+    "metricsOffNotice": "Monitoring (DCGM/Prometheus) není nainstalován, takže využití GPU a VRAM nelze zobrazit. Zapněte monitoring, abyste viděli živé metriky."
   },
   "mset": {
     "title": "Nastavení",
@@ -838,7 +844,9 @@
     "hint": "Absolutní stropy nezávislé na kreditech. Prázdná pole dědí od rodiče (skupina → organizace → globální).",
     "groupHint": "Pevné čepice pro členy této skupiny. Prázdná pole dědí z org → global.",
     "userTitle": "{{name}} — limity zdrojů",
-    "maxGpu": "Max GPU"
+    "maxGpu": "Max GPU",
+    "maxStoppedSessions": "Max. zastavených relací",
+    "maxEphemeralGib": "Max. dočasný disk"
   },
   "settings": {
     "mode": {

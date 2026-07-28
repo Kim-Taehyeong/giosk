@@ -9,7 +9,7 @@ import Modal from '../../../components/console/Modal';
 import Select from '../../../components/console/Select';
 import { useToast } from '../../../components/console/Toast';
 import { useConfirm } from '../../../components/console/Confirm';
-import { getVolumes, createVolume, shareVolume, deleteVolume } from '../../../api/console/volumes';
+import { getVolumes, createVolume, shareVolume, deleteVolume, changeVolumeTeam } from '../../../api/console/volumes';
 import { getShareTargets } from '../../../api/console/membership';
 
 // 용량 = 할당량. 사용량은 표시하지 않는다 — 볼륨이 NFS 익스포트의 하위 디렉터리라
@@ -27,8 +27,15 @@ export default function Volumes() {
   const [form, setForm] = useState({ name: '', sizeGib: 30 });
   const [share, setShare] = useState({ target: 'user', value: '', permission: 'ro' });
   const [shareTargets, setShareTargets] = useState({ users: [], groups: [] });
+  const [teamEdit, setTeamEdit] = useState(null); // 귀속 팀 변경 모달 { id, name, groupId }
   const { toast } = useToast();
   const confirm = useConfirm();
+
+  const saveTeam = async () => {
+    try { await changeVolumeTeam(teamEdit.id, Number(teamEdit.groupId) || 0); }
+    catch (e) { toast(e?.code === 'quota_exceeded' ? t('volume.teamQuota', { defaultValue: '대상 팀 볼륨 쿼터를 초과합니다' }) : (e?.message || t('volume.teamFail', { defaultValue: '팀 변경 실패' }))); return; }
+    toast(t('volume.teamChanged', { defaultValue: '귀속 팀을 변경했습니다' })); setTeamEdit(null); load();
+  };
 
   const load = () => getVolumes().then(setData);
   useEffect(() => { load(); }, []);
@@ -94,7 +101,12 @@ export default function Volumes() {
             {data.owned.map((r) => (
               <React.Fragment key={r.id}>
                 <tr>
-                  <td style={{ fontWeight: 600 }}>{r.name}</td>
+                  <td style={{ fontWeight: 600 }}>
+                    {r.name}
+                    <div className="muted" style={{ fontSize: 11.5, fontWeight: 500, marginTop: 2 }}>
+                      {t('volume.teamHome', { defaultValue: '귀속 팀' })}: {r.teamName || t('volume.personal', { defaultValue: '개인' })}
+                    </div>
+                  </td>
                   <td>{usageCell(r)}</td>
                   <td>{r.sharedWith?.length ? <Pill variant="primary">{t('volume.sharedN', { n: r.sharedWith.length })}</Pill> : <span className="muted">{t('volume.private')}</span>}</td>
                   <td className="flex">
@@ -102,6 +114,7 @@ export default function Volumes() {
                       {detailId === r.id ? <ChevronDown size={13} /> : <ChevronRight size={13} />} {t('volume.details')}
                     </button>
                     <button className="btn sm" onClick={() => { setShare({ target: 'user', value: '', permission: 'ro' }); setOpenShare(r); }}>{t('volume.share')}</button>
+                    <button className="btn sm" onClick={() => setTeamEdit({ id: r.id, name: r.name, groupId: r.groupId || '' })}>{t('volume.changeTeam', { defaultValue: '팀 변경' })}</button>
                     <button className="btn sm danger" onClick={() => remove(r.id)}>{t('volume.delete')}</button>
                   </td>
                 </tr>
@@ -141,7 +154,7 @@ export default function Volumes() {
           emptyText={t('volume.noShared')}
           columns={[
             { key: 'name', header: t('volume.name') },
-            { key: 'sharedBy', header: t('volume.shareStatus') },
+            { key: 'sharedBy', header: t('volume.sharedBy', { defaultValue: '공유자' }), render: (r) => (r.sharedBy ? <span style={{ fontWeight: 600 }}>{r.sharedBy}</span> : <span className="muted">—</span>) },
             { key: 'perm', header: t('volume.perm'), render: (r) => <Pill variant={r.perm === 'rw' ? 'ok' : 'pause'}>{r.perm}</Pill> },
             { key: 'usage', header: t('volume.usage'), render: usageCell },
           ]}
@@ -205,6 +218,19 @@ export default function Volumes() {
         <Select value={share.permission} onChange={(v) => setShare({ ...share, permission: v })}
           options={[{ value: 'ro', label: t('volume.ro') }, { value: 'rw', label: t('volume.rw') }]} />
         <div className="legend mt">{share.target === 'user' ? t('volume.hintUser') : t('volume.hintGroup')}</div>
+      </Modal>
+
+      <Modal open={!!teamEdit} title={t('volume.changeTeamTitle', { name: teamEdit?.name, defaultValue: `귀속 팀 변경 — ${teamEdit?.name || ''}` })} onClose={() => setTeamEdit(null)} width={460}
+        footer={<>
+          <button className="btn" onClick={() => setTeamEdit(null)}>{t('common.cancel')}</button>
+          <button className="btn primary" onClick={saveTeam}>{t('common.save')}</button>
+        </>}>
+        {teamEdit && (<>
+          <label className="fld" style={{ marginTop: 0 }}>{t('volume.teamHome', { defaultValue: '귀속 팀' })}</label>
+          <Select value={String(teamEdit.groupId || '')} onChange={(v) => setTeamEdit({ ...teamEdit, groupId: v })}
+            options={[{ value: '', label: t('volume.personal', { defaultValue: '개인(팀 없음)' }) }, ...(shareTargets.groups || []).map((g) => ({ value: String(g.id), label: g.displayName || g.name }))]} />
+          <div className="legend mt">{t('volume.teamHint', { defaultValue: '이 볼륨의 용량 쿼터와 스토리지 크레딧이 선택한 팀에서 나갑니다. 소유는 그대로 본인입니다.' })}</div>
+        </>)}
       </Modal>
     </div>
   );

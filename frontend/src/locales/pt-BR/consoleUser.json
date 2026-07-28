@@ -309,7 +309,8 @@
     "runtimeLeft": "Tempo de execução nesta taxa",
     "hoursApprox": "~{{n}} horas",
     "notEnough": "Crédito insuficiente – mínimo de 1 hora necessária",
-    "tsSlotN": "1 dos slots {{n}}"
+    "tsSlotN": "1 dos slots {{n}}",
+    "sshKeyChange": "Alterar"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "detActivity": "Registro de atividades",
     "detNoActivity": "Nenhuma atividade ainda",
     "idlePolicy": "As sessões são recuperadas automaticamente após {{n}} min inativo.",
-    "usage": "Uso"
+    "usage": "Uso",
+    "detReclaimTitle": "Retenção de sessões paradas",
+    "reclaimIn": "Recuperável em {{n}} d",
+    "reclaimDue": "Recuperável",
+    "reclaimKept": "Mantida",
+    "reclaimHint": "Sessões paradas continuam usando disco pessoal. Após {{n}} dias paradas elas se tornam recuperáveis, e as há mais tempo ociosas podem ser excluídas quando um nó ficar com pouco espaço em disco.",
+    "reclaimKeptHint": "Sua sessão parada mais recente nunca é recuperada.",
+    "reclaimResumeHint": "Reiniciar zera a contagem. Exclua as sessões que você não precisa mais manter."
   },
   "conn": {
     "title": "Conectar – {{name}}",
@@ -412,7 +420,9 @@
     "sshDirect": "Direto (intranet)",
     "sshDirectInHint": "Conecte-se diretamente ao nó de dentro da rede do escritório – ignorando o gateway.",
     "regenerate": "Regenerado",
-    "regenerated": "Emitido um novo link de acesso."
+    "regenerated": "Emitido um novo link de acesso.",
+    "sshNeedKey": "Nenhuma chave pública SSH cadastrada",
+    "sshNeedKeyHint": "Cadastre ou gere uma abaixo — sessões em execução aplicam na hora."
   },
   "account": {
     "title": "Minhas configurações",
@@ -448,7 +458,13 @@
     "dark": "Escuro",
     "homeTitle": "Cota inicial SSH",
     "homeHint": "O uso do diretório inicial do nó físico no modo híbrido (SSH).",
-    "localAcctNote": "Uma conta local é fornecida para você em cada nó físico."
+    "localAcctNote": "Uma conta local é fornecida para você em cada nó físico.",
+    "sshBad": "Chave pública inválida. Cole uma única linha como \"ssh-ed25519 AAAA…\".",
+    "sshFail": "Falha ao salvar a chave pública SSH.",
+    "sshGenerate": "Gerar e baixar chave",
+    "sshGenerated": "Chave gerada. Guarde com segurança a chave privada baixada — ela não pode ser baixada novamente.",
+    "sshGenFail": "Falha ao gerar a chave SSH.",
+    "sshGenerateHint": "Ainda sem chave? Clique em \"Gerar e baixar chave\". A chave privada (.pem) é baixada uma única vez e a pública é cadastrada automaticamente. Conexão: ssh -i chave-baixada.pem …"
   },
   "notify": {
     "title": "Notificações",

@@ -448,7 +448,8 @@
       "credit": "C",
       "times": "kali",
       "creditPerStep": "C/langkah",
-      "sessions": "sesi"
+      "sessions": "sesi",
+      "day": "hari"
     },
     "mode": {
       "container": "Mod bekas",
@@ -510,9 +511,19 @@
     "next": "Seterusnya",
     "finish": "Selesaikan persediaan",
     "wizardSubtitle": "Konfigurasikan mod pengendalian dan dasar lalai. Semuanya boleh diubah kemudian dalam Admin → Tetapan Sistem.",
-    "wizardTitle": "Persediaan Awal Giosk"
+    "wizardTitle": "Persediaan Awal Giosk",
+    "reclaim": {
+      "stoppedTtl": "Tempoh simpanan sesi terhenti",
+      "stoppedTtlHint": "Sesi yang dihentikan masih menggunakan cakera home-nya. Selepas tempoh ini, ia menjadi calon tuntutan semula. 0 = jangan sesekali tuntut secara automatik.",
+      "diskThreshold": "Penggunaan cakera yang memulakan tuntutan semula",
+      "diskThresholdHint": "Tuntutan semula hanya berjalan pada nod melebihi penggunaan cakera ini. Jika ruang mencukupi, sesi terhenti lama pun dibiarkan.",
+      "note": "Tuntutan semula bermula dengan sesi paling lama tidak digunakan milik pengguna yang mempunyai paling banyak sesi terhenti, dan berhenti sebaik sahaja nod kembali di bawah ambang.",
+      "exemptNote": "Sesi terhenti terbaharu setiap pengguna tidak pernah dituntut semula. Sesi yang sedang berjalan tidak pernah disentuh.",
+      "offNote": "Tuntutan semula automatik dimatikan. Sesi terhenti hanya dikawal oleh had bilangan dan caj storan; apabila cakera penuh, pentadbir perlu membersihkannya secara manual."
+    }
   },
   "topbar": {
-    "nodeBadge": "Nod {{up}}/{{total}} · GPU {{gpu}}%"
+    "nodeBadge": "Nod {{up}}/{{total}} · GPU {{gpu}}%",
+    "nodeBadgeNoGpu": "Nod {{up}}/{{total}} · GPU —"
   }
 }

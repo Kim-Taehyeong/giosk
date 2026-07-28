@@ -448,7 +448,8 @@
       "credit": "C",
       "times": "kertaa",
       "sessions": "istuntoja",
-      "creditPerStep": "C/askel"
+      "creditPerStep": "C/askel",
+      "day": "päivää"
     },
     "mode": {
       "container": "Säiliötila",
@@ -510,9 +511,19 @@
     "next": "Seuraavaksi",
     "wizardSubtitle": "Määritä toimintatila ja oletuskäytännöt. Kaikkia voi muuttaa myöhemmin kohdassa Admin → System Settings.",
     "finish": "Viimeistele asennus",
-    "wizardTitle": "Gioskin alkuasetukset"
+    "wizardTitle": "Gioskin alkuasetukset",
+    "reclaim": {
+      "stoppedTtl": "Pysäytettyjen istuntojen säilytysaika",
+      "stoppedTtlHint": "Pysäytetyt istunnot varaavat edelleen kotilevynsä. Tämän ajan jälkeen niistä tulee vapautusehdokkaita. 0 = ei koskaan automaattista vapautusta.",
+      "diskThreshold": "Levynkäyttö, jolla vapautus alkaa",
+      "diskThresholdHint": "Vapautus suoritetaan vain solmuissa, joiden levynkäyttö ylittää tämän. Jos tilaa on riittävästi, vanhatkin pysäytetyt istunnot jätetään rauhaan.",
+      "note": "Vapautus aloitetaan pisimpään käyttämättöminä olleista istunnoista niiltä käyttäjiltä, joilla on eniten pysäytettyjä istuntoja, ja se päättyy heti kun solmu on jälleen rajan alapuolella.",
+      "exemptNote": "Kunkin käyttäjän viimeisimmäksi pysäytettyä istuntoa ei koskaan vapauteta. Käynnissä oleviin istuntoihin ei kosketa.",
+      "offNote": "Automaattinen vapautus on pois käytöstä. Pysäytettyjä istuntoja rajoittavat vain lukumääräraja ja tallennusmaksut; levyjen täyttyessä ylläpitäjien on siivottava käsin."
+    }
   },
   "topbar": {
-    "nodeBadge": "Solmut {{up}}/{{total}} · GPU {{gpu}}%"
+    "nodeBadge": "Solmut {{up}}/{{total}} · GPU {{gpu}}%",
+    "nodeBadgeNoGpu": "Solmut {{up}}/{{total}} · GPU —"
   }
 }

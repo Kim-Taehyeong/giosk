@@ -61,10 +61,17 @@ type Repository interface {
 	ListPoliciesScoped(orgID, groupID int64) ([]PolicyRow, error) // 스코프 내(org/group)만
 }
 
-// Hierarchy는 사용자의 대표 그룹/조직을 해석한다(org.Service 가 구현).
+// Hierarchy는 사용자의 대표 그룹/조직 + 그룹의 조직을 해석한다(org.Service 가 구현).
 type Hierarchy interface {
 	GroupOfUser(userID int64) (int64, bool)
 	OrgOfUser(userID int64) (int64, bool)
+	OrgOfGroup(groupID int64) (int64, bool)
+}
+
+// ResolveGroupByID는 그룹 id 만으로 그 그룹의 유효 상한을 해석한다(전역←조직←그룹). 볼륨 팀 귀속 쿼터용.
+func (r *Resolver) ResolveGroupByID(groupID int64) Resolved {
+	orgID, _ := r.hier.OrgOfGroup(groupID)
+	return r.ResolveGroup(orgID, groupID)
 }
 
 // Resolver는 계층을 걸어 하드 상한을 산출한다.

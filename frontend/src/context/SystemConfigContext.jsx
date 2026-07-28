@@ -21,6 +21,10 @@ export const DEFAULT_CONFIG = {
     dynamic: { maxLeaseHours: 8, cooldownHours: 2, maxConcurrentSessions: 1 },
   },
   idle: { timeoutMin: 30 },
+  // 중단 세션 홈 회수 정책(운영 중 조정). 중단 세션도 노드 로컬 디스크를 계속 점유하므로,
+  // 방치 stoppedTtlDays 일을 넘긴 세션을 디스크 homeReapPct% 초과 노드에서만 회수한다.
+  // stoppedTtlDays: 0 = 자동 회수 끔(중단 세션 개수 상한과 스토리지 과금만으로 억제).
+  reclaim: { stoppedTtlDays: 14, homeReapPct: 88 },
   // 선착순(Dynamic) 임대 세션 연장 정책 — 회당 최대 연장 시간·최대 연장 횟수.
   lease: { extensionHours: 4, maxExtensions: 2 },
   // 사용자 기능 on/off (운영 중 조정 가능). 끄면 해당 기능은 관리자만 수행.

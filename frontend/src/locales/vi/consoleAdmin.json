@@ -115,7 +115,10 @@
     "noCredit": "Không có tín dụng",
     "alertFeed": "Nguồn cấp dữ liệu cảnh báo",
     "gpuTempMax": "Nhiệt độ GPU tối đa",
-    "byGpuType": "Phiên theo loại GPU"
+    "byGpuType": "Phiên theo loại GPU",
+    "metricsOffTitle": "Chưa cài đặt bộ giám sát",
+    "metricsOffAll": "Không có Prometheus và DCGM exporter thì không thể hiển thị mức dùng GPU, VRAM và nhiệt độ. Bật giám sát để xem số liệu trực tiếp.",
+    "metricsOffDcgm": "Prometheus đã kết nối nhưng không tìm thấy số liệu của DCGM exporter. Cài dcgm-exporter để xem trực tiếp mức dùng GPU, VRAM và nhiệt độ."
   },
   "approvals": {
     "title": "Phê duyệt",
@@ -470,7 +473,10 @@
     "impMissing": "Nhập tên, chủ sở hữu, máy chủ NFS và đường dẫn.",
     "impDone": "Đã nhập khối lượng {{name}} vào {{user}}.",
     "impName": "Tên tập",
-    "impSize": "Kích thước hiển thị (GiB)"
+    "impSize": "Kích thước hiển thị (GiB)",
+    "impOwnerHint": "Chọn một tài khoản trong danh sách để nhập.",
+    "impOwnerPicked": "Đã chọn: {{name}} ({{id}})",
+    "metricsOffNotice": "Chưa cài giám sát (DCGM/Prometheus) nên không thể hiển thị mức dùng GPU và VRAM. Bật giám sát để xem số liệu trực tiếp."
   },
   "mset": {
     "title": "Cài đặt",
@@ -838,7 +844,9 @@
     "title": "Giới hạn tài nguyên cứng",
     "maxGpu": "GPU tối đa",
     "saved": "Giới hạn đã lưu cho {{name}}",
-    "maxVolumeGib": "Âm lượng tối đa"
+    "maxVolumeGib": "Âm lượng tối đa",
+    "maxStoppedSessions": "Tối đa phiên đã dừng",
+    "maxEphemeralGib": "Tối đa đĩa tạm"
   },
   "settings": {
     "mode": {

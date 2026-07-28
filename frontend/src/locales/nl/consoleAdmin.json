@@ -115,7 +115,10 @@
     "alertFeed": "Waarschuwingsfeed",
     "noCredit": "Geen krediet",
     "noAlerts": "Geen waarschuwingen",
-    "modeHint_free": "Gratis modus – geen kredietlimieten. Houd het gebruik in de gaten via sessie-/inactieve statistieken en GPU-uren."
+    "modeHint_free": "Gratis modus – geen kredietlimieten. Houd het gebruik in de gaten via sessie-/inactieve statistieken en GPU-uren.",
+    "metricsOffTitle": "De monitoringstack is niet geïnstalleerd",
+    "metricsOffAll": "Zonder Prometheus en de DCGM-exporter kunnen GPU-gebruik, VRAM en temperatuur niet worden getoond. Schakel monitoring in om live-metrieken te zien.",
+    "metricsOffDcgm": "Prometheus is verbonden, maar er zijn geen metrieken van de DCGM-exporter gevonden. Installeer dcgm-exporter om GPU-gebruik, VRAM en temperatuur live te zien."
   },
   "approvals": {
     "title": "Goedkeuringen",
@@ -470,7 +473,10 @@
     "common": "Algemeen (CPU·RAM)",
     "impNoUser": "Account niet gevonden.",
     "impDone": "Geïmporteerd volume {{name}} tot {{user}}.",
-    "impMissing": "Voer naam, eigenaar, NFS-server en pad in."
+    "impMissing": "Voer naam, eigenaar, NFS-server en pad in.",
+    "impOwnerHint": "Kies een account uit de lijst om te importeren.",
+    "impOwnerPicked": "Geselecteerd: {{name}} ({{id}})",
+    "metricsOffNotice": "Monitoring (DCGM/Prometheus) is niet geïnstalleerd, dus GPU-gebruik en VRAM kunnen niet worden getoond. Schakel monitoring in om live-metrieken te zien."
   },
   "mset": {
     "title": "Instellingen",
@@ -838,7 +844,9 @@
     "title": "Harde resourcelimieten",
     "maxVolumeGib": "Maximaal volume",
     "short": "Grenzen",
-    "saved": "Opgeslagen limieten voor {{name}}"
+    "saved": "Opgeslagen limieten voor {{name}}",
+    "maxStoppedSessions": "Max. gestopte sessies",
+    "maxEphemeralGib": "Max. tijdelijke schijf"
   },
   "settings": {
     "mode": {

@@ -309,7 +309,8 @@
     "notEnough": "Không đủ tín dụng - yêu cầu tối thiểu 1 giờ",
     "grpGuaranteedDesc": "Chia sẻ VRAM của bạn được đảm bảo. Các phiên khác trên cùng GPU không thể chiếm bộ nhớ của bạn.",
     "guaranteeHint": "CPU và bộ nhớ được đảm bảo tương ứng với tỷ lệ chia sẻ GPU của bạn. Bạn có thể sử dụng nhiều hơn khi nút không hoạt động (đó là mức sàn, không phải mức giới hạn).",
-    "grpSlotDesc": "Một số người thay phiên nhau sử dụng một GPU. Bộ nhớ không được đảm bảo — nếu một phiên khác làm cạn kiệt VRAM thì phiên của bạn cũng có thể bị lỗi."
+    "grpSlotDesc": "Một số người thay phiên nhau sử dụng một GPU. Bộ nhớ không được đảm bảo — nếu một phiên khác làm cạn kiệt VRAM thì phiên của bạn cũng có thể bị lỗi.",
+    "sshKeyChange": "Thay đổi"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "idlePolicy": "Các phiên được tự động lấy lại sau phút {{n}} không hoạt động.",
     "detLogs": "Nhật ký gần đây",
     "detNoActivity": "Chưa có hoạt động nào",
-    "detNoLogs": "Không có nhật ký"
+    "detNoLogs": "Không có nhật ký",
+    "detReclaimTitle": "Lưu giữ phiên đã dừng",
+    "reclaimIn": "Có thể thu hồi sau {{n}} ngày",
+    "reclaimDue": "Có thể thu hồi",
+    "reclaimKept": "Được giữ",
+    "reclaimHint": "Phiên đã dừng vẫn dùng đĩa home. Sau {{n}} ngày ở trạng thái dừng, phiên có thể bị thu hồi, và những phiên nhàn rỗi lâu nhất có thể bị xóa khi một nút sắp hết dung lượng đĩa.",
+    "reclaimKeptHint": "Phiên bạn dừng gần đây nhất không bao giờ bị thu hồi.",
+    "reclaimResumeHint": "Khởi động lại sẽ đặt lại bộ đếm. Hãy xóa những phiên bạn không cần giữ nữa."
   },
   "conn": {
     "webConnectHint": "Mở một thiết bị đầu cuối ngay trong trình duyệt của bạn (không cần khóa SSH hoặc lệnh).",
@@ -412,7 +420,9 @@
     "sshDirectInHint": "Kết nối thẳng tới nút từ bên trong mạng văn phòng — bỏ qua cổng.",
     "sshProxy": "Proxy (cổng)",
     "sshDirect": "Trực tiếp (mạng nội bộ)",
-    "regenerated": "Đã ban hành một liên kết truy cập mới."
+    "regenerated": "Đã ban hành một liên kết truy cập mới.",
+    "sshNeedKey": "Chưa đăng ký khóa công khai SSH",
+    "sshNeedKeyHint": "Hãy đăng ký hoặc tạo một khóa bên dưới — phiên đang chạy sẽ áp dụng ngay."
   },
   "account": {
     "title": "Cài đặt của tôi",
@@ -448,7 +458,13 @@
     "memberRole": "Vai trò nhóm",
     "subtitle": "Hồ sơ · Thành viên · Đám mây vững chắc · SSH · Chủ đề",
     "localAcctNote": "Một tài khoản cục bộ được cung cấp cho bạn trên mỗi nút vật lý.",
-    "homeHint": "Việc sử dụng thư mục gốc nút vật lý của bạn ở chế độ kết hợp (SSH)."
+    "homeHint": "Việc sử dụng thư mục gốc nút vật lý của bạn ở chế độ kết hợp (SSH).",
+    "sshBad": "Khóa công khai không hợp lệ. Hãy dán một dòng duy nhất như “ssh-ed25519 AAAA…”.",
+    "sshFail": "Lưu khóa công khai SSH thất bại.",
+    "sshGenerate": "Tạo và tải khóa",
+    "sshGenerated": "Đã tạo khóa. Hãy giữ an toàn khóa riêng đã tải — không thể tải lại lần nữa.",
+    "sshGenFail": "Tạo khóa SSH thất bại.",
+    "sshGenerateHint": "Chưa có khóa? Nhấn “Tạo và tải khóa”. Khóa riêng (.pem) chỉ tải một lần và khóa công khai được đăng ký tự động. Kết nối: ssh -i khoa-da-tai.pem …"
   },
   "notify": {
     "title": "Thông báo",

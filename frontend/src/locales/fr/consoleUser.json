@@ -309,7 +309,8 @@
     "notEnough": "Pas assez de crédit – 1 heure minimum requise",
     "grpGuaranteedDesc": "Votre partage VRAM est garanti. Les autres sessions sur le même GPU ne peuvent pas utiliser votre mémoire.",
     "grpSlot": "Emplacement partagé · moins cher, sans garantie",
-    "tsSlotN": "1 des emplacements {{n}}"
+    "tsSlotN": "1 des emplacements {{n}}",
+    "sshKeyChange": "Modifier"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "detStoppedIdle": "Arrêt automatique en raison d'un GPU inactif",
     "detLogs": "Journaux récents",
     "detNoLogs": "Aucun journal",
-    "idlePolicy": "Les sessions sont récupérées automatiquement après {{n}} min d'inactivité."
+    "idlePolicy": "Les sessions sont récupérées automatiquement après {{n}} min d'inactivité.",
+    "detReclaimTitle": "Conservation des sessions arrêtées",
+    "reclaimIn": "Récupérable dans {{n}} j",
+    "reclaimDue": "Récupérable",
+    "reclaimKept": "Conservée",
+    "reclaimHint": "Les sessions arrêtées utilisent toujours le disque personnel. Après {{n}} jours à l'arrêt, elles deviennent récupérables, et les plus anciennes peuvent être supprimées lorsqu'un nœud manque d'espace disque.",
+    "reclaimKeptHint": "Votre session arrêtée la plus récente n'est jamais récupérée.",
+    "reclaimResumeHint": "Un redémarrage remet le compteur à zéro. Supprimez les sessions que vous n'avez plus besoin de conserver."
   },
   "conn": {
     "webConnect": "Connectez-vous via le Web",
@@ -412,7 +420,9 @@
     "sshExternal": "SSH (externe – via proxy)",
     "sshInternal": "SSH (réseau du campus / VPN)",
     "sshDirect": "Direct (intranet)",
-    "regenerated": "Publication d'un nouveau lien d'accès."
+    "regenerated": "Publication d'un nouveau lien d'accès.",
+    "sshNeedKey": "Aucune clé publique SSH enregistrée",
+    "sshNeedKeyHint": "Enregistrez-en une ou générez-la ci-dessous — les sessions en cours la prennent en compte immédiatement."
   },
   "account": {
     "title": "Mes paramètres",
@@ -448,7 +458,13 @@
     "ssh": "Clé publique SSH",
     "homeTitle": "Quota domestique SSH",
     "pwHint": "Utilisez au moins 8 caractères.",
-    "pwWrong": "Le mot de passe actuel est incorrect"
+    "pwWrong": "Le mot de passe actuel est incorrect",
+    "sshBad": "Clé publique invalide. Collez une seule ligne, par exemple « ssh-ed25519 AAAA… ».",
+    "sshFail": "Échec de l'enregistrement de la clé publique SSH.",
+    "sshGenerate": "Générer et télécharger une clé",
+    "sshGenerated": "Clé générée. Conservez la clé privée téléchargée en lieu sûr — elle ne peut pas être téléchargée à nouveau.",
+    "sshGenFail": "Échec de la génération de la clé SSH.",
+    "sshGenerateHint": "Pas encore de clé ? Cliquez sur « Générer et télécharger une clé ». La clé privée (.pem) est téléchargée une seule fois et la clé publique est enregistrée automatiquement. Connexion : ssh -i cle-telechargee.pem …"
   },
   "notify": {
     "title": "Notifications",

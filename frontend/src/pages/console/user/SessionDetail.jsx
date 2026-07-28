@@ -16,6 +16,7 @@ import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { c } from '../../../lib/credit';
 import { getMySessionsWithUsage, stopSession, startSession, deleteSession, extendSession, getSessionAudit, getSessionHistory } from '../../../api/console/sessions';
 import { measureRows, gpuUnmeasurable } from '../../../utils/sessionUsage';
+import { reclaimInfo } from '../../../utils/reclaim';
 
 const CONN_ICON = { vscode: Code2, jupyter: NotebookPen, ssh: TerminalSquare };
 
@@ -71,6 +72,8 @@ export default function UserSessionDetail() {
   // 자동 종료 임계 = 전역 유휴 정책(config.idle.timeoutMin). 유휴 리퍼는 GPU 세션만 회수(CPU 제외).
   const autoStopMin = isGpu ? (r.autoStopIdleMin || config.idle?.timeoutMin || 0) : 0;
   const canConnect = r.status === 'running' && (r.conn || []).length > 0;
+  // 중단 세션 홈 회수 안내(중단 상태에서만 의미; 그 외엔 state='off').
+  const reclaim = reclaimInfo(r, config);
 
   return (
     <div>
@@ -129,6 +132,26 @@ export default function UserSessionDetail() {
                 {r.status === 'stopped' && <div style={{ fontSize: 12.5, color: 'var(--danger)', fontWeight: 600, marginTop: 6 }}>{t('session.detStoppedIdle')}</div>}
               </>
             ) : <div className="muted" style={{ fontSize: 12.5 }}>{t('session.detNoAutoStop')}</div>}
+
+            {/* 중단 세션 홈 회수 — 중단 중에도 홈 디스크를 계속 점유한다는 사실과 회수 조건을 알린다. */}
+            {reclaim.state !== 'off' && (
+              <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
+                <div style={{ fontWeight: 700, fontSize: 12.5, marginBottom: 4 }}>{t('session.detReclaimTitle')}</div>
+                {reclaim.state === 'exempt' ? (
+                  <div className="muted" style={{ fontSize: 12.5 }}>{t('session.reclaimKeptHint')}</div>
+                ) : (
+                  <>
+                    <div style={{ fontSize: 12.5, fontWeight: 600, color: reclaim.state === 'due' ? 'var(--danger)' : reclaim.state === 'soon' ? 'var(--warn)' : 'inherit' }}>
+                      {reclaim.state === 'due' ? t('session.reclaimDue') : t('session.reclaimIn', { n: reclaim.days })}
+                    </div>
+                    <div className="muted" style={{ fontSize: 12.5, marginTop: 4, lineHeight: 1.6 }}>
+                      {t('session.reclaimHint', { n: config.reclaim.stoppedTtlDays })}<br />
+                      {t('session.reclaimResumeHint')}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
 

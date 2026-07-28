@@ -115,7 +115,10 @@
     "alertFeed": "Varningsflöde",
     "noActiveUsers": "Inga löppass just nu",
     "modeHint_dynamic": "Först till kvarn-läge — inga poäng; gripkapacitet när tillgänglig. Övervaka via session/tomgångsstatistik och varningar.",
-    "modeHint_free": "Fritt läge — inga kreditgränser. Övervaka användningen via sessions-/tomgångsstatistik och GPU-timmar."
+    "modeHint_free": "Fritt läge — inga kreditgränser. Övervaka användningen via sessions-/tomgångsstatistik och GPU-timmar.",
+    "metricsOffTitle": "Övervakningsstacken är inte installerad",
+    "metricsOffAll": "Utan Prometheus och DCGM-exportören går det inte att visa GPU-användning, VRAM och temperatur. Aktivera övervakning för att se realtidsmått.",
+    "metricsOffDcgm": "Prometheus är anslutet men inga mått från DCGM-exportören hittades. Installera dcgm-exporter för att se GPU-användning, VRAM och temperatur i realtid."
   },
   "approvals": {
     "title": "Godkännanden",
@@ -470,7 +473,10 @@
     "impNoUser": "Kontot hittades inte.",
     "impSize": "Visad storlek (GiB)",
     "impDone": "Importerad volym {{name}} till {{user}}.",
-    "impMissing": "Ange namn, ägare, NFS-server och sökväg."
+    "impMissing": "Ange namn, ägare, NFS-server och sökväg.",
+    "impOwnerHint": "Välj ett konto i listan för att importera.",
+    "impOwnerPicked": "Valt: {{name}} ({{id}})",
+    "metricsOffNotice": "Övervakning (DCGM/Prometheus) är inte installerad, så GPU-användning och VRAM kan inte visas. Aktivera övervakning för att se realtidsmått."
   },
   "mset": {
     "title": "Inställningar",
@@ -838,7 +844,9 @@
     "userTitle": "{{name}} — resursgränser",
     "hint": "Absoluta tak oberoende av poäng. Tomma fält ärver från den överordnade (grupp → org → global).",
     "maxGpu": "Max GPU:er",
-    "saved": "Sparade gränser för {{name}}"
+    "saved": "Sparade gränser för {{name}}",
+    "maxStoppedSessions": "Max stoppade sessioner",
+    "maxEphemeralGib": "Max tillfällig disk"
   },
   "settings": {
     "mode": {

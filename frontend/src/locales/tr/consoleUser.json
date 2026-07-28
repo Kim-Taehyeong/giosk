@@ -309,7 +309,8 @@
     "tsSlotN": "1 adet {{n}} yuvası",
     "hoursApprox": "~{{n}} saat",
     "grpSlotDesc": "Birkaç kişi sırayla bir GPU'yu kullanır. Bellek garanti edilmez; eğer başka bir oturum VRAM'i tüketirse sizinki de başarısız olabilir.",
-    "notEnough": "Yeterli kredi yok — minimum 1 saat gerekli"
+    "notEnough": "Yeterli kredi yok — minimum 1 saat gerekli",
+    "sshKeyChange": "Değiştir"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "detLogs": "Son günlükler",
     "detActivity": "Etkinlik günlüğü",
     "idlePolicy": "Oturumlar, {{n}} dakika boşta kaldıktan sonra otomatik olarak geri alınır.",
-    "detNoActivity": "Henüz etkinlik yok"
+    "detNoActivity": "Henüz etkinlik yok",
+    "detReclaimTitle": "Durdurulmuş oturum saklama",
+    "reclaimIn": "{{n}} gün sonra geri kazanılabilir",
+    "reclaimDue": "Geri kazanılabilir",
+    "reclaimKept": "Saklanıyor",
+    "reclaimHint": "Durdurulmuş oturumlar ana diski kullanmaya devam eder. {{n}} gün durdurulmuş kaldıktan sonra geri kazanılabilir hale gelir ve bir düğümün disk alanı azaldığında en uzun süredir boşta duranlar silinebilir.",
+    "reclaimKeptHint": "En son durdurduğunuz oturum asla geri kazanılmaz.",
+    "reclaimResumeHint": "Yeniden başlatmak sayacı sıfırlar. Artık saklamanız gerekmeyen oturumları silin."
   },
   "conn": {
     "webConnectHint": "Doğrudan tarayıcınızda bir terminal açar (SSH anahtarına veya komutuna gerek yoktur).",
@@ -412,7 +420,9 @@
     "sshDirectInHint": "Ağ geçidini atlayarak ofis ağının içinden doğrudan düğüme bağlanın.",
     "sshProxyHint": "Her yerden tek ağ geçidi giriş noktası üzerinden bağlanın. Kimlik doğrulaması yapıldıktan sonra oturum bağlı kalır (periyodik olarak yeniden kontrol yapılmaz).",
     "regenerated": "Yeni bir erişim bağlantısı yayınladı.",
-    "sshDirect": "Doğrudan (intranet)"
+    "sshDirect": "Doğrudan (intranet)",
+    "sshNeedKey": "Kayıtlı SSH açık anahtarı yok",
+    "sshNeedKeyHint": "Aşağıdan kaydedin veya oluşturun — çalışan oturumlar anında alır."
   },
   "account": {
     "title": "Ayarlarım",
@@ -448,7 +458,13 @@
     "ssh": "SSH ortak anahtarı",
     "homeHint": "Karma (SSH) modda fiziksel düğüm ana dizini kullanımınız.",
     "localAcctNote": "Her fiziksel düğümde sizin için bir yerel hesap sağlanır.",
-    "homeTitle": "SSH ev kotası"
+    "homeTitle": "SSH ev kotası",
+    "sshBad": "Geçersiz açık anahtar. “ssh-ed25519 AAAA…” gibi tek bir satır yapıştırın.",
+    "sshFail": "SSH açık anahtarı kaydedilemedi.",
+    "sshGenerate": "Anahtar oluştur ve indir",
+    "sshGenerated": "Anahtar oluşturuldu. İndirilen özel anahtarı güvende tutun — tekrar indirilemez.",
+    "sshGenFail": "SSH anahtarı oluşturulamadı.",
+    "sshGenerateHint": "Henüz anahtarınız yok mu? “Anahtar oluştur ve indir”e tıklayın. Özel anahtar (.pem) bir kez indirilir, açık anahtar otomatik kaydedilir. Bağlantı: ssh -i indirilen-anahtar.pem …"
   },
   "notify": {
     "title": "Bildirimler",
