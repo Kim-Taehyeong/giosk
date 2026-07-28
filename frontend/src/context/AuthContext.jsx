@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { apiGet, apiPost, setSessionKey, getSessionKey, getConsoleScope, setConsoleScope } from '../api/client';
+import { apiGet, apiPost, setSessionKey, getSessionKey, getScopeForRoute, setScopeForRoute, setConsoleScope, setUserScope } from '../api/client';
 
 const AuthContext = createContext(null);
 
@@ -11,8 +11,9 @@ export const AuthProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : null;
   });
 
-  // 멀티롤 활성 스코프("org:10"|"group:2"|null). null=기본(최우선 스코프, 백엔드가 scopes[0] 사용).
-  const [activeScope, setActiveScopeState] = useState(() => getConsoleScope());
+  // 활성 스코프("org:10"|"group:2"|null). 현재 콘솔(관리자/사용자)에 맞는 키에서 초기화한다
+  // — 관리자 콘솔과 사용자 콘솔이 스코프를 공유하지 않도록(콘솔 오염 방지). null=기본(백엔드 scopes[0]).
+  const [activeScope, setActiveScopeState] = useState(() => getScopeForRoute());
 
   // 가입 신청 완료 후 SignupPending 페이지에 표시할 메시지.
   const [pendingMessage, setPendingMessage] = useState(null);
@@ -23,11 +24,14 @@ export const AuthProvider = ({ children }) => {
     else localStorage.removeItem(STORAGE_KEY);
   };
 
-  // 활성 스코프 전환 — localStorage(요청 헤더용) + 상태(리렌더용) 동기화.
+  // 활성 스코프 전환 — 현재 콘솔에 맞는 localStorage 키(요청 헤더용) + 상태(리렌더용) 동기화.
   const setActiveScope = (s) => {
-    setConsoleScope(s);
+    setScopeForRoute(s);
     setActiveScopeState(s || null);
   };
+  // 콘솔 간 이동 시(사용자↔관리자) 그 콘솔 전용 키에서 스코프를 다시 로드 — 상태가 다른 콘솔 값을
+  // 물고 넘어오는 것(SPA 이동 누수) 방지. ConsoleLayout 이 variant 변경마다 호출한다.
+  const reloadScopeForConsole = () => setActiveScopeState(getScopeForRoute() || null);
 
   // 세션키가 있으면 /me 로 사용자 정보를 갱신(새로고침 후 컨텍스트 복원).
   useEffect(() => {
@@ -67,7 +71,8 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try { await apiGet('/auth/logout'); } catch { /* 무시 */ }
     setSessionKey(null);
-    setActiveScope(null); // 전환기 스코프도 초기화(다음 로그인 사용자와 섞이지 않도록)
+    setConsoleScope(null); setUserScope(null); // 두 콘솔 스코프 모두 초기화(다음 로그인 사용자와 섞이지 않도록)
+    setActiveScopeState(null);
     persist(null);
     setPendingMessage(null);
   };
@@ -78,6 +83,7 @@ export const AuthProvider = ({ children }) => {
         user,
         activeScope,
         setActiveScope,
+        reloadScopeForConsole,
         refreshUser,
         pendingMessage,
         loginLocal,

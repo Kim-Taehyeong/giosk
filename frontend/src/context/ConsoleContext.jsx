@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { setConsoleScope } from '../api/client';
+import { setUserScope } from '../api/client';
 
 // 콘솔 전역 선택 상태:
 //  - admin: 선택 클러스터 / user: 선택 그룹(org/group)
@@ -23,9 +23,10 @@ export const ConsoleProvider = ({ children }) => {
 
   const setActiveGroup = useCallback((g) => {
     setActiveGroupState(g);
-    // 사용자 뷰의 활성 팀 = 백엔드 스코프(X-Console-Scope group:N). D 지갑/세션이 이 팀에 귀속된다.
-    if (g) { localStorage.setItem(GROUP_KEY, JSON.stringify(g)); setConsoleScope(`group:${g.id}`); }
-    else { localStorage.removeItem(GROUP_KEY); setConsoleScope(null); }
+    // 사용자 뷰의 활성 팀 = 사용자 콘솔 스코프(X-Console-Scope group:N). D 지갑/세션이 이 팀에 귀속된다.
+    // 사용자 콘솔 전용 키에 저장해 관리자 콘솔 스코프를 오염시키지 않는다.
+    if (g) { localStorage.setItem(GROUP_KEY, JSON.stringify(g)); setUserScope(`group:${g.id}`); }
+    else { localStorage.removeItem(GROUP_KEY); setUserScope(null); }
   }, []);
 
   return (
