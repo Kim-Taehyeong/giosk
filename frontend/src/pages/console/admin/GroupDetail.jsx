@@ -144,8 +144,8 @@ export default function GroupDetail() {
               onSave={submitGroupRefill} />
             <div className="flex" style={{ gap: 10, alignItems: 'center', marginTop: 10, flexWrap: 'wrap' }}>
               <span className="muted flex" style={{ gap: 5, alignItems: 'center', fontSize: 12.5 }}>
-                <Clock size={13} /> {t('gdetail.nextRefill', { defaultValue: '다음 리필' })}: <b>{fmtNext(wallet?.nextRefillAt)}</b></span>
-              <button className="btn sm" onClick={doGroupRefillNow} disabled={!group?.recurringCredit}>
+                <Clock size={13} /> {t('gdetail.nextRefill', { defaultValue: '다음 리필' })}: <b>{wallet?.recurringCredit ? fmtNext(wallet?.nextRefillAt) : t('gdetail.noRecurringShort', { defaultValue: '정기 리필 미설정' })}</b></span>
+              <button className="btn sm" onClick={doGroupRefillNow}>
                 <RefreshCw size={13} /> {t('gdetail.refillNow', { defaultValue: '지금 리필' })}</button>
             </div>
           </div>
@@ -187,6 +187,7 @@ export default function GroupDetail() {
               <Select size="sm" value={r.role} onChange={(v) => setRole(r, v)}
                 options={ROLES.map((x) => ({ value: x, label: t(`roles.${x}`) }))} />) },
             { key: 'status', header: t('groups.colStatus'), render: (r) => <Pill variant={r.status === 'active' ? 'ok' : 'wait'} dot>{r.status}</Pill> },
+            ...(creditMode ? [{ key: 'recurring', header: t('gdetail.refillCol', { defaultValue: '정기 리필' }), render: (r) => (r.recurringCredit ? <span style={{ fontWeight: 600 }}>{c(r.recurringCredit)} C</span> : <span className="muted">—</span>) }] : []),
             { key: 'act', header: '', className: 'flex', render: (r) => (
               <span className="flex gap" style={{ gap: 6, alignItems: 'center' }}>
                 {creditMode && (<>

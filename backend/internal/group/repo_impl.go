@@ -75,7 +75,7 @@ func (r *gormRepo) ListMembers(groupID int64) ([]Member, error) {
 	err := r.db.Raw(`
 		SELECT m.user_id, u.username, TRIM(CONCAT(COALESCE(u.last_name,''), COALESCE(u.first_name,''))) AS name,
 		       u.email, m.role, m.status, m.budget, m.consumed,
-		       COALESCE(uw.balance, 0) AS balance
+		       COALESCE(uw.balance, 0) AS balance, COALESCE(uw.recurring_credit, 0) AS recurring_credit
 		FROM memberships m JOIN users u ON u.id = m.user_id
 		LEFT JOIN user_wallets uw ON uw.user_id = m.user_id AND uw.group_id = m.group_id
 		WHERE m.group_id = ? AND m.status <> 'removed' ORDER BY m.id`, groupID).Scan(&out).Error
