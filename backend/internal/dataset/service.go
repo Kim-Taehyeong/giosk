@@ -221,12 +221,12 @@ func (s *Service) List(ctx context.Context, userID int64) (*ListRes, error) {
 	}
 	for i := range global { // 다운로드 중인 데이터셋은 진행률(%)·ETA·받은 용량 채움
 		if global[i].LoadStatus == "loading" {
-			global[i].Progress, global[i].EtaSec, global[i].Downloaded = s.downloadProgress(ctx, global[i].ID, global[i].SizeBytes)
+			global[i].Phase, global[i].Progress, global[i].EtaSec, global[i].Downloaded = s.loadProgress(ctx, global[i].ID, global[i].SizeBytes)
 		}
-		// 노드 로컬 캐시 복사 중이면 복사 진행률(%)도 채운다("진행중.." 대신 실측 %).
+		// 노드 로컬 캐시 복사 중이면 단계(복사/해제)+진행률(%)을 채운다.
 		for j := range global[i].Caches {
 			if global[i].Caches[j].Status == "caching" {
-				global[i].Caches[j].Progress = s.cacheProgress(ctx, global[i].ID, global[i].Caches[j].Node)
+				global[i].Caches[j].Phase, global[i].Caches[j].Progress = s.cacheProgress(ctx, global[i].ID, global[i].Caches[j].Node)
 			}
 		}
 	}
@@ -241,17 +241,60 @@ func (s *Service) List(ctx context.Context, userID int64) (*ListRes, error) {
 // Prometheus 가 아니라 실제 기록된 파일 크기 기반이라 정밀하다. 로그/용량 미가용이면 0.
 const progressIntervalSec = 2 // 다운로드 Job 의 PROGRESS 출력 간격(RunDatasetFetch 의 sleep 과 일치)
 
-func (s *Service) downloadProgress(ctx context.Context, id int64, total int64) (pct, etaSec int, downloaded int64) {
-	if s.prov == nil || total <= 0 {
-		return 0, 0, 0
+// lastMarker는 로그에서 "<key> <int>" 마지막 값을 찾는다(없으면 ok=false).
+func lastMarker(toks []string, key string) (int64, bool) {
+	var v int64
+	found := false
+	for i := 0; i+1 < len(toks); i++ {
+		if toks[i] == key {
+			if n, err := strconv.ParseInt(toks[i+1], 10, 64); err == nil {
+				v, found = n, true
+			}
+		}
 	}
-	logs := s.prov.BuildLogs(ctx, s.namespace, fmt.Sprintf("dl-ds-%d", id), 20)
+	return v, found
+}
+
+func capPct(v int) int {
+	if v > 99 {
+		return 99
+	}
+	if v < 0 {
+		return 0
+	}
+	return v
+}
+
+// loadProgress는 적재 Job 로그로 현재 단계(download|extract)와 그 단계의 진행률(%)을 산출한다.
+//   다운로드: "PROGRESS <bytes>" / SizeBytes. 해제: "EXTOTAL"·"EXPROGRESS <bytes>". "EXTRACT DONE"=거의 완료.
+func (s *Service) loadProgress(ctx context.Context, id int64, total int64) (phase string, pct, etaSec int, downloaded int64) {
+	if s.prov == nil {
+		return "", 0, 0, 0
+	}
+	logs := s.prov.BuildLogs(ctx, s.namespace, fmt.Sprintf("dl-ds-%d", id), 40)
 	if logs == "" {
-		return 0, 0, 0
+		return "download", 0, 0, 0
 	}
-	// "PROGRESS <n>" 값들을 시간순으로 수집.
-	var vals []int64
 	toks := strings.Fields(logs)
+	// 해제 단계 — EXTRACT 마커가 보이면 다운로드는 끝난 것.
+	if strings.Contains(logs, "EXTRACT DONE") {
+		return "extract", 99, 0, 0
+	}
+	if exTotal, ok := lastMarker(toks, "EXTOTAL"); ok {
+		exProg, _ := lastMarker(toks, "EXPROGRESS")
+		if exTotal > 0 {
+			return "extract", capPct(int(exProg * 100 / exTotal)), 0, 0
+		}
+		return "extract", 0, 0, 0
+	}
+	if strings.Contains(logs, "EXTRACT") { // 해제 시작(총량 미산출)
+		return "extract", 0, 0, 0
+	}
+	// 다운로드 단계.
+	if total <= 0 {
+		return "download", 0, 0, 0
+	}
+	var vals []int64
 	for i := 0; i+1 < len(toks); i++ {
 		if toks[i] == "PROGRESS" {
 			if n, err := strconv.ParseInt(toks[i+1], 10, 64); err == nil {
@@ -260,46 +303,47 @@ func (s *Service) downloadProgress(ctx context.Context, id int64, total int64) (
 		}
 	}
 	if len(vals) == 0 {
-		return 0, 0, 0
+		return "download", 0, 0, 0
 	}
 	downloaded = vals[len(vals)-1]
-	pct = int(downloaded * 100 / total)
-	if pct > 99 {
-		pct = 99
-	}
-	if pct < 0 {
-		pct = 0
-	}
-	// 속도 = (마지막-처음)/경과시간 → ETA = 남은바이트/속도. 표본 2개 이상일 때만.
+	pct = capPct(int(downloaded * 100 / total))
 	if len(vals) >= 2 {
 		elapsed := float64(len(vals)-1) * progressIntervalSec
-		rate := float64(downloaded-vals[0]) / elapsed // bytes/s
-		if rate > 0 {
-			etaSec = int(float64(total-downloaded) / rate)
-			if etaSec < 0 {
+		if rate := float64(downloaded-vals[0]) / elapsed; rate > 0 {
+			if etaSec = int(float64(total-downloaded) / rate); etaSec < 0 {
 				etaSec = 0
 			}
 		}
 	}
-	return pct, etaSec, downloaded
+	return "download", pct, etaSec, downloaded
 }
 
-// cacheProgress는 노드 로컬 캐시 복사 Job(dc-<id>-<node>) 로그의 "PROGRESS <cur> <total>" 로
-// 복사 진행률(%)을 낸다. 복사가 끝나 로컬 해제(EXTRACT) 단계면 97%로 표시(해제 진행은 측정 불가).
-// 로그/총량 미가용이면 0. (다운로드 진행률 downloadProgress 와 형제 함수)
-func (s *Service) cacheProgress(ctx context.Context, id int64, node string) int {
+// cacheProgress는 노드 로컬 캐시 Job(dc-<id>-<node>) 로그로 단계(copy|extract)+진행률(%)을 산출한다.
+//   복사: "PROGRESS <cur> <total>". 해제: "EXTOTAL"·"EXPROGRESS <bytes>". "EXTRACT DONE"=거의 완료.
+func (s *Service) cacheProgress(ctx context.Context, id int64, node string) (phase string, pct int) {
 	if s.prov == nil {
-		return 0
+		return "", 0
 	}
-	logs := s.prov.BuildLogs(ctx, s.namespace, fmt.Sprintf("dc-%d-%s", id, node), 20)
+	logs := s.prov.BuildLogs(ctx, s.namespace, fmt.Sprintf("dc-%d-%s", id, node), 40)
 	if logs == "" {
-		return 0
+		return "copy", 0
 	}
-	if strings.Contains(logs, "EXTRACT") { // 복사 완료 → 로컬 해제 중
-		return 97
-	}
-	var cur, total int64
 	toks := strings.Fields(logs)
+	if strings.Contains(logs, "EXTRACT DONE") {
+		return "extract", 99
+	}
+	if exTotal, ok := lastMarker(toks, "EXTOTAL"); ok { // 해제 단계
+		exProg, _ := lastMarker(toks, "EXPROGRESS")
+		if exTotal > 0 {
+			return "extract", capPct(int(exProg * 100 / exTotal))
+		}
+		return "extract", 0
+	}
+	if strings.Contains(logs, "EXTRACT") {
+		return "extract", 0
+	}
+	// 복사 단계 — "PROGRESS <cur> <total>".
+	var cur, total int64
 	for i := 0; i+2 < len(toks); i++ {
 		if toks[i] != "PROGRESS" {
 			continue
@@ -311,16 +355,12 @@ func (s *Service) cacheProgress(ctx context.Context, id int64, node string) int 
 		}
 	}
 	if total <= 0 {
-		return 0
+		return "copy", 0
 	}
 	if cur > total {
 		cur = total
 	}
-	pct := int(cur * 100 / total)
-	if pct > 96 {
-		pct = 96 // 복사 100% 도달해도 해제 전이므로 EXTRACT 전까진 96 상한
-	}
-	return pct
+	return "copy", capPct(int(cur * 100 / total))
 }
 
 // Register는 업로드-등록 신청을 접수한다(승인 대기).

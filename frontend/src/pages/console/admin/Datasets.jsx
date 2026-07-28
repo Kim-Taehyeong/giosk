@@ -82,6 +82,10 @@ export default function Datasets() {
   const global = data?.global || [];
   const requests = data?.requests || [];
   const totalGb = global.reduce((a, x) => a + x.sizeGb, 0);
+  // 적재/캐시 단계 라벨(다운로드중/복사중/압축해제중).
+  const phaseLabel = (phase) => phase === 'extract' ? t('datasets.phaseExtract', { defaultValue: '압축 해제중' })
+    : phase === 'copy' ? t('datasets.phaseCopy', { defaultValue: '복사중' })
+      : t('datasets.phaseDownload', { defaultValue: '다운로드중' });
 
   return (
     <div>
@@ -117,7 +121,7 @@ export default function Datasets() {
                     onClick={(e) => { if (e.target.closest('button, a, input, select, label')) return; navigate(`/console/admin/datasets/${r.id}`); }}>
                     <td style={{ fontWeight: 600 }}>
                       <span style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>{r.name}
-                        {r.loadStatus === 'loading' && <Pill variant="wait" dot>{t('datasets.loading')}</Pill>}
+                        {r.loadStatus === 'loading' && <Pill variant="wait" dot>{phaseLabel(r.phase)} {r.progress || 0}%</Pill>}
                         {r.loadStatus === 'failed' && <Pill variant="err">{t('datasets.loadFailed')}</Pill>}
                       </span>
                     </td>
@@ -135,9 +139,10 @@ export default function Datasets() {
                           {/* 다운로드 중: NFS 적재 진행률(%) — 완료 후 노드 배치 UI 로 전환 */}
                           {r.loadStatus === 'loading' ? (
                             <div>
-                              <div className="flex" style={{ gap: 6, marginBottom: 8, fontWeight: 700 }}><HardDrive size={15} /> {t('datasets.dlTitle')}</div>
+                              <div className="flex" style={{ gap: 6, marginBottom: 8, fontWeight: 700 }}><HardDrive size={15} /> {phaseLabel(r.phase)}</div>
                               <div className="flex" style={{ justifyContent: 'space-between', fontSize: 12.5, marginBottom: 6 }}>
-                                <span className="muted">{formatBytes(r.downloaded)} / {formatBytes(r.sizeBytes)}{r.etaSec > 0 && <> · ETA {formatEta(r.etaSec)}</>}</span>
+                                {/* 다운로드 단계만 받은용량/ETA 표시, 해제 단계는 % 만 */}
+                                <span className="muted">{r.phase === 'extract' ? t('datasets.extracting', { defaultValue: '압축 해제 중…' }) : <>{formatBytes(r.downloaded)} / {formatBytes(r.sizeBytes)}{r.etaSec > 0 && <> · ETA {formatEta(r.etaSec)}</>}</>}</span>
                                 <span style={{ fontWeight: 700 }}>{r.progress || 0}%</span>
                               </div>
                               <div style={{ height: 10, borderRadius: 6, background: 'var(--surface-2)', overflow: 'hidden' }}>
@@ -159,9 +164,18 @@ export default function Datasets() {
                               const on = !!cache; // 캐시 행 존재(caching/cached/failed) = 토글 on
                               const st = cache?.status;
                               const badge = st === 'cached' ? <Pill variant="ok">{t('datasets.cacheDone')}</Pill>
-                                : st === 'caching' ? <Pill variant="wait" dot>{t('datasets.caching')} {cache.progress ? `${cache.progress}%` : '…'}</Pill>
-                                  : st === 'failed' ? <Pill variant="err">{t('datasets.cacheFailed')}</Pill>
-                                    : <span className="muted" style={{ fontSize: 12 }}>{t('datasets.notCached')}</span>;
+                                : st === 'caching' ? (
+                                  <div style={{ width: 120 }}>
+                                    <div className="flex" style={{ justifyContent: 'space-between', fontSize: 11, marginBottom: 3 }}>
+                                      <span className="muted">{phaseLabel(cache.phase)}</span>
+                                      <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{cache.progress || 0}%</span>
+                                    </div>
+                                    <div style={{ height: 6, borderRadius: 4, background: 'var(--surface-2)', overflow: 'hidden' }}>
+                                      <div style={{ height: '100%', width: `${cache.progress || 0}%`, background: 'var(--primary)', transition: 'width .5s' }} />
+                                    </div>
+                                  </div>
+                                ) : st === 'failed' ? <Pill variant="err">{t('datasets.cacheFailed')}</Pill>
+                                  : <span className="muted" style={{ fontSize: 12 }}>{t('datasets.notCached')}</span>;
                               return (
                                 <label key={n.node} onClick={() => toggleNode(r.id, n.node)}
                                   style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 12, cursor: 'pointer',
@@ -180,7 +194,7 @@ export default function Datasets() {
                                   {/* 노드 상태 */}
                                   <Pill variant={n.status === 'ready' ? 'ok' : 'pause'} dot>{n.status === 'ready' ? t('datasets.nodeReady') : n.status}</Pill>
                                   {/* 캐시 상태 */}
-                                  <div style={{ width: 92, textAlign: 'center', flex: '0 0 auto' }}>{badge}</div>
+                                  <div style={{ width: 130, textAlign: 'center', flex: '0 0 auto' }}>{badge}</div>
                                   {/* 액션 */}
                                   <span style={{ flex: '0 0 auto', width: 60, textAlign: 'right', color: on ? 'var(--danger)' : 'var(--primary)', fontWeight: 700, fontSize: 13 }}>
                                     {on ? t('datasets.uncache') : t('datasets.doCache')}
