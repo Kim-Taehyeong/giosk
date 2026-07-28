@@ -26,8 +26,8 @@ export default function Billing() {
       rows = [['그룹', '조직', '세션수', 'GPU시간', '소모(C)', '예산(C)']];
       (d.byGroup || []).forEach((r) => rows.push([r.name, r.orgName, r.sessions, r.gpuHours, r.consumed, r.budgetCap]));
     } else {
-      rows = [['사용자', '그룹', '세션수', 'GPU시간', '소모(C)']];
-      (d.byUser || []).forEach((r) => rows.push([r.name, r.group, r.sessions, r.gpuHours, r.consumed]));
+      rows = [['사용자', '조직', '그룹', '세션수', 'GPU시간', '소모(C)']];
+      (d.byUser || []).forEach((r) => rows.push([r.name, r.org, r.group, r.sessions, r.gpuHours, r.consumed]));
     }
     downloadCsv(`billing-${tab}.csv`, rows);
   };
@@ -77,7 +77,8 @@ export default function Billing() {
         {tab === 'user' && (
           <PagedTable rows={d.byUser} pageSize={12} rowKey={(r) => r.id} columns={[
             { key: 'name', header: t('billing.user') },
-            { key: 'group', header: t('billing.group'), render: (r) => <Pill variant="primary">{r.group}</Pill> },
+            { key: 'org', header: t('billing.org', { defaultValue: '조직' }), render: (r) => (r.org ? <Pill variant="gpu">{r.org}</Pill> : <span className="muted">—</span>) },
+            { key: 'group', header: t('billing.group'), render: (r) => (r.group ? <Pill variant="primary">{r.group}</Pill> : <span className="muted">—</span>) },
             { key: 'sessions', header: t('billing.sessions') },
             { key: 'gpuHours', header: t('billing.gpuHours'), render: (r) => `${r.gpuHours} h` },
             { key: 'consumed', header: t('billing.consumed'), render: (r) => cU(r.consumed) },

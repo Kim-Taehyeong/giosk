@@ -14,31 +14,32 @@ type Showback struct {
 }
 
 type GroupRow struct {
-	ID        int64  `json:"id"`
-	Name      string `json:"name"`
-	OrgName   string `json:"orgName"`
-	Sessions  int    `json:"sessions"`
+	ID        int64   `json:"id"`
+	Name      string  `json:"name"`
+	OrgName   string  `json:"orgName"`
+	Sessions  int     `json:"sessions"`
 	GpuHours  float64 `json:"gpuHours"`
-	Consumed  int    `json:"consumed"`
-	BudgetCap int    `json:"budgetCap"`
-	UsagePct  int    `json:"usagePct"`
+	Consumed  int     `json:"consumed"`
+	BudgetCap int     `json:"budgetCap"`
+	UsagePct  int     `json:"usagePct"`
 }
 
 type UserRow struct {
-	ID       int64  `json:"id"`
-	Name     string `json:"name"`
-	Group    string `json:"group"`
-	Sessions int    `json:"sessions"`
-	GpuHours  float64 `json:"gpuHours"`
-	Consumed int    `json:"consumed"`
+	ID       int64   `json:"id"`
+	Name     string  `json:"name"`
+	Org      string  `json:"org"`
+	Group    string  `json:"group"`
+	Sessions int     `json:"sessions"`
+	GpuHours float64 `json:"gpuHours"`
+	Consumed int     `json:"consumed"`
 }
 
 type OrgRow struct {
-	ID         int64  `json:"id"`
-	Name       string `json:"name"`
-	Groups     int    `json:"groups"`
-	Users      int    `json:"users"`
-	GpuHours  float64 `json:"gpuHours"`
-	Consumed   int    `json:"consumed"`
-	CreditPool int    `json:"creditPool"`
+	ID         int64   `json:"id"`
+	Name       string  `json:"name"`
+	Groups     int     `json:"groups"`
+	Users      int     `json:"users"`
+	GpuHours   float64 `json:"gpuHours"`
+	Consumed   int     `json:"consumed"`
+	CreditPool int     `json:"creditPool"`
 }

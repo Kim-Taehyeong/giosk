@@ -105,7 +105,13 @@ export default function GroupDetail() {
   // 그룹 삭제 — 리스트가 아니라 여기서만(실수 방지). 성공 시 그룹 목록으로.
   const removeGroup = async () => {
     if (!(await confirm({ title: t('groups.deleteTitle'), message: t('groups.deleteConfirm', { name: group?.displayName }), confirmText: t('common.delete') }))) return;
-    await deleteGroup(gid); toast(t('groups.deleted', { name: group?.displayName })); navigate('/console/admin/groups');
+    try { await deleteGroup(gid); } catch (e) {
+      toast(e?.code === 'default_group' ? t('groups.cantDeleteDefault', { defaultValue: "'일반' 팀은 삭제할 수 없습니다." })
+        : e?.code === 'group_has_members' ? t('groups.hasMembers', { defaultValue: '팀에 멤버가 있어 삭제할 수 없습니다. 멤버를 옮기거나 제거하세요.' })
+          : (e?.message || t('groups.deleteFail', { defaultValue: '삭제 실패' })));
+      return;
+    }
+    toast(t('groups.deleted', { name: group?.displayName })); navigate('/console/admin/groups');
   };
 
   const memberIds = new Set(members.map((m) => m.userId));

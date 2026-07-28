@@ -181,14 +181,24 @@ export default function UserDashboard() {
           <h3>{hybrid ? <><Server size={16} /> {t('dash.nodeAvail')}</> : <><Globe size={16} /> {t('dash.regions')}</>}</h3>
           {hybrid ? (
             <div className="grid" style={{ gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(max(220px, calc(25% - 9px)), 1fr))' }}>
-              {avail.byNode.map((n) => (
+              {avail.byNode.map((n) => {
+                // HAMi(분할) 노드는 정수 GPU 개수가 아니라 소수 단위로 여유를 보여준다(VRAM 비율×GPU수).
+                // 전용 노드는 기존대로 정수 카드.
+                const isHami = !!n.fractional;
+                const hamiFree = isHami && n.fracVramTotalMb > 0 ? (n.fracVramFreeMb / n.fracVramTotalMb) * (n.gpuTotal || 1) : 0;
+                const availOk = isHami ? hamiFree > 0.05 : n.gpuFree > 0;
+                const pct = isHami ? Math.max(0, Math.min(100, (hamiFree / (n.gpuTotal || 1)) * 100)) : 0;
+                return (
                 <div key={n.node} style={{ padding: 14, borderRadius: 12, border: '1px solid var(--border)', background: 'var(--surface-2)' }}>
                   <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
                     <span className="flex" style={{ gap: 8, minWidth: 0 }}>
                       <Server size={15} style={{ color: 'var(--primary)', flex: '0 0 auto' }} />
                       <span style={{ fontWeight: 800, fontSize: 15 }}>{n.node}</span>
                     </span>
-                    <Pill variant={n.gpuFree > 0 ? 'ok' : 'wait'}>{n.gpuFree > 0 ? t('dash.available') : t('dash.unavailable')}</Pill>
+                    <span className="flex gap" style={{ alignItems: 'center' }}>
+                      {isHami && <Pill variant="gpu">{t('dash.hamiShared', { defaultValue: 'HAMi 분할' })}</Pill>}
+                      <Pill variant={availOk ? 'ok' : 'wait'}>{availOk ? t('dash.available') : t('dash.unavailable')}</Pill>
+                    </span>
                   </div>
                   <div className="muted" style={{ fontSize: 12, margin: '8px 0 10px', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                     {[n.gpu, n.cpu, n.mem, n.disk].filter(Boolean).map((m, i) => (
@@ -197,15 +207,25 @@ export default function UserDashboard() {
                   </div>
                   <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 5 }}>
                     <span className="muted" style={{ fontSize: 12 }}>{t('dash.gpuAvail')}</span>
-                    <span className="free-n">{n.gpuFree}/{n.gpuTotal}</span>
+                    <span className="free-n">{isHami ? `${hamiFree.toFixed(1)}/${n.gpuTotal}` : `${n.gpuFree}/${n.gpuTotal}`}</span>
                   </div>
-                  <div className="flex" style={{ gap: 4 }}>
-                    {Array.from({ length: n.gpuTotal }).map((_, j) => (
-                      <span key={j} style={{ flex: 1, height: 10, borderRadius: 3, background: j < n.gpuFree ? 'var(--free)' : 'var(--danger)' }} />
-                    ))}
-                  </div>
+                  {isHami ? (<>
+                    <div style={{ height: 10, borderRadius: 3, background: 'var(--danger)', overflow: 'hidden' }}>
+                      <div style={{ width: `${pct}%`, height: '100%', background: 'var(--free)' }} />
+                    </div>
+                    {n.fracSlotsTotal > 0 && (
+                      <div className="muted" style={{ fontSize: 11.5, marginTop: 6 }}>{t('dash.slots', { defaultValue: '슬롯' })} {n.fracSlotsFree}/{n.fracSlotsTotal}</div>
+                    )}
+                  </>) : (
+                    <div className="flex" style={{ gap: 4 }}>
+                      {Array.from({ length: n.gpuTotal }).map((_, j) => (
+                        <span key={j} style={{ flex: 1, height: 10, borderRadius: 3, background: j < n.gpuFree ? 'var(--free)' : 'var(--danger)' }} />
+                      ))}
+                    </div>
+                  )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             avail.byType.map((r, i) => {

@@ -31,15 +31,15 @@ const (
 // Summary — 관리자 그룹 목록(집계 + 지갑 포함).
 type Summary struct {
 	Group
-	OrgName     string `json:"orgName"`
-	MemberCount int    `json:"memberCount"`
-	Balance            int  `json:"balance"`            // group_wallets.balance
-	BudgetCap          int  `json:"budgetCap"`          // group_wallets.budget_cap
-	AlertPct           int  `json:"alertPct"`           // group_wallets.alert_threshold_pct
-	RecurringCredit    int  `json:"recurringCredit"`    // 정기 리필 양
-	RefillIntervalDays int  `json:"refillIntervalDays"` // 리필 주기(일)
-	Carryover          bool `json:"carryover"`          // 이월 여부
-	Consumed           int  `json:"consumed"`           // 멤버 누적 사용량 합(showback)
+	OrgName            string `json:"orgName"`
+	MemberCount        int    `json:"memberCount"`
+	Balance            int    `json:"balance"`            // group_wallets.balance
+	BudgetCap          int    `json:"budgetCap"`          // group_wallets.budget_cap
+	AlertPct           int    `json:"alertPct"`           // group_wallets.alert_threshold_pct
+	RecurringCredit    int    `json:"recurringCredit"`    // 정기 리필 양
+	RefillIntervalDays int    `json:"refillIntervalDays"` // 리필 주기(일)
+	Carryover          bool   `json:"carryover"`          // 이월 여부
+	Consumed           int    `json:"consumed"`           // 멤버 누적 사용량 합(showback)
 }
 
 // Member — 그룹 멤버(memberships ⨝ users).

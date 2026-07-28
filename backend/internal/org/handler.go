@@ -89,6 +89,10 @@ func (h *Handler) Update(c *gin.Context) {
 
 func (h *Handler) Archive(c *gin.Context) {
 	if err := h.svc.Archive(idParam(c)); err != nil {
+		if errors.Is(err, ErrOrgHasUsers) {
+			httpx.Err(c, 409, "org_has_users", "조직에 아직 사용자가 있어 삭제할 수 없습니다. 모든 사용자를 다른 조직으로 옮기거나 삭제한 뒤 삭제하세요.")
+			return
+		}
 		httpx.Internal(c, "조직 보관 실패")
 		return
 	}

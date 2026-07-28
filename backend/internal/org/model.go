@@ -9,7 +9,7 @@ type Organization struct {
 	DisplayName        string    `gorm:"column:display_name" json:"displayName"`
 	Description        string    `gorm:"column:description" json:"description"`
 	CreditPool         int       `gorm:"column:credit_pool" json:"creditPool"`
-	RecurringCredit    int       `gorm:"column:recurring_credit" json:"recurringCredit"` // 매 주기 재생성될 정기 크레딧(0=없음)
+	RecurringCredit    int       `gorm:"column:recurring_credit" json:"recurringCredit"`        // 매 주기 재생성될 정기 크레딧(0=없음)
 	RefillIntervalDays int       `gorm:"column:refill_interval_days" json:"refillIntervalDays"` // 리필 주기(일). 0=플랫폼 기본
 	Carryover          bool      `gorm:"column:carryover" json:"carryover"`                     // 이월 여부
 	DefaultGroupBudget int       `gorm:"column:default_group_budget" json:"defaultGroupBudget"`
@@ -77,10 +77,10 @@ type CreateReq struct {
 }
 
 type GrantReq struct {
-	Amount    int    `json:"amount"`               // 일회성 부여(즉시 풀에 가산)
-	Recurring *int   `json:"recurring,omitempty"`  // 정기 크레딧 설정(매 주기 재생성될 양). nil=변경 안 함
-	Interval  *int   `json:"interval,omitempty"`   // 리필 주기(일). 플랫폼 기본보다 길 수 없다(캡). nil=변경 안 함
-	Carryover *bool  `json:"carryover,omitempty"`  // 이월 on/off. nil=변경 안 함
+	Amount    int    `json:"amount"`              // 일회성 부여(즉시 풀에 가산)
+	Recurring *int   `json:"recurring,omitempty"` // 정기 크레딧 설정(매 주기 재생성될 양). nil=변경 안 함
+	Interval  *int   `json:"interval,omitempty"`  // 리필 주기(일). 플랫폼 기본보다 길 수 없다(캡). nil=변경 안 함
+	Carryover *bool  `json:"carryover,omitempty"` // 이월 on/off. nil=변경 안 함
 	Reason    string `json:"reason"`
 }
 

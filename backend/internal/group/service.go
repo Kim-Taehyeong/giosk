@@ -8,10 +8,13 @@ import (
 )
 
 var (
-	ErrJoinClosed = errors.New("group not accepting join requests")
+	ErrJoinClosed   = errors.New("group not accepting join requests")
 	ErrUserUnknown  = errors.New("user not found")
 	ErrGroupUnknown = errors.New("target group not found")
 	ErrSameGroup    = errors.New("source and target group are identical")
+	// 삭제 가드 — 고아 멤버 방지.
+	ErrDefaultGroup    = errors.New("default group cannot be deleted") // '일반'(general)은 이전 대상이라 삭제 불가
+	ErrGroupHasMembers = errors.New("group has active members")        // 멤버를 다른 팀으로 옮기거나 제거해야 삭제 가능
 )
 
 // GroupWalletSeeder는 팀 생성 시 초기 크레딧/리필을 세팅한다(wallet.Service 구현; import 사이클 방지 위해 로컬 인터페이스).
@@ -128,7 +131,21 @@ func (s *Service) UpdateGroup(id int64, displayName *string, acceptsJoin *bool) 
 }
 
 // ArchiveGroup은 그룹을 소프트 삭제한다(관리자).
-func (s *Service) ArchiveGroup(id int64) error { return s.repo.Archive(id) }
+// ArchiveGroup은 팀을 삭제한다. 데이터 무결성 가드: '일반'(general)은 이전 대상이라 절대 삭제 불가,
+// 활성 멤버가 있는 팀도 삭제 불가(멤버를 다른 팀으로 옮기거나 제거한 뒤에야 삭제) → 고아 멤버 방지.
+func (s *Service) ArchiveGroup(id int64) error {
+	g, err := s.repo.Find(id)
+	if err != nil {
+		return err
+	}
+	if g.Name == "general" {
+		return ErrDefaultGroup
+	}
+	if s.repo.ActiveMemberCount(id) > 0 {
+		return ErrGroupHasMembers
+	}
+	return s.repo.Archive(id)
+}
 
 // CancelJoinRequest는 본인의 대기중 가입신청을 취소한다.
 func (s *Service) CancelJoinRequest(userID, reqID int64) error {
@@ -257,7 +274,9 @@ func (s *Service) AddMember(groupID int64, req AddMemberReq) error {
 	return s.repo.UpsertMembership(groupID, uid, orDefault(req.Role, RoleMember), MemberActive)
 }
 
-func (s *Service) RemoveMember(groupID, userID int64) error { return s.repo.RemoveMember(groupID, userID) }
+func (s *Service) RemoveMember(groupID, userID int64) error {
+	return s.repo.RemoveMember(groupID, userID)
+}
 
 // MoveMember는 사용자를 from 그룹에서 to 그룹으로 옮긴다.
 // role 이 비면 원 그룹에서의 역할을 유지한다(팀장을 옮겨도 팀장).
@@ -281,8 +300,10 @@ func (s *Service) SetMemberRole(groupID, userID int64, role string) error {
 	return s.repo.SetMemberRole(groupID, userID, role)
 }
 
-func (s *Service) JoinPolicy(groupID int64) (bool, error)     { return s.repo.GetAcceptsJoin(groupID) }
-func (s *Service) SetJoinPolicy(groupID int64, v bool) error  { return s.repo.SetAcceptsJoin(groupID, v) }
+func (s *Service) JoinPolicy(groupID int64) (bool, error) { return s.repo.GetAcceptsJoin(groupID) }
+func (s *Service) SetJoinPolicy(groupID int64, v bool) error {
+	return s.repo.SetAcceptsJoin(groupID, v)
+}
 
 func (s *Service) PendingJoinRequests(groupID int64) ([]JoinRequest, error) {
 	return s.repo.ListJoinRequests(groupID, "pending")
@@ -290,8 +311,8 @@ func (s *Service) PendingJoinRequests(groupID int64) ([]JoinRequest, error) {
 func (s *Service) ApproveJoin(reqID int64) error { return s.repo.ApproveJoin(reqID) }
 func (s *Service) RejectJoin(reqID int64) error  { return s.repo.RejectJoin(reqID) }
 
-func (s *Service) MyGroups(userID int64) ([]GroupRef, error)       { return s.repo.MyGroups(userID) }
-func (s *Service) Directory(userID int64) ([]DirItem, error)       { return s.repo.Directory(userID) }
+func (s *Service) MyGroups(userID int64) ([]GroupRef, error) { return s.repo.MyGroups(userID) }
+func (s *Service) Directory(userID int64) ([]DirItem, error) { return s.repo.Directory(userID) }
 func (s *Service) MyJoinRequests(userID int64) ([]MyJoinRequest, error) {
 	return s.repo.MyJoinRequests(userID)
 }

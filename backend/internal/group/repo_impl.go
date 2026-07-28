@@ -38,6 +38,13 @@ func (r *gormRepo) Archive(id int64) error {
 	return r.db.Table("`groups`").Where("id = ?", id).Update("status", "archived").Error
 }
 
+// ActiveMemberCount는 그룹의 활성 멤버 수(삭제 가드용 — 멤버 있는 팀은 삭제 불가).
+func (r *gormRepo) ActiveMemberCount(groupID int64) int {
+	var n int64
+	r.db.Raw(`SELECT COUNT(*) FROM memberships WHERE group_id = ? AND status = 'active'`, groupID).Scan(&n)
+	return int(n)
+}
+
 // CancelJoinRequest는 본인의 대기중(pending) 가입신청을 취소(삭제)한다(타인 신청은 영향 없음).
 func (r *gormRepo) CancelJoinRequest(userID, reqID int64) error {
 	return r.db.Exec(`DELETE FROM group_join_requests WHERE id = ? AND user_id = ? AND status = 'pending'`, reqID, userID).Error

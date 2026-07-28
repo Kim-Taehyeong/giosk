@@ -8,6 +8,7 @@ type Repository interface {
 	Create(o *Organization) error
 	Update(id int64, fields map[string]any) error
 	Archive(id int64) error
+	ActiveUserCount(orgID int64) int // 조직 산하 활성 사용자 수(삭제 가드용)
 	AddCredit(id, amount int64) error
 	SetRecurring(id int64, amount int) error
 	SetRefill(id int64, intervalDays int, carryover bool) error
@@ -51,6 +52,15 @@ func (r *gormRepo) Update(id int64, fields map[string]any) error {
 
 func (r *gormRepo) Archive(id int64) error {
 	return r.db.Model(&Organization{}).Where("id = ?", id).Update("status", "archived").Error
+}
+
+// ActiveUserCount는 조직 산하 팀들의 활성 멤버(고유 사용자) 수(삭제 가드용).
+func (r *gormRepo) ActiveUserCount(orgID int64) int {
+	var n int64
+	r.db.Raw(`SELECT COUNT(DISTINCT m.user_id) FROM memberships m
+		JOIN `+"`groups`"+` g ON g.id = m.group_id
+		WHERE g.org_id = ? AND m.status = 'active'`, orgID).Scan(&n)
+	return int(n)
 }
 
 func (r *gormRepo) AddCredit(id, amount int64) error {
