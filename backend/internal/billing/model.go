@@ -26,6 +26,7 @@ type GroupRow struct {
 
 type UserRow struct {
 	ID       int64   `json:"id"`
+	GroupID  int64   `json:"groupId"` // 이 행이 귀속된 팀(사용자×팀 단위) — 프론트 rowKey 구분용
 	Name     string  `json:"name"`
 	Org      string  `json:"org"`
 	Group    string  `json:"group"`

@@ -75,7 +75,7 @@ export default function Billing() {
         )}
 
         {tab === 'user' && (
-          <PagedTable rows={d.byUser} pageSize={12} rowKey={(r) => r.id} columns={[
+          <PagedTable rows={d.byUser} pageSize={12} rowKey={(r) => `${r.id}-${r.groupId}`} columns={[
             { key: 'name', header: t('billing.user') },
             { key: 'org', header: t('billing.org', { defaultValue: '조직' }), render: (r) => (r.org ? <Pill variant="gpu">{r.org}</Pill> : <span className="muted">—</span>) },
             { key: 'group', header: t('billing.group'), render: (r) => (r.group ? <Pill variant="primary">{r.group}</Pill> : <span className="muted">—</span>) },

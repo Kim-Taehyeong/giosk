@@ -38,20 +38,22 @@ func (r *gormRepo) ByGroup() []GroupRow {
 	return out
 }
 
-// ByUser — 사용자별 소비/세션/GPU시간. 사용자 1행(여러 팀 소속이어도 중복 안 됨) + 대표 조직/팀 표시.
-// 예전엔 memberships 를 JOIN 해 다중소속 사용자가 중복 행으로 나오고 조직도 안 보였다.
+// ByUser — (사용자×팀) 단위 소비/세션/GPU시간. 크레딧이 팀 지갑에서 차감되므로, 다중 소속 사용자는
+// 팀마다 한 행씩(각 행 숫자는 그 팀에서 쓴 만큼만) → 어느 팀 예산에서 빠졌는지 정확. 조직/팀 표시.
 func (r *gormRepo) ByUser() []UserRow {
 	var out []UserRow
 	r.db.Raw(`
-		SELECT u.id, u.username AS name,
-		       COALESCE((SELECT o.display_name FROM memberships m2 JOIN ` + "`groups`" + ` g2 ON g2.id=m2.group_id JOIN organizations o ON o.id=g2.org_id WHERE m2.user_id=u.id AND m2.status='active' ORDER BY m2.id LIMIT 1),'') AS org,
-		       COALESCE((SELECT g3.display_name FROM memberships m3 JOIN ` + "`groups`" + ` g3 ON g3.id=m3.group_id WHERE m3.user_id=u.id AND m3.status='active' ORDER BY m3.id LIMIT 1),'') AS ` + "`group`" + `,
-		       (SELECT COUNT(*) FROM sessions s WHERE s.user_id = u.id) AS sessions,
-		       COALESCE(ROUND((SELECT SUM(gu.seconds) FROM gpu_usage gu WHERE gu.user_id = u.id)/3600,1),0) AS gpu_hours,
-		       COALESCE((SELECT SUM(s2.billed_credits) FROM sessions s2 WHERE s2.user_id = u.id),0) AS consumed
-		FROM users u
-		WHERE u.id IN (SELECT DISTINCT user_id FROM memberships WHERE status='active')
-		ORDER BY consumed DESC`).Scan(&out)
+		SELECT u.id, m.group_id AS group_id, u.username AS name,
+		       COALESCE(o.display_name,'') AS org, COALESCE(g.display_name,'') AS ` + "`group`" + `,
+		       (SELECT COUNT(*) FROM sessions s WHERE s.user_id = u.id AND s.group_id = m.group_id) AS sessions,
+		       COALESCE(ROUND((SELECT SUM(gu.seconds) FROM gpu_usage gu WHERE gu.user_id = u.id AND gu.group_id = m.group_id)/3600,1),0) AS gpu_hours,
+		       COALESCE((SELECT SUM(s2.billed_credits) FROM sessions s2 WHERE s2.user_id = u.id AND s2.group_id = m.group_id),0) AS consumed
+		FROM memberships m
+		JOIN users u ON u.id = m.user_id
+		JOIN ` + "`groups`" + ` g ON g.id = m.group_id
+		LEFT JOIN organizations o ON o.id = g.org_id
+		WHERE m.status = 'active'
+		ORDER BY consumed DESC, u.username`).Scan(&out)
 	return out
 }
 
@@ -101,39 +103,32 @@ func (r *gormRepo) ByGroupScoped(orgID, groupID int64) []GroupRow {
 	return out
 }
 
-// ByUserScoped — 스코프(팀/조직) 범위의 사용자별 소비. 사용자 1행(중복 없음)이고, 소비/세션/GPU시간은
-// 그 범위(팀=group_id, 조직=산하 그룹)에서 발생한 것만 집계한다(전역 아님) → 팀/조직 showback 이 정확.
+// ByUserScoped — 스코프(팀/조직) 범위의 (사용자×팀) 소비. 각 행은 그 팀에서 쓴 만큼만 집계(전역 아님).
+// group 스코프면 그 팀의 멤버 1행씩, org 스코프면 산하 팀별로 한 행씩(팀 예산 귀속 정확).
 func (r *gormRepo) ByUserScoped(orgID, groupID int64) []UserRow {
 	if orgID <= 0 && groupID <= 0 {
 		return r.ByUser()
 	}
-	// 대상 사용자 필터(어떤 사용자가 나오는지) + 세션/사용량 서브쿼리에 걸 스코프 절.
-	var memberWhere, scS, scGU, scS2 string
-	var scopeArg any
-	if groupID > 0 {
-		memberWhere = "group_id = ?"
-		scS, scGU, scS2 = " AND s.group_id = ?", " AND gu.group_id = ?", " AND s2.group_id = ?"
-		scopeArg = groupID
-	} else {
-		gsub := " IN (SELECT id FROM `groups` WHERE org_id = ?)"
-		memberWhere = "group_id" + gsub
-		scS, scGU, scS2 = " AND s.group_id"+gsub, " AND gu.group_id"+gsub, " AND s2.group_id"+gsub
-		scopeArg = orgID
+	where := "g.id = ?"
+	arg := groupID
+	if groupID <= 0 {
+		where = "g.org_id = ?"
+		arg = orgID
 	}
 	q := `
-		SELECT u.id, u.username AS name,
-		       COALESCE((SELECT o.display_name FROM memberships m2 JOIN ` + "`groups`" + ` g2 ON g2.id=m2.group_id JOIN organizations o ON o.id=g2.org_id WHERE m2.user_id=u.id AND m2.status='active' ORDER BY m2.id LIMIT 1),'') AS org,
-		       COALESCE((SELECT g3.display_name FROM memberships m3 JOIN ` + "`groups`" + ` g3 ON g3.id=m3.group_id WHERE m3.user_id=u.id AND m3.status='active' ORDER BY m3.id LIMIT 1),'') AS ` + "`group`" + `,
-		       (SELECT COUNT(*) FROM sessions s WHERE s.user_id = u.id` + scS + `) AS sessions,
-		       COALESCE(ROUND((SELECT SUM(gu.seconds) FROM gpu_usage gu WHERE gu.user_id = u.id` + scGU + `)/3600,1),0) AS gpu_hours,
-		       COALESCE((SELECT SUM(s2.billed_credits) FROM sessions s2 WHERE s2.user_id = u.id` + scS2 + `),0) AS consumed
-		FROM users u
-		WHERE u.id IN (SELECT DISTINCT user_id FROM memberships WHERE status='active' AND ` + memberWhere + `)
-		ORDER BY consumed DESC`
-	// 인자 순서: sessions scope, gpu scope, consumed scope, memberWhere scope.
-	args := []any{scopeArg, scopeArg, scopeArg, scopeArg}
+		SELECT u.id, m.group_id AS group_id, u.username AS name,
+		       COALESCE(o.display_name,'') AS org, COALESCE(g.display_name,'') AS ` + "`group`" + `,
+		       (SELECT COUNT(*) FROM sessions s WHERE s.user_id = u.id AND s.group_id = m.group_id) AS sessions,
+		       COALESCE(ROUND((SELECT SUM(gu.seconds) FROM gpu_usage gu WHERE gu.user_id = u.id AND gu.group_id = m.group_id)/3600,1),0) AS gpu_hours,
+		       COALESCE((SELECT SUM(s2.billed_credits) FROM sessions s2 WHERE s2.user_id = u.id AND s2.group_id = m.group_id),0) AS consumed
+		FROM memberships m
+		JOIN users u ON u.id = m.user_id
+		JOIN ` + "`groups`" + ` g ON g.id = m.group_id
+		LEFT JOIN organizations o ON o.id = g.org_id
+		WHERE m.status = 'active' AND ` + where + `
+		ORDER BY consumed DESC, u.username`
 	var out []UserRow
-	r.db.Raw(q, args...).Scan(&out)
+	r.db.Raw(q, arg).Scan(&out)
 	return out
 }
 
