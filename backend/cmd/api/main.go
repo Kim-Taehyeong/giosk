@@ -269,7 +269,7 @@ func main() {
 		out := map[string][]node.CachedDataset{}
 		for _, c := range datasetSvc.CachedByNode() {
 			out[c.Node] = append(out[c.Node], node.CachedDataset{
-				Name: c.Name, SizeClass: c.SizeClass, SizeGb: c.SizeGB, Owner: c.Owner, Desc: c.Desc,
+				Name: c.Name, SizeClass: c.SizeClass, SizeGb: c.SizeGB, SizeBytes: c.SizeBytes, Hash: c.Hash, Owner: c.Owner, Desc: c.Desc,
 			})
 		}
 		return out
