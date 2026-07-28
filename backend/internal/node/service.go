@@ -34,6 +34,15 @@ type Service struct {
 	dpConfigName    string // device plugin 설정 ConfigMap 이름
 	freeMode        bool   // 자유 모드: 임대 영속(cordon 없음·만료 없음·해제 안 함) → 계정 재사용·동시접속
 	cachedProvider  func() map[string][]CachedDataset // 노드별 캐시 데이터셋(세션 생성 노드 선호 표시). nil=빈 목록.
+	physicalLabel   string // 물리노드 식별 라벨(기본 giosk.io/physical). 토글 시 이 라벨을 노드에 적용.
+}
+
+// WithPhysicalLabel은 물리노드 식별 라벨을 설정한다(물리 임대 토글이 이 라벨을 k8s 노드에 붙인다).
+func (s *Service) WithPhysicalLabel(label string) *Service {
+	if label != "" {
+		s.physicalLabel = label
+	}
+	return s
 }
 
 // WithCachedDatasets는 노드별 캐시 완료 데이터셋 제공자를 주입한다(세션 생성 UI 에서 "이 노드에 있는 데이터셋" 표시).
@@ -344,6 +353,17 @@ func (s *Service) SetConfig(name string, req ConfigReq) error {
 	}
 	if req.PhysicalLease != nil {
 		fields["physical_lease"] = *req.PhysicalLease
+		// DB 뿐 아니라 k8s 노드 라벨(giosk.io/physical)도 적용해야 물리 임대 목록(/nodes/physical)에 잡힌다.
+		// 이 라벨이 곧 Physical 판정 기준이므로 토글=라벨 on/off.
+		label := s.physicalLabel
+		if label == "" {
+			label = "giosk.io/physical"
+		}
+		val := ""
+		if *req.PhysicalLease {
+			val = "true"
+		}
+		_ = s.ops.SetNodeLabel(context.Background(), name, label, val)
 	}
 	if req.ScratchEnabled != nil {
 		fields["scratch_enabled"] = *req.ScratchEnabled

@@ -98,7 +98,8 @@ func main() {
 		WithUIDBase(cfg.PhysicalNodes.UIDBase).                                              // 전역 안정 UID 베이스(재사용 방지)
 		WithLocalHomeHost(cfg.Storage.PhysicalHomeHost).                                     // 물리 SSH 로컬 home 루트(/home/giosk)
 		WithFreeMode(cfg.IsFree()).                                                          // 자유 모드: 임대 영속·계정 재사용·동시접속
-		WithDevicePluginConfig(cfg.K8s.DevicePluginConfigNS, cfg.K8s.DevicePluginConfigName) // 타임셰어링 웹 설정 → device plugin 즉시 반영
+		WithDevicePluginConfig(cfg.K8s.DevicePluginConfigNS, cfg.K8s.DevicePluginConfigName). // 타임셰어링 웹 설정 → device plugin 즉시 반영
+		WithPhysicalLabel(cfg.PhysicalNodes.Label)                                           // 물리 임대 토글이 이 라벨을 k8s 노드에 적용
 	cfgStore := systemconfig.NewStore(db) // 런타임 설정(유휴·기능 토글·전역 상한) 저장소
 	platIntervalFn := func() int { return cfgStore.IntOr(systemconfig.KeyRechargeIntervalDays, 30) }
 	orgSvc.WithPlatformInterval(platIntervalFn)    // 조직 리필 주기 캡(플랫폼 기본)
