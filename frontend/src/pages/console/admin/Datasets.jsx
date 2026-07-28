@@ -57,8 +57,8 @@ export default function Datasets() {
   const reject = async (id) => { await rejectDatasetRequest(id); setData((d) => ({ ...d, requests: d.requests.filter((x) => x.id !== id) })); toast(t('datasets.rejected')); };
 
   const openRegister = () => { setReg({ name: '', scope: 'global', filename: '', url: '' }); setRegTab('nfs'); setOpenReg(true); loadInbox(); };
-  // 인박스 파일 선택 시 이름 기본값 채우기(확장자 제거).
-  const pickInboxFile = (fn) => setReg((r) => ({ ...r, filename: fn, name: r.name || fn.replace(/\.(zip|tar\.gz|tgz|tar)$/i, '') }));
+  // 인박스 파일 선택 시 이름도 그 파일명(확장자 제거)으로 함께 변경(요청).
+  const pickInboxFile = (fn) => setReg((r) => ({ ...r, filename: fn, name: fn.replace(/\.(zip|tar\.gz|tgz|tar)$/i, '') }));
   const submitRegister = async () => {
     const name = reg.name.trim();
     if (!name) { toast(t('datasets.regNeedName', { defaultValue: '데이터셋 이름을 입력하세요.' })); return; }
@@ -238,10 +238,16 @@ export default function Datasets() {
 
       <Modal open={openReg} title={t('datasets.regTitle', { defaultValue: '데이터셋 등록' })} onClose={() => !regBusy && setOpenReg(false)} width={600}
         footer={<button className="btn primary" disabled={regBusy} onClick={submitRegister}>{regBusy ? t('datasets.regBusy', { defaultValue: '등록 중…' }) : t('datasets.register', { defaultValue: '데이터셋 등록' })}</button>}>
-        {/* 등록 방식 2가지 */}
-        <div className="subtabs" style={{ marginTop: 0 }}>
-          <span className={`st${regTab === 'nfs' ? ' active' : ''}`} onClick={() => setRegTab('nfs')}><FolderInput size={13} /> {t('datasets.regNfs', { defaultValue: 'NFS 복사(SCP)' })}</span>
-          <span className={`st${regTab === 'url' ? ' active' : ''}`} onClick={() => setRegTab('url')}><Link2 size={13} /> {t('datasets.regUrl', { defaultValue: 'URL(wget)' })}</span>
+        {/* 등록 방식 2가지 — 명시적 flex 탭(모달 안 subtabs 클래스 레이아웃 깨짐 회피) */}
+        <div style={{ display: 'flex', gap: 8, marginTop: 0, marginBottom: 6 }}>
+          {[{ k: 'nfs', icon: FolderInput, label: t('datasets.regNfs', { defaultValue: 'NFS 복사(SCP)' }) },
+            { k: 'url', icon: Link2, label: t('datasets.regUrl', { defaultValue: 'URL(wget)' }) }].map(({ k, icon: Ic, label }) => (
+            <button key={k} type="button" onClick={() => setRegTab(k)}
+              style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '9px 12px', borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                border: `1.5px solid ${regTab === k ? 'var(--primary)' : 'var(--border)'}`, background: regTab === k ? 'var(--primary-soft)' : 'var(--surface-2)', color: regTab === k ? 'var(--primary)' : 'var(--text)' }}>
+              <Ic size={15} /> {label}
+            </button>
+          ))}
         </div>
 
         <label className="fld">{t('datasets.name')}<Req /></label>

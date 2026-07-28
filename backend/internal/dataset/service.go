@@ -168,6 +168,18 @@ func (s *Service) RunReconciler(ctx context.Context, interval time.Duration) {
 	}
 }
 
+// parseHash는 해제 잡 로그에서 마지막 "HASH <값>" 을 뽑는다(없으면 "").
+func parseHash(logs string) string {
+	toks := strings.Fields(logs)
+	hash := ""
+	for i := 0; i+1 < len(toks); i++ {
+		if toks[i] == "HASH" && toks[i+1] != "" {
+			hash = toks[i+1]
+		}
+	}
+	return hash
+}
+
 func (s *Service) reconcileOnce(ctx context.Context) {
 	for _, d := range s.repo.ListLoading() {
 		job := fmt.Sprintf("dl-ds-%d", d.ID)
@@ -191,6 +203,12 @@ func (s *Service) reconcileOnce(ctx context.Context) {
 			continue
 		}
 		_ = s.repo.SetPVC(d.ID, pvc, s.namespace)
+		// 해제 잡이 남긴 "HASH <sum>" 을 저장(아카이브 sha256 앞 16자). Job 삭제 전에 읽는다.
+		if d.Hash == "" {
+			if h := parseHash(s.prov.BuildLogs(ctx, s.namespace, job, 60)); h != "" {
+				_ = s.repo.SetHash(d.ID, h)
+			}
+		}
 		_ = s.repo.SetLoadStatus(d.ID, "ready")
 		_ = s.prov.DeleteBuildJob(ctx, s.namespace, job)
 		log.Printf("[dataset] ds %d 적재 완료 → /dataset/%s", d.ID, d.Name)
@@ -429,6 +447,7 @@ func (s *Service) InboxList() ([]InboxFile, error) {
 	}
 	dir := s.inboxDir()
 	_ = os.MkdirAll(dir, 0o777) // 최초 조회 시 생성해 안내 경로가 실재하게
+	_ = os.Chmod(dir, 0o777)    // umask 로 0755 가 되면 SCP 하는 외부 계정이 못 쓴다 → 강제로 world-writable
 	ents, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, err

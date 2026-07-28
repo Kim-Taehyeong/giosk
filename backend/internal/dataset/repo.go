@@ -26,6 +26,7 @@ type Repository interface {
 	Get(id int64) (*Dataset, error)
 	SetPVC(id int64, name, ns string) error      // RWX NFS 실체 PVC 좌표 기록
 	SetLoadStatus(id int64, status string) error // loading|ready|failed
+	SetHash(id int64, hash string) error         // 해제 잡이 계산한 아카이브 해시 저장
 	SetDescription(id int64, desc string) error
 	ListLoading() []Dataset                      // 적재중 데이터셋(리컨실러)
 
@@ -123,6 +124,13 @@ func (r *gormRepo) Get(id int64) (*Dataset, error) {
 func (r *gormRepo) SetPVC(id int64, name, ns string) error {
 	return r.db.Model(&Dataset{}).Where("id = ?", id).
 		Updates(map[string]any{"pvc_name": name, "pvc_namespace": ns}).Error
+}
+
+func (r *gormRepo) SetHash(id int64, hash string) error {
+	if hash == "" {
+		return nil
+	}
+	return r.db.Exec(`UPDATE datasets SET hash = ? WHERE id = ?`, hash, id).Error
 }
 
 func (r *gormRepo) SetLoadStatus(id int64, status string) error {

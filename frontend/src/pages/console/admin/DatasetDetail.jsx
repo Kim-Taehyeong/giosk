@@ -37,7 +37,11 @@ export default function DatasetDetail() {
 
   const toggleNode = async (node) => { await toggleDatasetCache(did, node); load(); };
   const saveDesc = async () => { try { await updateDatasetDescription(did, descDraft ?? ''); setDescDraft(null); load(); toast(t('datasets.descSaved', { defaultValue: '설명을 저장했습니다.' })); } catch { toast(t('datasets.descFail', { defaultValue: '설명 저장 실패' })); } };
-  const cacheOf = (node) => (ds.caches || []).find((c) => c.node === node)?.status || ((ds.nodes || []).includes(node) ? 'cached' : undefined);
+  const cacheObjOf = (node) => (ds.caches || []).find((c) => c.node === node);
+  const cacheOf = (node) => cacheObjOf(node)?.status || ((ds.nodes || []).includes(node) ? 'cached' : undefined);
+  const phaseLabel = (phase) => phase === 'extract' ? t('datasets.phaseExtract', { defaultValue: '압축 해제중' })
+    : phase === 'copy' ? t('datasets.phaseCopy', { defaultValue: '복사중' })
+      : t('datasets.phaseDownload', { defaultValue: '다운로드중' });
   const doDelete = async () => { if (!(await confirm({ title: t('datasets.delete'), message: t('confirmDelete'), confirmText: t('datasets.delete'), danger: true }))) return; await deleteDataset(did); toast(t('datasets.removed')); navigate('/console/admin/datasets'); };
 
   const orderedNodes = nodes.filter((n) => n.gpu && n.gpu !== '— (CPU 풀)').concat(nodes.filter((n) => !n.gpu || n.gpu === '— (CPU 풀)'));
@@ -104,7 +108,17 @@ export default function DatasetDetail() {
                     {n.gpu && n.gpu !== '— (CPU 풀)' && <div className="muted mono" style={{ fontSize: 11.5, marginTop: 2 }}>{n.gpu.split(' ')[0].replace(/^NVIDIA-/, '')}</div>}
                   </div>
                   {st === 'cached' && <Pill variant="ok"><BadgeCheck size={12} /> {t('images.cached')}</Pill>}
-                  {st === 'caching' && <Pill variant="wait">{t('images.pulling')}…</Pill>}
+                  {st === 'caching' && (() => { const c = cacheObjOf(n.node); return (
+                    <div style={{ width: 150, flex: '0 0 auto' }} onClick={(e) => e.preventDefault()}>
+                      <div className="flex" style={{ justifyContent: 'space-between', fontSize: 11.5, marginBottom: 3 }}>
+                        <span className="muted">{phaseLabel(c?.phase)}</span>
+                        <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{c?.progress || 0}%</span>
+                      </div>
+                      <div style={{ height: 7, borderRadius: 4, background: 'var(--surface)', overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: `${c?.progress || 0}%`, background: 'var(--primary)', transition: 'width .5s' }} />
+                      </div>
+                    </div>
+                  ); })()}
                   {st === 'failed' && <Pill variant="err">{t('images.cacheFailed')}</Pill>}
                   {!st && <span className="muted" style={{ fontSize: 12 }}>{t('images.notCached', { defaultValue: '미캐시' })}</span>}
                 </label>
