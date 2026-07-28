@@ -205,7 +205,7 @@ func (c *Client) PodDescribe(ctx context.Context, ns, name string) (*PodDescribe
 		Reason: p.Status.Reason, Message: p.Status.Message,
 	}
 	if p.Status.StartTime != nil {
-		d.StartTime = p.Status.StartTime.Format("2006-01-02T15:04:05Z")
+		d.StartTime = p.Status.StartTime.UTC().Format(time.RFC3339)
 	}
 	for _, cs := range p.Status.ContainerStatuses {
 		st := ContainerState{Name: cs.Name, Ready: cs.Ready, RestartCount: cs.RestartCount, Image: cs.Image}
@@ -228,9 +228,9 @@ func (c *Client) PodDescribe(ctx context.Context, ns, name string) (*PodDescribe
 	})
 	if err == nil {
 		for _, e := range evs.Items {
-			last := e.LastTimestamp.Format("2006-01-02T15:04:05Z")
+			last := e.LastTimestamp.UTC().Format(time.RFC3339)
 			if e.LastTimestamp.IsZero() {
-				last = e.EventTime.Format("2006-01-02T15:04:05Z")
+				last = e.EventTime.UTC().Format(time.RFC3339)
 			}
 			d.Events = append(d.Events, PodEvent{Type: e.Type, Reason: e.Reason, Message: e.Message, Count: e.Count, Last: last})
 		}
@@ -243,7 +243,9 @@ func (c *Client) PodLogs(ctx context.Context, ns, name string, tail int64) (stri
 	if !c.Available() {
 		return "", ErrNoCluster
 	}
-	req := c.cs.CoreV1().Pods(ns).GetLogs(name, &corev1.PodLogOptions{TailLines: &tail})
+	// sshd 사이드카가 붙어 Pod 에 컨테이너가 여러 개다. Container 를 지정하지 않으면
+	// "a container name must be specified" 로 실패하므로 세션 본체("session") 로그를 콕 집는다.
+	req := c.cs.CoreV1().Pods(ns).GetLogs(name, &corev1.PodLogOptions{Container: "session", TailLines: &tail})
 	stream, err := req.Stream(ctx)
 	if err != nil {
 		return "", err
