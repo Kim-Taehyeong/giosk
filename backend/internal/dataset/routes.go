@@ -15,11 +15,9 @@ func RegisterAdmin(admin gin.IRouter, h *Handler) {
 	admin.POST("/dataset-requests/:reqId/approve", h.Approve)
 	admin.POST("/dataset-requests/:reqId/reject", h.Reject)
 	admin.POST("/datasets/:id/cache", h.ToggleCache)
-	admin.POST("/datasets/upload", h.Upload)          // zip/tar 직접 업로드(단발, 소용량)
-	// 청크 이어올리기(Cloudflare 100MB 리밋 우회 + 새로고침 재개) — 대용량 업로드용.
-	admin.POST("/datasets/upload/init", h.UploadInit)
-	admin.PUT("/datasets/upload/chunk", h.UploadChunk)
-	admin.GET("/datasets/upload/status", h.UploadStatus)
-	admin.POST("/datasets/upload/finish", h.UploadFinish)
+	// 관리자 데이터셋 등록: ① NFS 인박스(SCP 복사 후 선택 등록) ② URL(wget). 웹 파일 업로드는 폐지.
+	admin.GET("/datasets/inbox", h.Inbox)
+	admin.POST("/datasets/register-nfs", h.RegisterNFS)
+	admin.POST("/datasets/register-url", h.RegisterURL)
 	admin.PATCH("/datasets/:id", h.UpdateDescription) // 데이터셋 설명 수정
 }
