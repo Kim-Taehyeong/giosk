@@ -262,6 +262,16 @@ func main() {
 		WithMetrics(met) // 다운로드 진행률(%)
 	go datasetSvc.RunReconciler(context.Background(), 10*time.Second)
 	sessionSvc.WithDatasetCache(datasetSvc) // 세션이 캐시된 노드선 데이터셋을 hostPath 로 마운트
+	// 세션 생성 UI: 노드별 "캐시된 데이터셋" 표시(dataset_node_cache → node.Cached). 노드-선호 선택용.
+	nodeSvc.WithCachedDatasets(func() map[string][]node.CachedDataset {
+		out := map[string][]node.CachedDataset{}
+		for _, c := range datasetSvc.CachedByNode() {
+			out[c.Node] = append(out[c.Node], node.CachedDataset{
+				Name: c.Name, SizeClass: c.SizeClass, SizeGb: c.SizeGB, Owner: c.Owner, Desc: c.Desc,
+			})
+		}
+		return out
+	})
 
 	// 사용자 360 상세 — 각 도메인의 기존 userID-키 서비스를 클로저로 모아 한 응답으로.
 	usersRepo := users.NewRepository(db)

@@ -33,6 +33,13 @@ type Service struct {
 	dpConfigNS      string // device plugin 설정 ConfigMap 네임스페이스(빈값=자동적용 비활성 → 수동 운영)
 	dpConfigName    string // device plugin 설정 ConfigMap 이름
 	freeMode        bool   // 자유 모드: 임대 영속(cordon 없음·만료 없음·해제 안 함) → 계정 재사용·동시접속
+	cachedProvider  func() map[string][]CachedDataset // 노드별 캐시 데이터셋(세션 생성 노드 선호 표시). nil=빈 목록.
+}
+
+// WithCachedDatasets는 노드별 캐시 완료 데이터셋 제공자를 주입한다(세션 생성 UI 에서 "이 노드에 있는 데이터셋" 표시).
+func (s *Service) WithCachedDatasets(fn func() map[string][]CachedDataset) *Service {
+	s.cachedProvider = fn
+	return s
 }
 
 func NewService(repo Repository, ops NodeOps, met *metrics.Client, nfsServer, nfsPath string) *Service {
@@ -220,17 +227,21 @@ func (s *Service) PhysicalNodes(ctx context.Context) ([]UserNodeView, error) {
 	}
 	cfgs, _ := s.repo.Configs()
 	running := s.repo.RunningByNode()
+	var cached map[string][]CachedDataset
+	if s.cachedProvider != nil {
+		cached = s.cachedProvider()
+	}
 	out := make([]UserNodeView, 0)
 	for _, n := range live {
 		if !n.Physical {
 			continue
 		}
-		out = append(out, s.mergeUserNode(n, cfgs[n.Name], running[n.Name]))
+		out = append(out, s.mergeUserNode(n, cfgs[n.Name], running[n.Name], cached[n.Name]))
 	}
 	return out, nil
 }
 
-func (s *Service) mergeUserNode(n k8s.LiveNode, cfg Config, used int) UserNodeView {
+func (s *Service) mergeUserNode(n k8s.LiveNode, cfg Config, used int, cached []CachedDataset) UserNodeView {
 	total := atoiSafe(n.GpuCapacity)
 	free := total - used
 	if free < 0 {
@@ -242,7 +253,10 @@ func (s *Service) mergeUserNode(n k8s.LiveNode, cfg Config, used int) UserNodeVi
 		GpuTotal:       total,
 		GpuFree:        free,
 		DatasetQuotaGb: cfg.DatasetQuotaGB,
-		Cached:         []CachedDataset{},
+		Cached:         cached,
+	}
+	if v.Cached == nil {
+		v.Cached = []CachedDataset{}
 	}
 	if user, ok := s.repo.ActiveLeaseUser(n.Name); ok && user != "" {
 		v.Available = false

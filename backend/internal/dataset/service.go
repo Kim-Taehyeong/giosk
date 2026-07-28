@@ -587,6 +587,9 @@ func safeArchiveName(fn string) string {
 }
 
 // Delete는 데이터셋을 삭제하며 노드 로컬 캐시(hostPath)와 NFS 데이터도 함께 정리한다.
+// CachedByNode는 노드별 캐시 완료 데이터셋을 반환한다(세션 생성 UI 노드 선호 표시용).
+func (s *Service) CachedByNode() []NodeCachedDataset { return s.repo.CachedDatasetsByNode() }
+
 func (s *Service) Delete(ctx context.Context, id int64) error {
 	d, err := s.repo.Get(id)
 	if err == nil {
