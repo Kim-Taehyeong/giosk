@@ -469,6 +469,7 @@ export default function NewSession() {
         cpuCores: dc.cpu,
         memGb: dc.memGb,
         volumes: selVols.map((v) => ({ id: v.id, mountPath: v.mountPath })),
+        node: selNode && selNode !== 'auto' ? selNode : undefined, // 데이터셋 노드 picker 선택 = 실행 노드 하드 핀
         localHomeNode: localHomeNode || undefined, // 선택 시 그 노드 로컬 디스크 home 을 /home/work 로(노드 핀)
         datasets: [], // 데이터셋은 서버가 승인된 전체를 자동 마운트
       });
