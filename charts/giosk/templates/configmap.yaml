@@ -74,6 +74,9 @@ data:
   GIOSK_QUOTA_MAX_SESSIONS: {{ .Values.quota.maxConcurrentSessions | quote }}
   GIOSK_QUOTA_MAX_STOPPED: {{ .Values.quota.maxStoppedSessions | default 5 | quote }}
   GIOSK_VOLUME_QUOTA_GB: {{ .Values.quota.volumeQuotaGb | quote }}
+  GIOSK_QUOTA_MEM_BURST: {{ .Values.quota.memBurst | default 2 | quote }}
+  GIOSK_STOPPED_TTL_DAYS: {{ .Values.quota.stoppedTtlDays | default 14 | quote }}
+  GIOSK_HOME_REAP_PCT: {{ .Values.quota.homeReapPct | default 88 | quote }}
   # 세션 웹(VSCode) 노출 모드: nodeport(기본) | loadbalancer(MetalLB)
   GIOSK_SESSION_EXPOSE: {{ .Values.session.expose | quote }}
   # Prometheus(메트릭) — monitoring.enabled 면 in-cluster 서비스, 아니면 외부 URL.
