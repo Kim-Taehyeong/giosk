@@ -97,7 +97,7 @@ export default function Wallet() {
 
       <div className="grid cols-2">
         <div className="card">
-          <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+          <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 14 }}>
             <h3 style={{ margin: 0 }}><ReceiptText size={16} /> {t('wallet.history')}</h3>
             <div className="flex" style={{ gap: 8, alignItems: 'center' }}>
               <input type="text" value={q} onChange={(e) => { setQ(e.target.value); setPage(0); }}
