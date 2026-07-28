@@ -23,7 +23,7 @@ export const adminNavGroups = [
     items: [
       { key: 'approvals', icon: BadgeCheck, path: 'approvals', levels: ALL },
       { key: 'users', icon: Users, path: 'users', levels: ALL },
-      { key: 'groups', icon: FolderKanban, path: 'groups', levels: ['platform', 'org'] }, // 팀장은 전체 팀 목록 없음
+      { key: 'groups', icon: FolderKanban, path: 'groups', levels: ALL }, // 팀장은 자기 팀만(백엔드 group 스코프가 자기 팀만 반환) — 조직관리자가 자기 조직만 보는 것과 동일 관점
       { key: 'orgs', icon: Building2, path: 'orgs', levels: ['platform', 'org'] }, // 조직 관리는 최고/조직관리자만. 팀장은 조직 안 봄.
       { key: 'policies', icon: ShieldCheck, path: 'policies', levels: ALL }, // 자기 범위 정책(읽기), 편집은 platform
 
