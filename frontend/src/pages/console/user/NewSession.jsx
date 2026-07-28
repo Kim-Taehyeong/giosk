@@ -117,7 +117,9 @@ function createErrMsg(e, t) {
 // 데이터셋 1건을 정보가 풍부한 리스트 행으로 렌더(컨테이너 노드 선택 + SSH 캐시 보기 공용).
 // 선택 시에도 사이즈 뱃지가 묻히지 않도록 배경은 유지하고 좌측 보더+체크박스로 선택 표시.
 function DatasetRow({ t, d, selectable, on, onClick }) {
-  const meta = [`${d.sizeGb} GB`, d.format, d.files, d.updatedAt && t('newSession.dsUpdatedAt', { d: d.updatedAt })].filter(Boolean);
+  // 크기는 실제 바이트로(sub-GB 도 표시). sizeBytes 없으면 sizeGb 폴백. 해시/소유 등 상세도 함께.
+  const sizeText = d.sizeBytes ? formatBytes(d.sizeBytes) : `${d.sizeGb || 0} GB`;
+  const meta = [sizeText, d.sizeClass, d.hash && `#${d.hash}`, d.owner, d.format, d.files, d.updatedAt && t('newSession.dsUpdatedAt', { d: d.updatedAt })].filter(Boolean);
   return (
     <div onClick={onClick}
       style={{ display: 'flex', gap: 11, alignItems: 'flex-start', padding: '10px 12px', borderRadius: 10,
@@ -733,7 +735,7 @@ export default function NewSession() {
 
                 {wtype !== 'cpu' && config.features.datasets && (
                   // 세션 가용 노드(byNode = 컨테이너 GPU 노드) + 노드별 캐시 데이터셋. 물리(SSH) 노드가 아니라 여기 쓴다.
-                  <DatasetNodePicker t={t} nodes={nodesAvail} selGpuType={selGpuType} selNode={selNode} setSelNode={setSelNode} selDs={selDs} setSelDs={setSelDs} />
+                  <DatasetNodePicker t={t} nodes={nodesAvail} selGpuType={selGpuType} selNode={selNode} setSelNode={setSelNode} />
                 )}
 
                 <div className="cost-box mt">
@@ -843,17 +845,14 @@ function VolumePicker({ t, vols, selVols, toggleVol, setMount, localHomeNode, se
   );
 }
 
-// 데이터셋 고급 선택 — 실제 노드 지정 + 노드별 캐시 데이터셋을 박스로 클릭 선택.
-function DatasetNodePicker({ t, nodes, selGpuType, selNode, setSelNode, selDs, setSelDs }) {
+// 데이터셋 고급 선택 — 실행 노드만 지정한다(데이터셋은 서버가 전부 자동 마운트하므로 개별 선택 없음).
+// 각 노드에 캐시된 데이터셋을 정보로 보여줘 "여기로 배치하면 빠른" 노드를 고르게 한다.
+function DatasetNodePicker({ t, nodes, selGpuType, selNode, setSelNode }) {
   const [open, setOpen] = useState(false);
   const [openDs, setOpenDs] = useState({}); // 노드별 '저장된 데이터셋' 펼침
   // 전용 세션은 그 GPU 타입 노드만. byNode 는 gpuType(원시 모델)이 있어 정확 매칭, 없으면 라벨 부분매칭.
   const matched = (nodes || []).filter((n) => !selGpuType || (n.gpuType ? n.gpuType === selGpuType : (n.gpu || '').includes(selGpuType)));
-  const pickNode = (node) => { setSelNode(node); setSelDs([]); };
-  const toggleDs = (node, name) => {
-    if (selNode !== node) { setSelNode(node); setSelDs([name]); return; }
-    setSelDs((cur) => (cur.includes(name) ? cur.filter((x) => x !== name) : [...cur, name]));
-  };
+  const pickNode = (node) => setSelNode(node);
 
   return (
     <div className="mt">
@@ -883,20 +882,17 @@ function DatasetNodePicker({ t, nodes, selGpuType, selNode, setSelNode, selDs, s
                     <span className="muted" style={{ fontSize: 12.5 }}>{n.gpu}</span>
                   </div>
                   {(n.cached || []).length > 0 && (() => {
-                    const selN = on ? selDs.length : 0;
-                    const show = openDs[n.node] || selN > 0;
+                    const show = !!openDs[n.node];
+                    const totalBytes = (n.cached || []).reduce((a, d) => a + (d.sizeBytes || 0), 0);
                     return (
                       <div style={{ marginTop: 8 }}>
                         <button type="button" className="btn sm"
                           onClick={(e) => { e.stopPropagation(); setOpenDs((s) => ({ ...s, [n.node]: !show })); }}>
-                          <Database size={13} /> {t('newSession.dsView')} ({(n.cached || []).length}){selN > 0 ? ` · ${t('newSession.dsCountN', { n: selN })}` : ''} {show ? '▾' : '▸'}
+                          <Database size={13} /> {t('newSession.dsView')} ({(n.cached || []).length}{totalBytes ? ` · ${formatBytes(totalBytes)}` : ''}) {show ? '▾' : '▸'}
                         </button>
                         {show && (
-                          <div className="grid" style={{ gap: 8, marginTop: 8 }}>
-                            {(n.cached || []).map((d) => (
-                              <DatasetRow key={d.name} t={t} d={d} selectable on={on && selDs.includes(d.name)}
-                                onClick={() => toggleDs(n.node, d.name)} />
-                            ))}
+                          <div className="grid" style={{ gap: 8, marginTop: 8 }} onClick={(e) => e.stopPropagation()}>
+                            {(n.cached || []).map((d) => <DatasetRow key={d.name} t={t} d={d} />)}
                           </div>
                         )}
                       </div>

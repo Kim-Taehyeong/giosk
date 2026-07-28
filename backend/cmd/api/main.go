@@ -277,7 +277,7 @@ func main() {
 	resourceSvc.WithCachedDatasets(func() map[string][]resource.CachedDS {
 		out := map[string][]resource.CachedDS{}
 		for _, c := range datasetSvc.CachedByNode() {
-			out[c.Node] = append(out[c.Node], resource.CachedDS{Name: c.Name, SizeClass: c.SizeClass, SizeGb: c.SizeGB})
+			out[c.Node] = append(out[c.Node], resource.CachedDS{Name: c.Name, SizeClass: c.SizeClass, SizeGb: c.SizeGB, SizeBytes: c.SizeBytes, Hash: c.Hash, Owner: c.Owner})
 		}
 		return out
 	})

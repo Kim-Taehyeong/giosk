@@ -181,6 +181,7 @@ type NodeCachedDataset struct {
 	Name      string
 	SizeClass string
 	SizeGB    int
+	SizeBytes int64
 	Hash      string
 	Owner     string
 	Desc      string
@@ -189,7 +190,7 @@ type NodeCachedDataset struct {
 // CachedDatasetsByNode는 노드 로컬 캐시 완료(cached) 데이터셋을 메타와 함께 반환한다.
 func (r *gormRepo) CachedDatasetsByNode() []NodeCachedDataset {
 	var out []NodeCachedDataset
-	r.db.Raw(`SELECT c.node, d.name, d.size_class AS size_class, d.size_gb AS size_gb, d.hash, d.owner, d.description AS ` + "`desc`" + `
+	r.db.Raw(`SELECT c.node, d.name, d.size_class AS size_class, d.size_gb AS size_gb, d.size_bytes AS size_bytes, d.hash, d.owner, d.description AS ` + "`desc`" + `
 		FROM dataset_node_cache c JOIN datasets d ON d.id=c.dataset_id
 		WHERE c.status='cached' ORDER BY c.node, d.name`).Scan(&out)
 	return out

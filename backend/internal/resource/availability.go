@@ -63,6 +63,9 @@ type CachedDS struct {
 	Name      string `json:"name"`
 	SizeClass string `json:"sizeClass"`
 	SizeGb    int    `json:"sizeGb"`
+	SizeBytes int64  `json:"sizeBytes"` // 정확 크기(sub-GB 도 표시되게). 프론트는 formatBytes 로.
+	Hash      string `json:"hash"`
+	Owner     string `json:"owner"`
 }
 
 // ShareUse — 한 노드에서 실행 중인 공유(HAMi) 세션들의 자원 점유 합.
