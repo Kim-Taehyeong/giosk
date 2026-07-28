@@ -145,7 +145,7 @@ func (c *Client) RunDatasetFetch(ctx context.Context, ns, jobName, nfsServer, nf
 	script := "set -e; mkdir -p '" + dir + "'"
 	if url != "" {
 		script += `
-apk add --no-cache curl unzip tar coreutils >/dev/null 2>&1 || true
+apk add --no-cache curl unzip tar coreutils pigz >/dev/null 2>&1 || true
 fn=$(basename "` + url + `" | sed 's/[?].*//'); [ -z "$fn" ] && fn=download.bin
 ( curl -fSL --retry 3 -o "` + dir + `/$fn" "` + url + `" ) &
 pid=$!
@@ -184,7 +184,7 @@ echo "EXTOTAL $total"
 echo "EXTRACT"
 ( case "$a" in
     *.zip) unzip -o -q "$a" -d "` + dir + `" ;;
-    *.tar.gz|*.tgz) tar -xzf "$a" -C "` + dir + `" ;;
+    *.tar.gz|*.tgz) tar -I pigz -xf "$a" -C "` + dir + `" 2>/dev/null || tar -xzf "$a" -C "` + dir + `" ;;
     *.tar) tar -xf "$a" -C "` + dir + `" ;;
   esac ) &
 pid=$!
@@ -212,7 +212,7 @@ func (c *Client) RunDatasetExtract(ctx context.Context, ns, jobName, nfsServer, 
 	}
 	_ = c.DeleteBuildJob(ctx, ns, jobName)
 	dir := "/nfs/dataset/" + name
-	script := "set -e; apk add --no-cache unzip tar coreutils >/dev/null 2>&1 || true\n" +
+	script := "set -e; apk add --no-cache unzip tar coreutils pigz >/dev/null 2>&1 || true\n" +
 		"a=$(ls " + dir + "/*.zip " + dir + "/*.tar.gz " + dir + "/*.tgz " + dir + "/*.tar 2>/dev/null | head -1)\n" +
 		"[ -z \"$a\" ] && { echo 'no-archive(단일파일)'; echo 'EXTRACT DONE'; exit 0; }\n" +
 		extractWithProgress(dir)
@@ -237,7 +237,7 @@ func (c *Client) RunDatasetCache(ctx context.Context, ns, jobName, node, nfsServ
 	// (cp -a) 수많은 작은 파일이 NFS 를 오가 느리다 → 아카이브 1개만 노드로 복사(단일 대용량=빠름)한 뒤
 	// 노드 로컬에서 해제한다. 아카이브가 없으면(단일파일 데이터셋) 폴더 통째 복사로 폴백.
 	// 복사 진행률을 "PROGRESS <cur> <total>" 로 출력 → API 가 파싱해 %.
-	script := "set -e; apk add --no-cache unzip tar coreutils >/dev/null 2>&1 || true; mkdir -p '" + dst + `'
+	script := "set -e; apk add --no-cache unzip tar coreutils pigz >/dev/null 2>&1 || true; mkdir -p '" + dst + `'
 arc=$(ls /src/*.zip /src/*.tar.gz /src/*.tgz /src/*.tar 2>/dev/null | head -1)
 if [ -n "$arc" ]; then
   bn=$(basename "$arc"); total=$(stat -c %s "$arc" 2>/dev/null || echo 0)
