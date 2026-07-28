@@ -191,6 +191,21 @@ func podVolumes(s SessionSpec) ([]corev1.Volume, []corev1.VolumeMount) {
 		})
 		mounts = append(mounts, corev1.VolumeMount{Name: name, MountPath: path, ReadOnly: ro})
 	}
+	// /dev/shm — 쿠버네티스 기본은 64MB tmpfs 라, PyTorch DataLoader(num_workers>0)가 공유메모리로
+	// 텐서를 주고받다 꽉 차면 "Bus error / out of shared memory" 로 워커가 죽는다. Memory emptyDir 로
+	// 넉넉히 준다. 사용량은 컨테이너 메모리 한도에 산입되므로, shm 단독 OOM 을 막게 메모리의 절반으로 캡한다.
+	shmGi := s.MemGB / 2
+	if shmGi < 1 {
+		shmGi = 1
+	}
+	shmLimit := resource.MustParse(fmt.Sprintf("%dGi", shmGi))
+	vols = append(vols, corev1.Volume{
+		Name: "dshm",
+		VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{
+			Medium: corev1.StorageMediumMemory, SizeLimit: &shmLimit,
+		}},
+	})
+	mounts = append(mounts, corev1.VolumeMount{Name: "dshm", MountPath: "/dev/shm"})
 	if s.HomePVC != "" {
 		add("home", s.HomePVC, "/home/work", false)
 	}
