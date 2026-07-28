@@ -262,13 +262,21 @@ func main() {
 		WithMetrics(met) // 다운로드 진행률(%)
 	go datasetSvc.RunReconciler(context.Background(), 10*time.Second)
 	sessionSvc.WithDatasetCache(datasetSvc) // 세션이 캐시된 노드선 데이터셋을 hostPath 로 마운트
-	// 세션 생성 UI: 노드별 "캐시된 데이터셋" 표시(dataset_node_cache → node.Cached). 노드-선호 선택용.
+	// 세션 생성 UI: 노드별 "캐시된 데이터셋" 표시(dataset_node_cache). 노드-선호 선택용.
+	// node.Cached(물리노드 뷰) + resource.byNode.cached(세션 가용노드 = 컨테이너 GPU 노드) 둘 다 채운다.
 	nodeSvc.WithCachedDatasets(func() map[string][]node.CachedDataset {
 		out := map[string][]node.CachedDataset{}
 		for _, c := range datasetSvc.CachedByNode() {
 			out[c.Node] = append(out[c.Node], node.CachedDataset{
 				Name: c.Name, SizeClass: c.SizeClass, SizeGb: c.SizeGB, Owner: c.Owner, Desc: c.Desc,
 			})
+		}
+		return out
+	})
+	resourceSvc.WithCachedDatasets(func() map[string][]resource.CachedDS {
+		out := map[string][]resource.CachedDS{}
+		for _, c := range datasetSvc.CachedByNode() {
+			out[c.Node] = append(out[c.Node], resource.CachedDS{Name: c.Name, SizeClass: c.SizeClass, SizeGb: c.SizeGB})
 		}
 		return out
 	})

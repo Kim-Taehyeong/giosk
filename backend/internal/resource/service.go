@@ -14,13 +14,20 @@ type GpuLister interface {
 
 // Service는 자원 정의 비즈니스 로직.
 type Service struct {
-	repo    Repository
-	gpu     GpuLister
-	counter SessionCounter
+	repo        Repository
+	gpu         GpuLister
+	counter     SessionCounter
+	cachedByNode func() map[string][]CachedDS // 노드별 캐시 데이터셋(세션 생성 노드 picker). nil=빈 목록.
 }
 
 func NewService(repo Repository, gpu GpuLister, counter SessionCounter) *Service {
 	return &Service{repo: repo, gpu: gpu, counter: counter}
+}
+
+// WithCachedDatasets는 노드별 캐시 데이터셋 제공자를 주입한다(availability.byNode.cached 채움).
+func (s *Service) WithCachedDatasets(fn func() map[string][]CachedDS) *Service {
+	s.cachedByNode = fn
+	return s
 }
 
 func (s *Service) ListOfferings(activeOnly bool) ([]Offering, error) {

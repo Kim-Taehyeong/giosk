@@ -732,7 +732,8 @@ export default function NewSession() {
                 <SshKeyField t={t} registered={user?.sshPublicKey} value={sshKey} onChange={setSshKey} />
 
                 {wtype !== 'cpu' && config.features.datasets && (
-                  <DatasetNodePicker t={t} nodes={nodes} selGpuType={selGpuType} selNode={selNode} setSelNode={setSelNode} selDs={selDs} setSelDs={setSelDs} />
+                  // 세션 가용 노드(byNode = 컨테이너 GPU 노드) + 노드별 캐시 데이터셋. 물리(SSH) 노드가 아니라 여기 쓴다.
+                  <DatasetNodePicker t={t} nodes={nodesAvail} selGpuType={selGpuType} selNode={selNode} setSelNode={setSelNode} selDs={selDs} setSelDs={setSelDs} />
                 )}
 
                 <div className="cost-box mt">
@@ -846,7 +847,8 @@ function VolumePicker({ t, vols, selVols, toggleVol, setMount, localHomeNode, se
 function DatasetNodePicker({ t, nodes, selGpuType, selNode, setSelNode, selDs, setSelDs }) {
   const [open, setOpen] = useState(false);
   const [openDs, setOpenDs] = useState({}); // 노드별 '저장된 데이터셋' 펼침
-  const matched = nodes.filter((n) => !selGpuType || n.gpu.includes(selGpuType));
+  // 전용 세션은 그 GPU 타입 노드만. byNode 는 gpuType(원시 모델)이 있어 정확 매칭, 없으면 라벨 부분매칭.
+  const matched = (nodes || []).filter((n) => !selGpuType || (n.gpuType ? n.gpuType === selGpuType : (n.gpu || '').includes(selGpuType)));
   const pickNode = (node) => { setSelNode(node); setSelDs([]); };
   const toggleDs = (node, name) => {
     if (selNode !== node) { setSelNode(node); setSelDs([name]); return; }
@@ -880,18 +882,18 @@ function DatasetNodePicker({ t, nodes, selGpuType, selNode, setSelNode, selDs, s
                     <span className="flex" style={{ gap: 8, fontWeight: 700 }}><Server size={15} color="var(--primary)" />{on && <CheckMark />}{n.node}</span>
                     <span className="muted" style={{ fontSize: 12.5 }}>{n.gpu}</span>
                   </div>
-                  {n.cached.length > 0 && (() => {
+                  {(n.cached || []).length > 0 && (() => {
                     const selN = on ? selDs.length : 0;
                     const show = openDs[n.node] || selN > 0;
                     return (
                       <div style={{ marginTop: 8 }}>
                         <button type="button" className="btn sm"
                           onClick={(e) => { e.stopPropagation(); setOpenDs((s) => ({ ...s, [n.node]: !show })); }}>
-                          <Database size={13} /> {t('newSession.dsView')} ({n.cached.length}){selN > 0 ? ` · ${t('newSession.dsCountN', { n: selN })}` : ''} {show ? '▾' : '▸'}
+                          <Database size={13} /> {t('newSession.dsView')} ({(n.cached || []).length}){selN > 0 ? ` · ${t('newSession.dsCountN', { n: selN })}` : ''} {show ? '▾' : '▸'}
                         </button>
                         {show && (
                           <div className="grid" style={{ gap: 8, marginTop: 8 }}>
-                            {n.cached.map((d) => (
+                            {(n.cached || []).map((d) => (
                               <DatasetRow key={d.name} t={t} d={d} selectable on={on && selDs.includes(d.name)}
                                 onClick={() => toggleDs(n.node, d.name)} />
                             ))}
@@ -991,7 +993,7 @@ function SSHWizard({ t, navigate, toast, nodes, vols, labels }) {
                           {detail === n.node && (
                             <div className="mt grid" onClick={(e) => e.stopPropagation()} style={{ gap: 8, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
                               {n.cached.length === 0 && <div className="muted" style={{ fontSize: 12.5 }}>{t('newSession.sshNoCache')}</div>}
-                              {n.cached.map((d) => <DatasetRow key={d.name} t={t} d={d} />)}
+                              {(n.cached || []).map((d) => <DatasetRow key={d.name} t={t} d={d} />)}
                             </div>
                           )}
                         </>
