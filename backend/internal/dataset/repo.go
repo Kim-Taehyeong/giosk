@@ -29,6 +29,7 @@ type Repository interface {
 	SetHash(id int64, hash string) error         // 해제 잡이 계산한 아카이브 해시 저장
 	SetSize(id int64, bytes int64) error         // 해제 완료 후 실제 콘텐츠 크기로 교정
 	SetDescription(id int64, desc string) error
+	SetSizeClass(id int64, sizeClass string) error
 	ListLoading() []Dataset                      // 적재중 데이터셋(리컨실러)
 
 	CacheStatus(datasetID int64, node string) (status string, exists bool)
@@ -145,6 +146,10 @@ func (r *gormRepo) SetSize(id int64, bytes int64) error {
 
 func (r *gormRepo) SetLoadStatus(id int64, status string) error {
 	return r.db.Model(&Dataset{}).Where("id = ?", id).Update("load_status", status).Error
+}
+
+func (r *gormRepo) SetSizeClass(id int64, sizeClass string) error {
+	return r.db.Exec(`UPDATE datasets SET size_class = ? WHERE id = ?`, sizeClass, id).Error
 }
 
 func (r *gormRepo) SetDescription(id int64, desc string) error {

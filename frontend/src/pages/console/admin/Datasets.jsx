@@ -29,7 +29,7 @@ export default function Datasets() {
   // 데이터셋 등록 모달 — 방식 2가지: ① NFS 인박스(SCP 복사 후 선택) ② URL(wget).
   const [openReg, setOpenReg] = useState(false);
   const [regTab, setRegTab] = useState('nfs');
-  const [reg, setReg] = useState({ name: '', scope: 'global', filename: '', url: '' });
+  const [reg, setReg] = useState({ name: '', scope: 'global', filename: '', url: '', sizeClass: 'Medium' });
   const [inbox, setInbox] = useState({ scpTarget: '', files: [] });
   const [regBusy, setRegBusy] = useState(false);
   const loadInbox = () => getDatasetInbox().then((d) => setInbox({ scpTarget: d.scpTarget || '', files: d.files || [] })).catch(() => {});
@@ -56,7 +56,7 @@ export default function Datasets() {
   };
   const reject = async (id) => { await rejectDatasetRequest(id); setData((d) => ({ ...d, requests: d.requests.filter((x) => x.id !== id) })); toast(t('datasets.rejected')); };
 
-  const openRegister = () => { setReg({ name: '', scope: 'global', filename: '', url: '' }); setRegTab('nfs'); setOpenReg(true); loadInbox(); };
+  const openRegister = () => { setReg({ name: '', scope: 'global', filename: '', url: '', sizeClass: 'Medium' }); setRegTab('nfs'); setOpenReg(true); loadInbox(); };
   // 인박스 파일 선택 시 이름도 그 파일명(확장자 제거)으로 함께 변경(요청).
   const pickInboxFile = (fn) => setReg((r) => ({ ...r, filename: fn, name: fn.replace(/\.(zip|tar\.gz|tgz|tar)$/i, '') }));
   const submitRegister = async () => {
@@ -66,10 +66,10 @@ export default function Datasets() {
     try {
       if (regTab === 'nfs') {
         if (!reg.filename) { toast(t('datasets.regNeedFile', { defaultValue: '인박스에서 파일을 선택하세요.' })); setRegBusy(false); return; }
-        await registerDatasetNFS({ name, filename: reg.filename, scope: reg.scope });
+        await registerDatasetNFS({ name, filename: reg.filename, scope: reg.scope, sizeClass: reg.sizeClass });
       } else {
         if (!reg.url.trim()) { toast(t('datasets.regNeedUrl', { defaultValue: 'URL 을 입력하세요.' })); setRegBusy(false); return; }
-        await registerDatasetURL({ name, url: reg.url.trim(), scope: reg.scope });
+        await registerDatasetURL({ name, url: reg.url.trim(), scope: reg.scope, sizeClass: reg.sizeClass });
       }
       setOpenReg(false);
       toast(t('datasets.regStarted', { defaultValue: '등록 시작 — 목록에서 진행률을 확인하세요.' }));
@@ -295,11 +295,23 @@ export default function Datasets() {
           </>
         )}
 
-        <label className="fld">{t('datasets.upScope', { defaultValue: '공개 범위' })}</label>
-        <select value={reg.scope} onChange={(e) => setReg({ ...reg, scope: e.target.value })}>
-          <option value="global">{t('datasets.scopeGlobal', { defaultValue: '전역(모든 사용자)' })}</option>
-          <option value="personal">{t('datasets.scopePersonal', { defaultValue: '개인(나만)' })}</option>
-        </select>
+        <div className="grid cols-2" style={{ gap: 14 }}>
+          <div>
+            <label className="fld">{t('datasets.upScope', { defaultValue: '공개 범위' })}</label>
+            <select value={reg.scope} onChange={(e) => setReg({ ...reg, scope: e.target.value })}>
+              <option value="global">{t('datasets.scopeGlobal', { defaultValue: '전역(모든 사용자)' })}</option>
+              <option value="personal">{t('datasets.scopePersonal', { defaultValue: '개인(나만)' })}</option>
+            </select>
+          </div>
+          <div>
+            <label className="fld">{t('datasets.regSizeClass', { defaultValue: '크기 클래스' })}</label>
+            <select value={reg.sizeClass} onChange={(e) => setReg({ ...reg, sizeClass: e.target.value })}>
+              <option value="Small">Small</option>
+              <option value="Medium">Medium</option>
+              <option value="Large">Large</option>
+            </select>
+          </div>
+        </div>
       </Modal>
     </div>
   );

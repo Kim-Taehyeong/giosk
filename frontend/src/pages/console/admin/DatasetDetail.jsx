@@ -8,7 +8,7 @@ import Spinner from '../../../components/console/Spinner';
 import { formatBytes } from '../../../utils/format';
 import { useToast } from '../../../components/console/Toast';
 import { useConfirm } from '../../../components/console/Confirm';
-import { getDatasets, deleteDataset, toggleDatasetCache, updateDatasetDescription } from '../../../api/console/datasets';
+import { getDatasets, deleteDataset, toggleDatasetCache, updateDatasetDescription, updateDatasetMeta } from '../../../api/console/datasets';
 import { getAdminNodes } from '../../../api/console/nodes';
 
 const sizeVariant = { Large: 'primary', Medium: 'gpu', Small: 'free' };
@@ -76,6 +76,16 @@ export default function DatasetDetail() {
               <span className={mono ? 'mono' : ''} style={{ fontWeight: 600, textAlign: 'right', wordBreak: 'break-all' }}>{v}</span>
             </div>
           ))}
+          {/* 크기 클래스 — 편집 가능(즉시 저장) */}
+          <div className="flex" style={{ justifyContent: 'space-between', gap: 12, padding: '8px 0', fontSize: 13, alignItems: 'center' }}>
+            <span className="muted">{t('datasets.sizeClass', { defaultValue: '크기 클래스' })}</span>
+            <select value={ds.sizeClass || 'Medium'} style={{ width: 'auto' }}
+              onChange={async (e) => { try { await updateDatasetMeta(did, { description: ds.desc && ds.desc !== '—' ? ds.desc : '', sizeClass: e.target.value }); load(); toast(t('datasets.sizeClassSaved', { defaultValue: '크기 클래스를 저장했습니다.' })); } catch { toast(t('datasets.descFail', { defaultValue: '저장 실패' })); } }}>
+              <option value="Small">Small</option>
+              <option value="Medium">Medium</option>
+              <option value="Large">Large</option>
+            </select>
+          </div>
         </div>
         <div className="mt">
           <label className="fld" style={{ marginTop: 6 }}>{t('datasets.description', { defaultValue: '설명' })}</label>

@@ -490,7 +490,7 @@ func (s *Service) InboxList() ([]InboxFile, error) {
 }
 
 // RegisterNFS는 인박스의 파일을 데이터셋으로 등록한다 — dataset/<name>/ 로 이동 후 해제 Job.
-func (s *Service) RegisterNFS(ctx context.Context, userID int64, name, scope, ownerName, filename string) error {
+func (s *Service) RegisterNFS(ctx context.Context, userID int64, name, scope, ownerName, filename, sizeClass string) error {
 	if !s.UploadEnabled() {
 		return ErrUploadDisabled
 	}
@@ -517,11 +517,11 @@ func (s *Service) RegisterNFS(ctx context.Context, userID int64, name, scope, ow
 		}
 		_ = os.Remove(src)
 	}
-	return s.createLoadingAndExtract(ctx, userID, name, scope, ownerName, fi.Size())
+	return s.createLoadingAndExtract(ctx, userID, name, scope, ownerName, sizeClass, fi.Size())
 }
 
 // RegisterURL은 관리자가 URL(wget)로 데이터셋을 직접 등록한다(요청/승인 절차 없이).
-func (s *Service) RegisterURL(ctx context.Context, userID int64, name, scope, ownerName, url string) error {
+func (s *Service) RegisterURL(ctx context.Context, userID int64, name, scope, ownerName, url, sizeClass string) error {
 	if !s.canonical() {
 		return ErrUploadDisabled
 	}
@@ -538,7 +538,7 @@ func (s *Service) RegisterURL(ctx context.Context, userID int64, name, scope, ow
 	if scope == ScopePersonal {
 		status = StatusPrivate
 	}
-	d := &Dataset{Name: name, Scope: scope, Owner: ownerName, OwnerUserID: &userID, SourceURL: url, SizeBytes: remoteSize(url), Status: status, LoadStatus: "loading"}
+	d := &Dataset{Name: name, Scope: scope, Owner: ownerName, OwnerUserID: &userID, SourceURL: url, SizeClass: sizeClass, SizeBytes: remoteSize(url), Status: status, LoadStatus: "loading"}
 	if err := s.repo.CreateDataset(d); err != nil {
 		return err
 	}
@@ -550,7 +550,7 @@ func (s *Service) RegisterURL(ctx context.Context, userID int64, name, scope, ow
 }
 
 // createLoadingAndExtract는 NFS 에 이미 놓인 아카이브를 loading 데이터셋으로 만들고 해제 Job 을 띄운다.
-func (s *Service) createLoadingAndExtract(ctx context.Context, userID int64, name, scope, ownerName string, bytes int64) error {
+func (s *Service) createLoadingAndExtract(ctx context.Context, userID int64, name, scope, ownerName, sizeClass string, bytes int64) error {
 	if scope == "" {
 		scope = ScopeGlobal
 	}
@@ -559,7 +559,7 @@ func (s *Service) createLoadingAndExtract(ctx context.Context, userID int64, nam
 		status = StatusPrivate
 	}
 	// 초기 용량 = 아카이브 크기(정직한 하한). 해제 완료 시 리컨실러가 실제 해제 콘텐츠 크기로 교정한다.
-	d := &Dataset{Name: name, Scope: scope, Owner: ownerName, OwnerUserID: &userID, SizeBytes: bytes, Status: status, LoadStatus: "loading"}
+	d := &Dataset{Name: name, Scope: scope, Owner: ownerName, OwnerUserID: &userID, SizeClass: sizeClass, SizeBytes: bytes, Status: status, LoadStatus: "loading"}
 	if err := s.repo.CreateDataset(d); err != nil {
 		return err
 	}
@@ -626,6 +626,17 @@ func (s *Service) Delete(ctx context.Context, id int64) error {
 
 // UpdateDescription은 데이터셋 설명을 수정한다(관리자).
 func (s *Service) UpdateDescription(id int64, desc string) error { return s.repo.SetDescription(id, desc) }
+
+// UpdateMeta는 설명 + 크기 클래스를 함께 저장한다(관리자 상세 편집). sizeClass 빈값이면 클래스 미변경.
+func (s *Service) UpdateMeta(id int64, desc, sizeClass string) error {
+	if err := s.repo.SetDescription(id, desc); err != nil {
+		return err
+	}
+	if sizeClass != "" {
+		return s.repo.SetSizeClass(id, sizeClass)
+	}
+	return nil
+}
 
 func (s *Service) PendingRequests() ([]Request, error) { return s.repo.ListPendingRequests() }
 

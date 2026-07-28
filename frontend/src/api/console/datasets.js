@@ -31,13 +31,15 @@ export const deleteDataset = (id) => apiDelete(`/datasets/${id}`);
 // 인박스: SCP 안내 경로 + 그 폴더에 올라온 아카이브 목록.
 export const getDatasetInbox = () => apiGet('/admin/datasets/inbox');
 // 인박스 파일을 데이터셋으로 등록(등록 후 인박스에서 제거 + 자동 해제).
-export const registerDatasetNFS = ({ name, filename, scope }) => apiPost('/admin/datasets/register-nfs', { name, filename, scope: scope || 'global' });
+export const registerDatasetNFS = ({ name, filename, scope, sizeClass }) => apiPost('/admin/datasets/register-nfs', { name, filename, scope: scope || 'global', sizeClass: sizeClass || '' });
 // URL(wget)로 등록 — 서버가 직접 다운로드.
-export const registerDatasetURL = ({ name, url, scope }) => apiPost('/admin/datasets/register-url', { name, url, scope: scope || 'global' });
+export const registerDatasetURL = ({ name, url, scope, sizeClass }) => apiPost('/admin/datasets/register-url', { name, url, scope: scope || 'global', sizeClass: sizeClass || '' });
 
 // 노드 로컬 캐시 토글(관리자) — 없으면 캐시 시작(NFS→노드 로컬 복사), 있으면 해제.
 export const toggleDatasetCache = (id, node) => apiPost(`/admin/datasets/${id}/cache`, { node });
 export const updateDatasetDescription = (id, description) => apiPatch(`/admin/datasets/${id}`, { description });
+// 설명 + 크기 클래스 함께 저장(상세 편집).
+export const updateDatasetMeta = (id, { description, sizeClass }) => apiPatch(`/admin/datasets/${id}`, { description: description ?? '', sizeClass: sizeClass || '' });
 export const createDataset = (form) => registerDataset(form);
 
 // 관리자 승인/거절.

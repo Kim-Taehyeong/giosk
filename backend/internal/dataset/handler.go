@@ -60,13 +60,13 @@ func (h *Handler) Inbox(c *gin.Context) {
 
 // RegisterNFS는 인박스 파일을 데이터셋으로 등록한다(등록 후 인박스에서 제거·자동 해제). {name, filename, scope}.
 func (h *Handler) RegisterNFS(c *gin.Context) {
-	var req struct{ Name, Filename, Scope string }
+	var req struct{ Name, Filename, Scope, SizeClass string }
 	if err := c.ShouldBindJSON(&req); err != nil || req.Name == "" || req.Filename == "" {
 		httpx.BadRequest(c, "name·filename 필요")
 		return
 	}
 	u := auth.CurrentUser(c)
-	if err := h.svc.RegisterNFS(c.Request.Context(), u.ID, req.Name, req.Scope, u.Username, req.Filename); err != nil {
+	if err := h.svc.RegisterNFS(c.Request.Context(), u.ID, req.Name, req.Scope, u.Username, req.Filename, req.SizeClass); err != nil {
 		h.registerErr(c, err)
 		return
 	}
@@ -75,13 +75,13 @@ func (h *Handler) RegisterNFS(c *gin.Context) {
 
 // RegisterURL은 URL(wget)로 데이터셋을 등록한다. {name, url, scope}.
 func (h *Handler) RegisterURL(c *gin.Context) {
-	var req struct{ Name, Url, Scope string }
+	var req struct{ Name, Url, Scope, SizeClass string }
 	if err := c.ShouldBindJSON(&req); err != nil || req.Name == "" || req.Url == "" {
 		httpx.BadRequest(c, "name·url 필요")
 		return
 	}
 	u := auth.CurrentUser(c)
-	if err := h.svc.RegisterURL(c.Request.Context(), u.ID, req.Name, req.Scope, u.Username, req.Url); err != nil {
+	if err := h.svc.RegisterURL(c.Request.Context(), u.ID, req.Name, req.Scope, u.Username, req.Url, req.SizeClass); err != nil {
 		h.registerErr(c, err)
 		return
 	}
@@ -113,13 +113,14 @@ func (h *Handler) Delete(c *gin.Context) {
 func (h *Handler) UpdateDescription(c *gin.Context) {
 	var req struct {
 		Description string `json:"description"`
+		SizeClass   string `json:"sizeClass"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		httpx.BadRequest(c, "description 필요")
+		httpx.BadRequest(c, "본문 오류")
 		return
 	}
-	if err := h.svc.UpdateDescription(idParam(c), req.Description); err != nil {
-		httpx.Internal(c, "설명 저장 실패")
+	if err := h.svc.UpdateMeta(idParam(c), req.Description, req.SizeClass); err != nil {
+		httpx.Internal(c, "저장 실패")
 		return
 	}
 	httpx.OK(c, gin.H{"ok": true})
