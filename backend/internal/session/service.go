@@ -22,6 +22,10 @@ const idleCPUThreshold = 0.05
 // GPU 대여 세션은 GPU 점유가 목적이므로 CPU 가 아니라 GPU util(DCGM)로만 유휴를 판정한다.
 const idleGPUThreshold = 5.0
 
+// idleGPUPowerW는 전용/물리 GPU 세션의 "연산 중" 판정 전력(W). DCGM util 이 오보고(0)돼도 이 이상
+// 전력을 쓰면 실제 연산 중으로 보고 유휴로 죽이지 않는다. 유휴 4090 ~25W, 실부하 130W+ → 60W 로 넉넉히.
+const idleGPUPowerW = 60.0
+
 // AuditReader는 세션 대상 감사 로그 조회/기록(audit.Repository 가 구현).
 type AuditReader interface {
 	ListByTarget(target string, limit int) ([]audit.Log, error)
@@ -1802,7 +1806,17 @@ func (s *Service) isIdle(ctx context.Context, sess *Session, windowMin int) (idl
 	if !got {
 		return false, false // GPU 메트릭 미가용 → 정지하지 않음(보수적)
 	}
-	return v < idleGPUThreshold, true
+	if v >= idleGPUThreshold {
+		return false, true // 사용 중
+	}
+	// util 이 낮게 나와도 유휴로 단정하지 않는다. 컨슈머 GeForce+최신 드라이버에선 DCGM 이 util(%)을
+	// 종종 0 으로 오보고하지만(전력·클럭은 정상), 이를 그대로 믿으면 100% 학습 중인 세션이 유휴로 죽는다.
+	// 전력을 보조 신호로: GPU 가 유의미한 전력을 쓰면 실제 연산 중 → 유휴 아님. (유휴 4090 ~25W, 부하 >130W)
+	pq := fmt.Sprintf(`avg(avg_over_time(DCGM_FI_DEV_POWER_USAGE[%dm]) * on(pod,namespace) group_left(node) kube_pod_info{node=%q})`, windowMin, sess.Node)
+	if p, ok := s.met.Scalar(ctx, pq); ok && p >= idleGPUPowerW {
+		return false, true // 전력 사용 중 → util 오보고 방어(유휴 아님)
+	}
+	return true, true
 }
 
 // RunPhaseReconciler는 컨테이너 세션의 라이브 Pod 상태를 주기적으로 DB 에 반영한다.
