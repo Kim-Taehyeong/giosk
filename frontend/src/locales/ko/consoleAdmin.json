@@ -844,6 +844,7 @@
     "maxVramGb": "최대 VRAM",
     "maxVolumeGib": "최대 볼륨",
     "maxConcurrentSessions": "최대 동시 세션",
+    "maxStoppedSessions": "최대 중단(대기) 세션",
     "maxEphemeralGib": "최대 임시 디스크",
     "effective": "적용 중",
     "saved": "{{name}} 한계를 저장했습니다",

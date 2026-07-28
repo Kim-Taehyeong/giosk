@@ -11,6 +11,7 @@ type Limits struct {
 	MaxVramGB             *int
 	MaxVolumeGiB          *int
 	MaxConcurrentSessions *int
+	MaxStoppedSessions    *int
 	MaxEphemeralGiB       *int
 }
 
@@ -20,6 +21,7 @@ type Resolved struct {
 	MaxVramGB             int
 	MaxVolumeGiB          int
 	MaxConcurrentSessions int
+	MaxStoppedSessions    int
 	MaxEphemeralGiB       int
 }
 
@@ -45,6 +47,7 @@ type PolicyRow struct {
 	MaxVramGB             *int   `json:"maxVramGb" gorm:"column:max_vram_gb"`
 	MaxVolumeGiB          *int   `json:"maxVolumeGib" gorm:"column:max_volume_gib"`
 	MaxConcurrentSessions *int   `json:"maxConcurrentSessions" gorm:"column:max_concurrent_sessions"`
+	MaxStoppedSessions    *int   `json:"maxStoppedSessions" gorm:"column:max_stopped_sessions"`
 	MaxEphemeralGiB       *int   `json:"maxEphemeralGib" gorm:"column:max_ephemeral_gib"`
 }
 
@@ -53,8 +56,8 @@ type Repository interface {
 	UserLimits(userID int64) (Limits, error)
 	GroupLimits(groupID int64) (Limits, error)
 	OrgLimits(orgID int64) (Limits, error)
-	SetLimits(level Level, id int64, l Limits) error       // nil 필드 = NULL(그 레벨 미지정 → 상위 폴백)
-	ListPolicies() ([]PolicyRow, error)                    // 상한이 하나라도 설정된 전 범위 목록
+	SetLimits(level Level, id int64, l Limits) error              // nil 필드 = NULL(그 레벨 미지정 → 상위 폴백)
+	ListPolicies() ([]PolicyRow, error)                           // 상한이 하나라도 설정된 전 범위 목록
 	ListPoliciesScoped(orgID, groupID int64) ([]PolicyRow, error) // 스코프 내(org/group)만
 }
 
@@ -116,6 +119,9 @@ func (r *Resolver) Resolve(userID int64) Resolved {
 		if l.MaxConcurrentSessions != nil {
 			out.MaxConcurrentSessions = *l.MaxConcurrentSessions
 		}
+		if l.MaxStoppedSessions != nil {
+			out.MaxStoppedSessions = *l.MaxStoppedSessions
+		}
 		if l.MaxEphemeralGiB != nil {
 			out.MaxEphemeralGiB = *l.MaxEphemeralGiB
 		}
@@ -155,6 +161,9 @@ func applyLimits(out *Resolved, l Limits) {
 	if l.MaxConcurrentSessions != nil {
 		out.MaxConcurrentSessions = *l.MaxConcurrentSessions
 	}
+	if l.MaxStoppedSessions != nil {
+		out.MaxStoppedSessions = *l.MaxStoppedSessions
+	}
 	if l.MaxEphemeralGiB != nil {
 		out.MaxEphemeralGiB = *l.MaxEphemeralGiB
 	}
@@ -185,5 +194,5 @@ func (r *Resolver) HierOfUser(userID int64) (orgID, groupID int64) {
 
 func (r *Resolver) globalAsLimits() Limits {
 	g := r.Global()
-	return Limits{MaxGpu: &g.MaxGpu, MaxVramGB: &g.MaxVramGB, MaxVolumeGiB: &g.MaxVolumeGiB, MaxConcurrentSessions: &g.MaxConcurrentSessions, MaxEphemeralGiB: &g.MaxEphemeralGiB}
+	return Limits{MaxGpu: &g.MaxGpu, MaxVramGB: &g.MaxVramGB, MaxVolumeGiB: &g.MaxVolumeGiB, MaxConcurrentSessions: &g.MaxConcurrentSessions, MaxStoppedSessions: &g.MaxStoppedSessions, MaxEphemeralGiB: &g.MaxEphemeralGiB}
 }

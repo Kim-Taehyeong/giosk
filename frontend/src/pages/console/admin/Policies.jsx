@@ -79,7 +79,7 @@ export default function Policies() {
   // 삭제 = 그 범위의 상한을 전부 null 로(= 상위로 상속). 별도 delete API 없이 의미가 정확하다.
   const remove = async (r) => {
     if (!(await confirm({ title: t('policies.removeTitle'), message: t('policies.removeConfirm', { name: r.name }), confirmText: t('common.delete') }))) return;
-    try { await SETTER[r.scope](r.id, { maxGpu: null, maxVramGb: null, maxVolumeGib: null, maxConcurrentSessions: null }); } catch (e) { toast(errMsg(e)); return; }
+    try { await SETTER[r.scope](r.id, { maxGpu: null, maxVramGb: null, maxVolumeGib: null, maxConcurrentSessions: null, maxStoppedSessions: null, maxEphemeralGib: null }); } catch (e) { toast(errMsg(e)); return; }
     toast(t('policies.removed', { name: r.name })); load();
   };
 
@@ -110,13 +110,14 @@ export default function Policies() {
             { key: 'maxVramGb', header: t('limits.maxVramGb'), render: (r) => val(r.maxVramGb, ' GB') },
             { key: 'maxVolumeGib', header: t('limits.maxVolumeGib'), render: (r) => val(r.maxVolumeGib, ' GiB') },
             { key: 'maxConcurrentSessions', header: t('limits.maxConcurrentSessions'), render: (r) => val(r.maxConcurrentSessions) },
+            { key: 'maxStoppedSessions', header: t('limits.maxStoppedSessions'), render: (r) => val(r.maxStoppedSessions) },
             { key: 'act', header: t('policies.act'), className: 'flex', render: (r) => (r._fixed
               ? (isPlatform && <button className="btn sm" onClick={() => setEdit({ scope: 'global', id: 0, name: r.name, limits: {
-                  maxGpu: r.maxGpu, maxVramGb: r.maxVramGb, maxVolumeGib: r.maxVolumeGib, maxConcurrentSessions: r.maxConcurrentSessions } })}>
+                  maxGpu: r.maxGpu, maxVramGb: r.maxVramGb, maxVolumeGib: r.maxVolumeGib, maxConcurrentSessions: r.maxConcurrentSessions, maxStoppedSessions: r.maxStoppedSessions } })}>
                   <Pencil size={13} /> {t('common.edit')}</button>)
               : <span className="flex gap">
                   <button className="btn sm" onClick={() => setEdit({ scope: r.scope, id: r.id, name: r.name, limits: {
-                    maxGpu: r.maxGpu, maxVramGb: r.maxVramGb, maxVolumeGib: r.maxVolumeGib, maxConcurrentSessions: r.maxConcurrentSessions } })}>
+                    maxGpu: r.maxGpu, maxVramGb: r.maxVramGb, maxVolumeGib: r.maxVolumeGib, maxConcurrentSessions: r.maxConcurrentSessions, maxStoppedSessions: r.maxStoppedSessions } })}>
                     <Pencil size={13} /> {t('common.edit')}</button>
                   <button className="btn sm danger" onClick={() => remove(r)}><Trash2 size={13} /> {t('common.delete')}</button>
                 </span>) },

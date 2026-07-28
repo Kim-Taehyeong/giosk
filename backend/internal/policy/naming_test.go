@@ -15,7 +15,7 @@ func TestPolicyRowColumnNames(t *testing.T) {
 	if err != nil {
 		t.Fatalf("schema parse: %v", err)
 	}
-	want := []string{"scope", "id", "name", "max_gpu", "max_vram_gb", "max_volume_gib", "max_concurrent_sessions"}
+	want := []string{"scope", "id", "name", "max_gpu", "max_vram_gb", "max_volume_gib", "max_concurrent_sessions", "max_stopped_sessions"}
 	for _, col := range want {
 		if s.LookUpField(col) == nil {
 			t.Errorf("컬럼 %q 에 매핑되는 필드가 없다 — gorm:\"column:%s\" 태그 확인", col, col)

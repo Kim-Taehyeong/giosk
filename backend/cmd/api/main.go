@@ -115,7 +115,8 @@ func main() {
 			MaxVramGB:             cfgStore.IntOr(systemconfig.KeyQuotaMaxVramGB, cfg.Quota.MaxVramGB),
 			MaxVolumeGiB:          cfgStore.IntOr(systemconfig.KeyQuotaMaxVolGiB, cfg.Quota.VolumeQuotaGB),
 			MaxConcurrentSessions: cfgStore.IntOr(systemconfig.KeyQuotaMaxSessions, cfg.Quota.MaxConcurrentSessions),
-			MaxEphemeralGiB:       cfg.Quota.MaxEphemeralGiB, // 전역 폴백(런타임 오버라이드 키 없음 — 설치값 사용)
+			MaxStoppedSessions:    cfg.Quota.MaxStoppedSessions, // 전역 폴백(설치값; 계층 오버라이드는 정책 컬럼으로)
+			MaxEphemeralGiB:       cfg.Quota.MaxEphemeralGiB,    // 전역 폴백(런타임 오버라이드 키 없음 — 설치값 사용)
 		}
 	}
 	limitResolver := policy.NewResolver(policyRepo, orgSvc, globalQuota)

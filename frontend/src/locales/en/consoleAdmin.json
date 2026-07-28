@@ -844,6 +844,7 @@
     "maxVramGb": "Max VRAM",
     "maxVolumeGib": "Max volume",
     "maxConcurrentSessions": "Max concurrent sessions",
+    "maxStoppedSessions": "Max stopped sessions",
     "maxEphemeralGib": "Max ephemeral disk",
     "effective": "Effective",
     "saved": "Saved limits for {{name}}",
