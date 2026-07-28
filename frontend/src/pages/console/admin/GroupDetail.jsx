@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Users, UserPlus, Trash2, Coins, Building2, ShieldCheck, ChevronRight, Pencil } from 'lucide-react';
+import { ArrowLeft, Users, UserPlus, Trash2, Coins, Building2, ShieldCheck, ChevronRight, Pencil, RefreshCw, Clock } from 'lucide-react';
 import PageHead from '../../../components/console/PageHead';
 import StatCard from '../../../components/console/StatCard';
 import CreditGrantCard from '../../../components/console/CreditGrantCard';
@@ -15,7 +15,7 @@ import { useConfirm } from '../../../components/console/Confirm';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { useAuth } from '../../../context/AuthContext';
 import { activeLevelOf } from '../../../config/consoleRoles';
-import { getGroups, getMembers, addMember, updateMember, grantGroupCredit, updateGroup, deleteGroup, setGroupRefill } from '../../../api/console/governance';
+import { getGroups, getMembers, addMember, updateMember, grantGroupCredit, updateGroup, deleteGroup, setGroupRefill, refillGroupNow, getGroupWallet, setMemberRefill, refillMemberNow } from '../../../api/console/governance';
 import RefillCard from '../../../components/console/RefillCard';
 import { c } from '../../../lib/credit';
 
@@ -35,15 +35,38 @@ export default function GroupDetail() {
   const confirm = useConfirm();
 
   const [group, setGroup] = useState(null);
+  const [wallet, setWallet] = useState(null); // 팀 지갑(다음 리필일)
   const [members, setMembers] = useState([]);
   const [add, setAdd] = useState(null);     // { account, role }
   const [edit, setEdit] = useState(null);   // { displayName, acceptsJoin }
+  const [refill, setRefill] = useState(null); // 멤버 리필 모달 { userId, name, recurring, interval, carryover }
 
   const loadMembers = () => getMembers(gid).then((d) => setMembers(d.items));
   const loadGroup = () => getGroups().then((d) => {
     setGroup((d.items || []).find((g) => g.id === gid) || null);
   });
-  useEffect(() => { loadGroup(); loadMembers(); }, [gid]);
+  const loadWallet = () => { if (creditMode) getGroupWallet(gid).then(setWallet).catch(() => {}); };
+  useEffect(() => { loadGroup(); loadMembers(); loadWallet(); }, [gid]); // eslint-disable-line
+
+  // 다음 리필일 표시(백엔드 nextRefillAt ISO). 없으면 —.
+  const fmtNext = (iso) => (iso ? new Date(iso).toLocaleDateString() : '—');
+  // 팀 즉시 리필.
+  const doGroupRefillNow = async () => {
+    try { const r = await refillGroupNow(gid); toast(t('gdetail.refilledNow', { n: r?.amount || 0, defaultValue: `즉시 리필 +${r?.amount || 0} C` })); }
+    catch (e) { toast(e?.code === 'no_recurring' ? t('gdetail.noRecurring', { defaultValue: '정기 리필 금액이 설정되지 않았습니다' }) : t('gdetail.refillFail', { defaultValue: '리필 실패' })); return; }
+    loadGroup(); loadWallet();
+  };
+  // 멤버 리필 금액 저장.
+  const saveMemberRefill = async () => {
+    try { await setMemberRefill(gid, refill.userId, { recurring: Number(refill.recurring) || 0, interval: Number(refill.interval) || 0, carryover: !!refill.carryover }); }
+    catch { toast(t('gdetail.refillFail', { defaultValue: '설정 실패' })); return; }
+    toast(t('gdetail.memberRefillSaved', { name: refill.name, defaultValue: '정기 리필을 설정했습니다' })); setRefill(null);
+  };
+  // 멤버 즉시 리필.
+  const doMemberRefillNow = async (m) => {
+    try { const r = await refillMemberNow(gid, m.userId); toast(t('gdetail.refilledNow', { n: r?.amount || 0, defaultValue: `즉시 리필 +${r?.amount || 0} C` })); }
+    catch (e) { toast(e?.code === 'no_recurring' ? t('gdetail.noRecurring', { defaultValue: '정기 리필 금액이 설정되지 않았습니다' }) : t('gdetail.refillFail', { defaultValue: '리필 실패' })); }
+  };
 
   const submitAdd = async () => {
     if (!add.account.trim()) { toast(t('gdetail.needAccount')); return; }
@@ -71,7 +94,7 @@ export default function GroupDetail() {
   const submitGroupRefill = async (spec) => {
     try { await setGroupRefill(gid, spec); toast(t('gdetail.refillSaved', { defaultValue: '정기 리필을 설정했습니다.' })); }
     catch { toast(t('gdetail.refillFail', { defaultValue: '설정 실패' })); }
-    loadGroup();
+    loadGroup(); loadWallet();
   };
 
   // 그룹 설정(표시명·가입 수락) — 목록에 있던 걸 상세로 옮겼다(관리는 상세 한 곳에서).
@@ -109,9 +132,17 @@ export default function GroupDetail() {
       {creditMode && (
         <div className="grid cols-2 mb" style={{ gap: 16, alignItems: 'start' }}>
           <CreditGrantCard balance={group?.balance} onGrant={submitGrant} hint={isPlatform ? t('groups.grantHintSuper') : t('groups.grantHintOrg')} />
-          <RefillCard key={group?.id} title={t('gdetail.refillTitle', { defaultValue: '팀 정기 리필' })}
-            current={{ recurringCredit: group?.recurringCredit, refillIntervalDays: group?.refillIntervalDays, carryover: group?.carryover }}
-            onSave={submitGroupRefill} />
+          <div>
+            <RefillCard key={group?.id} title={t('gdetail.refillTitle', { defaultValue: '팀 정기 리필' })}
+              current={{ recurringCredit: group?.recurringCredit, refillIntervalDays: group?.refillIntervalDays, carryover: group?.carryover }}
+              onSave={submitGroupRefill} />
+            <div className="flex" style={{ gap: 10, alignItems: 'center', marginTop: 10, flexWrap: 'wrap' }}>
+              <span className="muted flex" style={{ gap: 5, alignItems: 'center', fontSize: 12.5 }}>
+                <Clock size={13} /> {t('gdetail.nextRefill', { defaultValue: '다음 리필' })}: <b>{fmtNext(wallet?.nextRefillAt)}</b></span>
+              <button className="btn sm" onClick={doGroupRefillNow} disabled={!group?.recurringCredit}>
+                <RefreshCw size={13} /> {t('gdetail.refillNow', { defaultValue: '지금 리필' })}</button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -150,7 +181,17 @@ export default function GroupDetail() {
               <Select size="sm" value={r.role} onChange={(v) => setRole(r, v)}
                 options={ROLES.map((x) => ({ value: x, label: t(`roles.${x}`) }))} />) },
             { key: 'status', header: t('groups.colStatus'), render: (r) => <Pill variant={r.status === 'active' ? 'ok' : 'wait'} dot>{r.status}</Pill> },
-            { key: 'act', header: '', render: () => <ChevronRight size={15} style={{ color: 'var(--muted)' }} /> },
+            { key: 'act', header: '', className: 'flex', render: (r) => (
+              <span className="flex gap" style={{ gap: 6, alignItems: 'center' }}>
+                {creditMode && (<>
+                  <button className="btn sm" title={t('gdetail.memberRefillSet', { defaultValue: '정기 리필 설정' })}
+                    onClick={(e) => { e.stopPropagation(); setRefill({ userId: r.userId, name: r.name, recurring: r.recurringCredit || '', interval: '', carryover: false }); }}>
+                    <Coins size={13} /> {t('gdetail.refillMenu', { defaultValue: '리필' })}</button>
+                  <button className="btn sm" title={t('gdetail.refillNow', { defaultValue: '지금 리필' })}
+                    onClick={(e) => { e.stopPropagation(); doMemberRefillNow(r); }}><RefreshCw size={13} /></button>
+                </>)}
+                <ChevronRight size={15} style={{ color: 'var(--muted)' }} />
+              </span>) },
           ]}
         />
       </div>
@@ -170,6 +211,24 @@ export default function GroupDetail() {
           <Select value={add.role} onChange={(v) => setAdd({ ...add, role: v })}
             options={ROLES.map((x) => ({ value: x, label: t(`roles.${x}`) }))} />
           <div className="legend mt">{t('gdetail.roleHint')}</div>
+        </>)}
+      </Modal>
+
+      <Modal open={!!refill} title={t('gdetail.memberRefillTitle', { name: refill?.name, defaultValue: `정기 리필 — ${refill?.name || ''}` })} onClose={() => setRefill(null)} width={480}
+        footer={<>
+          <button className="btn" onClick={() => setRefill(null)}>{t('common.cancel')}</button>
+          <button className="btn primary" onClick={saveMemberRefill}>{t('common.save')}</button>
+        </>}>
+        {refill && (<>
+          <label className="fld" style={{ marginTop: 0 }}>{t('gdetail.refillAmount', { defaultValue: '정기 리필 금액 (C)' })}</label>
+          <input type="number" min={0} value={refill.recurring} onChange={(e) => setRefill({ ...refill, recurring: e.target.value })} placeholder="0" />
+          <label className="fld">{t('gdetail.refillInterval', { defaultValue: '주기 (일) — 비우면 팀 기본' })}</label>
+          <input type="number" min={0} value={refill.interval} onChange={(e) => setRefill({ ...refill, interval: e.target.value })} placeholder={t('gdetail.refillInheritPh', { defaultValue: '상속' })} />
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, cursor: 'pointer', marginTop: 12 }}>
+            <input type="checkbox" checked={refill.carryover} onChange={(e) => setRefill({ ...refill, carryover: e.target.checked })} />
+            {t('gdetail.refillCarryover', { defaultValue: '미사용분 이월(carryover)' })}
+          </label>
+          <div className="legend mt">{t('gdetail.memberRefillHint', { defaultValue: '설정한 금액이 주기마다 이 멤버 지갑에 지급됩니다. "지금 리필"로 즉시 지급도 가능합니다.' })}</div>
         </>)}
       </Modal>
 

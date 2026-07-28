@@ -9,7 +9,7 @@ type Repository interface {
 	SpendBySession(userID, groupID int64) ([]SessionSpend, error) // 세션별 소비 합계(원장 ref 기준)
 	UserTransactions(userID, groupID int64, limit int) ([]CreditTx, error)
 	DailyConsumption(userID, groupID int64, days int) ([]DailyPoint, error) // 잔디/달력 추이
-	AddMemberConsumed(userID, groupID int64, credits int) error            // showback 누적((user,group) 멤버십)
+	AddMemberConsumed(userID, groupID int64, credits int) error             // showback 누적((user,group) 멤버십)
 
 	GroupWallet(groupID int64) (*GroupWallet, error)
 	ApplyGroupTx(groupID int64, txType string, amount int, actor *int64, ref string) (int, error)
@@ -21,6 +21,8 @@ type Repository interface {
 	SetUserRefill(userID, groupID int64, recurring, intervalDays int, carryover bool) error
 	GroupRefillCap(groupID int64, platDefault int) int
 	UserRefillCap(groupID int64, platDefault int) int // 멤버십 지갑의 팀(group) 기준 리필 주기 상한
+	RefillNowUser(userID, groupID int64) (int, error) // 즉시 리필(멤버) — 정기 주기 무시하고 지금 적용
+	RefillNowGroup(groupID int64) (int, error)        // 즉시 리필(팀)
 }
 
 type gormRepo struct{ db *gorm.DB }

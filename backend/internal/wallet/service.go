@@ -108,6 +108,30 @@ func (s *Service) SetUserRefill(userID, groupID int64, spec RefillSpec) error {
 	return s.repo.SetUserRefill(userID, groupID, spec.Recurring, iv, spec.Carryover)
 }
 
+// RefillNowUser는 (user,group) 멤버십 지갑을 즉시 리필한다(설정된 정기 금액을 지금 지급).
+func (s *Service) RefillNowUser(userID, groupID int64) (int, error) {
+	return s.repo.RefillNowUser(userID, groupID)
+}
+
+// RefillNowGroup은 팀 지갑을 즉시 리필한다.
+func (s *Service) RefillNowGroup(groupID int64) (int, error) {
+	return s.repo.RefillNowGroup(groupID)
+}
+
+// nextRefill은 마지막 리필(cycle)과 실효 주기(effInterval)로 다음 리필 예정 시각을 계산한다.
+// recurring<=0(정기 없음) 또는 주기<=0 이면 nil. cycle 이 없으면(아직 한 번도 안 됨) 이미 도래 → now.
+func nextRefill(recurring, effIntervalDays int, cycle *time.Time) *time.Time {
+	if recurring <= 0 || effIntervalDays <= 0 {
+		return nil
+	}
+	if cycle == nil {
+		n := time.Now()
+		return &n
+	}
+	n := cycle.Add(time.Duration(effIntervalDays) * 24 * time.Hour)
+	return &n
+}
+
 // resolveGroup은 정산/조회에 쓸 팀을 정한다: 명시된 groupID 우선, 없으면 사용자의 대표 팀(pool).
 // 팀 없는 세션은 금지하므로 세션 정산 경로엔 항상 실제 팀이 온다 — 이 폴백은 groupID 미전달 방어용.
 func (s *Service) resolveGroup(userID, groupID int64) int64 {
@@ -144,11 +168,25 @@ func (s *Service) MyWallet(userID, groupID int64) (*MyWalletRes, error) {
 	if err != nil {
 		return nil, err
 	}
+	eff := w.RefillIntervalDays
+	if eff <= 0 {
+		eff = s.repo.UserRefillCap(g, s.platDefault())
+	}
+	w.NextRefillAt = nextRefill(w.RecurringCredit, eff, w.CycleStartedAt)
 	return &MyWalletRes{UserWallet: *w, History: hist, Trend: trend, BySession: bySession}, nil
 }
 
 func (s *Service) GroupWallet(groupID int64) (*GroupWallet, error) {
-	return s.repo.GroupWallet(groupID)
+	w, err := s.repo.GroupWallet(groupID)
+	if err != nil {
+		return nil, err
+	}
+	eff := w.RefillIntervalDays
+	if eff <= 0 {
+		eff = s.repo.GroupRefillCap(groupID, s.platDefault())
+	}
+	w.NextRefillAt = nextRefill(w.RecurringCredit, eff, w.CycleStartedAt)
+	return w, nil
 }
 
 func (s *Service) SetGroupBudget(groupID int64, req BudgetReq) error {
