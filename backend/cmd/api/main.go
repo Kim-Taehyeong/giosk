@@ -295,18 +295,13 @@ func main() {
 			}
 			return u, e
 		},
-		Wallet:   func(id int64) (any, error) { return walletSvc.MyWallet(id, 0) },
+		Wallet:   func(id, groupID int64) (any, error) { return walletSvc.MyWallet(id, groupID) },
 		Volumes:  func(id int64) (any, error) { return volumeSvc.List(id) },
-		Sessions: func(ctx context.Context, id int64) (any, error) { return sessionSvc.List(ctx, id, 0) },
+		Sessions: func(ctx context.Context, id, groupID int64) (any, error) { return sessionSvc.List(ctx, id, groupID) },
 		Datasets: func(ctx context.Context, id int64) (any, error) { return datasetSvc.List(ctx, id) },
 		JoinReqs: func(id int64) (any, error) { return groupSvc.MyJoinRequests(id) },
-		Usage: func(id int64) any { // billing.ByUser 전체에서 대상 사용자 1행(누적 GPU시간·소비)
-			for _, r := range billingRepo.ByUser() {
-				if r.ID == id {
-					return r
-				}
-			}
-			return nil
+		Usage: func(id, orgID, groupID int64) any { // 대상 사용자 사용량 — 스코프(팀/조직) 범위만 집계
+			return billingRepo.UserOneScoped(id, orgID, groupID)
 		},
 		UserHier: limitResolver.HierOfUser, // 매니저 스코프 검증(대상의 조직/그룹)
 		Members: func(id int64) (any, error) { // 전체 소속(조직/팀/역할) — 다중 소속 평면 나열
