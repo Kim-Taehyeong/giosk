@@ -4,11 +4,41 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
+
+// WaitPVCsBound은 지정한 PVC 들이 모두 Bound 될 때까지(또는 timeout) 기다린다.
+// PVC 는 생성 즉시 바인딩되지 않는데(비동기), hami-scheduler 는 unbound PVC 로 스케줄 실패 시
+// 재큐잉하지 않아 Pod 가 영구 Pending 이 된다 → Pod 생성 전에 바인딩을 보장한다.
+func (c *Client) WaitPVCsBound(ctx context.Context, ns string, names []string, timeout time.Duration) {
+	if !c.Available() || len(names) == 0 {
+		return
+	}
+	ctx2, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+	for {
+		allBound := true
+		for _, n := range names {
+			pvc, err := c.cs.CoreV1().PersistentVolumeClaims(ns).Get(ctx2, n, metav1.GetOptions{})
+			if err != nil || pvc.Status.Phase != corev1.ClaimBound {
+				allBound = false
+				break
+			}
+		}
+		if allBound {
+			return
+		}
+		select {
+		case <-ctx2.Done():
+			return // 타임아웃 — 그래도 Pod 생성 시도(최선)
+		case <-time.After(500 * time.Millisecond):
+		}
+	}
+}
 
 // SessionSpec은 세션 Pod 프로비저닝 입력(도메인 → k8s 변환 결과).
 type SessionSpec struct {

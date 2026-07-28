@@ -49,6 +49,7 @@ type Provisioner interface {
 	// 접속마다 다시 읽으므로, 실행 중 세션에도 키 등록/교체가 즉시 반영된다.
 	UpsertUserKeys(ctx context.Context, ns string, userID int64, keys string) error
 	CreateSessionPod(ctx context.Context, s k8s.SessionSpec) error
+	WaitPVCsBound(ctx context.Context, ns string, names []string, timeout time.Duration) // Pod 생성 전 PVC 바인딩 보장(스케줄 레이스 방지)
 	DeleteSessionPod(ctx context.Context, ns, name string) error
 	PodStatus(ctx context.Context, ns, name string) (*k8s.PodStatus, error)
 	PodLogs(ctx context.Context, ns, name string, tail int64) (string, error)
@@ -982,6 +983,19 @@ func (s *Service) provision(ctx context.Context, ns string, sess *Session, image
 			return err
 		}
 	}
+	// PVC(홈/볼륨/데이터셋)는 생성 즉시 바인딩되지 않는다. hami-scheduler 는 unbound PVC 로 스케줄
+	// 실패 후 재큐잉을 안 해 Pod 가 영구 Pending 이 되므로, Pod 생성 전에 바인딩을 기다린다.
+	var pvcNames []string
+	if homePVC != "" {
+		pvcNames = append(pvcNames, homePVC)
+	}
+	for _, m := range mounts {
+		if m.PVCName != "" {
+			pvcNames = append(pvcNames, m.PVCName)
+		}
+	}
+	s.prov.WaitPVCsBound(ctx, ns, pvcNames, 90*time.Second)
+
 	channels := s.sessionChannels(sess.ImageID, sess.WebPassword)
 	if err := s.prov.CreateSessionPod(ctx, k8s.SessionSpec{
 		Namespace:   ns,
