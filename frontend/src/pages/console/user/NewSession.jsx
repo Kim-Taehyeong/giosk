@@ -874,11 +874,11 @@ function DatasetNodePicker({ t, nodes, selGpuType, selNode, setSelNode }) {
             {matched.map((n) => {
               const on = selNode === n.node;
               return (
-                <div key={n.node} className={`selbox${on ? ' on' : ''}`}
-                  style={{ padding: 12, borderRadius: 10,
+                <div key={n.node} className={`selbox${on ? ' on' : ''}`} onClick={() => pickNode(n.node)}
+                  style={{ padding: 12, borderRadius: 10, cursor: 'pointer',
                     border: '2px solid ' + (on ? 'var(--primary)' : 'var(--border)'),
                     background: on ? 'var(--primary-soft)' : 'var(--surface)' }}>
-                  <div className="flex" style={{ justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => pickNode(n.node)}>
+                  <div className="flex" style={{ justifyContent: 'space-between' }}>
                     <span className="flex" style={{ gap: 8, fontWeight: 700 }}><Server size={15} color="var(--primary)" />{on && <CheckMark />}{n.node}</span>
                     <span className="muted" style={{ fontSize: 12.5 }}>{n.gpu}</span>
                   </div>
