@@ -700,6 +700,8 @@ func (s *Service) ToggleCache(ctx context.Context, datasetID int64, node string)
 	if _, exists := s.repo.CacheStatus(datasetID, node); exists {
 		_ = s.repo.CacheDelete(datasetID, node)
 		if s.prov != nil && s.cacheHost != "" {
+			// 진행 중이던 캐시 Job(복사/해제)을 먼저 죽여야 정리와 충돌·고아가 안 생긴다.
+			_ = s.prov.DeleteBuildJob(ctx, s.namespace, jobBase)
 			_ = s.prov.RunDatasetUncache(ctx, s.namespace, "rm-"+jobBase, node, s.cacheHost, d.Name)
 		}
 		return nil
