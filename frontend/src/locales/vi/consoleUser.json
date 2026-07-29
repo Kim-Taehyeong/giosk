@@ -156,7 +156,11 @@
     "regions": "Tính khả dụng của khu vực",
     "kpiNodes": "Các nút có sẵn",
     "kpiFree": "Miễn phí (không giới hạn)",
-    "kpiCooldown": "Thử lại thời gian hồi chiêu"
+    "kpiCooldown": "Thử lại thời gian hồi chiêu",
+    "slots": "Máy đánh bạc",
+    "hamiFractional": "Phân số (theo VRAM và lõi)",
+    "exclusiveWhole": "Dành riêng (toàn bộ thẻ)",
+    "hamiShared": "HAMi phân số"
   },
   "newSession": {
     "crumb": "Phiên",
@@ -310,7 +314,8 @@
     "grpGuaranteedDesc": "Chia sẻ VRAM của bạn được đảm bảo. Các phiên khác trên cùng GPU không thể chiếm bộ nhớ của bạn.",
     "guaranteeHint": "CPU và bộ nhớ được đảm bảo tương ứng với tỷ lệ chia sẻ GPU của bạn. Bạn có thể sử dụng nhiều hơn khi nút không hoạt động (đó là mức sàn, không phải mức giới hạn).",
     "grpSlotDesc": "Một số người thay phiên nhau sử dụng một GPU. Bộ nhớ không được đảm bảo — nếu một phiên khác làm cạn kiệt VRAM thì phiên của bạn cũng có thể bị lỗi.",
-    "sshKeyChange": "Thay đổi"
+    "sshKeyChange": "Thay đổi",
+    "sshCacheCount": "{{n}} được lưu vào bộ nhớ đệm"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "sshDirect": "Trực tiếp (mạng nội bộ)",
     "regenerated": "Đã ban hành một liên kết truy cập mới.",
     "sshNeedKey": "Chưa đăng ký khóa công khai SSH",
-    "sshNeedKeyHint": "Hãy đăng ký hoặc tạo một khóa bên dưới — phiên đang chạy sẽ áp dụng ngay."
+    "sshNeedKeyHint": "Hãy đăng ký hoặc tạo một khóa bên dưới — phiên đang chạy sẽ áp dụng ngay.",
+    "webConnectNewWindow": "Mở thiết bị đầu cuối trình duyệt trong một cửa sổ mới — không cần khóa SSH hoặc lệnh."
   },
   "account": {
     "title": "Cài đặt của tôi",
@@ -464,7 +470,8 @@
     "sshGenerate": "Tạo và tải khóa",
     "sshGenerated": "Đã tạo khóa. Hãy giữ an toàn khóa riêng đã tải — không thể tải lại lần nữa.",
     "sshGenFail": "Tạo khóa SSH thất bại.",
-    "sshGenerateHint": "Chưa có khóa? Nhấn “Tạo và tải khóa”. Khóa riêng (.pem) chỉ tải một lần và khóa công khai được đăng ký tự động. Kết nối: ssh -i khoa-da-tai.pem …"
+    "sshGenerateHint": "Chưa có khóa? Nhấn “Tạo và tải khóa”. Khóa riêng (.pem) chỉ tải một lần và khóa công khai được đăng ký tự động. Kết nối: ssh -i khoa-da-tai.pem …",
+    "activeScope": "Tích cực"
   },
   "notify": {
     "title": "Thông báo",
@@ -493,7 +500,19 @@
     "mIdle": "Thời gian rảnh của phiên",
     "sev_warn": "Cảnh báo",
     "sev_info": "Thông tin",
-    "sev_err": "Lỗi"
+    "sev_err": "Lỗi",
+    "inboxTitle": "Hộp thư đến",
+    "readAll": "Đánh dấu tất cả đã đọc",
+    "prev": "Trước",
+    "next": "Kế tiếp",
+    "mSessGpu": "Sử dụng GPU phiên",
+    "mSessVram": "Việc sử dụng VRAM phiên",
+    "scopeAccount": "Toàn bộ tài khoản",
+    "rulesHint": "Quy tắc cảnh báo và thông báo dành cho mỗi tài khoản và được chia sẻ giữa tất cả các nhóm. Số liệu phiên được đánh giá trên phiên đã chọn.",
+    "noSession": "Không có phiên chạy",
+    "mSessCpu": "Việc sử dụng CPU phiên",
+    "selectSession": "Chọn một phiên",
+    "inboxEmpty": "Chưa có thông báo nào."
   },
   "wallet": {
     "title": "Ví / Tín dụng",
@@ -535,7 +554,15 @@
     "topupNote": "Áp dụng sau khi quản trị viên nhóm của bạn phê duyệt (không thanh toán thực)",
     "topupSent": "Đã gửi yêu cầu (đang chờ quản trị viên nhóm phê duyệt)",
     "desc_gpu": "Mức sử dụng GPU ({{ref}})",
-    "desc_storage": "Lưu trữ ({{ref}})"
+    "desc_storage": "Lưu trữ ({{ref}})",
+    "nextRecharge": "Lần nạp tiếp theo",
+    "rechargeSoon": "Sớm",
+    "searchPh": "Tìm kiếm phiên, loại, chi tiết",
+    "rechargeEvery": "Mỗi ngày {{n}}",
+    "session": "Phiên họp",
+    "consumedCol": "tiêu thụ",
+    "viewAll": "Tất cả các mục",
+    "viewBySession": "Nhóm theo phiên"
   },
   "volume": {
     "title": "Dữ liệu/Khối lượng",
@@ -596,7 +623,16 @@
     "thisVol": "Tập này",
     "remain": "{{n}} GB còn lại",
     "overQuota": "Vượt quá hạn ngạch còn lại ({{remain}} GB)",
-    "quotaHint": "Giới hạn lưu trữ cho mỗi người dùng đối với ổ đĩa cá nhân của bạn (không phụ thuộc vào nhóm). Các tập mới sẽ bị chặn khi bạn vượt quá nó."
+    "quotaHint": "Giới hạn lưu trữ cho mỗi người dùng đối với ổ đĩa cá nhân của bạn (không phụ thuộc vào nhóm). Các tập mới sẽ bị chặn khi bạn vượt quá nó.",
+    "personal": "Riêng tư",
+    "changeTeam": "Thay đổi đội",
+    "teamHome": "Đã thanh toán cho nhóm",
+    "teamChanged": "Đội đã thay đổi",
+    "sharedBy": "Được chia sẻ bởi",
+    "teamQuota": "Vượt quá hạn ngạch khối lượng của nhóm mục tiêu",
+    "teamFail": "Không thể thay đổi đội",
+    "changeTeamTitle": "Thay đổi đội — {{name}}",
+    "teamHint": "Hạn ngạch dung lượng và tín dụng lưu trữ của khối lượng này đến từ nhóm đã chọn. Bạn vẫn là chủ sở hữu."
   },
   "gmembers": {
     "title": "Thành viên",

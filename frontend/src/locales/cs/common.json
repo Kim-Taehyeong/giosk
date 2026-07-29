@@ -67,7 +67,9 @@
       "errorPasswordShort": "Heslo musí mít alespoň 8 znaků.",
       "errorRequired": "Vyplňte prosím všechna povinná pole.",
       "submit": "Požádat o registraci",
-      "errorPasswordMismatch": "Hesla se neshodují."
+      "errorPasswordMismatch": "Hesla se neshodují.",
+      "pwMatch": "Hesla se shodují",
+      "pwMismatch": "Hesla se neshodují"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Uzly {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "Uzly {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "Uzly {{up}}/{{total}} · GPU —",
+    "clusterStatus": "Stav clusteru",
+    "orgWhole": "Celá organizace",
+    "alerts": "Upozornění",
+    "rolePlatformSub": "Super admin",
+    "creditBalance": "Zůstatek kreditu",
+    "rolePlatform": "Celá platforma",
+    "noAlerts": "Zatím žádná upozornění.",
+    "unreadN": "{{n}} nepřečteno",
+    "viewAll": "Zobrazit vše v Centru oznámení"
+  },
+  "table": {
+    "empty": "Žádná data"
+  },
+  "refill": {
+    "carryover": "Přenos",
+    "amount": "Kredity za cyklus",
+    "carryOff": "Vyprší",
+    "title": "Opakované doplňování",
+    "interval": "Cyklus doplňování (dny)",
+    "carryOn": "Přenést",
+    "note": "Doplní o toto množství v každém cyklu (0 jej deaktivuje). Cyklus nemůže být delší než cyklus rodiče a je automaticky omezen.",
+    "maxHint": "Limit rodičovského cyklu: {{n}} dnů nebo méně"
+  },
+  "select": {
+    "search": "Vyhledávání…",
+    "placeholder": "Vybrat",
+    "noMatch": "Žádná shoda"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "Tým {{target}} má málo kreditů",
+      "teamBody": "Týmové kredity {{target}} jsou na {{value}}, pod hranicí {{threshold}}. Relace v tomto týmu se mohou brzy zastavit."
+    }
+  },
+  "close": "Blízko"
 }

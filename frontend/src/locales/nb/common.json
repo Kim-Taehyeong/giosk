@@ -67,7 +67,9 @@
       "errorGroup": "Du må velge en organisasjon og en gruppe.",
       "submitting": "Sender inn...",
       "submit": "Be om påmelding",
-      "errorPasswordMismatch": "Passord stemmer ikke."
+      "errorPasswordMismatch": "Passord stemmer ikke.",
+      "pwMismatch": "Passord stemmer ikke",
+      "pwMatch": "Passord samsvarer"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Noder {{up}}/{{total}} · GPU {{gpu}} %",
-    "nodeBadgeNoGpu": "Noder {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "Noder {{up}}/{{total}} · GPU —",
+    "rolePlatformSub": "Super admin",
+    "orgWhole": "Hele organisasjonen",
+    "alerts": "Varsler",
+    "clusterStatus": "Klyngestatus",
+    "rolePlatform": "Hele plattformen",
+    "noAlerts": "Ingen varsler ennå.",
+    "creditBalance": "Kredittsaldo",
+    "unreadN": "{{n}} ulest",
+    "viewAll": "Se alt i varslingssenteret"
+  },
+  "table": {
+    "empty": "Ingen data"
+  },
+  "refill": {
+    "carryOff": "Utløpe",
+    "note": "Etterfylles med denne mengden hver syklus (0 deaktiverer den). Syklusen kan ikke være lengre enn forelderens og begrenses automatisk.",
+    "title": "Gjentakende påfylling",
+    "carryover": "Overføring",
+    "interval": "Påfyllingssyklus (dager)",
+    "amount": "Studiepoeng per syklus",
+    "carryOn": "Bær over",
+    "maxHint": "Grense for foreldresyklus: {{n}} dager eller færre"
+  },
+  "select": {
+    "placeholder": "Velge",
+    "search": "Søk...",
+    "noMatch": "Ingen kamp"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "{{target}}-teamet har lite kreditt",
+      "teamBody": "{{target}}-lagkreditter er på {{value}}, under {{threshold}}-terskelen. Økter i dette teamet kan stoppe snart."
+    }
+  },
+  "close": "Lukke"
 }

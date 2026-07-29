@@ -99,8 +99,8 @@ export default function DatasetDetail() {
           </div>
         </div>
         <div className="mt">
-          <label className="fld" style={{ marginTop: 6 }}>{t('datasets.description', { defaultValue: '설명' })}</label>
-          <textarea rows={2} value={descDraft ?? (ds.desc && ds.desc !== '—' ? ds.desc : '')}
+          <label className="fld" htmlFor="admin-datasetdetail-fld-0" style={{ marginTop: 6 }}>{t('datasets.description', { defaultValue: '설명' })}</label>
+          <textarea id="admin-datasetdetail-fld-0" rows={2} value={descDraft ?? (ds.desc && ds.desc !== '—' ? ds.desc : '')}
             onChange={(e) => setDescDraft(e.target.value)}
             placeholder={t('datasets.descPh', { defaultValue: '데이터셋 설명을 입력하세요' })}
             style={{ width: '100%', resize: 'vertical' }} />
@@ -136,7 +136,7 @@ export default function DatasetDetail() {
                         <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{c?.progress || 0}%</span>
                       </div>
                       <div style={{ height: 7, borderRadius: 4, background: 'var(--surface)', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${c?.progress || 0}%`, background: 'var(--primary)', transition: 'width .5s' }} />
+                        <div className="progress-fill" style={{ '--p': (c?.progress || 0) / 100 }} />
                       </div>
                     </div>
                   ); })()}

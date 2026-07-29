@@ -67,7 +67,9 @@
       "errorGroup": "Lazima uchague shirika na kikundi.",
       "errorTerms": "Lazima ukubali sheria na masharti ili kujisajili.",
       "errorGeneric": "Kujisajili kumeshindwa.",
-      "errorPasswordMismatch": "Manenosiri hayalingani."
+      "errorPasswordMismatch": "Manenosiri hayalingani.",
+      "pwMatch": "Manenosiri yanalingana",
+      "pwMismatch": "Manenosiri hayalingani"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Nodi {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "Nodi {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "Nodi {{up}}/{{total}} · GPU —",
+    "unreadN": "{{n}} haijasomwa",
+    "noAlerts": "Bado hakuna arifa.",
+    "orgWhole": "Shirika zima",
+    "rolePlatform": "Jukwaa zima",
+    "rolePlatformSub": "Msimamizi mkuu",
+    "clusterStatus": "Hali ya nguzo",
+    "creditBalance": "Salio la mkopo",
+    "alerts": "Tahadhari",
+    "viewAll": "Tazama yote katika Kituo cha Arifa"
+  },
+  "table": {
+    "empty": "Hakuna data"
+  },
+  "refill": {
+    "carryOn": "Endelea",
+    "amount": "Mikopo kwa kila mzunguko",
+    "carryover": "Usafirishaji",
+    "maxHint": "Kikomo cha mzunguko wa mzazi: siku {{n}} au chache",
+    "note": "Hujaza tena kwa kiasi hiki kila mzunguko (0 huizima). Mzunguko hauwezi kuwa mrefu kuliko wa mzazi na huwekwa kiotomatiki.",
+    "carryOff": "Muda wake unaisha",
+    "interval": "Mzunguko wa kujaza tena (siku)",
+    "title": "Kujaza mara kwa mara"
+  },
+  "select": {
+    "placeholder": "Chagua",
+    "search": "Tafuta...",
+    "noMatch": "Hakuna mechi"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "Timu ya {{target}} ina mikopo ya chini",
+      "teamBody": "Salio za timu ya {{target}} ziko {{value}}, chini ya kiwango cha {{threshold}}. Vipindi katika timu hii vinaweza kusimamishwa hivi karibuni."
+    }
+  },
+  "close": "Funga"
 }

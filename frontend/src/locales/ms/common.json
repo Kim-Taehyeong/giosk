@@ -67,7 +67,9 @@
       "errorAdvisor": "Pelajar prasiswazah dan siswazah mesti menyediakan penasihat.",
       "subtitle": "Isi borang di bawah. Anda boleh log masuk sebaik sahaja pentadbir meluluskan permintaan anda.",
       "errorTerms": "Anda mesti menerima syarat untuk mendaftar.",
-      "errorPasswordMismatch": "Kata laluan tidak sepadan."
+      "errorPasswordMismatch": "Kata laluan tidak sepadan.",
+      "pwMismatch": "Kata laluan tidak sepadan",
+      "pwMatch": "Kata laluan sepadan"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Nod {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "Nod {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "Nod {{up}}/{{total}} · GPU —",
+    "rolePlatformSub": "Pentadbir super",
+    "creditBalance": "Baki kredit",
+    "orgWhole": "Keseluruhan organisasi",
+    "noAlerts": "Tiada makluman lagi.",
+    "rolePlatform": "Seluruh platform",
+    "alerts": "Makluman",
+    "clusterStatus": "Status kluster",
+    "unreadN": "{{n}} belum dibaca",
+    "viewAll": "Lihat semua dalam Pusat Pemberitahuan"
+  },
+  "table": {
+    "empty": "Tiada data"
+  },
+  "refill": {
+    "carryOn": "bawa balik",
+    "title": "Isi semula berulang",
+    "amount": "Kredit setiap kitaran",
+    "interval": "Kitaran isi semula (hari)",
+    "carryover": "Pemindahan",
+    "carryOff": "tamat tempoh",
+    "maxHint": "Had kitaran ibu bapa: {{n}} hari atau kurang",
+    "note": "Isi semula dengan jumlah ini setiap kitaran (0 menyahdayakannya). Kitaran tidak boleh lebih lama daripada kitaran ibu bapa dan dihadkan secara automatik."
+  },
+  "select": {
+    "placeholder": "Pilih",
+    "search": "Cari…",
+    "noMatch": "Tiada jodoh"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "Pasukan {{target}} kekurangan kredit",
+      "teamBody": "Kredit pasukan {{target}} berada pada {{value}}, di bawah ambang {{threshold}}. Sesi dalam pasukan ini mungkin berhenti tidak lama lagi."
+    }
+  },
+  "close": "tutup"
 }

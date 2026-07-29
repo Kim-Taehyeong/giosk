@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { BookOpen, Rocket, Cpu, Database, Coins, Boxes, HardDrive, Building2, UserPlus, BellRing } from 'lucide-react';
 import PageHead from '../../../components/console/PageHead';
 import { GUIDES } from '../../../config/guides';
+import { clickable } from '../../../utils/a11y';
 
 const GUIDE_ICON = {
   start: Rocket, session: Boxes, gpu: Cpu, volume: HardDrive, dataset: Database,
@@ -24,7 +25,7 @@ export default function Guide() {
           {GUIDES.map((g) => {
             const Icon = GUIDE_ICON[g.id] || BookOpen;
             return (
-              <div className="task-card" key={g.id} onClick={() => navigate(`/console/guide/${g.id}`)}>
+              <div className="task-card" key={g.id} {...clickable(() => navigate(`/console/guide/${g.id}`))}>
                 <div className="ico" style={{ background: 'var(--primary-soft)', color: 'var(--primary)' }}><Icon size={22} /></div>
                 <h4>{g.title[lang]}</h4>
                 <p>{t('guide.readMore')} →</p>

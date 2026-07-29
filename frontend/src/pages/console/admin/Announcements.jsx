@@ -139,23 +139,23 @@ export default function Announcements() {
         )}>
         {edit && (
           <>
-            <label className="fld" style={{ marginTop: 0 }}>{t('announce.level')}</label>
-            <Select value={edit.level} onChange={(v) => setEdit({ ...edit, level: v })} options={levelOpts} />
-            <label className="fld">{t('announce.fTitle')}</label>
-            <input type="text" value={edit.title} onChange={(e) => setEdit({ ...edit, title: e.target.value })} placeholder={t('announce.titlePh')} />
-            <label className="fld">{t('announce.fBody')}</label>
-            <textarea value={edit.body} onChange={(e) => setEdit({ ...edit, body: e.target.value })} placeholder={t('announce.bodyPh')} style={{ minHeight: 90 }} />
+            <label className="fld" id="admin-announcements-fld-0-lbl" style={{ marginTop: 0 }}>{t('announce.level')}</label>
+            <Select ariaLabelledBy="admin-announcements-fld-0-lbl" value={edit.level} onChange={(v) => setEdit({ ...edit, level: v })} options={levelOpts} />
+            <label className="fld" htmlFor="admin-announcements-fld-1">{t('announce.fTitle')}</label>
+            <input id="admin-announcements-fld-1" type="text" value={edit.title} onChange={(e) => setEdit({ ...edit, title: e.target.value })} placeholder={t('announce.titlePh')} />
+            <label className="fld" htmlFor="admin-announcements-fld-2">{t('announce.fBody')}</label>
+            <textarea id="admin-announcements-fld-2" value={edit.body} onChange={(e) => setEdit({ ...edit, body: e.target.value })} placeholder={t('announce.bodyPh')} style={{ minHeight: 90 }} />
 
             {/* 타겟 — group 관리자는 자기 그룹 고정(선택 UI 없음). */}
             {lvl === 'group' ? (
               <>
-                <label className="fld">{t('announce.target')}</label>
+                <label className="fld" id="admin-announcements-fld-3-lbl">{t('announce.target')}</label>
                 <div className="legend">{t('announce.tgGroupFixed')}</div>
               </>
             ) : (
               <>
                 <label className="fld">{t('announce.target')}</label>
-                <Select value={edit._mode || defaultMode}
+                <Select ariaLabelledBy="admin-announcements-fld-3-lbl" value={edit._mode || defaultMode}
                   onChange={(v) => setEdit({ ...edit, _mode: v, targetOrgId: null, targetGroupId: null })}
                   options={modeOpts} />
                 {(edit._mode || defaultMode) === 'org' && lvl === 'platform' && (

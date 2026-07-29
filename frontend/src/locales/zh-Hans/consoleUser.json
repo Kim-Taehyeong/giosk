@@ -156,7 +156,11 @@
     "nodeAvail": "每个节点的可用性",
     "kpiNodes": "可用节点",
     "kpiMaxLease": "最大租期",
-    "gpuAvail": "GPU可用"
+    "gpuAvail": "GPU可用",
+    "slots": "老虎机",
+    "exclusiveWhole": "专用（全卡）",
+    "hamiShared": "HAMi 分数",
+    "hamiFractional": "小数（按 VRAM 和内核）"
   },
   "newSession": {
     "crumb": "会议",
@@ -310,7 +314,8 @@
     "grpSlotDesc": "几个人轮流使用一个 GPU。内存无法得到保证——如果另一个会话耗尽了 VRAM，您的会话也可能会失败。",
     "notEnough": "学分不足 — 至少需要 1 小时",
     "grpSlot": "共享插槽 · 更便宜，但没有保证",
-    "sshKeyChange": "更改"
+    "sshKeyChange": "更改",
+    "sshCacheCount": "{{n}} 已缓存"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "sshDirectInHint": "绕过网关，从办公网络内部直接连接到节点。",
     "sshDirect": "直接（内联网）",
     "sshNeedKey": "尚未注册 SSH 公钥",
-    "sshNeedKeyHint": "请在下方注册或生成；运行中的会话会立即生效。"
+    "sshNeedKeyHint": "请在下方注册或生成；运行中的会话会立即生效。",
+    "webConnectNewWindow": "在新窗口中打开浏览器终端 - 无需 SSH 密钥或命令。"
   },
   "account": {
     "title": "我的设置",
@@ -464,7 +470,8 @@
     "sshGenerate": "生成并下载密钥",
     "sshGenerated": "密钥已生成。请妥善保管下载的私钥——它无法再次下载。",
     "sshGenFail": "SSH 密钥生成失败。",
-    "sshGenerateHint": "还没有密钥？点击“生成并下载密钥”。私钥（.pem）只会下载一次，公钥自动注册。连接方式：ssh -i 下载的密钥.pem …"
+    "sshGenerateHint": "还没有密钥？点击“生成并下载密钥”。私钥（.pem）只会下载一次，公钥自动注册。连接方式：ssh -i 下载的密钥.pem …",
+    "activeScope": "积极的"
   },
   "notify": {
     "title": "通知",
@@ -493,7 +500,19 @@
     "saved": "已保存 {{n}} 规则",
     "sev_info": "信息",
     "sev_warn": "警告",
-    "sev_err": "错误"
+    "sev_err": "错误",
+    "inboxTitle": "收件箱",
+    "inboxEmpty": "还没有通知。",
+    "readAll": "标记全部已读",
+    "prev": "以前的",
+    "next": "下一个",
+    "mSessVram": "会话 VRAM 利用率",
+    "mSessGpu": "会话 GPU 利用率",
+    "selectSession": "选择一个会话",
+    "scopeAccount": "全账户",
+    "mSessCpu": "会话CPU利用率",
+    "noSession": "没有正在运行的会话",
+    "rulesHint": "警报规则和通知针对每个帐户并在所有团队之间共享。会话指标是在选定的会话上评估的。"
   },
   "wallet": {
     "title": "钱包/积分",
@@ -535,7 +554,15 @@
     "topupNote": "群管理员批准后申请（无需实际付款）",
     "topupSent": "请求已发送（等待群组管理员批准）",
     "desc_storage": "存储（{{ref}}）",
-    "desc_gpu": "GPU 使用情况 ({{ref}})"
+    "desc_gpu": "GPU 使用情况 ({{ref}})",
+    "nextRecharge": "下次补充",
+    "rechargeSoon": "很快",
+    "session": "会议",
+    "consumedCol": "已消耗",
+    "viewBySession": "按会话分组",
+    "viewAll": "所有参赛作品",
+    "rechargeEvery": "每{{n}}天",
+    "searchPh": "搜索会话、类型、详细信息"
   },
   "volume": {
     "title": "数据/体积",
@@ -596,7 +623,16 @@
     "thisVol": "本卷",
     "afterUse": "之后使用",
     "overQuota": "超出剩余配额 ({{remain}} GB)",
-    "quotaHint": "个人卷的每用户存储限制（独立于组）。一旦超过它，新的卷就会被阻止。"
+    "quotaHint": "个人卷的每用户存储限制（独立于组）。一旦超过它，新的卷就会被阻止。",
+    "sharedBy": "分享者",
+    "personal": "个人的",
+    "changeTeam": "改变团队",
+    "teamHome": "向团队计费",
+    "changeTeamTitle": "改变团队——{{name}}",
+    "teamFail": "无法更改团队",
+    "teamChanged": "团队发生了变化",
+    "teamQuota": "超过目标团队的数量配额",
+    "teamHint": "该卷的容量配额和存储积分来自所选团队。您仍然是所有者。"
   },
   "gmembers": {
     "title": "会员",

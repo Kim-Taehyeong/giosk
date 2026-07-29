@@ -14,6 +14,7 @@ import {
   getAdminGpuTypes, getGpuPricing, setGpuPricing,
 } from '../../../api/console/resources';
 import { c } from '../../../lib/credit';
+import { tabbable } from '../../../utils/a11y';
 
 function Field({ label, children, w = 150 }) {
   return (
@@ -89,17 +90,17 @@ function OfferingsTab({ creditMode, onGotoPricing, title }) {
         </>}>
         {edit && (
           <div className="grid" style={{ gap: 12 }}>
-            <div><label className="fld" style={{ marginTop: 0 }}>{t('res.fName')}</label>
-              <input type="text" value={edit.name} onChange={(e) => setEdit({ ...edit, name: e.target.value })} placeholder="A100 Medium" /></div>
-            <div><label className="fld" style={{ marginTop: 0 }}>{t('res.fGpuModel')}</label>
-              <Select value={edit.gpuType} placeholder={t('res.selectGpu')} width="100%"
+            <div><label className="fld" htmlFor="admin-resources-fld-0" style={{ marginTop: 0 }}>{t('res.fName')}</label>
+              <input id="admin-resources-fld-0" type="text" value={edit.name} onChange={(e) => setEdit({ ...edit, name: e.target.value })} placeholder="A100 Medium" /></div>
+            <div><label className="fld" id="admin-resources-fld-1-lbl" style={{ marginTop: 0 }}>{t('res.fGpuModel')}</label>
+              <Select ariaLabelledBy="admin-resources-fld-1-lbl" value={edit.gpuType} placeholder={t('res.selectGpu')} width="100%"
                 onChange={(v) => setEdit({ ...edit, gpuType: v })}
                 options={gpuTypes.map((g) => ({ value: g.name, label: g.name }))} /></div>
             <div className="grid cols-2" style={{ gap: 12 }}>
-              <div><label className="fld" style={{ marginTop: 0 }}>{t('res.fVram')}</label>
-                <input type="number" value={edit.vramMb} onChange={(e) => setEdit({ ...edit, vramMb: Number(e.target.value) })} /></div>
-              <div><label className="fld" style={{ marginTop: 0 }}>{t('res.fCore')}</label>
-                <input type="number" value={edit.corePercent} onChange={(e) => setEdit({ ...edit, corePercent: Number(e.target.value) })} /></div>
+              <div><label className="fld" htmlFor="admin-resources-fld-2" style={{ marginTop: 0 }}>{t('res.fVram')}</label>
+                <input id="admin-resources-fld-2" type="number" value={edit.vramMb} onChange={(e) => setEdit({ ...edit, vramMb: Number(e.target.value) })} /></div>
+              <div><label className="fld" htmlFor="admin-resources-fld-3" style={{ marginTop: 0 }}>{t('res.fCore')}</label>
+                <input id="admin-resources-fld-3" type="number" value={edit.corePercent} onChange={(e) => setEdit({ ...edit, corePercent: Number(e.target.value) })} /></div>
             </div>
             {creditMode && <div className="legend">{t('res.priceInPricingHint', { defaultValue: '단가는 저장 후 “단가” 탭에서 설정합니다(또는 GPU 단가로 자동 채우기).' })}</div>}
           </div>
@@ -286,8 +287,8 @@ export default function Resources() {
       <PageHead icon={Boxes} title={t('res.title')} subtitle={t('res.subtitle')} />
       <div className="legend mb">{t('res.catalogNote')}</div>
       <div className="subtabs">
-        <span className={`st${tab === 'offerings' ? ' active' : ''}`} onClick={() => setTab('offerings')}>{t('res.tabOfferings')}</span>
-        {creditMode && <span className={`st${tab === 'pricing' ? ' active' : ''}`} onClick={() => setTab('pricing')}>{t('res.tabPricing')}</span>}
+        <span className={`st${tab === 'offerings' ? ' active' : ''}`} {...tabbable(() => setTab('offerings'), tab === 'offerings')}>{t('res.tabOfferings')}</span>
+        {creditMode && <span className={`st${tab === 'pricing' ? ' active' : ''}`} {...tabbable(() => setTab('pricing'), tab === 'pricing')}>{t('res.tabPricing')}</span>}
       </div>
       {tab === 'offerings' ? (
         <OfferingsTab creditMode={creditMode} title={title} onGotoPricing={() => setTab('pricing')} />

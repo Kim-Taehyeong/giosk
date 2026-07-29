@@ -53,7 +53,8 @@
     "back": "Tilbake",
     "optional": "(valgfri)",
     "empty": "Ingen data",
-    "advanced": "Flere innstillinger"
+    "advanced": "Flere innstillinger",
+    "prev": "Tidligere"
   },
   "dash": {
     "title": "Dashbord",
@@ -197,7 +198,10 @@
     "groupPickOrgFirst": "Velg en organisasjon først",
     "colMemberRole": "Org/lagrolle",
     "totalN": "{{n}}-brukere",
-    "advBelong": "Medlemskap · rolle · passord"
+    "advBelong": "Medlemskap · rolle · passord",
+    "colRefill": "Gjentakende påfylling",
+    "refillDefault": "Misligholde",
+    "colBalance": "Gjeldende saldo"
   },
   "groups": {
     "title": "Grupper",
@@ -248,7 +252,18 @@
     "createFail": "Kunne ikke opprette gruppe",
     "bulkDone": "Massetillagte {{n}}-grupper",
     "adminOpt": "Gruppeadministrator (valgfritt)",
-    "grantFail": "Kunne ikke gi kreditt."
+    "grantFail": "Kunne ikke gi kreditt.",
+    "colRefill": "Gjentakende påfylling",
+    "refillDefault": "Misligholde",
+    "refillInterval": "Påfyllingssyklus (dager)",
+    "initCreditAmt": "Innledende studiepoeng",
+    "deleteFail": "Sletting mislyktes",
+    "hasMembers": "Dette laget har fortsatt medlemmer. Flytt eller fjern dem før du sletter dem.",
+    "refillAmt": "Gjentakende påfylling (per syklus)",
+    "carryover": "Overfør ubrukte kreditter",
+    "cantDeleteDefault": "Standardteamet kan ikke slettes.",
+    "initCredit": "Innledende kreditter og gjentakende påfyll",
+    "initCreditHint": "Eventuelt allokere fra organisasjonspoolen og angi en refill når du oppretter teamet. Du kan også gjøre dette senere på teamets detaljside."
   },
   "orgs": {
     "title": "Organisasjoner",
@@ -292,7 +307,11 @@
     "defaultGroupBudget": "Standard gruppebudsjett (C)",
     "bulkDone": "Massetillagte {{n}}-organisasjoner",
     "adminHintOpt": "La det stå tomt for å opprette bare 'Generelt'-gruppen og tilordne en administrator senere, fra organisasjonsdetalj → Generelt → Legg til medlem med organisasjonsadministratorrollen.",
-    "adminOpt": "Organisasjonsadministrator (valgfritt)"
+    "adminOpt": "Organisasjonsadministrator (valgfritt)",
+    "colRefill": "Gjentakende påfylling",
+    "refillDefault": "Misligholde",
+    "deleteFail": "Sletting mislyktes",
+    "hasUsers": "Denne organisasjonen har fortsatt brukere. Flytt eller fjern dem før du sletter dem."
   },
   "billing": {
     "title": "Fakturering",
@@ -318,7 +337,12 @@
     "byUser": "Forbruk etter bruker",
     "byGroup": "Forbruk etter gruppe (showback)",
     "vsAlloc": "vs allok",
-    "consumed": "Studiepoeng"
+    "consumed": "Studiepoeng",
+    "periodAll": "Hele tiden",
+    "periodLastMonth": "Forrige måned",
+    "period7d": "Siste 7 dager",
+    "periodMonth": "Denne måneden",
+    "periodNote": "Forbruk og GPU-timer som vises er det som skjedde i den valgte perioden, i henhold til hovedboken. Budsjetter og puljer er ikke periodisert."
   },
   "audit": {
     "title": "Revisjonslogg",
@@ -476,7 +500,10 @@
     "impFail": "Import mislyktes",
     "impOwnerHint": "Velg en konto fra listen for å importere.",
     "impOwnerPicked": "Valgt: {{name}} ({{id}})",
-    "metricsOffNotice": "Overvåking (DCGM/Prometheus) er ikke installert, så GPU-bruk og VRAM kan ikke vises. Slå på overvåking for å se sanntidsmålinger."
+    "metricsOffNotice": "Overvåking (DCGM/Prometheus) er ikke installert, så GPU-bruk og VRAM kan ikke vises. Slå på overvåking for å se sanntidsmålinger.",
+    "cordon": "Cordon",
+    "noMetrics": "Ingen beregninger",
+    "uncordon": "Uncordon"
   },
   "mset": {
     "title": "Innstillinger",
@@ -599,7 +626,21 @@
     "moveFail": "Flytting mislyktes",
     "pickGroup": "Velg en gruppe",
     "moveTitle": "Flytt {{name}} til en annen gruppe",
-    "removeConfirm": "Fjern denne brukeren fra {{group}}."
+    "removeConfirm": "Fjern denne brukeren fra {{group}}.",
+    "memberAdded": "Medlemskap lagt til.",
+    "addFail": "Kunne ikke legge til",
+    "suspend": "Henge",
+    "restore": "Restaurere",
+    "grantAmount": "Kreditter å gi (C; negative fradrag)",
+    "noTeamsInOrg": "Denne organisasjonen har ingen lag.",
+    "statusConfirm": "Dette endrer brukerens status.",
+    "grantFail": "Grant mislyktes",
+    "granted": "Innvilget {{n}} C",
+    "pickOrg": "Velg en organisasjon",
+    "addMembership": "Legg til medlemskap",
+    "grantTitle": "Gi kreditter – {{name}}",
+    "grant": "Gi studiepoeng",
+    "grantHint": "Påført personlig kredittsaldo umiddelbart og registrert i revisjonsloggen som en engangsjustering."
   },
   "clusters": {
     "title": "Klynger",
@@ -699,7 +740,12 @@
     "webName": "Kanalnavn (valgfritt)",
     "imgRefHint": "Trekk og bruk en Docker Hub / eksternt registerbilde som det er (ingen build). f.eks. codercom/code-server: siste",
     "extSshOnly": "Uten VSCode/Jupyter/egendefinert port, er økter på dette bildet kun for SSH.",
-    "webPort": "Egendefinert nettport (valgfritt)"
+    "webPort": "Egendefinert nettport (valgfritt)",
+    "loading": "…",
+    "info": "Bilde info",
+    "notCached": "Ikke bufret",
+    "notFound": "Finner ikke bilde.",
+    "logsHint": "Laster bygge- og skannelogger."
   },
   "anotify": {
     "title": "Varsler",
@@ -886,7 +932,23 @@
     "brandingNote": "Tilpass tjenestenavnet og logofargen for organisasjonen din. Brukes umiddelbart på pålogging og konsolloverskrift.",
     "brandAccentHint": "La stå tomt for å bruke temafargen.",
     "leaseHead": "Øktutvidelse (førstemann til mølla)",
-    "brandAccent": "Logo farge"
+    "brandAccent": "Logo farge",
+    "carryoverOn": "Overfør ubrukte kreditter",
+    "rechargeCarryover": "Tillat overføring",
+    "rechargeEnabled": "Aktiver gjentakende påfylling",
+    "rechargeSaved": "Påfyllingsinnstillinger lagret.",
+    "rechargeTitle": "Gjentakende kredittpåfylling (standard og grense)",
+    "brandIconClear": "Fjerne",
+    "carryoverOff": "Utløper hver syklus",
+    "brandSubtitle": "Undertekst",
+    "rechargeNote": "Plattformens standard påfyllingssyklus og overføringspolicy. Organisasjoner, lag og enkeltpersoner kan velge en kortere syklus, men aldri en lengre, og når en forelder ikke tillater overføring, utløper ubrukte kreditter under den ved den grensen.",
+    "rechargeAmountHint": "Angi påfyllingsmengder per organisasjon, per team og per bruker, sykluser og overføring på detaljsidene deres. En syklus kan aldri være lengre enn foreldrenes.",
+    "rechargeInterval": "Standard påfyllingssyklus (dager) · grense for lavere nivåer",
+    "brandIconTooBig": "Ikonet må være 120 KB eller mindre.",
+    "brandIconUploadHint": "Et opplastet ikon har forrang over Lucide-ikonet ovenfor. PNG eller SVG under 120KB anbefales.",
+    "brandIconUpload": "Last opp et ikon (valgfritt)",
+    "brandIcon": "Ikon",
+    "brandSubtitleHint": "Liten tekst ved siden av logoen. La stå tomt for å skjule det."
   },
   "datasets": {
     "title": "Datasett",
@@ -932,7 +994,40 @@
     "assignTitle": "Cache node tilordning",
     "measuring": "Måler …",
     "assignHint": "Velg hvilke noder som cacher dette datasettet. Det trekkes ut fra NFS til nodelokalt for umiddelbar bruk.",
-    "notCached": "Ikke bufret"
+    "notCached": "Ikke bufret",
+    "descSaved": "Beskrivelse lagret.",
+    "phaseExtract": "Trekker ut",
+    "description": "Beskrivelse",
+    "descFail": "Kunne ikke lagre beskrivelsen",
+    "sizeClass": "Størrelsesklasse",
+    "notFound": "Datasett ikke funnet.",
+    "sizeClassSaved": "Størrelsesklasse lagret.",
+    "cacheFail": "Bufferforespørsel mislyktes",
+    "info": "Datasett info",
+    "phaseDownload": "Laster ned",
+    "cache": "Nodebuffer",
+    "descPh": "Beskriv dette datasettet",
+    "phaseCopy": "Kopierer",
+    "regNeedName": "Skriv inn et datasettnavn.",
+    "regNeedUrl": "Skriv inn en URL.",
+    "regStarted": "Registrering startet — spor fremdriften i listen.",
+    "regNeedFile": "Velg en fil fra innboksen.",
+    "regBusy": "Registrerer …",
+    "regNfs": "NFS-kopi (SCP)",
+    "upTaken": "Et datasett med det navnet finnes allerede.",
+    "registering": "Registrerer",
+    "regFail": "Registreringen mislyktes",
+    "regRefresh": "Forfriske",
+    "regSizeClass": "Størrelsesklasse",
+    "upScope": "Synlighet",
+    "regUrlField": "Last ned URL",
+    "regTitle": "Registrer datasett",
+    "extracting": "Trekker ut …",
+    "regUrl": "URL (wget)",
+    "regNfsHint": "Kopier et arkiv (zip, tar, tar.gz) til banen nedenfor, og velg deretter filen for å registrere den. Registrering flytter den ut av innboksen og trekker den ut automatisk.",
+    "regInboxFile": "Innboksfil",
+    "regInboxEmpty": "Innboksen er tom. Kopier en fil til banen ovenfor, og oppdater deretter.",
+    "regUrlHint": "Serveren laster ned denne nettadressen direkte - ingenting lastes opp fra nettleseren din. Spor fremgang i listen."
   },
   "announce": {
     "title": "Kunngjøringer",
@@ -1054,7 +1149,8 @@
     "pickTarget": "Velg mål",
     "removeConfirm": "Hvis du sletter '{{name}}'-policyen, arves den fra omfanget ovenfor. Fortsette?",
     "globalNeedsValue": "Alle fire globale grensene må være minst 1",
-    "globalHint": "Global er reserven for alle – den kan ikke være tom og må være minst 1. Org/gruppe/brukeromfang kan overstyre den."
+    "globalHint": "Global er reserven for alle – den kan ikke være tom og må være minst 1. Org/gruppe/brukeromfang kan overstyre den.",
+    "capHint": "Maksimalt tillatt — GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · volum ≤ {{vol}}GiB · samtidige økter ≤ {{sess}}"
   },
   "roles": {
     "org_admin": "Organisasjonsadmin",
@@ -1070,7 +1166,16 @@
     "usersCapped": "viser første {{shown}} av {{total}}",
     "usersHint": "Rolle er brukerens rolle i gruppen sin. Endre det fra den gruppens medlemsadministrasjon.",
     "inGroup": "Administrer i gruppe",
-    "subtitle": "Identifikator {{name}} · administrere sine grupper, brukere og kreditter her"
+    "subtitle": "Identifikator {{name}} · administrere sine grupper, brukere og kreditter her",
+    "recurringAmount": "Studiepoeng per syklus",
+    "recurringInterval": "Påfyllingssyklus (dager)",
+    "recurringCarryover": "Overføring",
+    "carryOn": "Bær over",
+    "carryOff": "Utløpe",
+    "recurringTitle": "Gjentakende studiepoeng",
+    "maxIntervalHint": "Plattformgrense: {{n}} dager eller færre",
+    "recurringNote": "Fyller organisasjonspoolen med dette beløpet hver syklus (0 deaktiverer den).",
+    "recurringSaved": "Gjentakende kreditter er lagret."
   },
   "gdetail": {
     "title": "Gruppe",
@@ -1098,7 +1203,25 @@
     "moveFail": "Kunne ikke flytte",
     "needTarget": "Velg en målgruppe",
     "roleSet": "Endret {{name}}s rolle til {{role}}",
-    "moved": "Flyttet {{name}} til {{group}}"
+    "moved": "Flyttet {{name}} til {{group}}",
+    "noRecurring": "Ingen gjentakende påfyllingsmengde er angitt",
+    "refillCol": "Gjentakende påfylling",
+    "refillMenu": "Fylle på",
+    "refilledNow": "Etterfylt nå: +{{n}} C",
+    "refillSaved": "Gjentakende påfyll er lagret.",
+    "refillFail": "Påfyll mislyktes",
+    "nextRefill": "Neste påfyll",
+    "refillCarryover": "Overfør ubrukte kreditter",
+    "noRecurringShort": "Ingen gjentakende påfylling",
+    "memberRefillSaved": "Gjentakende påfyll er lagret",
+    "refillNow": "Fyll på nå",
+    "memberRefillSet": "Still inn gjentakende påfylling",
+    "refillTitle": "Gjentakende påfylling av team",
+    "refillAmount": "Gjentakende påfyllingsmengde (C)",
+    "memberRefillTitle": "Gjentakende påfyll - {{name}}",
+    "refillInterval": "Syklus (dager) — la stå tomt for teamstandard",
+    "memberRefillHint": "Dette beløpet betales inn i medlemmets lommebok hver syklus. Bruk \"Påfyll nå\" for å betale den umiddelbart.",
+    "refillInheritPh": "Nedarvet"
   },
   "picker": {
     "allOrgs": "Alle organisasjoner",
@@ -1125,5 +1248,8 @@
   "brand": "Giosk konsoll",
   "confirmDelete": "Vil du slette dette? Dette kan ikke angres.",
   "confirmTerminate": "Tvangsavslutte denne økten? Arbeidet i gang stopper umiddelbart.",
-  "confirmRemoveMember": "Vil du fjerne dette medlemmet fra gruppen?"
+  "confirmRemoveMember": "Vil du fjerne dette medlemmet fra gruppen?",
+  "paged": {
+    "range": "{{from}}–{{to}} av {{total}}"
+  }
 }

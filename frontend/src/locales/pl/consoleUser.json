@@ -156,7 +156,11 @@
     "kpiCooldown": "Ponów próbę odnowienia",
     "kpiFree": "Bezpłatny (nieograniczony)",
     "kpiMaxLease": "Maksymalny leasing",
-    "kpiNodes": "Dostępne węzły"
+    "kpiNodes": "Dostępne węzły",
+    "exclusiveWhole": "Dedykowane (cała karta)",
+    "slots": "Sloty",
+    "hamiFractional": "Ułamkowe (według pamięci VRAM i rdzeni)",
+    "hamiShared": "Ułamek HAMI"
   },
   "newSession": {
     "crumb": "Sesje",
@@ -310,7 +314,8 @@
     "tsSlotN": "1 z gniazd {{n}}",
     "guaranteed": "Gwarantowane zasoby",
     "runtimeLeft": "Czas działania w tym tempie",
-    "sshKeyChange": "Zmień"
+    "sshKeyChange": "Zmień",
+    "sshCacheCount": "{{n}} w pamięci podręcznej"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "sshProxy": "Serwer proxy (brama)",
     "regenerated": "Wydano nowy link dostępu.",
     "sshNeedKey": "Nie zarejestrowano klucza publicznego SSH",
-    "sshNeedKeyHint": "Zarejestruj lub wygeneruj go poniżej — działające sesje przejmą go natychmiast."
+    "sshNeedKeyHint": "Zarejestruj lub wygeneruj go poniżej — działające sesje przejmą go natychmiast.",
+    "webConnectNewWindow": "Otwiera terminal przeglądarki w nowym oknie — nie jest potrzebny żaden klucz SSH ani polecenie."
   },
   "account": {
     "title": "Moje ustawienia",
@@ -464,7 +470,8 @@
     "sshGenerate": "Wygeneruj i pobierz klucz",
     "sshGenerated": "Klucz wygenerowany. Przechowuj pobrany klucz prywatny w bezpiecznym miejscu — nie da się go pobrać ponownie.",
     "sshGenFail": "Nie udało się wygenerować klucza SSH.",
-    "sshGenerateHint": "Nie masz jeszcze klucza? Kliknij „Wygeneruj i pobierz klucz”. Klucz prywatny (.pem) pobiera się raz, a publiczny rejestrowany jest automatycznie. Połączenie: ssh -i pobrany-klucz.pem …"
+    "sshGenerateHint": "Nie masz jeszcze klucza? Kliknij „Wygeneruj i pobierz klucz”. Klucz prywatny (.pem) pobiera się raz, a publiczny rejestrowany jest automatycznie. Połączenie: ssh -i pobrany-klucz.pem …",
+    "activeScope": "Aktywny"
   },
   "notify": {
     "title": "Powiadomienia",
@@ -493,7 +500,19 @@
     "webhooks": "Zarejestrowane webhooki",
     "sev_err": "Błąd",
     "sev_info": "Informacje",
-    "sev_warn": "Ostrzeżenie"
+    "sev_warn": "Ostrzeżenie",
+    "inboxTitle": "Skrzynka odbiorcza",
+    "mSessCpu": "Wykorzystanie procesora sesji",
+    "readAll": "Zaznacz wszystkie jako przeczytane",
+    "prev": "Poprzedni",
+    "mSessVram": "Wykorzystanie sesji VRAM",
+    "mSessGpu": "Wykorzystanie procesora graficznego w sesji",
+    "next": "Następny",
+    "rulesHint": "Reguły alertów i powiadomienia są przypisane do konta i udostępniane wszystkim zespołom. Metryki sesji są oceniane w wybranej sesji.",
+    "noSession": "Żadnych sesji biegowych",
+    "inboxEmpty": "Nie ma jeszcze żadnych powiadomień.",
+    "selectSession": "Wybierz sesję",
+    "scopeAccount": "Całe konto"
   },
   "wallet": {
     "title": "Portfel / Kredyty",
@@ -535,7 +554,15 @@
     "topupNote": "Stosowane po zatwierdzeniu przez administratora grupy (bez rzeczywistej płatności)",
     "topupSent": "Żądanie wysłane (oczekujące na zatwierdzenie przez administratora grupy)",
     "desc_storage": "Magazynowanie ({{ref}})",
-    "desc_gpu": "Użycie procesora graficznego ({{ref}})"
+    "desc_gpu": "Użycie procesora graficznego ({{ref}})",
+    "nextRecharge": "Następne uzupełnienie",
+    "rechargeSoon": "Wkrótce",
+    "session": "Sesja",
+    "consumedCol": "Strawiony",
+    "viewBySession": "Grupuj według sesji",
+    "viewAll": "Wszystkie wpisy",
+    "searchPh": "Wyszukaj sesje, typy, szczegóły",
+    "rechargeEvery": "Co {{n}} dni"
   },
   "volume": {
     "title": "Dane / Woluminy",
@@ -596,7 +623,16 @@
     "afterRemain": "Pozostało po",
     "afterUse": "Używany po",
     "thisVol": "Ta objętość",
-    "quotaHint": "Limit miejsca na użytkownika dla woluminów osobistych (niezależny od grupy). Nowe woluminy są blokowane po ich przekroczeniu."
+    "quotaHint": "Limit miejsca na użytkownika dla woluminów osobistych (niezależny od grupy). Nowe woluminy są blokowane po ich przekroczeniu.",
+    "teamFail": "Nie udało się zmienić drużyny",
+    "personal": "Osobisty",
+    "teamQuota": "Przekracza limit wolumenu zespołu docelowego",
+    "teamChanged": "Zespół się zmienił",
+    "teamHome": "Rozliczane na rzecz zespołu",
+    "changeTeam": "Zmień drużynę",
+    "sharedBy": "Udostępnione przez",
+    "changeTeamTitle": "Zmień zespół — {{name}}",
+    "teamHint": "Limit pojemności i kredyty magazynu tego wolumenu pochodzą od wybranego zespołu. Pozostajesz właścicielem."
   },
   "gmembers": {
     "title": "Członkowie",

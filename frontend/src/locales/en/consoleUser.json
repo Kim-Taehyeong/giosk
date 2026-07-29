@@ -157,7 +157,11 @@
     "kpiBilling": "Billing",
     "kpiFree": "Free (unlimited)",
     "kpiNodes": "Available nodes",
-    "noticePinned": "Pinned"
+    "noticePinned": "Pinned",
+    "hamiShared": "HAMi fractional",
+    "slots": "Slots",
+    "exclusiveWhole": "Dedicated (whole card)",
+    "hamiFractional": "Fractional (by VRAM and cores)"
   },
   "newSession": {
     "crumb": "Sessions",
@@ -311,7 +315,8 @@
     "hoursApprox": "~{{n}} hours",
     "notEnough": "Not enough credit — 1 hour minimum required",
     "tsSlotN": "1 of {{n}} slots",
-    "sshKeyChange": "Change"
+    "sshKeyChange": "Change",
+    "sshCacheCount": "{{n}} cached"
   },
   "session": {
     "title": "Sessions",
@@ -423,7 +428,8 @@
     "regenerate": "Regenerate",
     "regenerated": "Issued a fresh access link.",
     "sshNeedKey": "No SSH public key registered",
-    "sshNeedKeyHint": "Register or generate one below — running sessions pick it up immediately."
+    "sshNeedKeyHint": "Register or generate one below — running sessions pick it up immediately.",
+    "webConnectNewWindow": "Opens a browser terminal in a new window — no SSH key or command needed."
   },
   "account": {
     "title": "My Settings",
@@ -465,7 +471,8 @@
     "sshGenerate": "Generate & download key",
     "sshGenerated": "Key generated. Keep the downloaded private key safe — it cannot be downloaded again.",
     "sshGenFail": "Failed to generate an SSH key.",
-    "sshGenerateHint": "No key yet? Click \"Generate & download key\". The private key (.pem) downloads once and the public key is registered automatically. Connect with: ssh -i downloaded-key.pem ..."
+    "sshGenerateHint": "No key yet? Click \"Generate & download key\". The private key (.pem) downloads once and the public key is registered automatically. Connect with: ssh -i downloaded-key.pem ...",
+    "activeScope": "Active"
   },
   "notify": {
     "title": "Notifications",
@@ -494,7 +501,19 @@
     "mGpu": "GPU utilization",
     "sev_err": "Error",
     "sev_warn": "Warning",
-    "sev_info": "Info"
+    "sev_info": "Info",
+    "mSessGpu": "Session GPU utilization",
+    "mSessCpu": "Session CPU utilization",
+    "mSessVram": "Session VRAM utilization",
+    "inboxTitle": "Inbox",
+    "readAll": "Mark all read",
+    "inboxEmpty": "No notifications yet.",
+    "scopeAccount": "Whole account",
+    "prev": "Previous",
+    "next": "Next",
+    "rulesHint": "Alert rules and notifications are per account and shared across all teams. Session metrics are evaluated on the selected session.",
+    "selectSession": "Select a session",
+    "noSession": "No running sessions"
   },
   "wallet": {
     "title": "Wallet / Credits",
@@ -536,7 +555,15 @@
     "reasonPh": "Enter a reason",
     "free": "Free",
     "desc_gpu": "GPU usage ({{ref}})",
-    "desc_storage": "Storage ({{ref}})"
+    "desc_storage": "Storage ({{ref}})",
+    "rechargeSoon": "Soon",
+    "nextRecharge": "Next refill",
+    "rechargeEvery": "Every {{n}} days",
+    "searchPh": "Search sessions, types, details",
+    "viewAll": "All entries",
+    "viewBySession": "Group by session",
+    "session": "Session",
+    "consumedCol": "Consumed"
   },
   "volume": {
     "title": "Data / Volumes",
@@ -597,7 +624,16 @@
     "afterUse": "Used after",
     "afterRemain": "Left after",
     "quotaHint": "Per-user storage limit for your personal volumes (independent of group). New volumes are blocked once you exceed it.",
-    "overQuota": "Exceeds remaining quota ({{remain}} GB)"
+    "overQuota": "Exceeds remaining quota ({{remain}} GB)",
+    "teamQuota": "Exceeds the target team's volume quota",
+    "teamFail": "Could not change team",
+    "teamChanged": "Team changed",
+    "teamHome": "Billed to team",
+    "personal": "Personal",
+    "changeTeam": "Change team",
+    "sharedBy": "Shared by",
+    "changeTeamTitle": "Change team — {{name}}",
+    "teamHint": "This volume's capacity quota and storage credits come from the selected team. You remain the owner."
   },
   "gmembers": {
     "title": "Members",

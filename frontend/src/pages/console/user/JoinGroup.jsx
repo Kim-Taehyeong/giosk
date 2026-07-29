@@ -5,6 +5,7 @@ import PageHead from '../../../components/console/PageHead';
 import Pill from '../../../components/console/Pill';
 import { useToast } from '../../../components/console/Toast';
 import { getMembershipContext, requestJoinGroup, cancelJoinRequest } from '../../../api/console/membership';
+import { tabbable } from '../../../utils/a11y';
 
 // 그룹 가입 신청 — 전체 그룹(내 조직/타 조직)을 검색해 가입을 신청하고 신청 상태를 확인한다.
 export default function JoinGroup() {
@@ -64,10 +65,10 @@ export default function JoinGroup() {
 
       {/* 탭 분할 — 검색(가입 가능한 그룹) / 나의 요청(신청 현황·취소) */}
       <div className="subtabs mb" style={{ display: 'flex', gap: 4 }}>
-        <span className={`st${tab === 'search' ? ' active' : ''}`} onClick={() => setTab('search')}>
+        <span className={`st${tab === 'search' ? ' active' : ''}`} {...tabbable(() => setTab('search'), tab === 'search')}>
           <Search size={13} /> {t('joingrp.tabSearch')}
         </span>
-        <span className={`st${tab === 'mine' ? ' active' : ''}`} onClick={() => setTab('mine')}>
+        <span className={`st${tab === 'mine' ? ' active' : ''}`} {...tabbable(() => setTab('mine'), tab === 'mine')}>
           <Clock size={13} /> {t('joingrp.tabMine')}{pendingCount > 0 ? ` (${pendingCount})` : ''}
         </span>
       </div>

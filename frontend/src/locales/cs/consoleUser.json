@@ -156,7 +156,11 @@
     "kpiMaxLease": "Max pronájem",
     "kpiEtaVal": "~{{n}}d",
     "kpiCooldown": "Znovu zkusit cooldown",
-    "kpiNodes": "Dostupné uzly"
+    "kpiNodes": "Dostupné uzly",
+    "slots": "Sloty",
+    "exclusiveWhole": "Věnováno (celá karta)",
+    "hamiShared": "HAMi zlomkové",
+    "hamiFractional": "Zlomkové (podle VRAM a jader)"
   },
   "newSession": {
     "crumb": "Relace",
@@ -310,7 +314,8 @@
     "notEnough": "Nedostatek kreditu – je vyžadována minimálně 1 hodina",
     "runtimeLeft": "Doba běhu tímto tempem",
     "tsSlotN": "1 ze slotů {{n}}",
-    "sshKeyChange": "Změnit"
+    "sshKeyChange": "Změnit",
+    "sshCacheCount": "{{n}} uloženo do mezipaměti"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "regenerated": "Vydán nový přístupový odkaz.",
     "sshDirectInHint": "Připojte se přímo k uzlu zevnitř kancelářské sítě – obejděte bránu.",
     "sshNeedKey": "Není zaregistrován žádný veřejný klíč SSH",
-    "sshNeedKeyHint": "Zaregistrujte nebo vygenerujte jej níže — běžící relace jej převezmou okamžitě."
+    "sshNeedKeyHint": "Zaregistrujte nebo vygenerujte jej níže — běžící relace jej převezmou okamžitě.",
+    "webConnectNewWindow": "Otevře terminál prohlížeče v novém okně – není potřeba žádný klíč SSH ani příkaz."
   },
   "account": {
     "title": "Moje nastavení",
@@ -464,7 +470,8 @@
     "sshGenerate": "Vygenerovat a stáhnout klíč",
     "sshGenerated": "Klíč vygenerován. Stažený soukromý klíč bezpečně uschovejte — znovu jej stáhnout nelze.",
     "sshGenFail": "Klíč SSH se nepodařilo vygenerovat.",
-    "sshGenerateHint": "Ještě nemáte klíč? Klikněte na „Vygenerovat a stáhnout klíč“. Soukromý klíč (.pem) se stáhne jednou a veřejný se zaregistruje automaticky. Připojení: ssh -i stazeny-klic.pem …"
+    "sshGenerateHint": "Ještě nemáte klíč? Klikněte na „Vygenerovat a stáhnout klíč“. Soukromý klíč (.pem) se stáhne jednou a veřejný se zaregistruje automaticky. Připojení: ssh -i stazeny-klic.pem …",
+    "activeScope": "Aktivní"
   },
   "notify": {
     "title": "Oznámení",
@@ -493,7 +500,19 @@
     "webhook": "Adresa URL webhooku (Slack/Discord)",
     "sev_info": "Info",
     "sev_warn": "Varování",
-    "sev_err": "Chyba"
+    "sev_err": "Chyba",
+    "mSessGpu": "Využití GPU relace",
+    "inboxTitle": "Doručená pošta",
+    "prev": "Předchozí",
+    "mSessCpu": "Využití CPU relace",
+    "readAll": "Označte vše jako přečtené",
+    "next": "Další",
+    "mSessVram": "Využití relace VRAM",
+    "rulesHint": "Pravidla upozornění a oznámení jsou pro každý účet a sdílena mezi všemi týmy. Metriky relace se vyhodnocují ve vybrané relaci.",
+    "noSession": "Žádné běžecké relace",
+    "scopeAccount": "Celý účet",
+    "selectSession": "Vyberte relaci",
+    "inboxEmpty": "Zatím žádná upozornění."
   },
   "wallet": {
     "title": "Peněženka / Kredity",
@@ -535,7 +554,15 @@
     "bySession": "Podle relace",
     "topupSent": "Požadavek odeslán (čeká na schválení správcem skupiny)",
     "desc_storage": "Úložiště ({{ref}})",
-    "desc_gpu": "Využití GPU ({{ref}})"
+    "desc_gpu": "Využití GPU ({{ref}})",
+    "nextRecharge": "Další náplň",
+    "rechargeSoon": "Brzy",
+    "session": "Zasedání",
+    "consumedCol": "Spotřebováno",
+    "viewBySession": "Seskupit podle relace",
+    "viewAll": "Všechny záznamy",
+    "rechargeEvery": "Každých {{n}} dnů",
+    "searchPh": "Vyhledávání relací, typů, podrobností"
   },
   "volume": {
     "title": "Data / Objemy",
@@ -596,7 +623,16 @@
     "deleted": "Svazek smazán",
     "afterRemain": "Odešel po",
     "overQuota": "Překračuje zbývající kvótu ({{remain}} GB)",
-    "quotaHint": "Limit úložiště na uživatele pro vaše osobní svazky (nezávisle na skupině). Nové svazky jsou zablokovány, jakmile jej překročíte."
+    "quotaHint": "Limit úložiště na uživatele pro vaše osobní svazky (nezávisle na skupině). Nové svazky jsou zablokovány, jakmile jej překročíte.",
+    "personal": "Osobní",
+    "teamQuota": "Překračuje objemovou kvótu cílového týmu",
+    "teamFail": "Tým se nepodařilo změnit",
+    "sharedBy": "Sdíleno uživatelem",
+    "changeTeam": "Změnit tým",
+    "teamHome": "Účtováno týmu",
+    "teamChanged": "Tým se změnil",
+    "changeTeamTitle": "Změnit tým — {{name}}",
+    "teamHint": "Kvóta kapacity tohoto svazku a kredity úložiště pocházejí od vybraného týmu. Vy zůstáváte vlastníkem."
   },
   "gmembers": {
     "title": "členové",

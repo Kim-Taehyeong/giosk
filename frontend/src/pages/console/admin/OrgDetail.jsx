@@ -30,11 +30,11 @@ function RecurringCreditCard({ org, maxInterval, onSave, t }) {
     <div className="card" style={{ margin: 0 }}>
       <h3><Coins size={15} /> {t('odetail.recurringTitle', { defaultValue: '정기 크레딧' })}</h3>
       <div className="legend mb">{t('odetail.recurringNote', { defaultValue: '설정한 주기마다 이 양으로 조직 풀을 리필합니다(0이면 리필 안 함).' })}</div>
-      <label className="fld" style={{ marginTop: 0 }}>{t('odetail.recurringAmount', { defaultValue: '주기당 크레딧' })}</label>
-      <input type="number" min={0} value={v} onChange={(e) => setV(e.target.value)} />
+      <label className="fld" htmlFor="admin-orgdetail-fld-0" style={{ marginTop: 0 }}>{t('odetail.recurringAmount', { defaultValue: '주기당 크레딧' })}</label>
+      <input id="admin-orgdetail-fld-0" type="number" min={0} value={v} onChange={(e) => setV(e.target.value)} />
       <div className="grid cols-2" style={{ gap: 12 }}>
-        <div><label className="fld">{t('odetail.recurringInterval', { defaultValue: '리필 주기(일)' })}</label>
-          <input type="number" min={1} max={maxInterval || undefined} value={iv} onChange={(e) => setIv(e.target.value)} onBlur={clampIv} /></div>
+        <div><label className="fld" htmlFor="admin-orgdetail-fld-1">{t('odetail.recurringInterval', { defaultValue: '리필 주기(일)' })}</label>
+          <input id="admin-orgdetail-fld-1" type="number" min={1} max={maxInterval || undefined} value={iv} onChange={(e) => setIv(e.target.value)} onBlur={clampIv} /></div>
         <div><label className="fld">{t('odetail.recurringCarryover', { defaultValue: '이월' })}</label>
           <div className="flex" style={{ gap: 8, alignItems: 'center', height: 38 }}>
             <Toggle checked={carry} onChange={setCarry} />
@@ -215,12 +215,12 @@ export default function OrgDetail() {
         {newGroup && (<>
           <div className="grid cols-2" style={{ gap: 14 }}>
             <div>
-              <label className="fld" style={{ marginTop: 0 }}>{t('groups.ident')}<Req /></label>
-              <input type="text" value={newGroup.name} onChange={(e) => setNewGroup({ ...newGroup, name: e.target.value })} placeholder="ml-lab" />
+              <label className="fld" htmlFor="admin-orgdetail-fld-2" style={{ marginTop: 0 }}>{t('groups.ident')}<Req /></label>
+              <input id="admin-orgdetail-fld-2" type="text" value={newGroup.name} onChange={(e) => setNewGroup({ ...newGroup, name: e.target.value })} placeholder="ml-lab" />
             </div>
             <div>
-              <label className="fld" style={{ marginTop: 0 }}>{t('groups.display')}</label>
-              <input type="text" value={newGroup.displayName} onChange={(e) => setNewGroup({ ...newGroup, displayName: e.target.value })} />
+              <label className="fld" htmlFor="admin-orgdetail-fld-3" style={{ marginTop: 0 }}>{t('groups.display')}</label>
+              <input id="admin-orgdetail-fld-3" type="text" value={newGroup.displayName} onChange={(e) => setNewGroup({ ...newGroup, displayName: e.target.value })} />
             </div>
           </div>
           <Advanced title={t('groups.admin')} hint={t('groups.adminHintOpt')} defaultOpen={!!newGroup.adminAccount}>
@@ -233,11 +233,11 @@ export default function OrgDetail() {
       <Modal open={!!edit} title={t('orgs.editTitle')} onClose={() => setEdit(null)} width={520}
         footer={<button className="btn primary" onClick={saveEdit}>{t('common.save')}</button>}>
         {edit && (<>
-          <label className="fld" style={{ marginTop: 0 }}>{t('orgs.display')}</label>
-          <input type="text" value={edit.displayName} onChange={(e) => setEdit({ ...edit, displayName: e.target.value })} />
+          <label className="fld" htmlFor="admin-orgdetail-fld-4" style={{ marginTop: 0 }}>{t('orgs.display')}</label>
+          <input id="admin-orgdetail-fld-4" type="text" value={edit.displayName} onChange={(e) => setEdit({ ...edit, displayName: e.target.value })} />
           {creditMode && (<>
-            <label className="fld">{t('orgs.defaultGroupBudget')}</label>
-            <input type="number" value={edit.defaultGroupBudget} onChange={(e) => setEdit({ ...edit, defaultGroupBudget: e.target.value })} />
+            <label className="fld" htmlFor="admin-orgdetail-fld-5">{t('orgs.defaultGroupBudget')}</label>
+            <input id="admin-orgdetail-fld-5" type="number" value={edit.defaultGroupBudget} onChange={(e) => setEdit({ ...edit, defaultGroupBudget: e.target.value })} />
           </>)}
         </>)}
       </Modal>

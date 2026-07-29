@@ -67,7 +67,9 @@
       "errorTerms": "Om u aan te melden, moet u de voorwaarden accepteren.",
       "errorRequired": "Vul alle verplichte velden in.",
       "errorGeneric": "Aanmelden mislukt.",
-      "errorPasswordMismatch": "Wachtwoorden komen niet overeen."
+      "errorPasswordMismatch": "Wachtwoorden komen niet overeen.",
+      "pwMatch": "Wachtwoorden komen overeen",
+      "pwMismatch": "Wachtwoorden komen niet overeen"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Knooppunten {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "Knooppunten {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "Knooppunten {{up}}/{{total}} · GPU —",
+    "alerts": "Waarschuwingen",
+    "rolePlatform": "Gehele platform",
+    "unreadN": "{{n}} ongelezen",
+    "orgWhole": "Gehele organisatie",
+    "clusterStatus": "Clusterstatus",
+    "rolePlatformSub": "Super beheerder",
+    "creditBalance": "Creditsaldo",
+    "noAlerts": "Nog geen waarschuwingen.",
+    "viewAll": "Bekijk alles in Berichtencentrum"
+  },
+  "table": {
+    "empty": "Geen gegevens"
+  },
+  "refill": {
+    "carryOff": "Verlopen",
+    "note": "Wordt elke cyclus met deze hoeveelheid bijgevuld (0 schakelt dit uit). De cyclus kan niet langer zijn dan die van de ouder en wordt automatisch beperkt.",
+    "amount": "Credits per cyclus",
+    "maxHint": "Limiet oudercyclus: {{n}} dagen of minder",
+    "carryover": "Overdracht",
+    "carryOn": "Overdragen",
+    "interval": "Bijvulcyclus (dagen)",
+    "title": "Terugkerende bijvulling"
+  },
+  "select": {
+    "placeholder": "Selecteer",
+    "search": "Zoekopdracht…",
+    "noMatch": "Geen wedstrijd"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "Het {{target}}-team heeft weinig credits",
+      "teamBody": "{{target}}-teamcredits bevinden zich op {{value}}, onder de {{threshold}}-drempel. Sessies in dit team kunnen binnenkort stoppen."
+    }
+  },
+  "close": "Dichtbij"
 }

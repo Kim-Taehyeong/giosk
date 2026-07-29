@@ -38,14 +38,14 @@ export default function CreditGrantCard({ balance, onGrant, hint, title }) {
       </div>
       <div className="flex gap wrap" style={{ alignItems: 'flex-end' }}>
         <div style={{ width: 160 }}>
-          <label className="fld" style={{ marginTop: 0 }}>{t('credit.amount')}</label>
-          <input type="number" value={amount} placeholder="100"
+          <label className="fld" htmlFor="console-creditgrantcard-fld-0" style={{ marginTop: 0 }}>{t('credit.amount')}</label>
+          <input id="console-creditgrantcard-fld-0" type="number" value={amount} placeholder="100"
             onChange={(e) => setAmount(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && submit()} />
         </div>
         <div style={{ flex: 1, minWidth: 200 }}>
-          <label className="fld" style={{ marginTop: 0 }}>{t('credit.reason')}</label>
-          <input type="text" value={reason} placeholder={t('credit.reasonPh')}
+          <label className="fld" htmlFor="console-creditgrantcard-fld-1" style={{ marginTop: 0 }}>{t('credit.reason')}</label>
+          <input id="console-creditgrantcard-fld-1" type="text" value={reason} placeholder={t('credit.reasonPh')}
             onChange={(e) => setReason(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && submit()} />
         </div>

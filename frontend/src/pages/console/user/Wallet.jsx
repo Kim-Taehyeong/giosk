@@ -162,10 +162,10 @@ export default function Wallet() {
           <span className="legend">{t('wallet.topupNote')}</span>
           <button className="btn primary" onClick={submit}>{t('wallet.topupSend')}</button>
         </>}>
-        <label className="fld" style={{ marginTop: 0 }}>{t('wallet.amountLabel')}</label>
-        <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
-        <label className="fld">{t('wallet.reason')}</label>
-        <textarea value={reason} onChange={(e) => setReason(e.target.value)} placeholder={t('wallet.reasonPh')} />
+        <label className="fld" htmlFor="user-wallet-fld-0" style={{ marginTop: 0 }}>{t('wallet.amountLabel')}</label>
+        <input id="user-wallet-fld-0" type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
+        <label className="fld" htmlFor="user-wallet-fld-1">{t('wallet.reason')}</label>
+        <textarea id="user-wallet-fld-1" value={reason} onChange={(e) => setReason(e.target.value)} placeholder={t('wallet.reasonPh')} />
       </Modal>
     </div>
   );

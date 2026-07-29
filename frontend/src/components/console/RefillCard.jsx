@@ -15,11 +15,11 @@ export default function RefillCard({ title, current, maxInterval, onSave, ns = '
     <div className="card" style={{ margin: 0 }}>
       <h3><RefreshCcw size={15} /> {title || t('refill.title', { defaultValue: '정기 리필' })}</h3>
       <div className="legend mb">{t('refill.note', { defaultValue: '주기마다 이 양으로 리필합니다(0이면 리필 안 함). 주기는 상위보다 길 수 없어 자동 제한됩니다.' })}</div>
-      <label className="fld" style={{ marginTop: 0 }}>{t('refill.amount', { defaultValue: '주기당 크레딧' })}</label>
-      <input type="number" min={0} value={v} onChange={(e) => setV(e.target.value)} />
+      <label className="fld" htmlFor="console-refillcard-fld-0" style={{ marginTop: 0 }}>{t('refill.amount', { defaultValue: '주기당 크레딧' })}</label>
+      <input id="console-refillcard-fld-0" type="number" min={0} value={v} onChange={(e) => setV(e.target.value)} />
       <div className="grid cols-2" style={{ gap: 12 }}>
-        <div><label className="fld">{t('refill.interval', { defaultValue: '리필 주기(일)' })}</label>
-          <input type="number" min={1} max={maxInterval || undefined} value={iv} onChange={(e) => setIv(e.target.value)} /></div>
+        <div><label className="fld" htmlFor="console-refillcard-fld-1">{t('refill.interval', { defaultValue: '리필 주기(일)' })}</label>
+          <input id="console-refillcard-fld-1" type="number" min={1} max={maxInterval || undefined} value={iv} onChange={(e) => setIv(e.target.value)} /></div>
         <div><label className="fld">{t('refill.carryover', { defaultValue: '이월' })}</label>
           <div className="flex" style={{ gap: 8, alignItems: 'center', height: 38 }}>
             <Toggle checked={carry} onChange={setCarry} />

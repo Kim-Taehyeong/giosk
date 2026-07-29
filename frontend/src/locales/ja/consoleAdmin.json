@@ -55,7 +55,8 @@
     "all": "全て",
     "back": "戻る",
     "advanced": "その他の設定",
-    "optional": "(オプション)"
+    "optional": "(オプション)",
+    "prev": "前の"
   },
   "dash": {
     "title": "ダッシュボード",
@@ -199,7 +200,10 @@
     "totalN": "{{n}} ユーザー",
     "prev": "前へ",
     "next": "次",
-    "advBelong": "メンバーシップ・ロール・パスワード"
+    "advBelong": "メンバーシップ・ロール・パスワード",
+    "colRefill": "定期的な補充",
+    "refillDefault": "デフォルト",
+    "colBalance": "現在の残高"
   },
   "groups": {
     "title": "グループ",
@@ -250,7 +254,18 @@
     "grantHintSuper": "プラットフォーム管理者の例外許可。整合性を保つため、同じ金額が親組織プールに自動的に追加されます。",
     "grantHintOrg": "組織プールから差し引かれ、このグループのプールに追加されます。組織プールの残高を超えることはできません。",
     "insufficientOrgPool": "組織のクレジット プールの残高が不十分です。",
-    "grantFail": "クレジットの付与に失敗しました。"
+    "grantFail": "クレジットの付与に失敗しました。",
+    "colRefill": "定期的な補充",
+    "deleteFail": "削除に失敗しました",
+    "refillInterval": "詰め替えサイクル（日）",
+    "refillDefault": "デフォルト",
+    "carryover": "未使用のクレジットを引き継ぐ",
+    "refillAmt": "定期的な補充（サイクルごと）",
+    "hasMembers": "このチームにはまだメンバーがいます。削除する前に、移動または削除してください。",
+    "cantDeleteDefault": "デフォルトのチームは削除できません。",
+    "initCreditAmt": "初期クレジット",
+    "initCredit": "初回クレジットと定期的な補充",
+    "initCreditHint": "必要に応じて、チーム作成時に組織プールから割り当て、リフィルを設定します。これは、後でチームの詳細ページで行うこともできます。"
   },
   "orgs": {
     "title": "組織",
@@ -294,7 +309,11 @@
     "bulkDone": "一括追加された {{n}} 組織",
     "colConsumed": "消費された",
     "adminOpt": "組織管理者 (オプション)",
-    "adminHintOpt": "「一般」グループのみを作成し、後で「組織の詳細」→「一般」→「組織管理者ロールを持つメンバーを追加」から管理者を割り当てるには、空のままにしておきます。"
+    "adminHintOpt": "「一般」グループのみを作成し、後で「組織の詳細」→「一般」→「組織管理者ロールを持つメンバーを追加」から管理者を割り当てるには、空のままにしておきます。",
+    "deleteFail": "削除に失敗しました",
+    "colRefill": "定期的な補充",
+    "refillDefault": "デフォルト",
+    "hasUsers": "この組織にはまだユーザーがいます。削除する前に、移動または削除してください。"
   },
   "billing": {
     "title": "請求する",
@@ -320,7 +339,12 @@
     "notSet": "未設定",
     "sessions": "セッション",
     "vsAlloc": "対割り当て",
-    "vsBudget2": "対予算"
+    "vsBudget2": "対予算",
+    "periodAll": "ずっと",
+    "periodLastMonth": "先月",
+    "periodMonth": "今月",
+    "period7d": "過去 7 日間",
+    "periodNote": "表示される消費量と GPU 時間は、元帳ごとに、選択した期間に発生したものです。予算とプールには期間が適用されません。"
   },
   "audit": {
     "title": "監査ログ",
@@ -478,7 +502,10 @@
     "impFail": "インポートに失敗しました",
     "impOwnerHint": "インポートするにはリストからアカウントを選択してください。",
     "impOwnerPicked": "選択中: {{name}} ({{id}})",
-    "metricsOffNotice": "監視(DCGM／Prometheus)が未インストールのため、GPU 使用率と VRAM を表示できません。監視を有効にするとリアルタイム指標が表示されます。"
+    "metricsOffNotice": "監視(DCGM／Prometheus)が未インストールのため、GPU 使用率と VRAM を表示できません。監視を有効にするとリアルタイム指標が表示されます。",
+    "cordon": "非常線",
+    "uncordon": "警戒解除",
+    "noMetrics": "メトリクスなし"
   },
   "mset": {
     "title": "設定",
@@ -601,7 +628,21 @@
     "removeTitle": "グループから削除",
     "removeConfirm": "このユーザーを {{group}} から削除します。",
     "removed": "グループから削除されました",
-    "cancel": "キャンセル"
+    "cancel": "キャンセル",
+    "suspend": "つるす",
+    "restore": "復元する",
+    "memberAdded": "メンバーシップが追加されました。",
+    "grantFail": "付与に失敗しました",
+    "addFail": "追加できませんでした",
+    "grant": "クレジットを付与する",
+    "granted": "認められた {{n}} C",
+    "statusConfirm": "これにより、ユーザーのステータスが変化します。",
+    "grantTitle": "クレジットの付与 — {{name}}",
+    "addMembership": "メンバーシップを追加する",
+    "pickOrg": "組織を選択してください",
+    "grantHint": "個人信用残高に即時に適用され、1 回限りの調整として監査ログに記録されます。",
+    "grantAmount": "付与するクレジット (C; マイナスの控除)",
+    "noTeamsInOrg": "この組織にはチームがありません。"
   },
   "clusters": {
     "title": "クラスター",
@@ -701,7 +742,12 @@
     "extSshOnly": "VSCode/Jupyter/カスタム ポートがない場合、このイメージ上のセッションは SSH のみです。",
     "needRef": "画像参照を入力してください",
     "extFail": "外部画像の登録に失敗しました",
-    "extRegistered": "外部画像を登録しました"
+    "extRegistered": "外部画像を登録しました",
+    "loading": "…",
+    "info": "画像情報",
+    "notFound": "画像が見つかりません。",
+    "notCached": "キャッシュされていません",
+    "logsHint": "ビルドおよびスキャンのログを読み込みます。"
   },
   "anotify": {
     "title": "通知",
@@ -888,7 +934,23 @@
     "brandAccent": "ロゴの色",
     "brandAccentReset": "デフォルト",
     "brandAccentHint": "テーマカラーを使用するには、空のままにしておきます。",
-    "brandPreview": "プレビュー"
+    "brandPreview": "プレビュー",
+    "carryoverOn": "未使用のクレジットを引き継ぐ",
+    "rechargeCarryover": "キャリーオーバーを許可する",
+    "rechargeSaved": "リフィル設定が保存されました。",
+    "rechargeEnabled": "定期的な補充を有効にする",
+    "rechargeInterval": "デフォルトの補充サイクル (日) · 低レベルの制限",
+    "brandSubtitle": "字幕",
+    "brandIcon": "アイコン",
+    "brandIconClear": "取り除く",
+    "rechargeNote": "プラットフォームのデフォルトの補充サイクルとキャリーオーバー ポリシー。組織、チーム、個人は短いサイクルを選択することはできますが、長いサイクルを選択することはできません。親が繰り越しを禁止すると、それ以下の未使用のクレジットはその境界で期限切れになります。",
+    "rechargeTitle": "定期的なクレジット補充 (デフォルトおよび制限)",
+    "rechargeAmountHint": "詳細ページで、組織ごと、チームごと、ユーザーごとの補充量、サイクル、繰り越しを設定します。サイクルはその親のサイクルよりも長くすることはできません。",
+    "carryoverOff": "各サイクルを期限切れにする",
+    "brandSubtitleHint": "ロゴの横に小さなテキスト。非表示にするには空のままにします。",
+    "brandIconUpload": "アイコンをアップロードします (オプション)",
+    "brandIconUploadHint": "アップロードされたアイコンは、上の Lucide アイコンよりも優先されます。 120KB以下のPNGまたはSVGを推奨します。",
+    "brandIconTooBig": "アイコンは 120KB 以下である必要があります。"
   },
   "datasets": {
     "title": "データセット",
@@ -934,7 +996,40 @@
     "nodeReady": "準備ができて",
     "uncache": "取り除く",
     "doCache": "キャッシュ",
-    "noNodes": "ノードなし"
+    "noNodes": "ノードなし",
+    "phaseCopy": "コピーする",
+    "phaseExtract": "抽出中",
+    "phaseDownload": "ダウンロード中",
+    "notFound": "データセットが見つかりません。",
+    "cacheFail": "キャッシュリクエストが失敗しました",
+    "description": "説明",
+    "descFail": "説明を保存できませんでした",
+    "sizeClassSaved": "サイズクラスが保存されました。",
+    "sizeClass": "サイズクラス",
+    "regNeedUrl": "URLを入力します。",
+    "regNeedName": "データセット名を入力します。",
+    "cache": "ノードキャッシュ",
+    "descPh": "このデータセットについて説明します",
+    "descSaved": "説明が保存されました。",
+    "info": "データセット情報",
+    "regFail": "登録に失敗しました",
+    "regTitle": "データセットを登録する",
+    "regRefresh": "リフレッシュ",
+    "registering": "登録する",
+    "regNfs": "NFS コピー (SCP)",
+    "extracting": "抽出中…",
+    "regUrl": "URL（wget）",
+    "regStarted": "登録が開始されました — リストで進行状況を追跡します。",
+    "regSizeClass": "サイズクラス",
+    "upScope": "可視性",
+    "regNeedFile": "受信箱からファイルを選択します。",
+    "upTaken": "その名前のデータセットはすでに存在します。",
+    "regNfsHint": "アーカイブ (zip、tar、tar.gz) を以下のパスにコピーし、ファイルを選択して登録します。登録すると受信箱から移動され、自動的に抽出されます。",
+    "regBusy": "登録中…",
+    "regUrlField": "ダウンロードURL",
+    "regInboxFile": "受信箱ファイル",
+    "regUrlHint": "サーバーはこの URL を直接ダウンロードします。ブラウザからは何もアップロードされません。リストで進捗状況を追跡します。",
+    "regInboxEmpty": "受信箱は空です。ファイルを上記のパスにコピーして、更新します。"
   },
   "announce": {
     "title": "お知らせ",
@@ -1059,7 +1154,8 @@
     "removed": "「{{name}}」のポリシーを削除しました",
     "searchUser": "ユーザーを検索する",
     "globalHint": "Global は全員のフォールバックです。空にすることはできず、少なくとも 1 である必要があります。Org/group/user スコープはこれをオーバーライドできます。",
-    "globalNeedsValue": "4 つのグローバル制限はすべて少なくとも 1 でなければなりません"
+    "globalNeedsValue": "4 つのグローバル制限はすべて少なくとも 1 でなければなりません",
+    "capHint": "許容最大値 — GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · ボリューム ≤ {{vol}}GiB · 同時セッション数 ≤ {{sess}}"
   },
   "roles": {
     "org_admin": "組織管理者",
@@ -1075,7 +1171,16 @@
     "memberRole": "組織/チームの役割",
     "manage": "管理",
     "inGroup": "グループで管理する",
-    "usersCapped": "{{total}} の最初の {{shown}} を表示"
+    "usersCapped": "{{total}} の最初の {{shown}} を表示",
+    "recurringAmount": "サイクルごとのクレジット",
+    "recurringInterval": "詰め替えサイクル（日）",
+    "recurringCarryover": "持ち越す",
+    "carryOn": "持ち越す",
+    "carryOff": "期限切れ",
+    "recurringSaved": "定期的なクレジットが保存されました。",
+    "recurringTitle": "定期的なクレジット",
+    "recurringNote": "各サイクルでこの量だけ組織プールを補充します (0 は無効にします)。",
+    "maxIntervalHint": "プラットフォームの制限: {{n}} 日以下"
   },
   "gdetail": {
     "title": "グループ",
@@ -1103,7 +1208,25 @@
     "needTarget": "ターゲットグループを選択してください",
     "moveFail": "移動に失敗しました",
     "moved": "{{name}} を {{group}} に移動しました",
-    "moveHint": "役割は引き継がれます。このグループに割り当てられたクレジットは割り当てられず、使用履歴はこのグループに残ります。"
+    "moveHint": "役割は引き継がれます。このグループに割り当てられたクレジットは割り当てられず、使用履歴はこのグループに残ります。",
+    "refillNow": "今すぐ補充してください",
+    "refillCol": "定期的な補充",
+    "noRecurringShort": "定期的な補充はありません",
+    "memberRefillSaved": "定期的な補充が保存されました",
+    "refillTitle": "チーム定期補充",
+    "nextRefill": "次の詰め替え",
+    "refillFail": "補充に失敗しました",
+    "refillMenu": "リフィル",
+    "refillCarryover": "未使用のクレジットを引き継ぐ",
+    "refillInheritPh": "継承された",
+    "refilledNow": "今すぐ補充: +{{n}} C",
+    "refillSaved": "定期的な補充が保存されました。",
+    "refillInterval": "サイクル (日) — チームのデフォルトの場合は空のままにしておきます",
+    "memberRefillSet": "定期的なリフィルを設定する",
+    "memberRefillHint": "この金額は各サイクルでメンバーのウォレットに支払われます。 「今すぐ補充」を使用してすぐに支払います。",
+    "noRecurring": "定期的な補充量は設定されていません",
+    "refillAmount": "定期補充量(C)",
+    "memberRefillTitle": "定期的な補充 — {{name}}"
   },
   "picker": {
     "allOrgs": "すべての組織",
@@ -1125,5 +1248,8 @@
     "reason": "理由（任意）",
     "reasonPh": "例えば学期ごとの研究サポート",
     "grant": "付与"
+  },
+  "paged": {
+    "range": "{{from}}～{{to}}/{{total}}"
   }
 }

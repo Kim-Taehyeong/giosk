@@ -156,7 +156,11 @@
     "kpiCooldown": "Prøv nedkjøling på nytt",
     "kpiFree": "Gratis (ubegrenset)",
     "kpiNodes": "Tilgjengelige noder",
-    "kpiMaxLease": "Maks leieavtale"
+    "kpiMaxLease": "Maks leieavtale",
+    "hamiFractional": "Fraksjonert (av VRAM og kjerner)",
+    "exclusiveWhole": "Dedikert (helt kort)",
+    "hamiShared": "HAMi brøkdel",
+    "slots": "spilleautomater"
   },
   "newSession": {
     "crumb": "Økter",
@@ -310,7 +314,8 @@
     "grpGuaranteed": "Partisjonert GPU · VRAM garantert",
     "tsSlotN": "1 av {{n}}-spor",
     "hoursApprox": "~{{n}} timer",
-    "sshKeyChange": "Endre"
+    "sshKeyChange": "Endre",
+    "sshCacheCount": "{{n}} bufret"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "regenerated": "Utstedte en ny tilgangslenke.",
     "sshDirect": "Direkte (intranett)",
     "sshNeedKey": "Ingen offentlig SSH-nøkkel registrert",
-    "sshNeedKeyHint": "Registrer eller generer en nedenfor – kjørende økter tar den i bruk umiddelbart."
+    "sshNeedKeyHint": "Registrer eller generer en nedenfor – kjørende økter tar den i bruk umiddelbart.",
+    "webConnectNewWindow": "Åpner en nettleserterminal i et nytt vindu - ingen SSH-nøkkel eller kommando nødvendig."
   },
   "account": {
     "title": "Mine innstillinger",
@@ -464,7 +470,8 @@
     "sshGenerate": "Generer og last ned nøkkel",
     "sshGenerated": "Nøkkel generert. Oppbevar den nedlastede private nøkkelen trygt – den kan ikke lastes ned igjen.",
     "sshGenFail": "Kunne ikke generere SSH-nøkkel.",
-    "sshGenerateHint": "Ingen nøkkel ennå? Klikk «Generer og last ned nøkkel». Den private nøkkelen (.pem) lastes ned én gang, og den offentlige registreres automatisk. Koble til med: ssh -i nedlastet-noekkel.pem …"
+    "sshGenerateHint": "Ingen nøkkel ennå? Klikk «Generer og last ned nøkkel». Den private nøkkelen (.pem) lastes ned én gang, og den offentlige registreres automatisk. Koble til med: ssh -i nedlastet-noekkel.pem …",
+    "activeScope": "Aktiv"
   },
   "notify": {
     "title": "Varsler",
@@ -493,7 +500,19 @@
     "mIdle": "Inaktiv tid for økten",
     "sev_warn": "Advarsel",
     "sev_err": "Feil",
-    "sev_info": "Info"
+    "sev_info": "Info",
+    "mSessCpu": "Sesjon CPU-utnyttelse",
+    "mSessGpu": "Sesjon GPU-bruk",
+    "prev": "Tidligere",
+    "inboxTitle": "Innboks",
+    "next": "Neste",
+    "readAll": "Merk alt som lest",
+    "mSessVram": "Sesjon VRAM-utnyttelse",
+    "selectSession": "Velg en økt",
+    "noSession": "Ingen løpeøkter",
+    "scopeAccount": "Hele kontoen",
+    "inboxEmpty": "Ingen varsler ennå.",
+    "rulesHint": "Varslingsregler og varsler er per konto og deles på tvers av alle team. Øktberegninger blir evaluert på den valgte økten."
   },
   "wallet": {
     "title": "Lommebok / kreditter",
@@ -535,7 +554,15 @@
     "topupSent": "Forespørsel sendt (venter på godkjenning fra gruppeadministrator)",
     "topupSend": "Send forespørsel",
     "desc_gpu": "GPU-bruk ({{ref}})",
-    "desc_storage": "Lagring ({{ref}})"
+    "desc_storage": "Lagring ({{ref}})",
+    "rechargeSoon": "Snart",
+    "nextRecharge": "Neste påfyll",
+    "rechargeEvery": "Hver {{n}}-dag",
+    "searchPh": "Søk etter økter, typer, detaljer",
+    "consumedCol": "Forbrukt",
+    "session": "Sesjon",
+    "viewAll": "Alle oppføringer",
+    "viewBySession": "Gruppe for økt"
   },
   "volume": {
     "title": "Data / Volumer",
@@ -596,7 +623,16 @@
     "thisVol": "Dette volumet",
     "nfsHint": "Volumer lages på NFS.",
     "quotaHint": "Lagringsgrense per bruker for dine personlige volumer (uavhengig av gruppe). Nye volumer blokkeres når du overskrider det.",
-    "overQuota": "Overskrider gjenværende kvote ({{remain}} GB)"
+    "overQuota": "Overskrider gjenværende kvote ({{remain}} GB)",
+    "personal": "Personlig",
+    "teamQuota": "Overskrider mållagets volumkvote",
+    "changeTeamTitle": "Bytt lag — {{name}}",
+    "changeTeam": "Bytt lag",
+    "teamHome": "Fakturert til teamet",
+    "sharedBy": "Delt av",
+    "teamChanged": "Laget endret seg",
+    "teamFail": "Kunne ikke bytte lag",
+    "teamHint": "Dette volumets kapasitetskvote og lagringskreditter kommer fra det valgte teamet. Du forblir eieren."
   },
   "gmembers": {
     "title": "Medlemmer",

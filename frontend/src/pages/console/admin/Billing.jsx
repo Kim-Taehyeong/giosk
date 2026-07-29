@@ -8,6 +8,7 @@ import PagedTable from '../../../components/console/PagedTable';
 import { getBilling } from '../../../api/console/misc';
 import { downloadCsv } from '../../../utils/csv';
 import { cU } from '../../../lib/credit';
+import { tabbable } from '../../../utils/a11y';
 
 // 기간 프리셋 → {from,to} (YYYY-MM-DD; to 는 배타). 'all'=전체.
 function periodRange(key) {
@@ -71,9 +72,9 @@ export default function Billing() {
       </div>
 
       <div className="subtabs">
-        <span className={`st${tab === 'org' ? ' active' : ''}`} onClick={() => setTab('org')}>{t('billing.tabOrg')}</span>
-        <span className={`st${tab === 'group' ? ' active' : ''}`} onClick={() => setTab('group')}>{t('billing.tabGroup')}</span>
-        <span className={`st${tab === 'user' ? ' active' : ''}`} onClick={() => setTab('user')}>{t('billing.tabUser')}</span>
+        <span className={`st${tab === 'org' ? ' active' : ''}`} {...tabbable(() => setTab('org'), tab === 'org')}>{t('billing.tabOrg')}</span>
+        <span className={`st${tab === 'group' ? ' active' : ''}`} {...tabbable(() => setTab('group'), tab === 'group')}>{t('billing.tabGroup')}</span>
+        <span className={`st${tab === 'user' ? ' active' : ''}`} {...tabbable(() => setTab('user'), tab === 'user')}>{t('billing.tabUser')}</span>
       </div>
 
       <div className="card">

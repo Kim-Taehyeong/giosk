@@ -95,18 +95,18 @@ export default function Orgs() {
         {/* 필수는 식별자 하나뿐 — 나머지는 접어둔다(조직부터 만들고 사람은 나중에). */}
         <div className="grid cols-2" style={{ gap: 14 }}>
           <div>
-            <label className="fld" style={{ marginTop: 0 }}>{t('orgs.ident')}<Req /></label>
-            <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="ai-center" />
+            <label className="fld" htmlFor="admin-orgs-fld-0" style={{ marginTop: 0 }}>{t('orgs.ident')}<Req /></label>
+            <input id="admin-orgs-fld-0" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="ai-center" />
           </div>
           <div>
-            <label className="fld" style={{ marginTop: 0 }}>{t('orgs.display')}</label>
-            <input type="text" value={form.displayName} onChange={(e) => setForm({ ...form, displayName: e.target.value })} placeholder="AI Center" />
+            <label className="fld" htmlFor="admin-orgs-fld-1" style={{ marginTop: 0 }}>{t('orgs.display')}</label>
+            <input id="admin-orgs-fld-1" type="text" value={form.displayName} onChange={(e) => setForm({ ...form, displayName: e.target.value })} placeholder="AI Center" />
           </div>
         </div>
         {creditMode && (
           <>
-            <label className="fld">{t('orgs.pool')}</label>
-            <input type="number" value={form.creditPool} onChange={(e) => setForm({ ...form, creditPool: Number(e.target.value) })} />
+            <label className="fld" htmlFor="admin-orgs-fld-2">{t('orgs.pool')}</label>
+            <input id="admin-orgs-fld-2" type="number" value={form.creditPool} onChange={(e) => setForm({ ...form, creditPool: Number(e.target.value) })} />
             <div className="legend mt">{t('orgs.poolHint')}</div>
           </>
         )}

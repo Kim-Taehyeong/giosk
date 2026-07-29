@@ -14,6 +14,7 @@ import { getAnnouncements } from '../../../api/console/announcements';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { useAuth } from '../../../context/AuthContext';
 import { c } from '../../../lib/credit';
+import { clickable } from '../../../utils/a11y';
 
 // 공지 레벨별 스타일. critical 은 사용자가 닫을 수 없음(고정 노출).
 const NOTICE_STYLE = {
@@ -138,7 +139,7 @@ export default function UserDashboard() {
           {quick.map((c, i) => {
             const Icon = c.icon;
             return (
-              <div className="task-card" key={i} onClick={() => navigate(c.to)}>
+              <div className="task-card" key={i} {...clickable(() => navigate(c.to))}>
                 {c.badge && <div className="ribbon">{c.badge}</div>}
                 <div className="ico" style={{ background: c.color, color: c.fg }}><Icon size={22} /></div>
                 <h4>{c.title}</h4>

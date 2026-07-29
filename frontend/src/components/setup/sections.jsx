@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Boxes, TerminalSquare, Check, Wallet, Zap } from 'lucide-react';
 import Toggle from '../console/Toggle';
 import Select from '../console/Select';
+import { clickable } from '../../utils/a11y';
 
 // 위저드(/setup)와 관리자 Settings 가 공유하는 정책 폼 섹션.
 // 각 섹션은 { config, update } 를 받아 해당 슬라이스를 읽고 중첩 patch 로 갱신한다.
@@ -43,7 +44,7 @@ function SwitchRow({ label, hint, checked, onChange }) {
 
 function SelCard({ on, onClick, icon: Icon, title, desc }) {
   return (
-    <div className={`selbox${on ? ' on' : ''}`} onClick={onClick}
+    <div className={`selbox${on ? ' on' : ''}`} {...clickable(onClick)}
       style={{ flex: 1, minWidth: 220, padding: 16, borderRadius: 12, cursor: 'pointer',
         border: '2px solid ' + (on ? 'var(--primary)' : 'var(--border)'),
         background: on ? 'var(--primary-soft)' : 'var(--surface)' }}>

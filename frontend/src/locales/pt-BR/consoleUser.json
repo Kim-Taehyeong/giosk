@@ -156,7 +156,11 @@
     "kpiBilling": "Cobrança",
     "kpiFree": "Gratuito (ilimitado)",
     "kpiNodes": "Nós disponíveis",
-    "noticePinned": "Fixado"
+    "noticePinned": "Fixado",
+    "hamiShared": "HAMi fracionário",
+    "slots": "Caça-níqueis",
+    "exclusiveWhole": "Dedicado (cartão inteiro)",
+    "hamiFractional": "Fracionário (por VRAM e núcleos)"
   },
   "newSession": {
     "crumb": "Sessões",
@@ -310,7 +314,8 @@
     "hoursApprox": "~{{n}} horas",
     "notEnough": "Crédito insuficiente – mínimo de 1 hora necessária",
     "tsSlotN": "1 dos slots {{n}}",
-    "sshKeyChange": "Alterar"
+    "sshKeyChange": "Alterar",
+    "sshCacheCount": "{{n}} em cache"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "regenerate": "Regenerado",
     "regenerated": "Emitido um novo link de acesso.",
     "sshNeedKey": "Nenhuma chave pública SSH cadastrada",
-    "sshNeedKeyHint": "Cadastre ou gere uma abaixo — sessões em execução aplicam na hora."
+    "sshNeedKeyHint": "Cadastre ou gere uma abaixo — sessões em execução aplicam na hora.",
+    "webConnectNewWindow": "Abre um terminal do navegador em uma nova janela – nenhuma chave ou comando SSH é necessário."
   },
   "account": {
     "title": "Minhas configurações",
@@ -464,7 +470,8 @@
     "sshGenerate": "Gerar e baixar chave",
     "sshGenerated": "Chave gerada. Guarde com segurança a chave privada baixada — ela não pode ser baixada novamente.",
     "sshGenFail": "Falha ao gerar a chave SSH.",
-    "sshGenerateHint": "Ainda sem chave? Clique em \"Gerar e baixar chave\". A chave privada (.pem) é baixada uma única vez e a pública é cadastrada automaticamente. Conexão: ssh -i chave-baixada.pem …"
+    "sshGenerateHint": "Ainda sem chave? Clique em \"Gerar e baixar chave\". A chave privada (.pem) é baixada uma única vez e a pública é cadastrada automaticamente. Conexão: ssh -i chave-baixada.pem …",
+    "activeScope": "Ativo"
   },
   "notify": {
     "title": "Notificações",
@@ -493,7 +500,19 @@
     "mGpu": "Utilização de GPU",
     "sev_err": "Erro",
     "sev_warn": "Aviso",
-    "sev_info": "Informações"
+    "sev_info": "Informações",
+    "mSessGpu": "Utilização de GPU de sessão",
+    "mSessCpu": "Utilização da CPU da sessão",
+    "mSessVram": "Utilização de VRAM de sessão",
+    "inboxTitle": "Caixa de entrada",
+    "readAll": "Marcar tudo como lido",
+    "inboxEmpty": "Nenhuma notificação ainda.",
+    "scopeAccount": "Conta inteira",
+    "prev": "Anterior",
+    "next": "Próximo",
+    "rulesHint": "As regras e notificações de alerta são por conta e compartilhadas entre todas as equipes. As métricas da sessão são avaliadas na sessão selecionada.",
+    "selectSession": "Selecione uma sessão",
+    "noSession": "Nenhuma sessão em execução"
   },
   "wallet": {
     "title": "Carteira / Créditos",
@@ -535,7 +554,15 @@
     "reasonPh": "Insira um motivo",
     "free": "Livre",
     "desc_gpu": "Uso de GPU ({{ref}})",
-    "desc_storage": "Armazenamento ({{ref}})"
+    "desc_storage": "Armazenamento ({{ref}})",
+    "rechargeSoon": "Breve",
+    "nextRecharge": "Próxima recarga",
+    "rechargeEvery": "Todos os dias {{n}}",
+    "searchPh": "Pesquisar sessões, tipos, detalhes",
+    "viewAll": "Todas as entradas",
+    "viewBySession": "Agrupar por sessão",
+    "session": "Sessão",
+    "consumedCol": "Consumido"
   },
   "volume": {
     "title": "Dados/Volumes",
@@ -596,7 +623,16 @@
     "afterUse": "Usado depois",
     "afterRemain": "Saiu depois",
     "quotaHint": "Limite de armazenamento por usuário para seus volumes pessoais (independentemente do grupo). Novos volumes são bloqueados quando você excede esse valor.",
-    "overQuota": "Excede a cota restante ({{remain}} GB)"
+    "overQuota": "Excede a cota restante ({{remain}} GB)",
+    "teamQuota": "Excede a cota de volume da equipe alvo",
+    "teamFail": "Não foi possível mudar de equipe",
+    "teamChanged": "Equipe alterada",
+    "teamHome": "Faturado para a equipe",
+    "personal": "Pessoal",
+    "changeTeam": "Mudar equipe",
+    "sharedBy": "Compartilhado por",
+    "changeTeamTitle": "Mudança de equipe - {{name}}",
+    "teamHint": "A cota de capacidade e os créditos de armazenamento deste volume vêm da equipe selecionada. Você continua sendo o proprietário."
   },
   "gmembers": {
     "title": "Membros",

@@ -175,33 +175,33 @@ export default function Users() {
         {add && (<>
           {/* 필수는 이름·계정뿐. 소속·역할·비번은 나중에도 바꿀 수 있으니 접어둔다. */}
           <div className="grid cols-2" style={{ gap: 14 }}>
-            <div><label className="fld" style={{ marginTop: 0 }}>{t('users.fName')}<Req /></label>
-              <input type="text" value={add.name} onChange={(e) => setAdd({ ...add, name: e.target.value })} placeholder="홍길동" /></div>
-            <div><label className="fld" style={{ marginTop: 0 }}>{t('users.fUsername')}<Req /></label>
-              <input type="text" value={add.username} onChange={(e) => setAdd({ ...add, username: e.target.value })} placeholder="hong" /></div>
+            <div><label className="fld" htmlFor="admin-users-fld-0" style={{ marginTop: 0 }}>{t('users.fName')}<Req /></label>
+              <input id="admin-users-fld-0" type="text" value={add.name} onChange={(e) => setAdd({ ...add, name: e.target.value })} placeholder="홍길동" /></div>
+            <div><label className="fld" htmlFor="admin-users-fld-1" style={{ marginTop: 0 }}>{t('users.fUsername')}<Req /></label>
+              <input id="admin-users-fld-1" type="text" value={add.username} onChange={(e) => setAdd({ ...add, username: e.target.value })} placeholder="hong" /></div>
           </div>
-          <label className="fld">{t('users.fEmail')}</label>
-          <input type="email" value={add.email} onChange={(e) => setAdd({ ...add, email: e.target.value })} placeholder="hong@giosk.io" />
+          <label className="fld" htmlFor="admin-users-fld-2">{t('users.fEmail')}</label>
+          <input id="admin-users-fld-2" type="email" value={add.email} onChange={(e) => setAdd({ ...add, email: e.target.value })} placeholder="hong@giosk.io" />
           <div className="legend mt">{t('users.addHint')}</div>
 
           <Advanced title={t('users.advBelong')} defaultOpen={!!(add.orgId || add.groupId || add.advisor)}>
             <div className="grid cols-2" style={{ gap: 14 }}>
-              <div><label className="fld" style={{ marginTop: 0 }}>{t('users.fOrg')}</label>
-                <Select value={add.orgId} placeholder={t('users.orgPh')}
+              <div><label className="fld" id="admin-users-fld-3-lbl" style={{ marginTop: 0 }}>{t('users.fOrg')}</label>
+                <Select ariaLabelledBy="admin-users-fld-3-lbl" value={add.orgId} placeholder={t('users.orgPh')}
                   onChange={(v) => setAdd({ ...add, orgId: Number(v), groupId: 0 })}
                   options={orgs.map((o) => ({ value: o.id, label: o.displayName }))} /></div>
-              <div><label className="fld" style={{ marginTop: 0 }}>{t('users.fGroup')}</label>
-                <Select value={add.groupId} placeholder={add.orgId ? t('users.groupPh') : t('users.groupPickOrgFirst')}
+              <div><label className="fld" id="admin-users-fld-4-lbl" style={{ marginTop: 0 }}>{t('users.fGroup')}</label>
+                <Select ariaLabelledBy="admin-users-fld-4-lbl" value={add.groupId} placeholder={add.orgId ? t('users.groupPh') : t('users.groupPickOrgFirst')}
                   disabled={!add.orgId}
                   onChange={(v) => setAdd({ ...add, groupId: Number(v) })}
                   options={allGroups.filter((g) => g.orgId === add.orgId).map((g) => ({ value: g.id, label: g.displayName }))} /></div>
-              <div><label className="fld">{t('users.fRole')}</label>
-                <Select value={add.role} onChange={(v) => setAdd({ ...add, role: v })} options={ROLES.map((x) => ({ value: x, label: x }))} /></div>
-              <div><label className="fld">{t('users.fAdvisor')}</label>
-                <input type="text" value={add.advisor} onChange={(e) => setAdd({ ...add, advisor: e.target.value })} placeholder="김담당" /></div>
+              <div><label className="fld" id="admin-users-fld-5-lbl">{t('users.fRole')}</label>
+                <Select ariaLabelledBy="admin-users-fld-5-lbl" value={add.role} onChange={(v) => setAdd({ ...add, role: v })} options={ROLES.map((x) => ({ value: x, label: x }))} /></div>
+              <div><label className="fld" htmlFor="admin-users-fld-6">{t('users.fAdvisor')}</label>
+                <input id="admin-users-fld-6" type="text" value={add.advisor} onChange={(e) => setAdd({ ...add, advisor: e.target.value })} placeholder="김담당" /></div>
             </div>
-            <label className="fld">{t('users.fPassword')}</label>
-            <input type="text" value={add.password} onChange={(e) => setAdd({ ...add, password: e.target.value })} placeholder={t('users.fPasswordPh')} />
+            <label className="fld" htmlFor="admin-users-fld-7">{t('users.fPassword')}</label>
+            <input id="admin-users-fld-7" type="text" value={add.password} onChange={(e) => setAdd({ ...add, password: e.target.value })} placeholder={t('users.fPasswordPh')} />
             <div className="legend">{t('users.fPasswordHint')}</div>
           </Advanced>
         </>)}
@@ -210,8 +210,8 @@ export default function Users() {
       <Modal open={!!grant} title={t('users.grantTitle', { name: grant?.user?.name || '' })} onClose={() => setGrant(null)} width={520}
         footer={<button className="btn primary" onClick={submitGrant}>{t('users.grant')}</button>}>
         {grant && (<>
-          <label className="fld" style={{ marginTop: 0 }}>{t('users.grantLabel')}</label>
-          <input type="number" value={grant.delta} onChange={(e) => setGrant({ ...grant, delta: e.target.value })} />
+          <label className="fld" htmlFor="admin-users-fld-8" style={{ marginTop: 0 }}>{t('users.grantLabel')}</label>
+          <input id="admin-users-fld-8" type="number" value={grant.delta} onChange={(e) => setGrant({ ...grant, delta: e.target.value })} />
           <div className="legend mt">{t('users.grantHint')}</div>
         </>)}
       </Modal>

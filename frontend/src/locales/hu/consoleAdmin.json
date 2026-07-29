@@ -53,7 +53,8 @@
     "create": "Teremt",
     "edit": "Szerkesztés",
     "advanced": "További beállítások",
-    "comingSoon": "Hamarosan"
+    "comingSoon": "Hamarosan",
+    "prev": "Előző"
   },
   "dash": {
     "title": "Műszerfal",
@@ -197,7 +198,10 @@
     "groupPickOrgFirst": "Először válasszon egy szervezetet",
     "totalN": "{{n}} felhasználók",
     "advBelong": "Tagság · szerep · jelszó",
-    "prev": "Előző"
+    "prev": "Előző",
+    "colRefill": "Ismétlődő utántöltés",
+    "colBalance": "Jelenlegi egyenleg",
+    "refillDefault": "Alapértelmezett"
   },
   "groups": {
     "title": "Csoportok",
@@ -248,7 +252,18 @@
     "insufficientOrgPool": "Nem elegendő a szervezeti hitelkészlet egyenlege.",
     "grantHintSuper": "Platform-admin kivétel engedélyezése. Az integritás érdekében ugyanez az összeg automatikusan hozzáadódik a szülő szervezeti készlethez.",
     "grantHintOrg": "Levonva a szervezeti készletből, és hozzáadva a csoport készletéhez. Nem lépheti túl a szervezeti készlet egyenlegét.",
-    "bulkDone": "Tömegesen hozzáadott {{n}} csoportok"
+    "bulkDone": "Tömegesen hozzáadott {{n}} csoportok",
+    "colRefill": "Ismétlődő utántöltés",
+    "refillInterval": "Újratöltési ciklus (nap)",
+    "refillDefault": "Alapértelmezett",
+    "deleteFail": "A törlés nem sikerült",
+    "initCreditAmt": "Kezdeti kreditek",
+    "refillAmt": "Ismétlődő utántöltés (ciklusonként)",
+    "cantDeleteDefault": "Az alapértelmezett csapat nem törölhető.",
+    "carryover": "Vigye át a fel nem használt hiteleket",
+    "hasMembers": "Ennek a csapatnak még vannak tagjai. A törlés előtt mozgassa vagy távolítsa el őket.",
+    "initCredit": "Kezdeti kreditek és ismétlődő utántöltés",
+    "initCreditHint": "Opcionálisan lefoglalhat a szervezeti készletből, és a csapat létrehozásakor beállíthat egy utántöltést. Ezt később is megteheti a csapat részletes oldalán."
   },
   "orgs": {
     "title": "Szervezetek",
@@ -292,7 +307,11 @@
     "createFail": "Nem sikerült létrehozni a szervezetet",
     "grantHint": "Azonnal alkalmazzák a szervezeti készletben, és rögzítik az auditnaplóban.",
     "adminHintOpt": "Hagyja üresen, ha csak az „Általános” csoportot szeretné létrehozni, és később rendelhet hozzá adminisztrátort a Szervezeti adatok → Általános → Szervezeti rendszergazdai szerepkörrel rendelkező tag hozzáadása menüpontban.",
-    "adminOpt": "Szervezeti adminisztrátor (opcionális)"
+    "adminOpt": "Szervezeti adminisztrátor (opcionális)",
+    "deleteFail": "A törlés nem sikerült",
+    "colRefill": "Ismétlődő utántöltés",
+    "refillDefault": "Alapértelmezett",
+    "hasUsers": "Ennek a szervezetnek még mindig vannak felhasználói. A törlés előtt mozgassa vagy távolítsa el őket."
   },
   "billing": {
     "title": "Számlázás",
@@ -318,7 +337,12 @@
     "byGroup": "Fogyasztás csoportonként (bemutató)",
     "consumed": "Kredit",
     "byUser": "Fogyasztás felhasználó szerint",
-    "vsAlloc": "vs alloc"
+    "vsAlloc": "vs alloc",
+    "period7d": "Az elmúlt 7 nap",
+    "periodLastMonth": "Múlt hónapban",
+    "periodAll": "Minden alkalommal",
+    "periodMonth": "Ebben a hónapban",
+    "periodNote": "A megjelenített fogyasztás és GPU órák a kiválasztott időszakban történtek, főkönyvenként. A költségvetések és a készletek nem időszakosak."
   },
   "audit": {
     "title": "Ellenőrzési napló",
@@ -476,7 +500,10 @@
     "impNoUser": "Fiók nem található.",
     "impOwnerHint": "Az importáláshoz válasszon fiókot a listából.",
     "impOwnerPicked": "Kiválasztva: {{name}} ({{id}})",
-    "metricsOffNotice": "A megfigyelés (DCGM/Prometheus) nincs telepítve, ezért a GPU-kihasználtság és a VRAM nem jeleníthető meg. Kapcsolja be a megfigyelést az élő mutatókhoz."
+    "metricsOffNotice": "A megfigyelés (DCGM/Prometheus) nincs telepítve, ezért a GPU-kihasználtság és a VRAM nem jeleníthető meg. Kapcsolja be a megfigyelést az élő mutatókhoz.",
+    "cordon": "Kordon",
+    "uncordon": "Uncordon",
+    "noMetrics": "Nincsenek mutatók"
   },
   "mset": {
     "title": "Beállítások elemre",
@@ -599,7 +626,21 @@
     "removeConfirm": "Távolítsa el ezt a felhasználót a {{group}} csoportból.",
     "moved": "Áthelyezve a {{group}}-be",
     "moveFail": "Az áthelyezés nem sikerült",
-    "removed": "Eltávolítva a csoportból"
+    "removed": "Eltávolítva a csoportból",
+    "granted": "Nyújtott {{n}} C",
+    "restore": "Visszaállítás",
+    "memberAdded": "Tagság hozzáadva.",
+    "grantFail": "Grant megbukott",
+    "addFail": "Nem sikerült hozzáadni",
+    "grantAmount": "Megadandó jóváírások (C; negatív levonások)",
+    "statusConfirm": "Ez megváltoztatja a felhasználó állapotát.",
+    "noTeamsInOrg": "Ennek a szervezetnek nincsenek csapatai.",
+    "suspend": "Felfüggeszteni",
+    "grant": "Támogatási kreditek",
+    "addMembership": "Tagság hozzáadása",
+    "pickOrg": "Válasszon ki egy szervezetet",
+    "grantTitle": "Támogatási kreditek — {{name}}",
+    "grantHint": "A személyi hitelegyenlegre azonnal alkalmazva, egyszeri korrekcióként az ellenőrzési naplóban rögzítve."
   },
   "clusters": {
     "title": "Klaszterek",
@@ -699,7 +740,12 @@
     "needRef": "Adjon meg egy képet ref",
     "extSshOnly": "VSCode/Jupyter/egyéni port hiányában ezen a képen a munkamenetek csak SSH-t használnak.",
     "extFail": "Nem sikerült regisztrálni a külső képet",
-    "extRegistered": "Külső kép regisztrálva"
+    "extRegistered": "Külső kép regisztrálva",
+    "loading": "…",
+    "notCached": "Nincs gyorsítótárban",
+    "notFound": "A kép nem található.",
+    "info": "Kép információ",
+    "logsHint": "Betöltési és vizsgálati naplókat tölt be."
   },
   "anotify": {
     "title": "Értesítések",
@@ -886,7 +932,23 @@
     "leaseHead": "Munkamenet-kiterjesztés (érkezési sorrend)",
     "brandAccent": "Logó színe",
     "brandName": "Szolgáltatás neve",
-    "brandingNote": "Testreszabhatja a szolgáltatás nevét és a logó színét a szervezet számára. Azonnal alkalmazva a bejelentkezéshez és a konzol fejlécéhez."
+    "brandingNote": "Testreszabhatja a szolgáltatás nevét és a logó színét a szervezet számára. Azonnal alkalmazva a bejelentkezéshez és a konzol fejlécéhez.",
+    "carryoverOn": "Vigye át a fel nem használt hiteleket",
+    "rechargeEnabled": "Az ismétlődő utántöltés engedélyezése",
+    "brandSubtitle": "Felirat",
+    "rechargeInterval": "Alapértelmezett utántöltési ciklus (nap) · az alacsonyabb szintek határértéke",
+    "rechargeSaved": "Az utántöltési beállítások elmentve.",
+    "carryoverOff": "Minden ciklus lejár",
+    "rechargeCarryover": "Átvitel engedélyezése",
+    "rechargeNote": "A platform alapértelmezett utántöltési ciklusa és átviteli szabályzata. A szervezetek, csapatok és magánszemélyek választhatnak rövidebb ciklust, de soha nem hosszabbat, és ha egy szülő nem engedélyezi az átvitelt, az alatta lévő fel nem használt kreditek ezen a határon járnak le.",
+    "rechargeTitle": "Ismétlődő hitelfeltöltés (alapértelmezett és limit)",
+    "rechargeAmountHint": "Beállíthatja a szervezetenkénti, csapatonkénti és felhasználónkénti utántöltési mennyiségeket, ciklusokat és átvitelt a részletes oldalukon. Egy ciklus soha nem lehet hosszabb, mint a szülőé.",
+    "brandIcon": "Ikon",
+    "brandIconClear": "Távolítsa el",
+    "brandIconUpload": "Ikon feltöltése (nem kötelező)",
+    "brandSubtitleHint": "Kis szöveg a logó mellett. Hagyja üresen, hogy elrejtse.",
+    "brandIconUploadHint": "A feltöltött ikon elsőbbséget élvez a fenti Lucide ikonnal szemben. 120 KB alatti PNG vagy SVG ajánlott.",
+    "brandIconTooBig": "Az ikon 120 KB vagy kisebb lehet."
   },
   "datasets": {
     "title": "Adatkészletek",
@@ -932,7 +994,40 @@
     "measuring": "Mérő…",
     "assignHint": "Válassza ki, hogy mely csomópontok gyorsítótárazzák ezt az adatkészletet. Az NFS-ből csomóponti lokálisra bontják ki azonnali használatra.",
     "dlInto": "Betöltés a /dataset/{{name}} mappába",
-    "notCached": "Nincs gyorsítótárban"
+    "notCached": "Nincs gyorsítótárban",
+    "phaseCopy": "Másolás",
+    "phaseDownload": "Letöltés",
+    "descFail": "Nem sikerült elmenteni a leírást",
+    "descSaved": "Leírás mentve.",
+    "info": "Adatkészlet információ",
+    "phaseExtract": "Kivonás",
+    "description": "Leírás",
+    "cacheFail": "A gyorsítótár kérése sikertelen",
+    "cache": "Csomópont gyorsítótár",
+    "notFound": "Adatkészlet nem található.",
+    "sizeClassSaved": "Méretosztály mentve.",
+    "regNeedName": "Adja meg az adatkészlet nevét.",
+    "regNeedFile": "Válasszon ki egy fájlt a beérkező levelek közül.",
+    "regNeedUrl": "Adjon meg egy URL-t.",
+    "sizeClass": "Méretosztály",
+    "registering": "Regisztráció",
+    "descPh": "Ismertesse ezt az adatkészletet",
+    "regRefresh": "Frissítés",
+    "regStarted": "A regisztráció megkezdődött – nyomon követheti a folyamatot a listában.",
+    "upTaken": "Már létezik ilyen nevű adatkészlet.",
+    "regTitle": "Adatkészlet regisztrálása",
+    "regUrl": "URL (wget)",
+    "regFail": "A regisztráció sikertelen",
+    "regSizeClass": "Méretosztály",
+    "regNfs": "NFS-másolat (SCP)",
+    "regBusy": "Regisztráció…",
+    "regInboxFile": "Beérkezett üzenetek fájl",
+    "extracting": "Kibontás…",
+    "upScope": "Láthatóság",
+    "regNfsHint": "Másoljon egy archívumot (zip, tar, tar.gz) az alábbi elérési útra, majd válassza ki a fájlt a regisztráláshoz. A regisztráció kikerül a beérkező levelek mappából, és automatikusan kicsomagolja.",
+    "regUrlField": "Letöltési URL",
+    "regInboxEmpty": "Üres a beérkezett üzenet. Másoljon egy fájlt a fenti elérési útra, majd frissítse.",
+    "regUrlHint": "A szerver közvetlenül letölti ezt az URL-t – semmi sem kerül feltöltésre a böngészőből. Kövesse nyomon a folyamatot a listában."
   },
   "announce": {
     "title": "Közlemények",
@@ -1054,7 +1149,8 @@
     "pickTarget": "Válassza ki a célt",
     "removeConfirm": "A „{{name}}” házirend törlésével az öröklődik a fenti hatókörből. Folytatja?",
     "globalNeedsValue": "Mind a négy globális határértéknek legalább 1-nek kell lennie",
-    "globalHint": "A globális mindenki számára a tartalék – nem lehet üres, és legalább 1-nek kell lennie. A szervezet/csoport/felhasználói hatókör felülírhatja."
+    "globalHint": "A globális mindenki számára a tartalék – nem lehet üres, és legalább 1-nek kell lennie. A szervezet/csoport/felhasználói hatókör felülírhatja.",
+    "capHint": "Maximum megengedett – GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · hangerő ≤ {{vol}}GiB · párhuzamos munkamenetek ≤ {{sess}}"
   },
   "roles": {
     "org_admin": "Szervezeti adminisztrátor",
@@ -1070,7 +1166,16 @@
     "usersCapped": "a {{total}} első {{shown}}-jét mutatja",
     "usersHint": "A szerep a felhasználó szerepe a csoporton belül. Módosítsa az adott csoport tagkezeléséből.",
     "manage": "Kezelése",
-    "inGroup": "Csoportos kezelés"
+    "inGroup": "Csoportos kezelés",
+    "recurringAmount": "Kredit ciklusonként",
+    "recurringInterval": "Újratöltési ciklus (nap)",
+    "recurringCarryover": "Átvitel",
+    "carryOn": "Vigye át",
+    "carryOff": "Lejár",
+    "recurringNote": "Ezzel az összeggel minden ciklusban újratölti a szervezeti készletet (0 letiltja).",
+    "recurringSaved": "Ismétlődő kreditek mentve.",
+    "maxIntervalHint": "Platformkorlát: {{n}} nap vagy kevesebb",
+    "recurringTitle": "Ismétlődő kreditek"
   },
   "gdetail": {
     "title": "Csoport",
@@ -1098,7 +1203,25 @@
     "moved": "{{name}} áthelyezve a {{group}}-be",
     "moveTo": "Áthelyezés ide",
     "moveFail": "Nem sikerült mozgatni",
-    "moveHint": "A szerep továbbviszi. Az ebben a csoportban kiosztott jóváírás nem, és a használati előzmények ennél a csoportnál maradnak."
+    "moveHint": "A szerep továbbviszi. Az ebben a csoportban kiosztott jóváírás nem, és a használati előzmények ennél a csoportnál maradnak.",
+    "refilledNow": "Most újratöltve: +{{n}} C",
+    "refillFail": "Az újratöltés nem sikerült",
+    "noRecurring": "Nincs beállítva ismétlődő utántöltési mennyiség",
+    "refillCol": "Ismétlődő utántöltés",
+    "refillMenu": "Utántöltés",
+    "refillSaved": "Az ismétlődő utántöltés mentve.",
+    "memberRefillSet": "Állítsa be az ismétlődő utántöltést",
+    "refillCarryover": "Vigye át a fel nem használt hiteleket",
+    "refillTitle": "Csapat ismétlődő utántöltés",
+    "noRecurringShort": "Nincs ismétlődő utántöltés",
+    "refillInheritPh": "Örökölt",
+    "memberRefillSaved": "Az ismétlődő utántöltés mentve",
+    "nextRefill": "Következő utántöltés",
+    "refillNow": "Töltse fel most",
+    "memberRefillTitle": "Ismétlődő utántöltés — {{name}}",
+    "refillAmount": "Ismétlődő utántöltési mennyiség (C)",
+    "refillInterval": "Ciklus (napok) — hagyja üresen a csapat alapértelmezett beállításához",
+    "memberRefillHint": "Ezt az összeget minden ciklusban befizetik a tag pénztárcájába. Azonnali kiegyenlítéséhez használja az „Úttöltés most” lehetőséget."
   },
   "picker": {
     "allOrgs": "Minden org",
@@ -1125,5 +1248,8 @@
   "brand": "Giosk konzol",
   "confirmDelete": "Törli ezt? Ezt nem lehet visszavonni.",
   "confirmTerminate": "Kényszerítette ezt a munkamenetet? A futó munka azonnal leáll.",
-  "confirmRemoveMember": "Eltávolítja ezt a tagot a csoportból?"
+  "confirmRemoveMember": "Eltávolítja ezt a tagot a csoportból?",
+  "paged": {
+    "range": "{{from}}–{{to}}/{{total}}"
+  }
 }

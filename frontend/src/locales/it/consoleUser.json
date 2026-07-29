@@ -156,7 +156,11 @@
     "gpuAvail": "GPU disponibile",
     "kpiNodes": "Nodi disponibili",
     "mySessions": "Le mie sessioni",
-    "kpiMaxLease": "Locazione massima"
+    "kpiMaxLease": "Locazione massima",
+    "hamiFractional": "Frazionario (per VRAM e core)",
+    "hamiShared": "HAMi frazionario",
+    "exclusiveWhole": "Dedicato (scheda intera)",
+    "slots": "Slot"
   },
   "newSession": {
     "crumb": "Sessioni",
@@ -310,7 +314,8 @@
     "runtimeLeft": "Autonomia a questo ritmo",
     "tsSlotN": "1 degli slot {{n}}",
     "notEnough": "Credito insufficiente: minimo 1 ora richiesta",
-    "sshKeyChange": "Modifica"
+    "sshKeyChange": "Modifica",
+    "sshCacheCount": "{{n}} memorizzato nella cache"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "sshDirectInHint": "Connettiti direttamente al nodo dall'interno della rete aziendale, bypassando il gateway.",
     "sshDirect": "Diretto (intranet)",
     "sshNeedKey": "Nessuna chiave pubblica SSH registrata",
-    "sshNeedKeyHint": "Registrane o generane una qui sotto: le sessioni in esecuzione la applicano subito."
+    "sshNeedKeyHint": "Registrane o generane una qui sotto: le sessioni in esecuzione la applicano subito.",
+    "webConnectNewWindow": "Apre un terminale del browser in una nuova finestra: non è necessaria alcuna chiave o comando SSH."
   },
   "account": {
     "title": "Le mie impostazioni",
@@ -464,7 +470,8 @@
     "sshGenerate": "Genera e scarica chiave",
     "sshGenerated": "Chiave generata. Conserva al sicuro la chiave privata scaricata: non può essere scaricata di nuovo.",
     "sshGenFail": "Generazione della chiave SSH non riuscita.",
-    "sshGenerateHint": "Non hai ancora una chiave? Clicca «Genera e scarica chiave». La chiave privata (.pem) viene scaricata una sola volta e quella pubblica è registrata automaticamente. Connessione: ssh -i chiave-scaricata.pem …"
+    "sshGenerateHint": "Non hai ancora una chiave? Clicca «Genera e scarica chiave». La chiave privata (.pem) viene scaricata una sola volta e quella pubblica è registrata automaticamente. Connessione: ssh -i chiave-scaricata.pem …",
+    "activeScope": "Attivo"
   },
   "notify": {
     "title": "Notifiche",
@@ -493,7 +500,19 @@
     "mIdle": "Tempo di inattività della sessione",
     "sev_info": "Informazioni",
     "sev_err": "Errore",
-    "sev_warn": "Avvertimento"
+    "sev_warn": "Avvertimento",
+    "inboxTitle": "Posta in arrivo",
+    "readAll": "Segna tutto letto",
+    "prev": "Precedente",
+    "next": "Prossimo",
+    "mSessVram": "Utilizzo della VRAM della sessione",
+    "mSessGpu": "Utilizzo della GPU della sessione",
+    "inboxEmpty": "Nessuna notifica ancora.",
+    "mSessCpu": "Utilizzo della CPU della sessione",
+    "rulesHint": "Le regole di avviso e le notifiche sono per account e condivise tra tutti i team. Le metriche della sessione vengono valutate sulla sessione selezionata.",
+    "scopeAccount": "Conto intero",
+    "selectSession": "Seleziona una sessione",
+    "noSession": "Nessuna sessione di corsa"
   },
   "wallet": {
     "title": "Portafoglio/Crediti",
@@ -535,7 +554,15 @@
     "topupSent": "Richiesta inviata (in attesa di approvazione dell'amministratore del gruppo)",
     "topupNote": "Applicato dopo l'approvazione dell'amministratore del gruppo (nessun pagamento reale)",
     "desc_storage": "Stoccaggio ({{ref}})",
-    "desc_gpu": "Utilizzo della GPU ({{ref}})"
+    "desc_gpu": "Utilizzo della GPU ({{ref}})",
+    "nextRecharge": "Prossima ricarica",
+    "rechargeSoon": "Presto",
+    "session": "Sessione",
+    "searchPh": "Cerca sessioni, tipologie, dettagli",
+    "viewAll": "Tutte le voci",
+    "consumedCol": "Consumato",
+    "rechargeEvery": "Ogni {{n}} giorni",
+    "viewBySession": "Raggruppa per sessione"
   },
   "volume": {
     "title": "Dati/Volumi",
@@ -596,7 +623,16 @@
     "afterRemain": "Lasciato dopo",
     "quota": "Quota di volume",
     "quotaHint": "Limite di archiviazione per utente per i tuoi volumi personali (indipendente dal gruppo). I nuovi volumi vengono bloccati una volta superato tale limite.",
-    "overQuota": "Supera la quota rimanente ({{remain}} GB)"
+    "overQuota": "Supera la quota rimanente ({{remain}} GB)",
+    "teamQuota": "Supera la quota di volume del team target",
+    "personal": "Personale",
+    "teamFail": "Impossibile cambiare squadra",
+    "teamChanged": "La squadra è cambiata",
+    "changeTeamTitle": "Cambia squadra — {{name}}",
+    "teamHome": "Fatturato alla squadra",
+    "sharedBy": "Condiviso da",
+    "changeTeam": "Cambia squadra",
+    "teamHint": "La quota di capacità e i crediti di archiviazione di questo volume provengono dal team selezionato. Rimani il proprietario."
   },
   "gmembers": {
     "title": "Membri",

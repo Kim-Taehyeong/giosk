@@ -156,7 +156,11 @@
     "gpuAvail": "GPU saatavilla",
     "nodeAvail": "Solmukohtainen saatavuus",
     "kpiMaxLease": "Max vuokrasopimus",
-    "kpiNodes": "Käytettävissä olevat solmut"
+    "kpiNodes": "Käytettävissä olevat solmut",
+    "hamiShared": "HAMi murtoluku",
+    "slots": "Slots",
+    "exclusiveWhole": "Omistettu (koko kortti)",
+    "hamiFractional": "Murtoluku (VRAM:in ja ytimien mukaan)"
   },
   "newSession": {
     "crumb": "Istunnot",
@@ -310,7 +314,8 @@
     "runtimeLeft": "Kesto tällä nopeudella",
     "guaranteed": "Taatut resurssit",
     "grpSlotDesc": "Useat ihmiset käyttävät vuorotellen yhtä GPU:ta. Muistia ei taata – jos toinen istunto tyhjentää VRAM-muistin, sinunkin voi epäonnistua.",
-    "sshKeyChange": "Vaihda"
+    "sshKeyChange": "Vaihda",
+    "sshCacheCount": "{{n}} välimuistissa"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "sshExternalHint": "Käytä tätä komentoa kampusverkon ulkopuolelta (hyppää välityspalvelimen kautta yhdyskäytävään).",
     "regenerated": "Myönnetty uusi pääsylinkki.",
     "sshNeedKey": "SSH-julkista avainta ei ole rekisteröity",
-    "sshNeedKeyHint": "Rekisteröi tai luo sellainen alta – käynnissä olevat istunnot ottavat sen heti käyttöön."
+    "sshNeedKeyHint": "Rekisteröi tai luo sellainen alta – käynnissä olevat istunnot ottavat sen heti käyttöön.",
+    "webConnectNewWindow": "Avaa selainpäätteen uuteen ikkunaan – SSH-avainta tai komentoa ei tarvita."
   },
   "account": {
     "title": "Omat asetukset",
@@ -464,7 +470,8 @@
     "sshGenerate": "Luo ja lataa avain",
     "sshGenerated": "Avain luotu. Säilytä ladattu yksityinen avain turvassa – sitä ei voi ladata uudelleen.",
     "sshGenFail": "SSH-avaimen luonti epäonnistui.",
-    "sshGenerateHint": "Eikö avainta vielä ole? Napsauta ”Luo ja lataa avain”. Yksityinen avain (.pem) ladataan kerran ja julkinen rekisteröidään automaattisesti. Yhdistä: ssh -i ladattu-avain.pem …"
+    "sshGenerateHint": "Eikö avainta vielä ole? Napsauta ”Luo ja lataa avain”. Yksityinen avain (.pem) ladataan kerran ja julkinen rekisteröidään automaattisesti. Yhdistä: ssh -i ladattu-avain.pem …",
+    "activeScope": "Aktiivinen"
   },
   "notify": {
     "title": "Ilmoitukset",
@@ -493,7 +500,19 @@
     "mIdle": "Istunnon joutoaika",
     "sev_info": "Tiedot",
     "sev_err": "Virhe",
-    "sev_warn": "Varoitus"
+    "sev_warn": "Varoitus",
+    "inboxTitle": "Saapuneet",
+    "prev": "Edellinen",
+    "mSessGpu": "Istunnon GPU:n käyttö",
+    "mSessVram": "Istunnon VRAM-käyttö",
+    "mSessCpu": "Istunnon suorittimen käyttö",
+    "scopeAccount": "Koko tili",
+    "readAll": "Merkitse kaikki luetuiksi",
+    "rulesHint": "Hälytyssäännöt ja ilmoitukset ovat tilikohtaisia ​​ja jaetaan kaikille tiimeille. Istuntotiedot arvioidaan valitussa istunnossa.",
+    "noSession": "Ei juoksutunteja",
+    "selectSession": "Valitse istunto",
+    "inboxEmpty": "Ei vielä ilmoituksia.",
+    "next": "Seuraavaksi"
   },
   "wallet": {
     "title": "Lompakko / krediittejä",
@@ -535,7 +554,15 @@
     "topupSent": "Pyyntö lähetetty (odotetaan ryhmän järjestelmänvalvojan hyväksyntää)",
     "topupNote": "Haettu sen jälkeen, kun ryhmän ylläpitäjä on hyväksynyt (ei oikeaa maksua)",
     "desc_gpu": "GPU:n käyttö ({{ref}})",
-    "desc_storage": "Tallennustila ({{ref}})"
+    "desc_storage": "Tallennustila ({{ref}})",
+    "nextRecharge": "Seuraava täyttö",
+    "rechargeSoon": "Pian",
+    "rechargeEvery": "Joka {{n}} päivä",
+    "viewAll": "Kaikki merkinnät",
+    "searchPh": "Hae istuntoja, tyyppejä, yksityiskohtia",
+    "consumedCol": "Kulutettu",
+    "session": "Istunto",
+    "viewBySession": "Ryhmittele istunnon mukaan"
   },
   "volume": {
     "title": "Tiedot / volyymit",
@@ -596,7 +623,16 @@
     "overQuota": "Ylittää jäljellä olevan kiintiön ({{remain}} Gt)",
     "quotaHint": "Käyttäjäkohtainen tallennusraja henkilökohtaisille levyillesi (ryhmästä riippumatta). Uudet määrät estetään, kun ylität sen.",
     "thisVol": "Tämä volyymi",
-    "afterUse": "Käytetty jälkeen"
+    "afterUse": "Käytetty jälkeen",
+    "personal": "Henkilökohtainen",
+    "teamHome": "Laskutettu joukkueelle",
+    "teamChanged": "Joukkue vaihtui",
+    "changeTeamTitle": "Vaihda joukkuetta — {{name}}",
+    "teamQuota": "Ylittää kohderyhmän volyymikiintiön",
+    "teamFail": "Joukkuetta ei voitu vaihtaa",
+    "sharedBy": "Jakanut",
+    "changeTeam": "Vaihda joukkuetta",
+    "teamHint": "Tämän taltion kapasiteettikiintiö ja tallennuspisteet tulevat valitulta tiimiltä. Sinä pysyt omistajana."
   },
   "gmembers": {
     "title": "jäsenet",

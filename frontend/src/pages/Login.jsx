@@ -47,71 +47,64 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white">
-      <div className="w-full max-w-md px-8">
-        <div className="flex justify-center mb-10">
-          <div className="flex items-center gap-3">
-            <LogoMark size={52} style={{ color: config.branding?.accent || '#2563eb' }} />
-            <div className="flex flex-col leading-none">
-              <span className="text-blue-900 font-black text-4xl tracking-tight">{config.branding?.name?.trim() || 'Giosk'}</span>
-              <span className="text-blue-700 text-sm font-semibold tracking-[0.3em] mt-1">CONSOLE</span>
-            </div>
-          </div>
+    <div className="auth-root">
+      <div className="auth-card">
+        <div className="auth-brand">
+          <LogoMark size={50} style={config.branding?.accent ? { color: config.branding.accent } : undefined} />
+          <span className="auth-name">
+            <strong>{config.branding?.name?.trim() || 'Giosk'}</strong>
+            <small>CONSOLE</small>
+          </span>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
-          <div className="relative">
-            <User className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+        <form onSubmit={handleSubmit}>
+          <div className="auth-field has-icon">
+            <User size={17} aria-hidden="true" />
             <input
+              id="auth-username"
               type="text"
               name="username"
               value={form.username}
               onChange={handleChange}
               placeholder={t('auth.login.usernameLocal')}
+              aria-label={t('auth.login.usernameLocal')}
               autoComplete="username"
               required
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
-          <div className="relative">
-            <Lock className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+          <div className="auth-field has-icon">
+            <Lock size={17} aria-hidden="true" />
             <input
+              id="auth-password"
               type="password"
               name="password"
               value={form.password}
               onChange={handleChange}
               placeholder={t('auth.login.password')}
+              aria-label={t('auth.login.password')}
               autoComplete="current-password"
               required
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
-          {errorMessage && (
-            <div className="text-red-500 text-sm text-center font-medium">{errorMessage}</div>
-          )}
+          {/* 로그인 실패는 화면이 바뀌지 않아 놓치기 쉽다 — 라이브 리전으로 읽어준다. */}
+          {errorMessage && <div className="auth-note err" role="alert">{errorMessage}</div>}
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`w-full text-white py-2 rounded-md transition duration-200 font-bold ${
-              isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-            }`}
-          >
+          <button type="submit" className="auth-submit" disabled={isLoading}>
             {isLoading ? t('auth.login.submitting') : t('auth.login.submit')}
           </button>
         </form>
 
         {config.features.signupRequest && (
-          <div className="mt-4 text-center">
-            <Link to="/signup-local" className="text-sm text-blue-600 hover:underline">
+          <div style={{ marginTop: 16, textAlign: 'center' }}>
+            <Link to="/signup-local" className="auth-link">
               {t('auth.login.signupLink')}
             </Link>
           </div>
         )}
 
-        <div className="mt-6 flex justify-center">
+        <div className="auth-foot">
           <LanguageSwitcher />
         </div>
       </div>

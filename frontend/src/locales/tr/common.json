@@ -67,7 +67,9 @@
       "errorGroup": "Bir kuruluş ve grup seçmelisiniz.",
       "errorPasswordShort": "Şifre en az 8 karakter olmalıdır.",
       "errorGeneric": "Kayıt başarısız oldu.",
-      "errorPasswordMismatch": "Şifreler eşleşmiyor."
+      "errorPasswordMismatch": "Şifreler eşleşmiyor.",
+      "pwMismatch": "Şifreler eşleşmiyor",
+      "pwMatch": "Şifreler eşleşiyor"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Düğümler {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "Düğümler {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "Düğümler {{up}}/{{total}} · GPU —",
+    "clusterStatus": "Küme durumu",
+    "rolePlatform": "Tüm platform",
+    "orgWhole": "Tüm organizasyon",
+    "unreadN": "{{n}} okunmamış",
+    "noAlerts": "Henüz uyarı yok.",
+    "alerts": "Uyarılar",
+    "rolePlatformSub": "Süper yönetici",
+    "creditBalance": "Kredi bakiyesi",
+    "viewAll": "Tümünü Bildirim Merkezi'nde görün"
+  },
+  "table": {
+    "empty": "Veri yok"
+  },
+  "refill": {
+    "carryover": "Devralma",
+    "note": "Her döngüde bu miktarda yeniden doldurulur (0 bunu devre dışı bırakır). Döngü, ebeveyn döngüsünden daha uzun olamaz ve otomatik olarak sınırlandırılır.",
+    "carryOn": "devretmek",
+    "title": "Tekrarlanan dolum",
+    "interval": "Yeniden doldurma döngüsü (gün)",
+    "amount": "Döngü başına kredi",
+    "carryOff": "Süresi dolmuş",
+    "maxHint": "Ebeveyn döngüsü sınırı: {{n}} gün veya daha az"
+  },
+  "select": {
+    "placeholder": "Seçme",
+    "search": "Aramak…",
+    "noMatch": "Eşleşme yok"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "{{target}} ekibinin kredisi azaldı",
+      "teamBody": "{{target}} takım kredileri {{value}} seviyesinde, yani {{threshold}} eşiğinin altındadır. Bu ekibin oturumları yakında durdurulabilir."
+    }
+  },
+  "close": "Kapalı"
 }

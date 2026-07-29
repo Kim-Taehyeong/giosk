@@ -67,7 +67,9 @@
       "errorGroup": "You must select an organization and a group.",
       "errorPasswordShort": "Password must be at least 8 characters.",
       "errorGeneric": "Signup failed.",
-      "errorPasswordMismatch": "Passwords do not match."
+      "errorPasswordMismatch": "Passwords do not match.",
+      "pwMatch": "Passwords match",
+      "pwMismatch": "Passwords do not match"
     },
     "signup": {
       "title": "Sign up for Giosk Console",
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Nodes {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "Nodes {{up}}/{{total}} · GPU —"
+    "nodeBadgeNoGpu": "Nodes {{up}}/{{total}} · GPU —",
+    "rolePlatform": "Entire platform",
+    "rolePlatformSub": "Super admin",
+    "orgWhole": "Entire organization",
+    "clusterStatus": "Cluster status",
+    "creditBalance": "Credit balance",
+    "alerts": "Alerts",
+    "unreadN": "{{n}} unread",
+    "noAlerts": "No alerts yet.",
+    "viewAll": "See all in Notification Center"
+  },
+  "table": {
+    "empty": "No data"
+  },
+  "close": "Close",
+  "refill": {
+    "title": "Recurring refill",
+    "note": "Refills by this amount each cycle (0 disables it). The cycle cannot be longer than the parent's and is capped automatically.",
+    "amount": "Credits per cycle",
+    "interval": "Refill cycle (days)",
+    "carryover": "Carryover",
+    "carryOn": "Carry over",
+    "carryOff": "Expire",
+    "maxHint": "Parent cycle limit: {{n}} days or fewer"
+  },
+  "select": {
+    "placeholder": "Select",
+    "search": "Search…",
+    "noMatch": "No match"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "{{target}} team is low on credits",
+      "teamBody": "{{target}} team credits are at {{value}}, below the {{threshold}} threshold. Sessions in this team may stop soon."
+    }
   }
 }

@@ -53,7 +53,8 @@
     "advanced": "Pengaturan lainnya",
     "optional": "(opsional)",
     "create": "Membuat",
-    "empty": "Tidak ada data"
+    "empty": "Tidak ada data",
+    "prev": "Sebelumnya"
   },
   "dash": {
     "title": "Dasbor",
@@ -197,7 +198,10 @@
     "bulkEmpty": "Tidak ada baris untuk ditambahkan (periksa template)",
     "addHint": "Akun yang ditambahkan oleh admin segera diaktifkan (disetujui).",
     "groupPickOrgFirst": "Pilih organisasi terlebih dahulu",
-    "advBelong": "Keanggotaan · peran · kata sandi"
+    "advBelong": "Keanggotaan · peran · kata sandi",
+    "colRefill": "Isi ulang berulang",
+    "colBalance": "Saldo saat ini",
+    "refillDefault": "Bawaan"
   },
   "groups": {
     "title": "Grup",
@@ -248,7 +252,18 @@
     "adminOpt": "Admin grup (opsional)",
     "grantFail": "Gagal memberikan kredit.",
     "bulkDone": "Grup {{n}} yang ditambahkan secara massal",
-    "insufficientOrgPool": "Saldo kumpulan kredit organisasi tidak mencukupi."
+    "insufficientOrgPool": "Saldo kumpulan kredit organisasi tidak mencukupi.",
+    "colRefill": "Isi ulang berulang",
+    "deleteFail": "Penghapusan gagal",
+    "refillInterval": "Siklus isi ulang (hari)",
+    "refillDefault": "Bawaan",
+    "cantDeleteDefault": "Tim default tidak dapat dihapus.",
+    "initCredit": "Kredit awal dan isi ulang berulang",
+    "initCreditAmt": "Kredit awal",
+    "initCreditHint": "Secara opsional, alokasikan dari kumpulan organisasi dan atur pengisian ulang saat membuat tim. Anda juga dapat melakukannya nanti di halaman detail tim.",
+    "hasMembers": "Tim ini masih memiliki anggota. Pindahkan atau hapus sebelum menghapusnya.",
+    "refillAmt": "Isi ulang berulang (per siklus)",
+    "carryover": "Membawa kredit yang tidak terpakai"
   },
   "orgs": {
     "title": "Organisasi",
@@ -292,7 +307,11 @@
     "deleteTitle": "Hapus organisasi",
     "grantReasonPh": "Masukkan alasannya",
     "updated": "Organisasi diperbarui",
-    "adminHintOpt": "Biarkan kosong untuk membuat grup 'Umum' saja dan tetapkan admin nanti, dari Detail organisasi → Umum → Tambahkan anggota dengan peran Admin organisasi."
+    "adminHintOpt": "Biarkan kosong untuk membuat grup 'Umum' saja dan tetapkan admin nanti, dari Detail organisasi → Umum → Tambahkan anggota dengan peran Admin organisasi.",
+    "deleteFail": "Penghapusan gagal",
+    "colRefill": "Isi ulang berulang",
+    "refillDefault": "Bawaan",
+    "hasUsers": "Organisasi ini masih memiliki pengguna. Pindahkan atau hapus sebelum menghapusnya."
   },
   "billing": {
     "title": "Penagihan",
@@ -318,7 +337,12 @@
     "consumed": "Kredit",
     "notSet": "Tidak disetel",
     "byUser": "Konsumsi oleh pengguna",
-    "vsAlloc": "vs mengalokasikan"
+    "vsAlloc": "vs mengalokasikan",
+    "periodMonth": "Bulan ini",
+    "periodLastMonth": "Bulan lalu",
+    "period7d": "7 hari terakhir",
+    "periodAll": "Sepanjang waktu",
+    "periodNote": "Konsumsi dan jam GPU yang ditampilkan adalah apa yang terjadi pada periode yang dipilih, sesuai buku besar. Anggaran dan kumpulan tidak dibatasi periodenya."
   },
   "audit": {
     "title": "Catatan Audit",
@@ -476,7 +500,10 @@
     "impMissing": "Masukkan nama, pemilik, server NFS, dan jalur.",
     "impOwnerHint": "Pilih akun dari daftar untuk mengimpor.",
     "impOwnerPicked": "Dipilih: {{name}} ({{id}})",
-    "metricsOffNotice": "Pemantauan (DCGM/Prometheus) belum terpasang, sehingga penggunaan GPU dan VRAM tidak dapat ditampilkan. Aktifkan pemantauan untuk melihat metrik langsung."
+    "metricsOffNotice": "Pemantauan (DCGM/Prometheus) belum terpasang, sehingga penggunaan GPU dan VRAM tidak dapat ditampilkan. Aktifkan pemantauan untuk melihat metrik langsung.",
+    "cordon": "Barisan",
+    "uncordon": "Tanpa tali",
+    "noMetrics": "Tidak ada metrik"
   },
   "mset": {
     "title": "Pengaturan",
@@ -599,7 +626,21 @@
     "moveFail": "Pemindahan gagal",
     "membership": "Keanggotaan & peran",
     "removeConfirm": "Hapus pengguna ini dari {{group}}.",
-    "removed": "Dihapus dari grup"
+    "removed": "Dihapus dari grup",
+    "restore": "Memulihkan",
+    "suspend": "Menskors",
+    "memberAdded": "Keanggotaan ditambahkan.",
+    "addMembership": "Tambahkan keanggotaan",
+    "pickOrg": "Pilih organisasi",
+    "grantFail": "Hibah gagal",
+    "granted": "Diberikan {{n}} C",
+    "grant": "Berikan kredit",
+    "addFail": "Tidak dapat menambahkan",
+    "grantAmount": "Kredit yang akan diberikan (C; potongan negatif)",
+    "statusConfirm": "Ini mengubah status pengguna.",
+    "noTeamsInOrg": "Organisasi ini tidak memiliki tim.",
+    "grantHint": "Segera diterapkan ke saldo kredit pribadi dan dicatat dalam log audit sebagai penyesuaian satu kali.",
+    "grantTitle": "Berikan kredit — {{name}}"
   },
   "clusters": {
     "title": "Cluster",
@@ -699,7 +740,12 @@
     "needRef": "Masukkan referensi gambar",
     "imgRefHint": "Tarik dan gunakan Docker Hub/gambar registri eksternal apa adanya (tanpa build). misalnya codercom/kode-server:terbaru",
     "extFail": "Gagal mendaftarkan gambar eksternal",
-    "extRegistered": "Gambar eksternal terdaftar"
+    "extRegistered": "Gambar eksternal terdaftar",
+    "loading": "…",
+    "logsHint": "Memuat log build dan pemindaian.",
+    "notFound": "Gambar tidak ditemukan.",
+    "notCached": "Tidak di-cache",
+    "info": "informasi gambar"
   },
   "anotify": {
     "title": "Pemberitahuan",
@@ -886,7 +932,23 @@
     "brandAccentHint": "Biarkan kosong untuk menggunakan warna tema.",
     "brandAccent": "Warna logo",
     "brandName": "Nama layanan",
-    "brandingNote": "Sesuaikan nama layanan dan warna logo untuk organisasi Anda. Diterapkan secara instan ke login dan header konsol."
+    "brandingNote": "Sesuaikan nama layanan dan warna logo untuk organisasi Anda. Diterapkan secara instan ke login dan header konsol.",
+    "rechargeSaved": "Pengaturan isi ulang disimpan.",
+    "carryoverOn": "Membawa kredit yang tidak terpakai",
+    "rechargeTitle": "Isi ulang pulsa berulang (default dan limit)",
+    "rechargeInterval": "Siklus isi ulang default (hari) · batas untuk level yang lebih rendah",
+    "rechargeAmountHint": "Tetapkan jumlah, siklus, dan sisa isi ulang per organisasi, per tim, dan per pengguna di halaman detailnya. Sebuah siklus tidak akan pernah lebih panjang dari siklus induknya.",
+    "brandSubtitle": "Subjudul",
+    "rechargeCarryover": "Izinkan sisa",
+    "carryoverOff": "Kedaluwarsa setiap siklus",
+    "rechargeEnabled": "Aktifkan isi ulang berulang",
+    "brandIconClear": "Menghapus",
+    "rechargeNote": "Siklus isi ulang default dan kebijakan sisa platform. Organisasi, tim, dan individu dapat memilih siklus yang lebih pendek namun tidak pernah memilih siklus yang lebih panjang, dan jika induk tidak mengizinkan carryover, kredit yang tidak terpakai di bawahnya akan habis masa berlakunya pada batas tersebut.",
+    "brandIcon": "Ikon",
+    "brandSubtitleHint": "Teks kecil di samping logo. Biarkan kosong untuk menyembunyikannya.",
+    "brandIconUpload": "Unggah ikon (opsional)",
+    "brandIconTooBig": "Ikon harus berukuran 120KB atau lebih kecil.",
+    "brandIconUploadHint": "Ikon yang diunggah lebih diutamakan daripada ikon Lucide di atas. Disarankan PNG atau SVG di bawah 120KB."
   },
   "datasets": {
     "title": "Kumpulan data",
@@ -932,7 +994,40 @@
     "dlInto": "Memuat ke /dataset/{{name}}",
     "assignTitle": "Penetapan simpul cache",
     "notCached": "Tidak di-cache",
-    "assignHint": "Pilih node mana yang menyimpan cache kumpulan data ini. Itu diekstraksi dari NFS ke node-lokal untuk segera digunakan."
+    "assignHint": "Pilih node mana yang menyimpan cache kumpulan data ini. Itu diekstraksi dari NFS ke node-lokal untuk segera digunakan.",
+    "phaseCopy": "Penyalinan",
+    "phaseDownload": "Mengunduh",
+    "descSaved": "Deskripsi disimpan.",
+    "phaseExtract": "Mengekstraksi",
+    "description": "Keterangan",
+    "descFail": "Tidak dapat menyimpan deskripsi",
+    "regNeedName": "Masukkan nama kumpulan data.",
+    "notFound": "Kumpulan data tidak ditemukan.",
+    "descPh": "Jelaskan kumpulan data ini",
+    "regNeedUrl": "Masukkan URL.",
+    "sizeClass": "Kelas ukuran",
+    "cacheFail": "Permintaan cache gagal",
+    "info": "Informasi kumpulan data",
+    "regFail": "Pendaftaran gagal",
+    "regBusy": "Mendaftar…",
+    "cache": "Cache simpul",
+    "sizeClassSaved": "Kelas ukuran disimpan.",
+    "regRefresh": "Menyegarkan",
+    "regNeedFile": "Pilih file dari kotak masuk.",
+    "upTaken": "Kumpulan data dengan nama tersebut sudah ada.",
+    "regNfsHint": "Salin arsip (zip, tar, tar.gz) ke jalur di bawah, lalu pilih file untuk mendaftarkannya. Pendaftaran akan mengeluarkannya dari kotak masuk dan mengekstraknya secara otomatis.",
+    "regStarted": "Pendaftaran dimulai — lacak kemajuan dalam daftar.",
+    "upScope": "Visibilitas",
+    "regSizeClass": "Kelas ukuran",
+    "extracting": "Mengekstraksi…",
+    "regTitle": "Daftarkan kumpulan data",
+    "regUrl": "URL (apa yang didapat)",
+    "registering": "Mendaftar",
+    "regNfs": "Salinan NFS (SCP)",
+    "regUrlField": "URL unduhan",
+    "regInboxFile": "File kotak masuk",
+    "regInboxEmpty": "Kotak masuknya kosong. Salin file ke jalur di atas, lalu segarkan.",
+    "regUrlHint": "Server mengunduh URL ini secara langsung — tidak ada yang diunggah dari browser Anda. Lacak kemajuan dalam daftar."
   },
   "announce": {
     "title": "Pengumuman",
@@ -1054,7 +1149,8 @@
     "removeTitle": "Hapus kebijakan",
     "globalHint": "Global adalah cadangan untuk semua orang — tidak boleh kosong dan setidaknya harus berisi 1. Cakupan organisasi/grup/pengguna dapat menimpanya.",
     "removeConfirm": "Menghapus kebijakan '{{name}}' menjadikannya mewarisi cakupan di atas. Melanjutkan?",
-    "globalNeedsValue": "Keempat batas global harus minimal 1"
+    "globalNeedsValue": "Keempat batas global harus minimal 1",
+    "capHint": "Maksimum yang diperbolehkan — GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · volume ≤ {{vol}}GiB · sesi bersamaan ≤ {{sess}}"
   },
   "roles": {
     "org_admin": "Admin organisasi",
@@ -1070,7 +1166,16 @@
     "usersHint": "Peran adalah peran pengguna dalam grupnya. Ubah dari manajemen anggota grup itu.",
     "subtitle": "Pengenal {{name}} · kelola grup, pengguna, dan kreditnya di sini",
     "usersCapped": "menampilkan {{shown}} pertama dari {{total}}",
-    "inGroup": "Kelola dalam grup"
+    "inGroup": "Kelola dalam grup",
+    "recurringAmount": "Kredit per siklus",
+    "recurringInterval": "Siklus isi ulang (hari)",
+    "recurringCarryover": "Bawaan",
+    "carryOn": "Lanjutkan",
+    "carryOff": "Berakhir",
+    "recurringTitle": "Kredit berulang",
+    "maxIntervalHint": "Batas platform: {{n}} hari atau kurang",
+    "recurringNote": "Mengisi ulang kumpulan organisasi dengan jumlah ini setiap siklus (0 menonaktifkannya).",
+    "recurringSaved": "Kredit berulang disimpan."
   },
   "gdetail": {
     "title": "Kelompok",
@@ -1098,7 +1203,25 @@
     "roleSet": "Mengubah peran {{name}} menjadi {{role}}",
     "moveHint": "Peran itu terus berlanjut. Kredit yang dialokasikan dalam grup ini tidak, dan riwayat penggunaan tetap ada pada grup ini.",
     "moveFail": "Gagal bergerak",
-    "moved": "Memindahkan {{name}} ke {{group}}"
+    "moved": "Memindahkan {{name}} ke {{group}}",
+    "refillTitle": "Isi ulang tim berulang",
+    "refillCol": "Isi ulang berulang",
+    "refillSaved": "Isi ulang berulang disimpan.",
+    "refillFail": "Isi ulang gagal",
+    "memberRefillSaved": "Isi ulang berulang disimpan",
+    "nextRefill": "Isi ulang selanjutnya",
+    "refilledNow": "Diisi ulang sekarang: +{{n}} C",
+    "refillCarryover": "Membawa kredit yang tidak terpakai",
+    "refillInheritPh": "Diwarisi",
+    "noRecurring": "Tidak ada jumlah isi ulang berulang yang ditetapkan",
+    "memberRefillTitle": "Isi ulang berulang — {{name}}",
+    "refillInterval": "Siklus (hari) — biarkan kosong untuk default tim",
+    "refillNow": "Isi ulang sekarang",
+    "noRecurringShort": "Tidak ada isi ulang berulang",
+    "refillMenu": "Isi ulang",
+    "memberRefillSet": "Atur isi ulang berulang",
+    "memberRefillHint": "Jumlah ini dibayarkan ke dompet anggota setiap siklus. Gunakan \"Isi ulang sekarang\" untuk segera membayarnya.",
+    "refillAmount": "Jumlah isi ulang berulang (C)"
   },
   "picker": {
     "allOrgs": "Semua organisasi",
@@ -1125,5 +1248,8 @@
   "brand": "Konsol Giosk",
   "confirmTerminate": "Hentikan paksa sesi ini? Pekerjaan yang berjalan segera berhenti.",
   "confirmDelete": "Hapus ini? Hal ini tidak dapat dibatalkan.",
-  "confirmRemoveMember": "Hapus anggota ini dari grup?"
+  "confirmRemoveMember": "Hapus anggota ini dari grup?",
+  "paged": {
+    "range": "{{from}}–{{to}} dari {{total}}"
+  }
 }

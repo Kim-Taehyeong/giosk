@@ -67,7 +67,9 @@
       "errorAdvisor": "Az egyetemi és a posztgraduális hallgatóknak tanácsadót kell biztosítaniuk.",
       "errorPasswordShort": "A jelszónak legalább 8 karakterből kell állnia.",
       "errorRequired": "Kérjük, töltse ki az összes kötelező mezőt.",
-      "errorPasswordMismatch": "A jelszavak nem egyeznek."
+      "errorPasswordMismatch": "A jelszavak nem egyeznek.",
+      "pwMismatch": "A jelszavak nem egyeznek",
+      "pwMatch": "A jelszavak megegyeznek"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Csomópontok {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "Csomópontok {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "Csomópontok {{up}}/{{total}} · GPU —",
+    "orgWhole": "Az egész szervezet",
+    "rolePlatform": "Az egész platform",
+    "clusterStatus": "Klaszter állapota",
+    "unreadN": "{{n}} olvasatlan",
+    "alerts": "Figyelmeztetések",
+    "noAlerts": "Még nincsenek riasztások.",
+    "creditBalance": "Hitelegyenleg",
+    "rolePlatformSub": "Szuper admin",
+    "viewAll": "Az összes megtekintése az Értesítési központban"
+  },
+  "table": {
+    "empty": "Nincs adat"
+  },
+  "refill": {
+    "carryOff": "Lejár",
+    "carryover": "Átvitel",
+    "carryOn": "Vigye át",
+    "interval": "Újratöltési ciklus (nap)",
+    "amount": "Kredit ciklusonként",
+    "title": "Ismétlődő utántöltés",
+    "note": "Minden ciklusban ennyivel töltődik fel (a 0 letiltja). A ciklus nem lehet hosszabb, mint a szülőé, és automatikusan lezáródik.",
+    "maxHint": "Szülői cikluskorlát: {{n}} nap vagy kevesebb"
+  },
+  "select": {
+    "search": "Keresés…",
+    "placeholder": "Válassza ki",
+    "noMatch": "Nincs egyezés"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamBody": "A {{target}} csapat kreditjei a {{value}} értéknél vannak, a {{threshold}} küszöb alatt. Ebben a csapatban hamarosan leállhatnak a foglalkozások.",
+      "teamTitle": "A {{target}} csapatnak kevés a kreditje"
+    }
+  },
+  "close": "Közeli"
 }

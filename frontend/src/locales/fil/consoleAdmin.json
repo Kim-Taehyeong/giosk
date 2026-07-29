@@ -53,7 +53,8 @@
     "create": "Lumikha",
     "edit": "I-edit",
     "optional": "(opsyonal)",
-    "advanced": "Higit pang mga setting"
+    "advanced": "Higit pang mga setting",
+    "prev": "Nakaraang"
   },
   "dash": {
     "title": "Dashboard",
@@ -197,7 +198,10 @@
     "bulkDone": "Maramihang idinagdag na mga gumagamit ng {{n}}",
     "colMemberRole": "Tungkulin ng organisasyon/pangkat",
     "totalN": "Mga gumagamit ng {{n}}",
-    "advBelong": "Membership · tungkulin · password"
+    "advBelong": "Membership · tungkulin · password",
+    "colRefill": "Paulit-ulit na refill",
+    "colBalance": "Kasalukuyang balanse",
+    "refillDefault": "Default"
   },
   "groups": {
     "title": "Mga grupo",
@@ -248,7 +252,18 @@
     "bulkDone": "Maramihang idinagdag na mga pangkat ng {{n}}",
     "insufficientOrgPool": "Hindi sapat na balanse ng org credit pool.",
     "grantFail": "Nabigong magbigay ng kredito.",
-    "grantHintOrg": "Ibinawas sa pool ng iyong org at idinagdag sa pool ng grupong ito. Hindi maaaring lumampas sa balanse ng org pool."
+    "grantHintOrg": "Ibinawas sa pool ng iyong org at idinagdag sa pool ng grupong ito. Hindi maaaring lumampas sa balanse ng org pool.",
+    "colRefill": "Paulit-ulit na refill",
+    "deleteFail": "Nabigo ang pagtanggal",
+    "refillInterval": "Refill cycle (mga araw)",
+    "refillDefault": "Default",
+    "initCreditAmt": "Mga paunang kredito",
+    "carryover": "Dalhin ang hindi nagamit na mga kredito",
+    "hasMembers": "May mga miyembro pa ang team na ito. Ilipat o alisin ang mga ito bago ito tanggalin.",
+    "cantDeleteDefault": "Hindi matatanggal ang default na koponan.",
+    "refillAmt": "Umuulit na refill (bawat cycle)",
+    "initCredit": "Mga paunang kredito at paulit-ulit na refill",
+    "initCreditHint": "Opsyonal na maglaan mula sa pool ng organisasyon at magtakda ng refill kapag gumagawa ng team. Magagawa mo rin ito sa ibang pagkakataon sa page ng detalye ng team."
   },
   "orgs": {
     "title": "Mga organisasyon",
@@ -292,7 +307,11 @@
     "deleted": "Ang organisasyon na '{{name}}' ay tinanggal",
     "adminOpt": "Admin ng organisasyon (opsyonal)",
     "adminHintOpt": "Iwanang walang laman upang lumikha lamang ng pangkat na 'General' at magtalaga ng admin sa ibang pagkakataon, mula sa detalye ng Org → General → Magdagdag ng miyembro na may tungkuling admin ng Org.",
-    "grantHint": "Nag-apply kaagad sa org pool at naitala sa audit log."
+    "grantHint": "Nag-apply kaagad sa org pool at naitala sa audit log.",
+    "deleteFail": "Nabigo ang pagtanggal",
+    "colRefill": "Paulit-ulit na refill",
+    "refillDefault": "Default",
+    "hasUsers": "May mga user pa rin ang organisasyong ito. Ilipat o alisin ang mga ito bago ito tanggalin."
   },
   "billing": {
     "title": "Pagsingil",
@@ -318,7 +337,12 @@
     "totalBudget": "Kabuuang badyet",
     "subtitle": "Paggamit at istatistika ng org/group/user (mga panloob na kredito)",
     "vsAlloc": "vs alloc",
-    "byUser": "Pagkonsumo ng gumagamit"
+    "byUser": "Pagkonsumo ng gumagamit",
+    "periodMonth": "Ngayong buwan",
+    "period7d": "Huling 7 araw",
+    "periodLastMonth": "Noong nakaraang buwan",
+    "periodNote": "Ang mga oras ng pagkonsumo at GPU na ipinapakita ay kung ano ang nangyari sa napiling panahon, ayon sa ledger. Ang mga badyet at pool ay hindi saklaw ng panahon.",
+    "periodAll": "Sa lahat ng oras"
   },
   "audit": {
     "title": "Log ng Audit",
@@ -476,7 +500,10 @@
     "importHint": "I-map ang isang umiiral na landas ng NFS (naglalaman na ng data) nang direkta bilang isang volume (para sa paggamit sa isang umiiral na kapaligiran). Sa halip na lumikha ng isang bagong walang laman na volume, ito ay nagbubuklod sa ibinigay na server:path bilang isang static na PV.",
     "impOwnerHint": "Pumili ng account sa listahan para mag-import.",
     "impOwnerPicked": "Napili: {{name}} ({{id}})",
-    "metricsOffNotice": "Hindi naka-install ang monitoring (DCGM/Prometheus), kaya hindi maipapakita ang paggamit ng GPU at VRAM. I-enable ang monitoring para makita ang live na sukatan."
+    "metricsOffNotice": "Hindi naka-install ang monitoring (DCGM/Prometheus), kaya hindi maipapakita ang paggamit ng GPU at VRAM. I-enable ang monitoring para makita ang live na sukatan.",
+    "uncordon": "Uncordon",
+    "cordon": "Cordon",
+    "noMetrics": "Walang sukatan"
   },
   "mset": {
     "title": "Mga setting",
@@ -599,7 +626,21 @@
     "moved": "Inilipat sa {{group}}",
     "moveTitle": "Ilipat ang {{name}} sa ibang grupo",
     "removeConfirm": "Alisin ang user na ito mula sa {{group}}.",
-    "noMembership": "Hindi miyembro ng anumang grupo."
+    "noMembership": "Hindi miyembro ng anumang grupo.",
+    "suspend": "Suspindihin",
+    "restore": "Ibalik",
+    "memberAdded": "Idinagdag ang membership.",
+    "addFail": "Hindi maidagdag",
+    "pickOrg": "Pumili ng organisasyon",
+    "granted": "Ibinigay ang {{n}} C",
+    "grantFail": "Nabigo si Grant",
+    "grant": "Magbigay ng mga kredito",
+    "addMembership": "Magdagdag ng membership",
+    "statusConfirm": "Binabago nito ang katayuan ng user.",
+    "grantTitle": "Magbigay ng mga kredito — {{name}}",
+    "noTeamsInOrg": "Walang mga koponan ang organisasyong ito.",
+    "grantAmount": "Mga kreditong ibibigay (C; mga negatibong bawas)",
+    "grantHint": "Inilapat kaagad sa balanse ng personal na credit at naitala sa log ng pag-audit bilang isang one-off na pagsasaayos."
   },
   "clusters": {
     "title": "Mga kumpol",
@@ -699,7 +740,12 @@
     "extSshOnly": "Nang walang VSCode/Jupyter/custom na port, ang mga session sa larawang ito ay SSH-only.",
     "imgRefHint": "Hilahin at gumamit ng Docker Hub / panlabas na registry na imahe bilang-ay (walang build). hal. codercom/code-server:pinakabago",
     "extFail": "Nabigong irehistro ang panlabas na larawan",
-    "extRegistered": "Nakarehistro ang panlabas na larawan"
+    "extRegistered": "Nakarehistro ang panlabas na larawan",
+    "loading": "…",
+    "notCached": "Hindi naka-cache",
+    "info": "Impormasyon ng larawan",
+    "logsHint": "Naglo-load ng build at scan logs.",
+    "notFound": "Hindi nakita ang larawan."
   },
   "anotify": {
     "title": "Mga abiso",
@@ -886,7 +932,23 @@
     "brandName": "Pangalan ng serbisyo",
     "lockDatasetsSub": "Depende sa NFS/central storage — naayos sa pag-install",
     "runtimeNote": "Mga simpleng patakaran lang ang nalalapat nang live. Ang modelo ng pagsingil, concurrency, at mga dataset ay naayos sa oras ng pag-install.",
-    "brandingNote": "I-customize ang pangalan ng serbisyo at kulay ng logo para sa iyong organisasyon. Agad na inilapat sa login at console header."
+    "brandingNote": "I-customize ang pangalan ng serbisyo at kulay ng logo para sa iyong organisasyon. Agad na inilapat sa login at console header.",
+    "carryoverOn": "Dalhin ang hindi nagamit na mga kredito",
+    "rechargeInterval": "Default na ikot ng refill (mga araw) · limitasyon para sa mas mababang antas",
+    "rechargeNote": "Ang default na ikot ng refill at patakaran sa pag-carryover ng platform. Ang mga organisasyon, koponan, at indibidwal ay maaaring pumili ng mas maikling cycle ngunit hindi kailanman mas mahaba, at kapag hindi pinahintulutan ng magulang ang pag-carryover, ang mga hindi nagamit na kredito sa ibaba nito ay mawawalan ng bisa sa hangganang iyon.",
+    "rechargeTitle": "Umuulit na credit refill (default at limitasyon)",
+    "brandSubtitle": "Subtitle",
+    "brandIcon": "Icon",
+    "brandIconClear": "Alisin",
+    "rechargeSaved": "Na-save ang mga setting ng refill.",
+    "rechargeEnabled": "Paganahin ang umuulit na refill",
+    "carryoverOff": "Mag-expire ang bawat cycle",
+    "rechargeCarryover": "Payagan ang carryover",
+    "brandIconUpload": "Mag-upload ng icon (opsyonal)",
+    "brandIconTooBig": "Ang icon ay dapat na 120KB o mas maliit.",
+    "brandSubtitleHint": "Maliit na text sa tabi ng logo. Iwanang walang laman upang itago ito.",
+    "rechargeAmountHint": "Magtakda ng bawat-organisasyon, bawat-team, at bawat user na mga halaga ng refill, ikot, at carryover sa kanilang mga pahina ng detalye. Ang isang cycle ay hindi maaaring mas mahaba kaysa sa magulang nito.",
+    "brandIconUploadHint": "Nangunguna ang isang na-upload na icon kaysa sa icon na Lucide sa itaas. Inirerekomenda ang PNG o SVG na wala pang 120KB."
   },
   "datasets": {
     "title": "Mga Dataset",
@@ -932,7 +994,40 @@
     "notCached": "Hindi naka-cache",
     "measuring": "Pagsukat…",
     "assignTitle": "pagtatalaga ng node ng cache",
-    "assignHint": "Piliin kung aling mga node ang naka-cache sa dataset na ito. Ito ay kinuha mula sa NFS sa node-local para sa agarang paggamit."
+    "assignHint": "Piliin kung aling mga node ang naka-cache sa dataset na ito. Ito ay kinuha mula sa NFS sa node-local para sa agarang paggamit.",
+    "cacheFail": "Nabigo ang kahilingan sa cache",
+    "phaseCopy": "Nangongopya",
+    "descFail": "Hindi ma-save ang paglalarawan",
+    "notFound": "Hindi nakita ang dataset.",
+    "descSaved": "Na-save ang paglalarawan.",
+    "description": "Paglalarawan",
+    "phaseExtract": "Pag-extract",
+    "info": "Impormasyon ng dataset",
+    "sizeClassSaved": "Na-save ang laki ng klase.",
+    "regNeedUrl": "Maglagay ng URL.",
+    "regNeedName": "Maglagay ng pangalan ng dataset.",
+    "regNeedFile": "Pumili ng file mula sa inbox.",
+    "upTaken": "Mayroon nang isang dataset na may ganoong pangalan.",
+    "descPh": "Ilarawan ang dataset na ito",
+    "cache": "Cache ng node",
+    "phaseDownload": "Nagda-download",
+    "sizeClass": "Sukat klase",
+    "regRefresh": "I-refresh",
+    "regFail": "Nabigo ang pagpaparehistro",
+    "extracting": "Kinukuha…",
+    "registering": "Nagrerehistro",
+    "regUrl": "URL (wget)",
+    "regNfs": "NFS copy (SCP)",
+    "regSizeClass": "Sukat klase",
+    "regBusy": "Nagrerehistro…",
+    "regNfsHint": "Kopyahin ang isang archive (zip, tar, tar.gz) sa path sa ibaba, pagkatapos ay piliin ang file para irehistro ito. Ang pagrerehistro ay naglalabas nito sa inbox at awtomatikong na-extract ito.",
+    "regStarted": "Nagsimula ang pagpaparehistro — subaybayan ang pag-unlad sa listahan.",
+    "upScope": "Visibility",
+    "regInboxEmpty": "Walang laman ang inbox. Kopyahin ang isang file sa path sa itaas, pagkatapos ay i-refresh.",
+    "regInboxFile": "Inbox file",
+    "regTitle": "Magrehistro ng dataset",
+    "regUrlField": "I-download ang URL",
+    "regUrlHint": "Direktang dina-download ng server ang URL na ito — walang na-upload mula sa iyong browser. Subaybayan ang pag-unlad sa listahan."
   },
   "announce": {
     "title": "Mga anunsyo",
@@ -1054,7 +1149,8 @@
     "searchUser": "Maghanap ng user",
     "removeTitle": "Tanggalin ang patakaran",
     "globalNeedsValue": "Lahat ng apat na pandaigdigang limitasyon ay dapat na hindi bababa sa 1",
-    "globalHint": "Global ang fallback para sa lahat — hindi ito maaaring walang laman at dapat ay hindi bababa sa 1. Maaaring i-override ito ng mga saklaw ng org/group/user."
+    "globalHint": "Global ang fallback para sa lahat — hindi ito maaaring walang laman at dapat ay hindi bababa sa 1. Maaaring i-override ito ng mga saklaw ng org/group/user.",
+    "capHint": "Maximum na pinapayagan — GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · volume ≤ {{vol}}GiB · kasabay na mga session ≤ {{sess}}"
   },
   "roles": {
     "org_admin": "Admin ng org",
@@ -1070,7 +1166,16 @@
     "inGroup": "Pamahalaan sa pangkat",
     "usersHint": "Ang tungkulin ay ang tungkulin ng gumagamit sa loob ng kanilang pangkat. Baguhin ito mula sa pamamahala ng miyembro ng grupong iyon.",
     "usersCapped": "ipinapakita ang unang {{shown}} ng {{total}}",
-    "subtitle": "Identifier {{name}} · pamahalaan ang mga pangkat, user at credit nito dito"
+    "subtitle": "Identifier {{name}} · pamahalaan ang mga pangkat, user at credit nito dito",
+    "recurringAmount": "Mga kredito bawat cycle",
+    "recurringInterval": "Refill cycle (mga araw)",
+    "recurringCarryover": "Carryover",
+    "carryOn": "Dalhin",
+    "carryOff": "Mag-expire",
+    "recurringSaved": "Na-save ang mga umuulit na credit.",
+    "maxIntervalHint": "Limitasyon sa platform: {{n}} araw o mas kaunti",
+    "recurringNote": "Nire-refill ang pool ng organisasyon sa halagang ito sa bawat cycle (di-disable ito ng 0).",
+    "recurringTitle": "Mga paulit-ulit na kredito"
   },
   "gdetail": {
     "title": "Grupo",
@@ -1098,7 +1203,25 @@
     "needTarget": "Pumili ng target na grupo",
     "moved": "Inilipat ang {{name}} sa {{group}}",
     "moveHint": "Ang papel ay dinadala. Ang kreditong inilalaan sa pangkat na ito ay hindi, at ang kasaysayan ng paggamit ay nananatili sa pangkat na ito.",
-    "roleHint": "Ang mga pahintulot ng org-admin at group-admin ay nagmumula sa tungkuling ito (hiwalay sa tungkulin ng platform)."
+    "roleHint": "Ang mga pahintulot ng org-admin at group-admin ay nagmumula sa tungkuling ito (hiwalay sa tungkulin ng platform).",
+    "noRecurring": "Walang nakatakdang halaga ng umuulit na refill",
+    "refillCol": "Paulit-ulit na refill",
+    "memberRefillSaved": "Na-save ang umuulit na refill",
+    "refillSaved": "Na-save ang umuulit na refill.",
+    "refilledNow": "Na-refill na ngayon: +{{n}} C",
+    "refillMenu": "Refill",
+    "nextRefill": "Susunod na refill",
+    "refillFail": "Nabigo ang refill",
+    "refillCarryover": "Dalhin ang hindi nagamit na mga kredito",
+    "refillTitle": "Paulit-ulit na refill ng koponan",
+    "noRecurringShort": "Walang umuulit na refill",
+    "refillInheritPh": "Nagmana",
+    "refillNow": "Mag-refill ngayon",
+    "memberRefillSet": "Itakda ang umuulit na refill",
+    "refillAmount": "Nauulit na halaga ng refill (C)",
+    "memberRefillTitle": "Paulit-ulit na refill — {{name}}",
+    "refillInterval": "Cycle (days) — iwanang walang laman para sa default ng team",
+    "memberRefillHint": "Ang halagang ito ay binabayaran sa wallet ng miyembro sa bawat cycle. Gamitin ang \"Refill ngayon\" para mabayaran ito kaagad."
   },
   "picker": {
     "allOrgs": "Lahat ng orgs",
@@ -1125,5 +1248,8 @@
   "brand": "Giosk Console",
   "confirmTerminate": "Sapilitang wakasan ang session na ito? Agad na huminto ang pagpapatakbo ng trabaho.",
   "confirmDelete": "Tanggalin ito? Hindi na ito maaaring bawiin.",
-  "confirmRemoveMember": "Alisin ang miyembrong ito sa grupo?"
+  "confirmRemoveMember": "Alisin ang miyembrong ito sa grupo?",
+  "paged": {
+    "range": "{{from}}–{{to}} ng {{total}}"
+  }
 }

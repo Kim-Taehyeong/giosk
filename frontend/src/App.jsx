@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { useSystemConfig } from './context/SystemConfigContext';
@@ -9,51 +9,56 @@ import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute';
 import AdminRoute from './components/AdminRoute';
 import ConsoleLayout from './layouts/ConsoleLayout';
-import Terminal from './pages/console/Terminal';
+import Spinner from './components/console/Spinner';
+
+// 화면은 라우트 단위로 쪼개 필요할 때 내려받는다.
+// 이 콘솔은 VPN·저대역폭에서 열리는 일이 많고, 일반 사용자에게 관리자 26화면까지
+// 한 덩어리로 보내는 건 낭비다. 로그인 화면만 즉시 로드(첫 페인트)하고 나머지는 지연.
+const Terminal = lazy(() => import('./pages/console/Terminal'));
 
 // 사용자 콘솔 페이지
-import UserDashboard from './pages/console/user/UserDashboard';
-import Guide from './pages/console/user/Guide';
-import GuideDetail from './pages/console/user/GuideDetail';
-import Sessions from './pages/console/user/Sessions';
-import UserSessionDetail from './pages/console/user/SessionDetail';
-import NewSession from './pages/console/user/NewSession';
-import Volumes from './pages/console/user/Volumes';
-import UserDatasets from './pages/console/user/Datasets';
-import Wallet from './pages/console/user/Wallet';
-import NotificationCenter from './pages/console/user/NotificationCenter';
-import Account from './pages/console/user/Account';
-import JoinGroup from './pages/console/user/JoinGroup';
+const UserDashboard = lazy(() => import('./pages/console/user/UserDashboard'));
+const Guide = lazy(() => import('./pages/console/user/Guide'));
+const GuideDetail = lazy(() => import('./pages/console/user/GuideDetail'));
+const Sessions = lazy(() => import('./pages/console/user/Sessions'));
+const UserSessionDetail = lazy(() => import('./pages/console/user/SessionDetail'));
+const NewSession = lazy(() => import('./pages/console/user/NewSession'));
+const Volumes = lazy(() => import('./pages/console/user/Volumes'));
+const UserDatasets = lazy(() => import('./pages/console/user/Datasets'));
+const Wallet = lazy(() => import('./pages/console/user/Wallet'));
+const NotificationCenter = lazy(() => import('./pages/console/user/NotificationCenter'));
+const Account = lazy(() => import('./pages/console/user/Account'));
+const JoinGroup = lazy(() => import('./pages/console/user/JoinGroup'));
 
 import { consolePathFor, consoleHomeFor } from './config/consoleRoles';
 
 // 관리자 콘솔 페이지
-import OpsDashboard from './pages/console/admin/OpsDashboard';
-import InfraDashboard from './pages/console/admin/InfraDashboard';
-import SessionMonitor from './pages/console/admin/SessionMonitor';
-import SessionDetailPage from './pages/console/admin/SessionDetailPage';
-import Nodes from './pages/console/admin/Nodes';
-import NodeDetailPage from './pages/console/admin/NodeDetailPage';
-import VolumesAdmin from './pages/console/admin/VolumesAdmin';
-import ManagerSettings from './pages/console/admin/ManagerSettings';
-import ImageDetail from './pages/console/admin/ImageDetail';
-import AdminUsers2 from './pages/console/admin/Users';
-import UserDetail from './pages/console/admin/UserDetail';
-import Groups from './pages/console/admin/Groups';
-import Orgs from './pages/console/admin/Orgs';
-import Resources from './pages/console/admin/Resources';
-import Policies from './pages/console/admin/Policies';
-import OrgDetail from './pages/console/admin/OrgDetail';
-import GroupDetail from './pages/console/admin/GroupDetail';
-import AdminDatasets from './pages/console/admin/Datasets';
-import DatasetDetail from './pages/console/admin/DatasetDetail';
-import Billing from './pages/console/admin/Billing';
-import Audit from './pages/console/admin/Audit';
-import Images from './pages/console/admin/Images';
-import AdminNotifications from './pages/console/admin/AdminNotifications';
-import Announcements from './pages/console/admin/Announcements';
-import Approvals from './pages/console/admin/Approvals';
-import Settings from './pages/console/admin/Settings';
+const OpsDashboard = lazy(() => import('./pages/console/admin/OpsDashboard'));
+const InfraDashboard = lazy(() => import('./pages/console/admin/InfraDashboard'));
+const SessionMonitor = lazy(() => import('./pages/console/admin/SessionMonitor'));
+const SessionDetailPage = lazy(() => import('./pages/console/admin/SessionDetailPage'));
+const Nodes = lazy(() => import('./pages/console/admin/Nodes'));
+const NodeDetailPage = lazy(() => import('./pages/console/admin/NodeDetailPage'));
+const VolumesAdmin = lazy(() => import('./pages/console/admin/VolumesAdmin'));
+const ManagerSettings = lazy(() => import('./pages/console/admin/ManagerSettings'));
+const ImageDetail = lazy(() => import('./pages/console/admin/ImageDetail'));
+const AdminUsers2 = lazy(() => import('./pages/console/admin/Users'));
+const UserDetail = lazy(() => import('./pages/console/admin/UserDetail'));
+const Groups = lazy(() => import('./pages/console/admin/Groups'));
+const Orgs = lazy(() => import('./pages/console/admin/Orgs'));
+const Resources = lazy(() => import('./pages/console/admin/Resources'));
+const Policies = lazy(() => import('./pages/console/admin/Policies'));
+const OrgDetail = lazy(() => import('./pages/console/admin/OrgDetail'));
+const GroupDetail = lazy(() => import('./pages/console/admin/GroupDetail'));
+const AdminDatasets = lazy(() => import('./pages/console/admin/Datasets'));
+const DatasetDetail = lazy(() => import('./pages/console/admin/DatasetDetail'));
+const Billing = lazy(() => import('./pages/console/admin/Billing'));
+const Audit = lazy(() => import('./pages/console/admin/Audit'));
+const Images = lazy(() => import('./pages/console/admin/Images'));
+const AdminNotifications = lazy(() => import('./pages/console/admin/AdminNotifications'));
+const Announcements = lazy(() => import('./pages/console/admin/Announcements'));
+const Approvals = lazy(() => import('./pages/console/admin/Approvals'));
+const Settings = lazy(() => import('./pages/console/admin/Settings'));
 
 // 크레딧 전용 페이지 가드: Dynamic(선착순) 과금 모드에선 크레딧이 없으므로 콘솔 홈으로.
 const CreditOnlyRoute = ({ children, to }) => {
@@ -152,6 +157,9 @@ const App = () => {
 
   return (
   <BrowserRouter>
+    {/* 라우트 청크를 받아오는 동안의 대기 표시. 콘솔 내부 전환은 ConsoleLayout 안쪽에서
+        셸을 유지한 채 본문만 기다리므로, 여기 폴백은 로그인→콘솔 같은 첫 진입에만 보인다. */}
+    <Suspense fallback={<div style={{ display: 'grid', placeItems: 'center', minHeight: '100vh' }}><Spinner /></div>}>
     <Routes>
       <Route
         path="/login"
@@ -202,6 +210,7 @@ const App = () => {
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </Suspense>
   </BrowserRouter>
   );
 };

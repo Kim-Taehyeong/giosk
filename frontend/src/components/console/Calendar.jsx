@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../context/ThemeContext';
 import { c } from '../../lib/credit';
+import { clickable } from '../../utils/a11y';
 
 // 월별 달력. 두 가지 모드:
 //  1) 기본(표시 전용): 날짜별 소모 크레딧을 색/숫자로 표기. 표시 데이터는
@@ -78,7 +79,8 @@ export default function Calendar({ byDay = {}, byMonth = null, selectable = fals
             const disabled = outOfRange(d);
             const isSel = sameDay(atMidnight(date), selected && atMidnight(selected));
             return (
-              <div key={i} onClick={() => !disabled && onPick && onPick(atMidnight(date))}
+              <div key={i} {...clickable(disabled || !onPick ? undefined : () => onPick(atMidnight(date)), { label: `${ym.y}-${ym.m + 1}-${d}` })}
+                aria-current={isSel || undefined}
                 title={`${ym.m + 1}/${d}`}
                 style={{
                   height: 42, borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center',

@@ -1,6 +1,12 @@
 package wallet
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"giosk/pkg/dayspine"
+
+	"gorm.io/gorm"
+)
 
 // Repository는 wallet 영속성 계약(원장 정합성을 위해 트랜잭션 사용).
 type Repository interface {
@@ -104,16 +110,46 @@ func (r *gormRepo) UserTransactions(userID, groupID int64, limit int) ([]CreditT
 
 // DailyConsumption은 최근 days일간 일자별 소비 합계(양수)를 오래된→최근 순으로 반환.
 // 소비/정산(amount<0)만 집계하며, 원장 전체를 일자별로 GROUP BY 한다(거래 limit 무관).
+//
+// 소비가 없던 날도 0으로 채워 반드시 days개를 돌려준다. 잔디 히트맵은 "칸 1개 = 하루,
+// 마지막 칸 = 오늘"로 두고 칸 인덱스에서 날짜를 역산하므로, 빠진 날이 하나만 있어도
+// 모든 칸의 날짜와 요일 정렬이 밀린다(툴팁 날짜도 전부 틀어진다).
 func (r *gormRepo) DailyConsumption(userID, groupID int64, days int) ([]DailyPoint, error) {
-	var out []DailyPoint
+	if days < 1 {
+		return []DailyPoint{}, nil
+	}
+	var rows []DailyPoint
+	// 스파인이 오늘 포함 days 일이므로 하한도 days-1 일 전.
 	err := r.db.Raw(`
 		SELECT DATE_FORMAT(created_at, '%Y-%m-%d') AS day, CAST(SUM(-amount) AS SIGNED) AS amount
 		FROM credit_transactions
 		WHERE user_id = ? AND group_id = ? AND amount < 0
 		  AND created_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
 		GROUP BY DATE_FORMAT(created_at, '%Y-%m-%d')
-		ORDER BY day ASC`, userID, groupID, days).Scan(&out).Error
-	return out, err
+		ORDER BY day ASC`, userID, groupID, days-1).Scan(&rows).Error
+	if err != nil {
+		return nil, err
+	}
+	byDay := make(map[string]int, len(rows))
+	for _, x := range rows {
+		byDay[x.Day] = x.Amount
+	}
+	out := make([]DailyPoint, 0, days)
+	for _, k := range dayspine.Keys(r.dbToday(), days) {
+		out = append(out, DailyPoint{Day: k, Amount: byDay[k]})
+	}
+	return out, nil
+}
+
+// dbToday는 DB 기준 오늘 날짜(스파인 기준점). Go 시계를 쓰면 DB 서버 타임존이 다를 때
+// 스파인과 WHERE 절(CURDATE 기준)이 하루 어긋난다. 실패하면 Go 시계로 폴백.
+func (r *gormRepo) dbToday() time.Time {
+	var s string
+	r.db.Raw(`SELECT DATE_FORMAT(CURDATE(),'%Y-%m-%d')`).Scan(&s)
+	if t, err := time.Parse(dayspine.Layout, s); err == nil {
+		return t
+	}
+	return time.Now()
 }
 
 func (r *gormRepo) GroupWallet(groupID int64) (*GroupWallet, error) {

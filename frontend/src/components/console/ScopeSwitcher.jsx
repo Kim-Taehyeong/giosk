@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Building2, FolderKanban, ChevronsUpDown, Check } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { activeScopeOf } from '../../config/consoleRoles';
+import { clickable } from '../../utils/a11y';
 
 // scopeKey — 백엔드 X-Console-Scope 형식("org:10"|"group:2").
 const keyOf = (s) => `${s.level}:${s.level === 'org' ? s.orgId : s.groupId}`;
@@ -48,7 +49,8 @@ export default function ScopeSwitcher({ ns }) {
   }
 
   return (
-    <div className="proj" ref={ref} style={{ position: 'relative', cursor: 'pointer' }} onClick={() => setOpen((o) => !o)} role="button">
+    <div className="proj" ref={ref} style={{ position: 'relative', cursor: 'pointer' }}
+      aria-expanded={open} aria-haspopup="menu" {...clickable(() => setOpen((o) => !o))}>
       <small>{current ? roleLabel(current) : '—'}</small>
       <span className="flex gap" style={{ gap: 6, alignItems: 'center' }}>
         {current?.level === 'org' ? <Building2 size={13} /> : <FolderKanban size={13} />}
@@ -56,9 +58,9 @@ export default function ScopeSwitcher({ ns }) {
         <ChevronsUpDown size={13} style={{ opacity: 0.6 }} />
       </span>
       {open && (
-        <div className="scope-menu" style={{
+        <div className="scope-menu" role="menu" style={{
           position: 'absolute', top: '100%', left: 0, marginTop: 6, minWidth: 220, zIndex: 50,
-          background: 'var(--surface, #fff)', border: '1px solid var(--border, #e5e7eb)', borderRadius: 8,
+          background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8,
           boxShadow: '0 8px 24px rgba(0,0,0,.12)', padding: 6,
         }}>
           <div className="muted" style={{ fontSize: 11, padding: '4px 8px' }}>{t('topbar.switchScope')}</div>
@@ -69,7 +71,7 @@ export default function ScopeSwitcher({ ns }) {
                 onClick={(e) => { e.stopPropagation(); pick(s); }}
                 style={{
                   width: '100%', textAlign: 'left', alignItems: 'center', gap: 8, padding: '7px 8px',
-                  border: 0, borderRadius: 6, background: active ? 'var(--hover, #f3f4f6)' : 'transparent', cursor: 'pointer',
+                  border: 0, borderRadius: 6, background: active ? 'var(--surface-2)' : 'transparent', cursor: 'pointer',
                 }}>
                 {s.level === 'org' ? <Building2 size={14} /> : <FolderKanban size={14} />}
                 <span style={{ flex: 1 }}>

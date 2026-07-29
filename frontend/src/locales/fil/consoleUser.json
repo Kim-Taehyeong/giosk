@@ -156,7 +156,11 @@
     "mySessions": "Mga session ko",
     "nodeAvail": "Ang pagkakaroon ng per-node",
     "kpiFree": "Libre (walang limitasyon)",
-    "kpiCooldown": "Subukan muli ang cooldown"
+    "kpiCooldown": "Subukan muli ang cooldown",
+    "slots": "Mga puwang",
+    "hamiShared": "HAMi fractional",
+    "hamiFractional": "Fractional (sa pamamagitan ng VRAM at mga core)",
+    "exclusiveWhole": "Nakatuon (buong card)"
   },
   "newSession": {
     "crumb": "Mga session",
@@ -310,7 +314,8 @@
     "hoursApprox": "~{{n}} oras",
     "tsSlotN": "1 ng {{n}} slots",
     "notEnough": "Hindi sapat na credit — 1 oras na minimum na kinakailangan",
-    "sshKeyChange": "Palitan"
+    "sshKeyChange": "Palitan",
+    "sshCacheCount": "{{n}} naka-cache"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "sshDirectInHint": "Kumonekta nang diretso sa node mula sa loob ng network ng opisina — pag-bypass sa gateway.",
     "sshDirectHint": "Direktang kumokonekta sa node gamit ang iyong nakarehistrong pampublikong key (kinakailangan ang network ng campus / VPN).",
     "sshNeedKey": "Walang nakarehistrong SSH public key",
-    "sshNeedKeyHint": "Magrehistro o gumawa ng isa sa ibaba — agad itong ginagamit ng mga tumatakbong session."
+    "sshNeedKeyHint": "Magrehistro o gumawa ng isa sa ibaba — agad itong ginagamit ng mga tumatakbong session.",
+    "webConnectNewWindow": "Nagbubukas ng terminal ng browser sa bagong window — walang SSH key o command na kailangan."
   },
   "account": {
     "title": "Aking Mga Setting",
@@ -464,7 +470,8 @@
     "sshGenerate": "Gumawa at i-download ang key",
     "sshGenerated": "Nagawa na ang key. Ingatan ang na-download na private key — hindi na ito puwedeng i-download muli.",
     "sshGenFail": "Nabigong gumawa ng SSH key.",
-    "sshGenerateHint": "Wala pang key? I-click ang “Gumawa at i-download ang key”. Isang beses lang mada-download ang private key (.pem) at awtomatikong nakarehistro ang public key. Koneksyon: ssh -i na-download-na-key.pem …"
+    "sshGenerateHint": "Wala pang key? I-click ang “Gumawa at i-download ang key”. Isang beses lang mada-download ang private key (.pem) at awtomatikong nakarehistro ang public key. Koneksyon: ssh -i na-download-na-key.pem …",
+    "activeScope": "Aktibo"
   },
   "notify": {
     "title": "Mga abiso",
@@ -493,7 +500,19 @@
     "mBudget": "Paggamit ng badyet",
     "sev_info": "Impormasyon",
     "sev_err": "Error",
-    "sev_warn": "Babala"
+    "sev_warn": "Babala",
+    "mSessVram": "Paggamit ng VRAM ng session",
+    "mSessGpu": "Paggamit ng GPU ng session",
+    "prev": "Nakaraang",
+    "inboxTitle": "Inbox",
+    "next": "Susunod",
+    "selectSession": "Pumili ng session",
+    "inboxEmpty": "Wala pang notification.",
+    "scopeAccount": "Buong account",
+    "mSessCpu": "Paggamit ng CPU ng session",
+    "noSession": "Walang tumatakbong session",
+    "rulesHint": "Ang mga panuntunan at notification ng alerto ay bawat account at ibinabahagi sa lahat ng team. Sinusuri ang mga sukatan ng session sa napiling session.",
+    "readAll": "Markahan lahat ng nabasa"
   },
   "wallet": {
     "title": "Wallet / Mga Kredito",
@@ -535,7 +554,15 @@
     "topupNote": "Inilapat pagkatapos aprubahan ng admin ng iyong pangkat (walang tunay na pagbabayad)",
     "topupSend": "Magpadala ng kahilingan",
     "desc_storage": "Imbakan ({{ref}})",
-    "desc_gpu": "Paggamit ng GPU ({{ref}})"
+    "desc_gpu": "Paggamit ng GPU ({{ref}})",
+    "rechargeSoon": "Malapit na",
+    "nextRecharge": "Susunod na refill",
+    "consumedCol": "Naubos",
+    "session": "Sesyon",
+    "searchPh": "Mga sesyon ng paghahanap, mga uri, mga detalye",
+    "rechargeEvery": "Tuwing {{n}} araw",
+    "viewAll": "Lahat ng entry",
+    "viewBySession": "Igrupo ayon sa sesyon"
   },
   "volume": {
     "title": "Data / Dami",
@@ -596,7 +623,16 @@
     "thisVol": "Ang volume na ito",
     "afterRemain": "Iniwan pagkatapos",
     "afterUse": "Ginamit pagkatapos",
-    "quotaHint": "Bawat user na limitasyon ng imbakan para sa iyong mga personal na volume (independiyente sa grupo). Ang mga bagong volume ay naharang kapag nalampasan mo na ito."
+    "quotaHint": "Bawat user na limitasyon ng imbakan para sa iyong mga personal na volume (independiyente sa grupo). Ang mga bagong volume ay naharang kapag nalampasan mo na ito.",
+    "teamQuota": "Lampas sa quota ng volume ng target na team",
+    "teamChanged": "Nagbago ang team",
+    "personal": "Personal",
+    "teamFail": "Hindi makapagpalit ng team",
+    "sharedBy": "Ibinahagi ni",
+    "teamHome": "Sinisingil sa team",
+    "changeTeamTitle": "Baguhin ang koponan — {{name}}",
+    "teamHint": "Ang quota ng kapasidad ng volume na ito at mga kredito sa imbakan ay nagmumula sa napiling koponan. Mananatili kang may-ari.",
+    "changeTeam": "Baguhin ang koponan"
   },
   "gmembers": {
     "title": "Mga miyembro",

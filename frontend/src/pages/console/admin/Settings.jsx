@@ -30,8 +30,8 @@ function RechargeCard({ config, refresh, toast, t }) {
       </div>
       {d.enabled && (
         <div className="grid cols-2" style={{ gap: 14, marginTop: 8, alignItems: 'end' }}>
-          <div><label className="fld" style={{ marginTop: 0 }}>{t('settings.rechargeInterval', { defaultValue: '기본 리필 주기(일) · 하위 상한' })}</label>
-            <input type="number" min={1} value={d.intervalDays} onChange={(e) => setD({ ...d, intervalDays: Number(e.target.value) })} onBlur={() => save({})} /></div>
+          <div><label className="fld" htmlFor="admin-settings-fld-0" style={{ marginTop: 0 }}>{t('settings.rechargeInterval', { defaultValue: '기본 리필 주기(일) · 하위 상한' })}</label>
+            <input id="admin-settings-fld-0" type="number" min={1} value={d.intervalDays} onChange={(e) => setD({ ...d, intervalDays: Number(e.target.value) })} onBlur={() => save({})} /></div>
           <div><label className="fld" style={{ marginTop: 0 }}>{t('settings.rechargeCarryover', { defaultValue: '이월 허용' })}</label>
             <div className="flex" style={{ gap: 8, alignItems: 'center', height: 38 }}>
               <Toggle checked={d.carryover} onChange={(v) => save({ carryover: v })} />
@@ -112,11 +112,11 @@ export default function Settings() {
         <div className="card" style={{ margin: 0 }}>
           <h3><Sparkles size={15} /> {t('settings.brandingTitle')}</h3>
           <div className="legend mb">{t('settings.brandingNote')}</div>
-          <label className="fld" style={{ marginTop: 0 }}>{t('settings.brandName')}</label>
-          <input type="text" value={config.branding?.name || ''} placeholder="Giosk"
+          <label className="fld" htmlFor="admin-settings-fld-1" style={{ marginTop: 0 }}>{t('settings.brandName')}</label>
+          <input id="admin-settings-fld-1" type="text" value={config.branding?.name || ''} placeholder="Giosk"
             onChange={(e) => update({ branding: { name: e.target.value } })} />
-          <label className="fld">{t('settings.brandSubtitle', { defaultValue: '부제(서브타이틀)' })}</label>
-          <input type="text" value={config.branding?.subtitle ?? 'Console'} placeholder="Console"
+          <label className="fld" htmlFor="admin-settings-fld-2">{t('settings.brandSubtitle', { defaultValue: '부제(서브타이틀)' })}</label>
+          <input id="admin-settings-fld-2" type="text" value={config.branding?.subtitle ?? 'Console'} placeholder="Console"
             onChange={(e) => update({ branding: { subtitle: e.target.value } })} />
           <div className="legend" style={{ marginTop: 4 }}>{t('settings.brandSubtitleHint', { defaultValue: '로고 옆 작은 글씨. 비우면 표시하지 않습니다.' })}</div>
           <label className="fld">{t('settings.brandIcon', { defaultValue: '아이콘' })}</label>
@@ -133,10 +133,10 @@ export default function Settings() {
               );
             })}
           </div>
-          <label className="fld">{t('settings.brandIconUpload', { defaultValue: '아이콘 업로드 (선택)' })}</label>
+          <label className="fld" htmlFor="admin-settings-fld-3">{t('settings.brandIconUpload', { defaultValue: '아이콘 업로드 (선택)' })}</label>
           <div className="flex" style={{ gap: 10, alignItems: 'center' }}>
             {config.branding?.iconUrl && <img src={config.branding.iconUrl} alt="icon" style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'cover', border: '1px solid var(--border)' }} />}
-            <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" onChange={(e) => {
+            <input id="admin-settings-fld-3" type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" onChange={(e) => {
               const f = e.target.files?.[0]; if (!f) return;
               if (f.size > 120 * 1024) { toast(t('settings.brandIconTooBig', { defaultValue: '아이콘은 120KB 이하여야 합니다.' })); return; }
               const r = new FileReader(); r.onload = () => update({ branding: { iconUrl: String(r.result) } }); r.readAsDataURL(f);
@@ -144,9 +144,9 @@ export default function Settings() {
             {config.branding?.iconUrl && <button className="btn sm" onClick={() => update({ branding: { iconUrl: '' } })}>{t('settings.brandIconClear', { defaultValue: '제거' })}</button>}
           </div>
           <div className="legend" style={{ marginTop: 4 }}>{t('settings.brandIconUploadHint', { defaultValue: '업로드하면 위 Lucide 아이콘보다 우선 적용됩니다(120KB 이하 PNG/SVG 권장).' })}</div>
-          <label className="fld">{t('settings.brandAccent')}</label>
+          <label className="fld" htmlFor="admin-settings-fld-4">{t('settings.brandAccent')}</label>
           <div className="flex" style={{ gap: 10, alignItems: 'center' }}>
-            <input type="color" value={config.branding?.accent || '#2563eb'} style={{ width: 46, height: 34, padding: 2, borderRadius: 8, cursor: 'pointer' }}
+            <input id="admin-settings-fld-4" type="color" value={config.branding?.accent || '#2563eb'} style={{ width: 46, height: 34, padding: 2, borderRadius: 8, cursor: 'pointer' }}
               onChange={(e) => update({ branding: { accent: e.target.value } })} />
             <button className="btn sm" onClick={() => update({ branding: { accent: '' } })}>{t('settings.brandAccentReset')}</button>
           </div>

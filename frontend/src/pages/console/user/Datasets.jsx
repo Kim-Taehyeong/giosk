@@ -104,12 +104,12 @@ export default function Datasets() {
             <button className="btn primary" onClick={submit} disabled={submitting}>{t('datasets.submit')}</button>
           </>
         )}>
-        <label className="fld" style={{ marginTop: 0 }}>{t('datasets.fName')}</label>
-        <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="my-dataset" />
-        <label className="fld">{t('datasets.fClass')}</label>
-        <Select value={form.sizeClass} onChange={(v) => setForm({ ...form, sizeClass: v })} options={SIZE_OPTS.map((x) => ({ value: x, label: x }))} />
-        <label className="fld">{t('datasets.fUrl')}</label>
-        <input type="text" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} placeholder="https://example.com/dataset.zip" />
+        <label className="fld" htmlFor="user-datasets-fld-0" style={{ marginTop: 0 }}>{t('datasets.fName')}</label>
+        <input id="user-datasets-fld-0" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="my-dataset" />
+        <label className="fld" id="user-datasets-fld-1-lbl">{t('datasets.fClass')}</label>
+        <Select ariaLabelledBy="user-datasets-fld-1-lbl" value={form.sizeClass} onChange={(v) => setForm({ ...form, sizeClass: v })} options={SIZE_OPTS.map((x) => ({ value: x, label: x }))} />
+        <label className="fld" htmlFor="user-datasets-fld-2">{t('datasets.fUrl')}</label>
+        <input id="user-datasets-fld-2" type="text" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} placeholder="https://example.com/dataset.zip" />
         <div className="legend">{t('datasets.fUrlHint')}</div>
         <div className="legend mt">{t('datasets.fGlobalHint')}</div>
       </Modal>

@@ -156,7 +156,11 @@
     "nodeAvail": "זמינות לכל צומת",
     "kpiCooldown": "נסה להתקרר שוב",
     "kpiNodes": "צמתים זמינים",
-    "kpiFree": "חינם (ללא הגבלה)"
+    "kpiFree": "חינם (ללא הגבלה)",
+    "exclusiveWhole": "ייעודי (כרטיס שלם)",
+    "slots": "חריצים",
+    "hamiFractional": "חלקי (על ידי VRAM וליבות)",
+    "hamiShared": "שבר HAMi"
   },
   "newSession": {
     "crumb": "הפעלות",
@@ -310,7 +314,8 @@
     "hoursApprox": "~{{n}} שעות",
     "guaranteed": "משאבים מובטחים",
     "runtimeLeft": "זמן ריצה בקצב הזה",
-    "sshKeyChange": "שינוי"
+    "sshKeyChange": "שינוי",
+    "sshCacheCount": "{{n}} שמור"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "sshDirect": "ישיר (אינטרנט)",
     "regenerated": "הוציא קישור גישה חדש.",
     "sshNeedKey": "לא רשום מפתח SSH ציבורי",
-    "sshNeedKeyHint": "רשמו או צרו אחד למטה — מפגשים פעילים קולטים אותו מיד."
+    "sshNeedKeyHint": "רשמו או צרו אחד למטה — מפגשים פעילים קולטים אותו מיד.",
+    "webConnectNewWindow": "פותח מסוף דפדפן בחלון חדש - אין צורך במפתח SSH או בפקודה."
   },
   "account": {
     "title": "ההגדרות שלי",
@@ -464,7 +470,8 @@
     "sshGenerate": "יצירה והורדה של מפתח",
     "sshGenerated": "המפתח נוצר. שמרו את המפתח הפרטי שהורד במקום בטוח — לא ניתן להוריד אותו שוב.",
     "sshGenFail": "יצירת מפתח SSH נכשלה.",
-    "sshGenerateHint": "עדיין אין מפתח? לחצו על «יצירה והורדה של מפתח». המפתח הפרטי (.pem) יורד פעם אחת והציבורי נרשם אוטומטית. התחברות: ssh -i downloaded-key.pem …"
+    "sshGenerateHint": "עדיין אין מפתח? לחצו על «יצירה והורדה של מפתח». המפתח הפרטי (.pem) יורד פעם אחת והציבורי נרשם אוטומטית. התחברות: ssh -i downloaded-key.pem …",
+    "activeScope": "פָּעִיל"
   },
   "notify": {
     "title": "התראות",
@@ -493,7 +500,19 @@
     "webhooks": "webhooks רשומים",
     "sev_warn": "אַזהָרָה",
     "sev_err": "שְׁגִיאָה",
-    "sev_info": "מידע"
+    "sev_info": "מידע",
+    "mSessGpu": "שימוש ב-GPU בהפעלה",
+    "inboxTitle": "תיבת דואר נכנס",
+    "prev": "קוֹדֵם",
+    "next": "הַבָּא",
+    "mSessCpu": "ניצול מעבד מושב",
+    "mSessVram": "שימוש ב-VRAM בהפעלה",
+    "readAll": "סמן הכל כנקראו",
+    "rulesHint": "כללי ההתראה וההתראות הם לכל חשבון ומשותפים לכל הצוותים. מדדי הפעלה מוערכים בהפעלה שנבחרה.",
+    "scopeAccount": "כל החשבון",
+    "selectSession": "בחר הפעלה",
+    "noSession": "אין הפעלות ריצה",
+    "inboxEmpty": "עדיין אין התראות."
   },
   "wallet": {
     "title": "ארנק / קרדיטים",
@@ -535,7 +554,15 @@
     "noSpend": "עדיין אין צריכה",
     "topupNote": "הוחל לאחר שמנהל הקבוצה שלך יאשר (ללא תשלום אמיתי)",
     "desc_storage": "אחסון ({{ref}})",
-    "desc_gpu": "שימוש במעבד גרפי ({{ref}})"
+    "desc_gpu": "שימוש במעבד גרפי ({{ref}})",
+    "nextRecharge": "המילוי הבא",
+    "rechargeSoon": "בְּקָרוּב",
+    "session": "מוֹשָׁב",
+    "consumedCol": "מְאוּכָּל",
+    "viewBySession": "קבוצה לפי מפגש",
+    "rechargeEvery": "כל {{n}} ימים",
+    "viewAll": "כל הערכים",
+    "searchPh": "חיפוש הפעלות, סוגים, פרטים"
   },
   "volume": {
     "title": "נתונים / כרכים",
@@ -596,7 +623,16 @@
     "quota": "מכסת נפח",
     "overQuota": "חורג מהמכסה הנותרת ({{remain}} GB)",
     "quotaHint": "מגבלת אחסון למשתמש עבור הנפחים האישיים שלך (ללא תלות בקבוצה). נפחים חדשים נחסמים ברגע שאתה חורג ממנו.",
-    "afterRemain": "נשאר אחרי"
+    "afterRemain": "נשאר אחרי",
+    "teamFail": "לא יכול היה להחליף קבוצה",
+    "personal": "אִישִׁי",
+    "teamQuota": "חורג ממכסת הנפח של צוות היעד",
+    "changeTeam": "שנה צוות",
+    "sharedBy": "משותף על ידי",
+    "teamHome": "מחויב לצוות",
+    "teamHint": "מכסת הקיבולת ונקודות האחסון של נפח זה מגיעים מהצוות הנבחר. אתה נשאר הבעלים.",
+    "changeTeamTitle": "שינוי צוות - {{name}}",
+    "teamChanged": "הקבוצה השתנתה"
   },
   "gmembers": {
     "title": "חברים",

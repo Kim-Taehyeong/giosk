@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { notifyText } from '../../../utils/notify';
+import { clickable } from '../../../utils/a11y';
 import { BellRing, Plus, Trash2, Mail, Webhook, BellPlus, Cpu, Server } from 'lucide-react';
 import PageHead from '../../../components/console/PageHead';
 import Pill from '../../../components/console/Pill';
@@ -159,7 +160,7 @@ export default function NotificationCenter() {
             {inboxView.map((n, i) => {
               const txt = notifyText(n, t);
               return (
-              <div key={n.id} onClick={() => !n.read && readOne(n.id)}
+              <div key={n.id} {...clickable(n.read ? undefined : () => readOne(n.id))}
                 style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '12px 4px', borderTop: i ? '1px solid var(--border)' : 'none',
                   cursor: n.read ? 'default' : 'pointer', opacity: n.read ? 0.6 : 1 }}>
                 {!n.read && <span style={{ marginTop: 6, flex: '0 0 auto', width: 8, height: 8, borderRadius: 4, background: 'var(--danger)' }} />}
@@ -282,14 +283,14 @@ export default function NotificationCenter() {
             <button className="btn primary" onClick={addAvail}>{t('alerts.save')}</button>
           </>
         )}>
-        <label className="fld" style={{ marginTop: 0 }}>{t('alerts.type')}</label>
-        <Select value={availForm.type} onChange={setAvailType}
+        <label className="fld" id="user-notificationcenter-fld-0-lbl" style={{ marginTop: 0 }}>{t('alerts.type')}</label>
+        <Select ariaLabelledBy="user-notificationcenter-fld-0-lbl" value={availForm.type} onChange={setAvailType}
           options={[
             { value: 'gpu', label: t('alerts.typeGpu') },
             ...(hybrid ? [{ value: 'node', label: t('alerts.typeNode') }] : []),
           ]} />
-        <label className="fld">{t('alerts.target')}</label>
-        <Select value={availForm.target} onChange={(v) => setAvailForm({ ...availForm, target: v })} options={availTargetOptions} placeholder={t('alerts.selectTarget')} />
+        <label className="fld" id="user-notificationcenter-fld-1-lbl">{t('alerts.target')}</label>
+        <Select ariaLabelledBy="user-notificationcenter-fld-1-lbl" value={availForm.target} onChange={(v) => setAvailForm({ ...availForm, target: v })} options={availTargetOptions} placeholder={t('alerts.selectTarget')} />
         <div className="legend mt">{t('alerts.addHint')}</div>
       </Modal>
     </div>

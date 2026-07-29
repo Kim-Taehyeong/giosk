@@ -156,7 +156,11 @@
     "colConn": "Unganisha",
     "gpuAvail": "GPU inapatikana",
     "kpiMaxLease": "Ukodishaji wa kiwango cha juu",
-    "kpiNodes": "Nodi zinazopatikana"
+    "kpiNodes": "Nodi zinazopatikana",
+    "exclusiveWhole": "Imejitolea (kadi nzima)",
+    "slots": "Slots",
+    "hamiShared": "Sehemu ya HAMI",
+    "hamiFractional": "Sehemu (na VRAM na cores)"
   },
   "newSession": {
     "crumb": "Vikao",
@@ -310,7 +314,8 @@
     "hoursApprox": "~Saa {{n}}",
     "guaranteed": "Rasilimali zilizohakikishwa",
     "runtimeLeft": "Muda wa kukimbia kwa kiwango hiki",
-    "sshKeyChange": "Badilisha"
+    "sshKeyChange": "Badilisha",
+    "sshCacheCount": "{{n}} imehifadhiwa"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "regenerated": "Imetoa kiungo kipya cha ufikiaji.",
     "regenerate": "Tengeneza upya",
     "sshNeedKey": "Hakuna ufunguo wa umma wa SSH uliosajiliwa",
-    "sshNeedKeyHint": "Sajili au tengeneza mmoja hapa chini — vipindi vinavyoendeshwa huuchukua mara moja."
+    "sshNeedKeyHint": "Sajili au tengeneza mmoja hapa chini — vipindi vinavyoendeshwa huuchukua mara moja.",
+    "webConnectNewWindow": "Hufungua terminal ya kivinjari katika dirisha jipya - hakuna kitufe cha SSH au amri inahitajika."
   },
   "account": {
     "title": "Mipangilio Yangu",
@@ -464,7 +470,8 @@
     "sshGenerate": "Tengeneza na pakua ufunguo",
     "sshGenerated": "Ufunguo umetengenezwa. Hifadhi kwa usalama ufunguo binafsi uliopakuliwa — hauwezi kupakuliwa tena.",
     "sshGenFail": "Imeshindwa kutengeneza ufunguo wa SSH.",
-    "sshGenerateHint": "Bado huna ufunguo? Bofya “Tengeneza na pakua ufunguo”. Ufunguo binafsi (.pem) hupakuliwa mara moja tu na ule wa umma husajiliwa kiotomatiki. Kuunganisha: ssh -i downloaded-key.pem …"
+    "sshGenerateHint": "Bado huna ufunguo? Bofya “Tengeneza na pakua ufunguo”. Ufunguo binafsi (.pem) hupakuliwa mara moja tu na ule wa umma husajiliwa kiotomatiki. Kuunganisha: ssh -i downloaded-key.pem …",
+    "activeScope": "Inayotumika"
   },
   "notify": {
     "title": "Arifa",
@@ -493,7 +500,19 @@
     "saved": "Sheria za {{n}} zilizohifadhiwa",
     "sev_err": "Hitilafu",
     "sev_warn": "Onyo",
-    "sev_info": "Habari"
+    "sev_info": "Habari",
+    "inboxTitle": "Kikasha",
+    "readAll": "Weka alama kuwa zote zimesomwa",
+    "prev": "Iliyotangulia",
+    "mSessGpu": "Matumizi ya GPU ya Kipindi",
+    "mSessCpu": "Kipindi cha matumizi ya CPU",
+    "next": "Inayofuata",
+    "mSessVram": "Matumizi ya VRAM ya Kipindi",
+    "inboxEmpty": "Bado hakuna arifa.",
+    "scopeAccount": "Akaunti nzima",
+    "noSession": "Hakuna vipindi vinavyoendeshwa",
+    "selectSession": "Chagua kipindi",
+    "rulesHint": "Sheria za arifa na arifa ni kwa kila akaunti na hushirikiwa kwa timu zote. Vipimo vya kipindi hutathminiwa kwenye kipindi kilichochaguliwa."
   },
   "wallet": {
     "title": "Mkoba / Mikopo",
@@ -535,7 +554,15 @@
     "topupSend": "Tuma ombi",
     "topupSent": "Ombi limetumwa (inasubiri idhini ya msimamizi wa kikundi)",
     "desc_storage": "Hifadhi ({{ref}})",
-    "desc_gpu": "Matumizi ya GPU ({{ref}})"
+    "desc_gpu": "Matumizi ya GPU ({{ref}})",
+    "nextRecharge": "Jaza tena",
+    "rechargeEvery": "Kila siku {{n}}",
+    "viewBySession": "Kundi baada ya kikao",
+    "session": "Kikao",
+    "rechargeSoon": "Hivi karibuni",
+    "viewAll": "Maingizo yote",
+    "searchPh": "Tafuta vikao, aina, maelezo",
+    "consumedCol": "Zinazotumiwa"
   },
   "volume": {
     "title": "Data / Kiasi",
@@ -596,7 +623,16 @@
     "afterRemain": "Kushoto baada",
     "nfsHint": "Kiasi huundwa kwenye NFS.",
     "quotaHint": "Kikomo cha hifadhi kwa kila mtumiaji cha juzuu zako za kibinafsi (bila kundi). Majuzuu mapya yamezuiwa mara tu unapozidisha.",
-    "overQuota": "Inazidi mgawo uliosalia ({{remain}} GB)"
+    "overQuota": "Inazidi mgawo uliosalia ({{remain}} GB)",
+    "personal": "Binafsi",
+    "changeTeam": "Badilisha timu",
+    "changeTeamTitle": "Badilisha timu - {{name}}",
+    "teamQuota": "Huzidi kiwango cha kiasi cha timu inayolengwa",
+    "teamHome": "Inatozwa kwa timu",
+    "teamFail": "Haikuweza kubadilisha timu",
+    "sharedBy": "Imeshirikiwa na",
+    "teamHint": "Kiasi cha nafasi ya juzuu hii na salio la hifadhi hutoka kwa timu iliyochaguliwa. Unabaki kuwa mmiliki.",
+    "teamChanged": "Timu imebadilika"
   },
   "gmembers": {
     "title": "Wanachama",

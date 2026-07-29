@@ -67,7 +67,9 @@
       "errorGeneric": "El registro falló.",
       "errorAdvisor": "Los estudiantes de pregrado y posgrado deberán contar con un asesor.",
       "errorGroup": "Debes seleccionar una organización y un grupo.",
-      "errorPasswordMismatch": "Las contraseñas no coinciden."
+      "errorPasswordMismatch": "Las contraseñas no coinciden.",
+      "pwMismatch": "Las contraseñas no coinciden",
+      "pwMatch": "Las contraseñas coinciden"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Nodos {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "Nodos {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "Nodos {{up}}/{{total}} · GPU —",
+    "clusterStatus": "Estado del clúster",
+    "unreadN": "{{n}} no leído",
+    "orgWhole": "Toda la organización",
+    "rolePlatformSub": "superadministrador",
+    "noAlerts": "Aún no hay alertas.",
+    "alerts": "Alertas",
+    "rolePlatform": "Toda la plataforma",
+    "viewAll": "Ver todo en el Centro de notificaciones",
+    "creditBalance": "Saldo crediticio"
+  },
+  "table": {
+    "empty": "Sin datos"
+  },
+  "refill": {
+    "carryover": "Continuar",
+    "carryOn": "Continuar",
+    "carryOff": "Expirar",
+    "amount": "Créditos por ciclo",
+    "interval": "Ciclo de recarga (días)",
+    "title": "Recarga recurrente",
+    "maxHint": "Límite del ciclo principal: {{n}} días o menos",
+    "note": "Se recarga por esta cantidad en cada ciclo (0 lo desactiva). El ciclo no puede ser más largo que el de los padres y se limita automáticamente."
+  },
+  "select": {
+    "placeholder": "Seleccionar",
+    "search": "Buscar…",
+    "noMatch": "No hay coincidencia"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "El equipo {{target}} tiene pocos créditos.",
+      "teamBody": "Los créditos del equipo {{target}} están en {{value}}, por debajo del umbral de {{threshold}}. Es posible que las sesiones en este equipo finalicen pronto."
+    }
+  },
+  "close": "Cerca"
 }

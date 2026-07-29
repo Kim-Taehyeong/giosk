@@ -156,7 +156,11 @@
     "gpuAvail": "GPUが利用可能",
     "kpiCooldown": "クールダウンを再試行する",
     "kpiNodes": "利用可能なノード",
-    "kpiMaxLease": "最大リース"
+    "kpiMaxLease": "最大リース",
+    "slots": "スロット",
+    "exclusiveWhole": "専用（カード全体）",
+    "hamiShared": "HAMi分数",
+    "hamiFractional": "フラクショナル (VRAM およびコアによる)"
   },
   "newSession": {
     "crumb": "セッション",
@@ -310,7 +314,8 @@
     "grpSlotTech": "技術: NVIDIA タイムスライシング (メモリ分離なし)",
     "hoursApprox": "~{{n}}時間",
     "tsSlotN": "{{n}} スロットの 1 つ",
-    "sshKeyChange": "変更"
+    "sshKeyChange": "変更",
+    "sshCacheCount": "{{n}} キャッシュされました"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "sshDirectInHint": "ゲートウェイをバイパスして、オフィス ネットワーク内からノードに直接接続します。",
     "regenerated": "新しいアクセスリンクを発行しました。",
     "sshNeedKey": "SSH 公開鍵が登録されていません",
-    "sshNeedKeyHint": "下で登録または生成してください。実行中のセッションにも即座に反映されます。"
+    "sshNeedKeyHint": "下で登録または生成してください。実行中のセッションにも即座に反映されます。",
+    "webConnectNewWindow": "新しいウィンドウでブラウザ ターミナルを開きます。SSH キーやコマンドは必要ありません。"
   },
   "account": {
     "title": "私の設定",
@@ -464,7 +470,8 @@
     "sshGenerate": "鍵を生成してダウンロード",
     "sshGenerated": "鍵を生成しました。ダウンロードした秘密鍵は安全に保管してください(再ダウンロードはできません)。",
     "sshGenFail": "SSH 鍵の生成に失敗しました。",
-    "sshGenerateHint": "鍵がない場合は「鍵を生成してダウンロード」をクリックしてください。秘密鍵(.pem)は一度だけダウンロードされ、公開鍵は自動登録されます。接続: ssh -i ダウンロードした鍵.pem …"
+    "sshGenerateHint": "鍵がない場合は「鍵を生成してダウンロード」をクリックしてください。秘密鍵(.pem)は一度だけダウンロードされ、公開鍵は自動登録されます。接続: ssh -i ダウンロードした鍵.pem …",
+    "activeScope": "アクティブ"
   },
   "notify": {
     "title": "通知",
@@ -493,7 +500,19 @@
     "saved": "保存された {{n}} ルール",
     "sev_err": "エラー",
     "sev_warn": "警告",
-    "sev_info": "情報"
+    "sev_info": "情報",
+    "inboxTitle": "受信箱",
+    "readAll": "すべて既読としてマークする",
+    "inboxEmpty": "まだ通知はありません。",
+    "prev": "前の",
+    "next": "次",
+    "mSessCpu": "セッションの CPU 使用率",
+    "scopeAccount": "アカウント全体",
+    "mSessVram": "セッション VRAM 使用率",
+    "noSession": "実行中のセッションはありません",
+    "mSessGpu": "セッションGPU使用率",
+    "selectSession": "セッションを選択してください",
+    "rulesHint": "アラート ルールと通知はアカウントごとにあり、すべてのチームで共有されます。セッション メトリックは、選択したセッションで評価されます。"
   },
   "wallet": {
     "title": "ウォレット/クレジット",
@@ -535,7 +554,15 @@
     "topupTitle": "クレジットのチャージをリクエストする",
     "topupSent": "リクエストが送信されました (グループ管理者の承認待ち)",
     "desc_gpu": "GPU 使用率 ({{ref}})",
-    "desc_storage": "ストレージ ({{ref}})"
+    "desc_storage": "ストレージ ({{ref}})",
+    "nextRecharge": "次の詰め替え",
+    "rechargeSoon": "すぐ",
+    "session": "セッション",
+    "consumedCol": "消費された",
+    "searchPh": "検索セッション、タイプ、詳細",
+    "rechargeEvery": "{{n}} 日ごと",
+    "viewBySession": "セッションごとにグループ化する",
+    "viewAll": "すべてのエントリ"
   },
   "volume": {
     "title": "データ/ボリューム",
@@ -596,7 +623,16 @@
     "afterUse": "後に使用",
     "overQuota": "残りの割り当て量を超えています ({{remain}} GB)",
     "afterRemain": "後に残しました",
-    "quotaHint": "個人ボリュームのユーザーごとのストレージ制限 (グループとは独立)。それを超えると、新しいボリュームはブロックされます。"
+    "quotaHint": "個人ボリュームのユーザーごとのストレージ制限 (グループとは独立)。それを超えると、新しいボリュームはブロックされます。",
+    "teamQuota": "対象チームのボリューム割り当てを超えています",
+    "personal": "個人的",
+    "sharedBy": "共有者",
+    "teamHome": "チームに請求される",
+    "teamChanged": "チームが変わりました",
+    "teamFail": "チームを変更できませんでした",
+    "changeTeam": "チームを変更する",
+    "changeTeamTitle": "チームを変更 — {{name}}",
+    "teamHint": "このボリュームの容量割り当てとストレージ クレジットは、選択したチームから提供されます。あなたは所有者のままです。"
   },
   "gmembers": {
     "title": "メンバー",

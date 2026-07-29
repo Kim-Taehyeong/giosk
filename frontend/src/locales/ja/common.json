@@ -67,7 +67,9 @@
       "errorGroup": "組織とグループを選択する必要があります。",
       "errorPasswordShort": "パスワードは 8 文字以上である必要があります。",
       "errorGeneric": "サインアップに失敗しました。",
-      "errorPasswordMismatch": "パスワードが一致しません。"
+      "errorPasswordMismatch": "パスワードが一致しません。",
+      "pwMismatch": "パスワードが一致しません",
+      "pwMatch": "パスワードが一致する"
     },
     "signup": {
       "title": "Giosk コンソールにサインアップする",
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "ノード {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "ノード {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "ノード {{up}}/{{total}} · GPU —",
+    "creditBalance": "信用残高",
+    "alerts": "アラート",
+    "rolePlatform": "プラットフォーム全体",
+    "noAlerts": "まだアラートはありません。",
+    "orgWhole": "組織全体",
+    "unreadN": "{{n}}未読",
+    "rolePlatformSub": "スーパー管理者",
+    "clusterStatus": "クラスターのステータス",
+    "viewAll": "通知センターのすべてを表示"
+  },
+  "table": {
+    "empty": "データなし"
+  },
+  "refill": {
+    "title": "定期的な補充",
+    "note": "各サイクルでこの量が補充されます (0 は無効にします)。サイクルは親のサイクルよりも長くすることはできず、自動的に上限が設定されます。",
+    "carryover": "持ち越す",
+    "carryOn": "持ち越す",
+    "carryOff": "期限切れ",
+    "amount": "サイクルごとのクレジット",
+    "interval": "詰め替えサイクル（日）",
+    "maxHint": "親サイクルの制限: {{n}} 日以下"
+  },
+  "select": {
+    "placeholder": "選択",
+    "search": "検索…",
+    "noMatch": "一致しません"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "{{target}} チームのクレジットが残りわずかです",
+      "teamBody": "{{target}} チーム クレジットは {{value}} で、{{threshold}} のしきい値を下回っています。このチームのセッションは間もなく終了する可能性があります。"
+    }
+  },
+  "close": "近い"
 }

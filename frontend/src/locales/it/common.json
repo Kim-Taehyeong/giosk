@@ -67,7 +67,9 @@
       "errorGroup": "È necessario selezionare un'organizzazione e un gruppo.",
       "errorAdvisor": "Gli studenti universitari e laureati devono fornire un consulente.",
       "errorGeneric": "Registrazione non riuscita.",
-      "errorPasswordMismatch": "Le password non corrispondono."
+      "errorPasswordMismatch": "Le password non corrispondono.",
+      "pwMismatch": "Le password non corrispondono",
+      "pwMatch": "Le password corrispondono"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Nodi {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "Nodi {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "Nodi {{up}}/{{total}} · GPU —",
+    "alerts": "Avvisi",
+    "rolePlatformSub": "Super amministratore",
+    "unreadN": "{{n}} non letto",
+    "orgWhole": "Intera organizzazione",
+    "viewAll": "Vedi tutto nel Centro Notifiche",
+    "rolePlatform": "Intera piattaforma",
+    "clusterStatus": "Stato del cluster",
+    "noAlerts": "Nessun avviso ancora.",
+    "creditBalance": "Saldo del credito"
+  },
+  "table": {
+    "empty": "Nessun dato"
+  },
+  "refill": {
+    "title": "Ricarica ricorrente",
+    "carryover": "Riporto",
+    "carryOn": "Riporto",
+    "note": "Si ricarica di questo importo ad ogni ciclo (0 lo disabilita). Il ciclo non può essere più lungo di quello del genitore e viene limitato automaticamente.",
+    "maxHint": "Limite del ciclo genitore: {{n}} giorni o meno",
+    "amount": "Crediti per ciclo",
+    "interval": "Ciclo di ricarica (giorni)",
+    "carryOff": "Scadenza"
+  },
+  "select": {
+    "placeholder": "Selezionare",
+    "search": "Ricerca…",
+    "noMatch": "Nessuna corrispondenza"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "Il team {{target}} ha pochi crediti",
+      "teamBody": "I crediti della squadra {{target}} sono a {{value}}, sotto la soglia {{threshold}}. Le sessioni in questo team potrebbero interrompersi presto."
+    }
+  },
+  "close": "Vicino"
 }

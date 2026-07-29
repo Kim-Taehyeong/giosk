@@ -156,7 +156,11 @@
     "kpiFree": "Gratuito (ilimitado)",
     "kpiMaxLease": "Aluguel máximo",
     "kpiEta": "Acabou",
-    "kpiNodes": "Nós disponíveis"
+    "kpiNodes": "Nós disponíveis",
+    "hamiFractional": "Fracionário (por VRAM e núcleos)",
+    "exclusiveWhole": "Dedicado (cartão inteiro)",
+    "hamiShared": "HAMi fracionário",
+    "slots": "Caça-níqueis"
   },
   "newSession": {
     "crumb": "Sessões",
@@ -310,7 +314,8 @@
     "grpSlotTech": "Tecnologia: divisão de tempo NVIDIA (sem isolamento de memória)",
     "tsSlotN": "1 dos slots {{n}}",
     "guaranteed": "Recursos garantidos",
-    "sshKeyChange": "Alterar"
+    "sshKeyChange": "Alterar",
+    "sshCacheCount": "{{n}} em cache"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "sshDirectInHint": "Conecte-se diretamente ao nó de dentro da rede do escritório – ignorando o gateway.",
     "regenerated": "Emitido um novo link de acesso.",
     "sshNeedKey": "Nenhuma chave pública SSH registada",
-    "sshNeedKeyHint": "Registe ou gere uma abaixo — as sessões em execução aplicam-na de imediato."
+    "sshNeedKeyHint": "Registe ou gere uma abaixo — as sessões em execução aplicam-na de imediato.",
+    "webConnectNewWindow": "Abre um terminal do navegador em uma nova janela – nenhuma chave ou comando SSH é necessário."
   },
   "account": {
     "title": "Minhas configurações",
@@ -464,7 +470,8 @@
     "sshGenerate": "Gerar e transferir chave",
     "sshGenerated": "Chave gerada. Guarde em segurança a chave privada transferida — não é possível transferi-la novamente.",
     "sshGenFail": "Falha ao gerar a chave SSH.",
-    "sshGenerateHint": "Ainda sem chave? Clique em «Gerar e transferir chave». A chave privada (.pem) é transferida uma única vez e a pública é registada automaticamente. Ligação: ssh -i chave-transferida.pem …"
+    "sshGenerateHint": "Ainda sem chave? Clique em «Gerar e transferir chave». A chave privada (.pem) é transferida uma única vez e a pública é registada automaticamente. Ligação: ssh -i chave-transferida.pem …",
+    "activeScope": "Ativo"
   },
   "notify": {
     "title": "Notificações",
@@ -493,7 +500,19 @@
     "emails": "E-mails cadastrados",
     "sev_warn": "Aviso",
     "sev_info": "Informações",
-    "sev_err": "Erro"
+    "sev_err": "Erro",
+    "inboxTitle": "Caixa de entrada",
+    "readAll": "Marcar tudo como lido",
+    "prev": "Anterior",
+    "next": "Próximo",
+    "mSessGpu": "Utilização de GPU de sessão",
+    "mSessCpu": "Utilização da CPU da sessão",
+    "mSessVram": "Utilização de VRAM de sessão",
+    "scopeAccount": "Conta inteira",
+    "rulesHint": "As regras e notificações de alerta são por conta e compartilhadas entre todas as equipes. As métricas da sessão são avaliadas na sessão selecionada.",
+    "inboxEmpty": "Nenhuma notificação ainda.",
+    "selectSession": "Selecione uma sessão",
+    "noSession": "Nenhuma sessão em execução"
   },
   "wallet": {
     "title": "Carteira / Créditos",
@@ -535,7 +554,15 @@
     "topupNote": "Aplicado após a aprovação do administrador do grupo (sem pagamento real)",
     "jandi": "Últimas 30 semanas",
     "desc_gpu": "Uso de GPU ({{ref}})",
-    "desc_storage": "Armazenamento ({{ref}})"
+    "desc_storage": "Armazenamento ({{ref}})",
+    "nextRecharge": "Próxima recarga",
+    "rechargeSoon": "Breve",
+    "session": "Sessão",
+    "consumedCol": "Consumido",
+    "rechargeEvery": "Todos os dias {{n}}",
+    "viewBySession": "Agrupar por sessão",
+    "searchPh": "Pesquisar sessões, tipos, detalhes",
+    "viewAll": "Todas as entradas"
   },
   "volume": {
     "title": "Dados/Volumes",
@@ -596,7 +623,16 @@
     "overQuota": "Excede a cota restante ({{remain}} GB)",
     "afterRemain": "Saiu depois",
     "afterUse": "Usado depois",
-    "thisVol": "Este volume"
+    "thisVol": "Este volume",
+    "personal": "Pessoal",
+    "teamQuota": "Excede a cota de volume da equipe alvo",
+    "teamChanged": "Equipe alterada",
+    "teamHint": "A cota de capacidade e os créditos de armazenamento deste volume vêm da equipe selecionada. Você continua sendo o proprietário.",
+    "sharedBy": "Compartilhado por",
+    "teamFail": "Não foi possível mudar de equipe",
+    "changeTeamTitle": "Mudança de equipe - {{name}}",
+    "teamHome": "Faturado para a equipe",
+    "changeTeam": "Mudar equipe"
   },
   "gmembers": {
     "title": "Membros",

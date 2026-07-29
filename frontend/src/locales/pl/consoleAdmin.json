@@ -53,7 +53,8 @@
     "create": "Tworzyć",
     "optional": "(fakultatywny)",
     "edit": "Redagować",
-    "advanced": "Więcej ustawień"
+    "advanced": "Więcej ustawień",
+    "prev": "Poprzedni"
   },
   "dash": {
     "title": "Panel",
@@ -197,7 +198,10 @@
     "totalN": "Użytkownicy {{n}}",
     "groupPickOrgFirst": "Najpierw wybierz organizację",
     "advBelong": "Członkostwo · rola · hasło",
-    "colMemberRole": "Rola w organizacji/zespole"
+    "colMemberRole": "Rola w organizacji/zespole",
+    "colRefill": "Powtarzające się uzupełnianie",
+    "refillDefault": "Domyślny",
+    "colBalance": "Aktualne saldo"
   },
   "groups": {
     "title": "Grupy",
@@ -248,7 +252,18 @@
     "grantHintOrg": "Odebrane z puli Twojej organizacji i dodane do puli tej grupy. Nie może przekroczyć salda puli organizacji.",
     "adminHintOpt": "Pozostaw puste, aby utworzyć grupę bez administratora grupy. Dodaj członka ze szczegółów grupy i ustaw jego rolę na Administrator grupy.",
     "grantFail": "Nie udało się udzielić kredytu.",
-    "adminOpt": "Administrator grupy (opcjonalnie)"
+    "adminOpt": "Administrator grupy (opcjonalnie)",
+    "colRefill": "Powtarzające się uzupełnianie",
+    "deleteFail": "Usunięcie nie powiodło się",
+    "refillDefault": "Domyślny",
+    "refillInterval": "Cykl uzupełniania (dni)",
+    "initCreditAmt": "Początkowe kredyty",
+    "initCreditHint": "Opcjonalnie przydziel z puli organizacji i ustaw uzupełnienie podczas tworzenia zespołu. Możesz to również zrobić później na stronie szczegółów zespołu.",
+    "hasMembers": "Zespół ten nadal ma członków. Przenieś je lub usuń przed ich usunięciem.",
+    "carryover": "Przenieś niewykorzystane środki",
+    "cantDeleteDefault": "Domyślnego zespołu nie można usunąć.",
+    "initCredit": "Kredyty początkowe i doładowania cykliczne",
+    "refillAmt": "Uzupełnianie cykliczne (na cykl)"
   },
   "orgs": {
     "title": "Organizacje",
@@ -292,7 +307,11 @@
     "adminOpt": "Administrator organizacji (opcjonalnie)",
     "adminHintOpt": "Pozostaw puste, aby utworzyć tylko grupę „Ogólne” i przypisać administratora później, wybierając opcję Szczegóły organizacji → Ogólne → Dodaj członka z rolą administratora organizacji.",
     "grantHint": "Natychmiast zastosowane do puli organizacyjnej i zapisane w dzienniku kontroli.",
-    "bulkDone": "Zbiorczo dodano organizacje {{n}}"
+    "bulkDone": "Zbiorczo dodano organizacje {{n}}",
+    "deleteFail": "Usunięcie nie powiodło się",
+    "colRefill": "Powtarzające się uzupełnianie",
+    "refillDefault": "Domyślny",
+    "hasUsers": "Ta organizacja nadal ma użytkowników. Przenieś je lub usuń przed ich usunięciem."
   },
   "billing": {
     "title": "Rozliczenia",
@@ -318,7 +337,12 @@
     "vsAlloc": "vs przydział",
     "vsBudget": "kontra budżet",
     "vsBudget2": "kontra budżet",
-    "byGroup": "Konsumpcja według grup (pokaz)"
+    "byGroup": "Konsumpcja według grup (pokaz)",
+    "periodAll": "Cały czas",
+    "period7d": "Ostatnie 7 dni",
+    "periodMonth": "W tym miesiącu",
+    "periodLastMonth": "Ostatni miesiąc",
+    "periodNote": "Pokazane zużycie i godziny pracy procesora graficznego dotyczą wybranego okresu, zgodnie z księgą. Budżety i pule nie są ograniczone okresowo."
   },
   "audit": {
     "title": "Dziennik audytu",
@@ -476,7 +500,10 @@
     "impFail": "Import nie powiódł się",
     "impOwnerHint": "Wybierz konto z listy, aby zaimportować.",
     "impOwnerPicked": "Wybrano: {{name}} ({{id}})",
-    "metricsOffNotice": "Monitorowanie (DCGM/Prometheus) nie jest zainstalowane, więc użycie GPU i VRAM nie mogą być pokazane. Włącz monitorowanie, aby zobaczyć metryki na żywo."
+    "metricsOffNotice": "Monitorowanie (DCGM/Prometheus) nie jest zainstalowane, więc użycie GPU i VRAM nie mogą być pokazane. Włącz monitorowanie, aby zobaczyć metryki na żywo.",
+    "cordon": "Kordon",
+    "uncordon": "Uncordon",
+    "noMetrics": "Brak wskaźników"
   },
   "mset": {
     "title": "Ustawienia",
@@ -599,7 +626,21 @@
     "moveTo": "Grupa docelowa",
     "moveFail": "Przeniesienie nie powiodło się",
     "pickGroup": "Wybierz grupę",
-    "removeConfirm": "Usuń tego użytkownika z {{group}}."
+    "removeConfirm": "Usuń tego użytkownika z {{group}}.",
+    "granted": "Przyznane {{n}} C",
+    "memberAdded": "Dodano członkostwo.",
+    "addFail": "Nie można dodać",
+    "suspend": "Wstrzymać",
+    "restore": "Przywrócić",
+    "grantFail": "Grant nie powiódł się",
+    "statusConfirm": "Spowoduje to zmianę statusu użytkownika.",
+    "noTeamsInOrg": "Ta organizacja nie ma zespołów.",
+    "grantAmount": "Kredyty do przyznania (C; ujemne odliczenia)",
+    "grant": "Przyznaj kredyty",
+    "pickOrg": "Wybierz organizację",
+    "addMembership": "Dodaj członkostwo",
+    "grantTitle": "Przyznane kredyty — {{name}}",
+    "grantHint": "Natychmiast doliczane do salda kredytu osobistego i rejestrowane w dzienniku audytu jako jednorazowa korekta."
   },
   "clusters": {
     "title": "Klastry",
@@ -699,7 +740,12 @@
     "extSshOnly": "W przypadku braku portu VSCode/Jupyter/niestandardowego sesje na tym obrazie obejmują wyłącznie SSH.",
     "extRegistered": "Zarejestrowano obraz zewnętrzny",
     "webPort": "Niestandardowy port internetowy (opcjonalnie)",
-    "extFail": "Nie udało się zarejestrować obrazu zewnętrznego"
+    "extFail": "Nie udało się zarejestrować obrazu zewnętrznego",
+    "loading": "…",
+    "notFound": "Nie znaleziono obrazu.",
+    "info": "Informacje o obrazie",
+    "notCached": "Nie buforowane",
+    "logsHint": "Ładuje dzienniki kompilacji i skanowania."
   },
   "anotify": {
     "title": "Powiadomienia",
@@ -886,7 +932,23 @@
     "featuresHead": "Funkcje użytkownika",
     "brandingNote": "Dostosuj nazwę usługi i kolor logo swojej organizacji. Stosowane natychmiast do logowania i nagłówka konsoli.",
     "brandName": "Nazwa usługi",
-    "brandAccent": "Kolor loga"
+    "brandAccent": "Kolor loga",
+    "carryoverOn": "Przenieś niewykorzystane środki",
+    "rechargeSaved": "Ustawienia uzupełniania zostały zapisane.",
+    "rechargeEnabled": "Włącz cykliczne uzupełnianie",
+    "brandSubtitle": "Podtytuł",
+    "brandIcon": "Ikona",
+    "rechargeNote": "Domyślny cykl uzupełniania i zasady przenoszenia platformy. Organizacje, zespoły i osoby fizyczne mogą wybrać krótszy cykl, ale nigdy dłuższy, a gdy rodzic nie zgodzi się na przeniesienie, niewykorzystane kredyty poniżej wygasają w tej granicy.",
+    "brandIconClear": "Usunąć",
+    "rechargeTitle": "Powtarzające się doładowanie kredytu (domyślne i limitowe)",
+    "brandIconTooBig": "Ikona musi mieć 120 KB lub mniej.",
+    "brandIconUpload": "Prześlij ikonę (opcjonalnie)",
+    "rechargeCarryover": "Zezwalaj na przeniesienie",
+    "carryoverOff": "Wygasa każdy cykl",
+    "brandSubtitleHint": "Mały tekst obok logo. Pozostaw puste, aby je ukryć.",
+    "rechargeInterval": "Domyślny cykl uzupełniania (dni) · limit dla niższych poziomów",
+    "rechargeAmountHint": "Ustawiaj ilości, cykle i przeniesienia dla poszczególnych organizacji, zespołów i użytkowników na stronach szczegółowych. Cykl nigdy nie może być dłuższy niż cykl macierzysty.",
+    "brandIconUploadHint": "Przesłana ikona ma pierwszeństwo przed powyższą ikoną Lucide. Zalecany rozmiar PNG lub SVG poniżej 120 KB."
   },
   "datasets": {
     "title": "Zbiory danych",
@@ -932,7 +994,40 @@
     "assignTitle": "Przypisanie węzła pamięci podręcznej",
     "removed": "Zbiór danych został usunięty",
     "dlHint": "Po zakończeniu możesz poniżej przypisać lokalne pamięci podręczne węzła.",
-    "assignHint": "Wybierz, które węzły buforują ten zestaw danych. Jest wyodrębniany z NFS do lokalnego węzła w celu natychmiastowego użycia."
+    "assignHint": "Wybierz, które węzły buforują ten zestaw danych. Jest wyodrębniany z NFS do lokalnego węzła w celu natychmiastowego użycia.",
+    "cacheFail": "Żądanie pamięci podręcznej nie powiodło się",
+    "notFound": "Nie znaleziono zbioru danych.",
+    "descSaved": "Opis został zapisany.",
+    "phaseDownload": "Ściąganie",
+    "phaseExtract": "Ekstrahujący",
+    "phaseCopy": "Biurowy",
+    "description": "Opis",
+    "regNeedFile": "Wybierz plik ze skrzynki odbiorczej.",
+    "descFail": "Nie udało się zapisać opisu",
+    "cache": "Pamięć podręczna węzła",
+    "sizeClass": "Klasa wielkości",
+    "descPh": "Opisz ten zbiór danych",
+    "info": "Informacje o zbiorze danych",
+    "regNeedName": "Wprowadź nazwę zbioru danych.",
+    "sizeClassSaved": "Klasa wielkości została zapisana.",
+    "registering": "Rejestracyjny",
+    "regNeedUrl": "Wpisz adres URL.",
+    "extracting": "Ekstrahujący…",
+    "regBusy": "Rejestracyjny…",
+    "regRefresh": "Odświeżać",
+    "regStarted": "Rejestracja rozpoczęta — śledź postęp na liście.",
+    "upTaken": "Zbiór danych o tej nazwie już istnieje.",
+    "upScope": "Widoczność",
+    "regSizeClass": "Klasa wielkości",
+    "regNfsHint": "Skopiuj archiwum (zip, tar, tar.gz) do ścieżki poniżej, a następnie wybierz plik, aby go zarejestrować. Rejestracja przenosi go ze skrzynki odbiorczej i wyodrębnia automatycznie.",
+    "regNfs": "Kopia NFS (SCP)",
+    "regUrlField": "Pobierz adres URL",
+    "regTitle": "Zarejestruj zbiór danych",
+    "regUrlHint": "Serwer pobiera ten adres URL bezpośrednio — nic nie jest przesyłane z Twojej przeglądarki. Śledź postęp na liście.",
+    "regUrl": "Adres URL (wget)",
+    "regInboxEmpty": "Skrzynka odbiorcza jest pusta. Skopiuj plik do powyższej ścieżki, a następnie odśwież.",
+    "regInboxFile": "Plik skrzynki odbiorczej",
+    "regFail": "Rejestracja nie powiodła się"
   },
   "announce": {
     "title": "Ogłoszenia",
@@ -1054,7 +1149,8 @@
     "globalHint": "Globalny jest rezerwą dla wszystkich — nie może być pusty i musi wynosić co najmniej 1. Zakresy organizacji/grupy/użytkownika mogą to zastąpić.",
     "removeConfirm": "Usunięcie polityki „{{name}}” powoduje jej dziedziczenie z powyższego zakresu. Kontynuować?",
     "globalNeedsValue": "Wszystkie cztery globalne limity muszą wynosić co najmniej 1",
-    "searchUser": "Wyszukaj użytkownika"
+    "searchUser": "Wyszukaj użytkownika",
+    "capHint": "Maksymalnie dozwolone — GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · wolumen ≤ {{vol}}GiB · równoczesne sesje ≤ {{sess}}"
   },
   "roles": {
     "org_admin": "Administrator organizacji",
@@ -1070,7 +1166,16 @@
     "usersCapped": "pokazujące pierwsze {{shown}} z {{total}}",
     "subtitle": "Identyfikator {{name}} · zarządzaj tutaj swoimi grupami, użytkownikami i kredytami",
     "usersHint": "Rola to rola użytkownika w jego grupie. Zmień to w zarządzaniu członkami tej grupy.",
-    "inGroup": "Zarządzaj w grupie"
+    "inGroup": "Zarządzaj w grupie",
+    "recurringAmount": "Kredyty na cykl",
+    "recurringInterval": "Cykl uzupełniania (dni)",
+    "recurringCarryover": "Przeniesienie",
+    "carryOn": "Przenieść dokądś",
+    "carryOff": "Wygasać",
+    "recurringTitle": "Powtarzające się kredyty",
+    "recurringSaved": "Zapisano kredyty powtarzające się.",
+    "recurringNote": "Uzupełnia pulę organizacji o tę kwotę w każdym cyklu (0 wyłącza tę funkcję).",
+    "maxIntervalHint": "Limit platformy: {{n}} dni lub mniej"
   },
   "gdetail": {
     "title": "Grupa",
@@ -1098,7 +1203,25 @@
     "roleHint": "Uprawnienia administratora organizacji i administratora grupy pochodzą z tej roli (niezależnie od roli platformy).",
     "removeConfirm": "Usunąć „{{name}}” z tej grupy?",
     "moved": "Przeniesiono {{name}} do {{group}}",
-    "moveHint": "Rola przechodzi. Kredyt przydzielony w tej grupie nie jest przydzielany, a historia użytkowania pozostaje w tej grupie."
+    "moveHint": "Rola przechodzi. Kredyt przydzielony w tej grupie nie jest przydzielany, a historia użytkowania pozostaje w tej grupie.",
+    "refillCol": "Powtarzające się uzupełnianie",
+    "refilledNow": "Uzupełniono teraz: +{{n}} C",
+    "refillMenu": "Wkład",
+    "noRecurring": "Nie ma ustawionej kwoty powtarzającego się doładowania",
+    "memberRefillSet": "Ustaw doładowanie cykliczne",
+    "refillFail": "Uzupełnienie nie powiodło się",
+    "nextRefill": "Następne uzupełnienie",
+    "refillCarryover": "Przenieś niewykorzystane środki",
+    "refillNow": "Uzupełnij teraz",
+    "memberRefillSaved": "Powtarzające się uzupełnianie zostało zapisane",
+    "refillInheritPh": "Dziedziczny",
+    "refillSaved": "Powtarzające się uzupełnianie zostało zapisane.",
+    "refillTitle": "Uzupełnianie cykliczne zespołu",
+    "noRecurringShort": "Brak powtarzającego się uzupełniania",
+    "memberRefillTitle": "Doładowanie cykliczne — {{name}}",
+    "refillAmount": "Ilość doładowania cyklicznego (C)",
+    "memberRefillHint": "Kwota ta jest wpłacana do portfela członka w każdym cyklu. Użyj opcji „Dodaj teraz”, aby zapłacić natychmiast.",
+    "refillInterval": "Cykl (dni) — pozostaw puste dla domyślnego ustawienia zespołu"
   },
   "picker": {
     "allOrgs": "Wszystkie organizacje",
@@ -1125,5 +1248,8 @@
   "brand": "Konsola Gioska",
   "confirmDelete": "Usunąć to? Tego nie można cofnąć.",
   "confirmTerminate": "Wymusić zakończenie tej sesji? Uruchomiona praca zostaje natychmiast zatrzymana.",
-  "confirmRemoveMember": "Usunąć tego członka z grupy?"
+  "confirmRemoveMember": "Usunąć tego członka z grupy?",
+  "paged": {
+    "range": "{{from}}–{{to}} z {{total}}"
+  }
 }

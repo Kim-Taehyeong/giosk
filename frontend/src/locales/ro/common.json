@@ -67,7 +67,9 @@
       "errorRequired": "Vă rugăm să completați toate câmpurile obligatorii.",
       "errorGroup": "Trebuie să selectați o organizație și un grup.",
       "errorGeneric": "Înregistrarea a eșuat.",
-      "errorPasswordMismatch": "Parolele nu se potrivesc."
+      "errorPasswordMismatch": "Parolele nu se potrivesc.",
+      "pwMismatch": "Parolele nu se potrivesc",
+      "pwMatch": "Parolele se potrivesc"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Noduri {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "Noduri {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "Noduri {{up}}/{{total}} · GPU —",
+    "viewAll": "Vedeți totul în Centrul de notificări",
+    "rolePlatformSub": "Super admin",
+    "alerts": "Alerte",
+    "noAlerts": "Nicio alertă încă.",
+    "rolePlatform": "Întreaga platformă",
+    "orgWhole": "Întreaga organizație",
+    "unreadN": "{{n}} necitit",
+    "creditBalance": "Soldul creditului",
+    "clusterStatus": "Starea clusterului"
+  },
+  "table": {
+    "empty": "Fără date"
+  },
+  "refill": {
+    "carryover": "Reportare",
+    "carryOff": "Expira",
+    "carryOn": "Reportare",
+    "title": "Reîncărcare recurentă",
+    "amount": "Credite pe ciclu",
+    "maxHint": "Limită ciclului parental: {{n}} zile sau mai puțin",
+    "interval": "Ciclu de reumplere (zile)",
+    "note": "Se reumple cu această cantitate în fiecare ciclu (0 îl dezactivează). Ciclul nu poate fi mai lung decât cel al părintelui și este limitat automat."
+  },
+  "select": {
+    "placeholder": "Selecta",
+    "search": "Căutare…",
+    "noMatch": "Nicio potrivire"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "Echipa {{target}} are credite reduse",
+      "teamBody": "Creditele echipei {{target}} sunt la {{value}}, sub pragul {{threshold}}. Sesiunile din această echipă se pot opri în curând."
+    }
+  },
+  "close": "Aproape"
 }

@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Coins, Server, Bell, ShieldCheck, LayoutGrid } from 'lucide-react';
+import { Coins, Server, Bell, ShieldCheck, LayoutGrid, Menu } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useConsole } from '../../context/ConsoleContext';
 import { useSystemConfig } from '../../context/SystemConfigContext';
 import { getWallet } from '../../api/console/wallet';
 import { getAdminDashboard } from '../../api/console/dashboard';
 import { getInboxUnread, getInbox, markInboxRead } from '../../api/console/notify';
+import { clickable } from '../../utils/a11y';
 import OrgGroupSelector from './OrgGroupSelector';
 import RoleSwitcher from './RoleSwitcher';
 import UserMenu from './UserMenu';
@@ -16,7 +17,7 @@ import { notifyText } from '../../utils/notify';
 import { cU } from '../../lib/credit';
 
 // 콘솔 탑바 (.topbar 그리드 영역).
-export default function Topbar({ variant, ns }) {
+export default function Topbar({ variant, ns, onMenu, navOpen }) {
   const { t } = useTranslation(ns);
   const { user, activeScope } = useAuth();
   const { summary, setSummary } = useConsole();
@@ -81,6 +82,13 @@ export default function Topbar({ variant, ns }) {
 
   return (
     <div className="topbar">
+      {/* 모바일(≤768px)에서만 보이는 사이드바 토글. 데스크톱에선 사이드바가 항상 떠 있어 필요 없다. */}
+      {onMenu && (
+        <button className="icon-btn nav-toggle" onClick={onMenu} aria-label={t('nav.openMenu', { defaultValue: '메뉴 열기' })}
+          aria-expanded={navOpen} aria-controls="console-nav">
+          <Menu size={17} />
+        </button>
+      )}
       {/* 좌측 셀렉터는 '뷰'로 분리 —
           · 관리자 뷰: 역할 설정(RoleSwitcher). 어떤 역할/스코프로 관리하는지(플랫폼/조직/그룹) 선택.
           · 사용자 뷰: 조직→팀 2뎁스(OrgGroupSelector). 선택 팀이 세션·크레딧 컨텍스트. */}
@@ -93,11 +101,12 @@ export default function Topbar({ variant, ns }) {
 
       {/* 정보성 배지: admin=클러스터 요약 / user=크레딧 잔액(크레딧 모드, 클릭 시 지갑) */}
       {variant === 'admin' ? (
-        <div className="badge-credit" title="클러스터 현황" style={{ cursor: 'default' }}>
+        <div className="badge-credit" title={t('topbar.clusterStatus', { defaultValue: '클러스터 현황' })} style={{ cursor: 'default' }}>
           <Server size={14} /> {summary?.adminBadge || '…'}
         </div>
       ) : creditMode ? (
-        <div className="badge-credit" title="크레딧 잔액" onClick={() => navigate('/console/wallet')}>
+        <div className="badge-credit" title={t('topbar.creditBalance', { defaultValue: '크레딧 잔액' })}
+          {...clickable(() => navigate('/console/wallet'), { label: t('topbar.creditBalance', { defaultValue: '크레딧 잔액' }) })}>
           <Coins size={14} /> {summary?.credit != null ? cU(summary.credit) : '… C'}
         </div>
       ) : null}
@@ -137,7 +146,7 @@ export default function Topbar({ variant, ns }) {
               ) : recent.map((n, i) => {
                 const txt = notifyText(n, t);
                 return (
-                <div key={n.id} onClick={() => readRecent(n)}
+                <div key={n.id} {...clickable(() => readRecent(n), { role: 'menuitem' })}
                   style={{ display: 'flex', gap: 9, alignItems: 'flex-start', padding: '11px 14px', borderTop: i ? '1px solid var(--border)' : 'none',
                     cursor: n.read ? 'default' : 'pointer', background: n.read ? 'transparent' : 'var(--primary-soft)' }}>
                   <span style={{ marginTop: 5, flex: '0 0 auto', width: 7, height: 7, borderRadius: 4, background: n.read ? 'var(--border)' : (sevDot[n.severity] || 'var(--primary)') }} />

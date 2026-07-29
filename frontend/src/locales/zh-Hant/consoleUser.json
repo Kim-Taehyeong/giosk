@@ -156,7 +156,11 @@
     "kpiFree": "免費（無限制）",
     "qsVolDesc": "個人/團體/資料集",
     "kpiMaxLease": "最大租期",
-    "qsCpuDesc": "下載·預處理"
+    "qsCpuDesc": "下載·預處理",
+    "slots": "老虎機",
+    "hamiShared": "HAMi 分數",
+    "hamiFractional": "小數（按 VRAM 和核心）",
+    "exclusiveWhole": "專用（全卡）"
   },
   "newSession": {
     "crumb": "會議",
@@ -310,7 +314,8 @@
     "tsSlotN": "1 個 {{n}} 插槽",
     "guaranteed": "資源有保障",
     "runtimeLeft": "以此速度運行",
-    "sshKeyChange": "變更"
+    "sshKeyChange": "變更",
+    "sshCacheCount": "{{n}} 已緩存"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "sshDirect": "直接（內部網路）",
     "sshProxy": "代理（網關）",
     "sshNeedKey": "尚未註冊 SSH 公開金鑰",
-    "sshNeedKeyHint": "請在下方註冊或產生；執行中的工作階段會立即生效。"
+    "sshNeedKeyHint": "請在下方註冊或產生；執行中的工作階段會立即生效。",
+    "webConnectNewWindow": "在新視窗中開啟瀏覽器終端 - 無需 SSH 金鑰或命令。"
   },
   "account": {
     "title": "我的設定",
@@ -464,7 +470,8 @@
     "sshGenerate": "產生並下載金鑰",
     "sshGenerated": "金鑰已產生。請妥善保管下載的私密金鑰——無法再次下載。",
     "sshGenFail": "SSH 金鑰產生失敗。",
-    "sshGenerateHint": "還沒有金鑰？點選「產生並下載金鑰」。私密金鑰（.pem）只會下載一次，公開金鑰自動註冊。連線方式：ssh -i 下載的金鑰.pem …"
+    "sshGenerateHint": "還沒有金鑰？點選「產生並下載金鑰」。私密金鑰（.pem）只會下載一次，公開金鑰自動註冊。連線方式：ssh -i 下載的金鑰.pem …",
+    "activeScope": "積極的"
   },
   "notify": {
     "title": "通知",
@@ -493,7 +500,19 @@
     "subtitle": "定義您自己的條件來取得警報",
     "sev_warn": "警告",
     "sev_err": "錯誤",
-    "sev_info": "資訊"
+    "sev_info": "資訊",
+    "inboxTitle": "收件匣",
+    "readAll": "標記全部已讀",
+    "inboxEmpty": "還沒有通知。",
+    "prev": "以前的",
+    "scopeAccount": "全帳戶",
+    "next": "下一個",
+    "mSessCpu": "會話CPU利用率",
+    "mSessGpu": "會話 GPU 利用率",
+    "mSessVram": "會話 VRAM 使用率",
+    "selectSession": "選擇一個會話",
+    "noSession": "沒有正在運行的會話",
+    "rulesHint": "警報規則和通知針對每個帳戶並在所有團隊之間共用。會話指標是在選定的會話上評估的。"
   },
   "wallet": {
     "title": "錢包/積分",
@@ -535,7 +554,15 @@
     "topupNote": "群組管理員批准後申請（無需實際付款）",
     "topupTitle": "請求信用充值",
     "desc_gpu": "GPU 使用情況 ({{ref}})",
-    "desc_storage": "儲存（{{ref}}）"
+    "desc_storage": "儲存（{{ref}}）",
+    "rechargeSoon": "很快",
+    "nextRecharge": "下次補充",
+    "session": "會議",
+    "viewAll": "所有參賽作品",
+    "viewBySession": "按會話分組",
+    "consumedCol": "已消耗",
+    "rechargeEvery": "每{{n}}天",
+    "searchPh": "搜尋會話、類型、詳細信息"
   },
   "volume": {
     "title": "數據/體積",
@@ -596,7 +623,16 @@
     "overQuota": "超出剩餘配額 ({{remain}} GB)",
     "nfsHint": "卷是在 NFS 上建立的。",
     "quotaHint": "個人卷的每用戶儲存限制（獨立於群組）。一旦超過它，新的捲就會被阻止。",
-    "shareRemoved": "分享已刪除"
+    "shareRemoved": "分享已刪除",
+    "teamFail": "無法更改團隊",
+    "teamChanged": "團隊發生了變化",
+    "sharedBy": "分享者",
+    "personal": "個人的",
+    "changeTeam": "改變團隊",
+    "teamQuota": "超過目標團隊的數量配額",
+    "changeTeamTitle": "改變團隊—{{name}}",
+    "teamHome": "向團隊計費",
+    "teamHint": "此磁碟區的容量配額和儲存積分來自所選團隊。您仍然是所有者。"
   },
   "gmembers": {
     "title": "會員",

@@ -121,7 +121,7 @@ export default function Volumes() {
                 {detailId === r.id && (
                   <tr>
                     <td colSpan={4} style={{ background: 'var(--surface)' }}>
-                      <div style={{ padding: '8px 0 12px 18px', marginLeft: 8, borderLeft: '3px solid var(--primary)' }}>
+                      <div style={{ padding: '8px 0 12px 18px', marginLeft: 8, borderInlineStart: '1px solid var(--border)' }}>
                         <div className="flex" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
                           <strong>{r.name} · {t('volume.shareStatus')}</strong>
                           <button className="btn sm primary" onClick={() => { setShare({ target: 'user', value: '', permission: 'ro' }); setOpenShare(r); }}>{t('volume.addShare')}</button>
@@ -186,10 +186,10 @@ export default function Volumes() {
         </div>
         <Bar value={quota.allocatedGb} max={quota.totalGb} variant={remainGb < quota.totalGb * 0.15 ? 'warn' : 'gpu'} />
 
-        <label className="fld">{t('volume.name')}</label>
-        <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-        <label className="fld">{t('volume.capacity')}</label>
-        <input type="number" min={1} max={remainGb} value={form.sizeGib} onChange={(e) => setForm({ ...form, sizeGib: Number(e.target.value) })} />
+        <label className="fld" htmlFor="user-volumes-fld-0">{t('volume.name')}</label>
+        <input id="user-volumes-fld-0" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+        <label className="fld" htmlFor="user-volumes-fld-1">{t('volume.capacity')}</label>
+        <input id="user-volumes-fld-1" type="number" min={1} max={remainGb} value={form.sizeGib} onChange={(e) => setForm({ ...form, sizeGib: Number(e.target.value) })} />
 
         {/* 생성 후 예상 — 이 볼륨이 남은 한도에서 얼마를 쓰고 얼마가 남는지. 한도 초과분은 붉게 표시. */}
         <div className="cost-box mt">
@@ -206,16 +206,16 @@ export default function Volumes() {
 
       <Modal open={!!openShare} title={t('volume.shareTitle', { name: openShare?.name || '' })} onClose={() => setOpenShare(null)} width={460}
         footer={<button className="btn primary" onClick={submitShare}>{t('volume.share')}</button>}>
-        <label className="fld" style={{ marginTop: 0 }}>{t('volume.shareTarget')}</label>
-        <Select value={share.target} onChange={(v) => setShare({ ...share, target: v, value: '' })}
+        <label className="fld" id="user-volumes-fld-2-lbl" style={{ marginTop: 0 }}>{t('volume.shareTarget')}</label>
+        <Select ariaLabelledBy="user-volumes-fld-2-lbl" value={share.target} onChange={(v) => setShare({ ...share, target: v, value: '' })}
           options={[{ value: 'user', label: t('volume.targetUser') }, { value: 'group', label: t('volume.targetGroup') }]} />
-        <label className="fld">{share.target === 'user' ? t('volume.selUser') : t('volume.selGroup')}</label>
-        <Select value={share.value} onChange={(v) => setShare({ ...share, value: v })} placeholder={t('volume.selectPh')} searchable
+        <label className="fld" id="user-volumes-fld-3-lbl">{share.target === 'user' ? t('volume.selUser') : t('volume.selGroup')}</label>
+        <Select ariaLabelledBy="user-volumes-fld-3-lbl" value={share.value} onChange={(v) => setShare({ ...share, value: v })} placeholder={t('volume.selectPh')} searchable
           options={share.target === 'user'
             ? shareTargets.users.map((u) => ({ value: u.username, label: `${u.name || u.username} (${u.username})` }))
             : shareTargets.groups.map((g) => ({ value: String(g.id), label: g.displayName || g.name }))} />
-        <label className="fld">{t('volume.perm')}</label>
-        <Select value={share.permission} onChange={(v) => setShare({ ...share, permission: v })}
+        <label className="fld" id="user-volumes-fld-4-lbl">{t('volume.perm')}</label>
+        <Select ariaLabelledBy="user-volumes-fld-4-lbl" value={share.permission} onChange={(v) => setShare({ ...share, permission: v })}
           options={[{ value: 'ro', label: t('volume.ro') }, { value: 'rw', label: t('volume.rw') }]} />
         <div className="legend mt">{share.target === 'user' ? t('volume.hintUser') : t('volume.hintGroup')}</div>
       </Modal>
@@ -226,8 +226,8 @@ export default function Volumes() {
           <button className="btn primary" onClick={saveTeam}>{t('common.save')}</button>
         </>}>
         {teamEdit && (<>
-          <label className="fld" style={{ marginTop: 0 }}>{t('volume.teamHome', { defaultValue: '귀속 팀' })}</label>
-          <Select value={String(teamEdit.groupId || '')} onChange={(v) => setTeamEdit({ ...teamEdit, groupId: v })}
+          <label className="fld" id="user-volumes-fld-5-lbl" style={{ marginTop: 0 }}>{t('volume.teamHome', { defaultValue: '귀속 팀' })}</label>
+          <Select ariaLabelledBy="user-volumes-fld-5-lbl" value={String(teamEdit.groupId || '')} onChange={(v) => setTeamEdit({ ...teamEdit, groupId: v })}
             options={[{ value: '', label: t('volume.personal', { defaultValue: '개인(팀 없음)' }) }, ...(shareTargets.groups || []).map((g) => ({ value: String(g.id), label: g.displayName || g.name }))]} />
           <div className="legend mt">{t('volume.teamHint', { defaultValue: '이 볼륨의 용량 쿼터와 스토리지 크레딧이 선택한 팀에서 나갑니다. 소유는 그대로 본인입니다.' })}</div>
         </>)}

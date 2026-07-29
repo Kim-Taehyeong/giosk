@@ -3,6 +3,8 @@ package dashboard
 import (
 	"time"
 
+	"giosk/pkg/dayspine"
+
 	"gorm.io/gorm"
 )
 
@@ -141,13 +143,7 @@ func (r *gormRepo) MonthConsumedScoped(orgID, groupID int64) int {
 // CreditTrendScoped는 최근 days일 스코프 내 소비 추이.
 func (r *gormRepo) CreditTrendScoped(days int, orgID, groupID int64) []TrendPoint {
 	cl, args := userScopeClause("user_id", orgID, groupID)
-	out := []TrendPoint{}
-	q := `SELECT DATE_FORMAT(created_at,'%m/%d') AS date, CAST(COALESCE(SUM(-amount),0) AS SIGNED) AS amount
-		FROM credit_transactions
-		WHERE type='consume' AND created_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY) AND ` + cl + `
-		GROUP BY DATE_FORMAT(created_at,'%m/%d') ORDER BY MIN(created_at)`
-	r.db.Raw(q, append([]any{days}, args...)...).Scan(&out)
-	return out
+	return r.creditTrend(days, cl, args)
 }
 
 // BudgetRiskScoped는 스코프 내 풀 소진(잔여≤0) 활성 그룹 수.
@@ -272,13 +268,54 @@ func (r *gormRepo) BudgetRiskGroups() int {
 }
 
 // CreditTrend는 최근 days일 일자별 전체 소비 크레딧 추이(관리자 차트).
-func (r *gormRepo) CreditTrend(days int) []TrendPoint {
-	var out []TrendPoint
-	r.db.Raw(`SELECT DATE_FORMAT(created_at,'%m/%d') AS date, CAST(COALESCE(SUM(-amount),0) AS SIGNED) AS amount
+func (r *gormRepo) CreditTrend(days int) []TrendPoint { return r.creditTrend(days, "", nil) }
+
+// creditTrend는 전체/스코프 추이의 공통 구현이다.
+//
+// 핵심은 "날짜 스파인에 얹기" — GROUP BY 는 소비가 있었던 날만 돌려주므로, 그대로 넘기면
+// 14일 차트에 점이 2개만 찍히고(값이 0인 날은 행 자체가 없다) 카테고리 축에서 균등 배치돼
+// 실제로는 열흘 떨어진 두 날이 붙어 보인다. 없는 날을 0으로 메워 축과 라벨을 일치시킨다.
+func (r *gormRepo) creditTrend(days int, extraWhere string, args []any) []TrendPoint {
+	if days < 1 {
+		return []TrendPoint{}
+	}
+	var rows []struct {
+		Day    string
+		Amount int
+	}
+	// 스파인이 days 일(오늘 포함)이므로 조회 하한도 days-1 일 전이어야 한다.
+	// (기존 INTERVAL days DAY 는 오늘 포함 days+1 일치를 긁어 라벨("14일")과 어긋났다.)
+	q := `SELECT DATE_FORMAT(created_at,'%Y-%m-%d') AS day, CAST(COALESCE(SUM(-amount),0) AS SIGNED) AS amount
 		FROM credit_transactions
-		WHERE type='consume' AND created_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
-		GROUP BY DATE_FORMAT(created_at,'%m/%d') ORDER BY MIN(created_at)`, days).Scan(&out)
+		WHERE type='consume' AND created_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY)`
+	if extraWhere != "" {
+		q += ` AND ` + extraWhere
+	}
+	q += ` GROUP BY day ORDER BY day`
+	r.db.Raw(q, append([]any{days - 1}, args...)...).Scan(&rows)
+
+	byDay := make(map[string]int, len(rows))
+	for _, x := range rows {
+		byDay[x.Day] = x.Amount
+	}
+	keys := dayspine.Keys(r.dbToday(), days)
+	out := make([]TrendPoint, 0, len(keys))
+	for _, k := range keys {
+		// 표시는 짧게(MM/DD), 정렬·매칭은 ISO 키로 — 짧은 포맷을 키로 쓰면 연말에 순서가 뒤집힌다.
+		out = append(out, TrendPoint{Date: k[5:7] + "/" + k[8:10], Amount: byDay[k]})
+	}
 	return out
+}
+
+// dbToday는 DB 기준 오늘 날짜를 읽는다. Go 시계를 쓰면 DB 서버 타임존이 다를 때
+// 스파인과 WHERE 절(CURDATE 기준)이 하루 어긋난다. 실패하면 Go 시계로 폴백.
+func (r *gormRepo) dbToday() time.Time {
+	var s string
+	r.db.Raw(`SELECT DATE_FORMAT(CURDATE(),'%Y-%m-%d')`).Scan(&s)
+	if t, err := time.Parse(dayspine.Layout, s); err == nil {
+		return t
+	}
+	return time.Now()
 }
 
 // UserConsume7d는 최근 7일 사용자 소비 크레딧 합(일일 번레이트 산출용).

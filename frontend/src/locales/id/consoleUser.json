@@ -156,7 +156,11 @@
     "nodeAvail": "Ketersediaan per node",
     "kpiMaxLease": "Sewa maksimal",
     "gpuAvail": "GPU tersedia",
-    "kpiCooldown": "Coba lagi cooldown"
+    "kpiCooldown": "Coba lagi cooldown",
+    "slots": "slot",
+    "exclusiveWhole": "Khusus (seluruh kartu)",
+    "hamiShared": "pecahan HAMi",
+    "hamiFractional": "Pecahan (menurut VRAM dan inti)"
   },
   "newSession": {
     "crumb": "Sesi",
@@ -310,7 +314,8 @@
     "grpSlotTech": "Teknologi: Pemotongan waktu NVIDIA (tanpa isolasi memori)",
     "grpSlotDesc": "Beberapa orang bergantian menggunakan satu GPU. Memori tidak dijamin — jika sesi lain menghabiskan VRAM, sesi Anda juga bisa gagal.",
     "notEnough": "Pulsa tidak cukup — diperlukan minimum 1 jam",
-    "sshKeyChange": "Ubah"
+    "sshKeyChange": "Ubah",
+    "sshCacheCount": "{{n}} di-cache"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "sshExternal": "SSH (eksternal — melalui proxy)",
     "regenerated": "Mengeluarkan tautan akses baru.",
     "sshNeedKey": "Belum ada kunci publik SSH terdaftar",
-    "sshNeedKeyHint": "Daftarkan atau buat satu di bawah — sesi yang sedang berjalan langsung memakainya."
+    "sshNeedKeyHint": "Daftarkan atau buat satu di bawah — sesi yang sedang berjalan langsung memakainya.",
+    "webConnectNewWindow": "Membuka terminal browser di jendela baru — tidak memerlukan kunci atau perintah SSH."
   },
   "account": {
     "title": "Pengaturan Saya",
@@ -464,7 +470,8 @@
     "sshGenerate": "Buat & unduh kunci",
     "sshGenerated": "Kunci dibuat. Simpan kunci privat yang diunduh dengan aman — kunci tidak dapat diunduh lagi.",
     "sshGenFail": "Gagal membuat kunci SSH.",
-    "sshGenerateHint": "Belum punya kunci? Klik “Buat & unduh kunci”. Kunci privat (.pem) diunduh sekali dan kunci publik didaftarkan otomatis. Koneksi: ssh -i kunci-terunduh.pem …"
+    "sshGenerateHint": "Belum punya kunci? Klik “Buat & unduh kunci”. Kunci privat (.pem) diunduh sekali dan kunci publik didaftarkan otomatis. Koneksi: ssh -i kunci-terunduh.pem …",
+    "activeScope": "Aktif"
   },
   "notify": {
     "title": "Pemberitahuan",
@@ -493,7 +500,19 @@
     "noRules": "Tidak ada aturan. Klik \"Tambahkan aturan\" untuk membuatnya.",
     "sev_info": "Informasi",
     "sev_err": "Kesalahan",
-    "sev_warn": "Peringatan"
+    "sev_warn": "Peringatan",
+    "inboxTitle": "Kotak masuk",
+    "mSessCpu": "Pemanfaatan CPU sesi",
+    "prev": "Sebelumnya",
+    "inboxEmpty": "Belum ada pemberitahuan.",
+    "readAll": "Tandai semua telah dibaca",
+    "next": "Berikutnya",
+    "mSessGpu": "Pemanfaatan GPU sesi",
+    "mSessVram": "Pemanfaatan VRAM sesi",
+    "selectSession": "Pilih sesi",
+    "noSession": "Tidak ada sesi lari",
+    "scopeAccount": "Seluruh akun",
+    "rulesHint": "Aturan peringatan dan pemberitahuan berlaku per akun dan dibagikan ke semua tim. Metrik sesi dievaluasi pada sesi yang dipilih."
   },
   "wallet": {
     "title": "Dompet / Kredit",
@@ -535,7 +554,15 @@
     "topupNote": "Diterapkan setelah admin grup Anda menyetujui (tidak ada pembayaran nyata)",
     "topupSent": "Permintaan terkirim (menunggu persetujuan admin grup)",
     "desc_storage": "Penyimpanan ({{ref}})",
-    "desc_gpu": "Penggunaan GPU ({{ref}})"
+    "desc_gpu": "Penggunaan GPU ({{ref}})",
+    "nextRecharge": "Isi ulang selanjutnya",
+    "rechargeSoon": "Segera",
+    "session": "Sidang",
+    "consumedCol": "Dikonsumsi",
+    "viewBySession": "Kelompokkan demi sesi",
+    "viewAll": "Semua entri",
+    "rechargeEvery": "Setiap {{n}} hari",
+    "searchPh": "Sesi pencarian, jenis, detail"
   },
   "volume": {
     "title": "Data / Volume",
@@ -596,7 +623,16 @@
     "afterUse": "Digunakan setelahnya",
     "afterRemain": "Kiri setelahnya",
     "quota": "Kuota volume",
-    "quotaHint": "Batas penyimpanan per pengguna untuk volume pribadi Anda (tidak bergantung pada grup). Volume baru diblokir setelah Anda melampauinya."
+    "quotaHint": "Batas penyimpanan per pengguna untuk volume pribadi Anda (tidak bergantung pada grup). Volume baru diblokir setelah Anda melampauinya.",
+    "teamFail": "Tidak dapat mengubah tim",
+    "personal": "Pribadi",
+    "teamQuota": "Melebihi kuota volume tim target",
+    "teamHome": "Ditagih ke tim",
+    "changeTeam": "Ganti tim",
+    "changeTeamTitle": "Ganti tim — {{name}}",
+    "teamChanged": "Tim berubah",
+    "sharedBy": "Dibagikan oleh",
+    "teamHint": "Kuota kapasitas dan kredit penyimpanan volume ini berasal dari tim yang dipilih. Anda tetap menjadi pemiliknya."
   },
   "gmembers": {
     "title": "Anggota",

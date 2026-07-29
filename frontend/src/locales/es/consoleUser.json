@@ -156,7 +156,11 @@
     "kpiFree": "Gratis (ilimitado)",
     "mySessions": "Mis sesiones",
     "kpiCooldown": "Reintentar el tiempo de reutilización",
-    "nodeAvail": "Disponibilidad por nodo"
+    "nodeAvail": "Disponibilidad por nodo",
+    "slots": "Tragamonedas",
+    "hamiFractional": "Fraccionado (por VRAM y núcleos)",
+    "hamiShared": "HAMi fraccional",
+    "exclusiveWhole": "Dedicado (tarjeta completa)"
   },
   "newSession": {
     "crumb": "Sesiones",
@@ -310,7 +314,8 @@
     "guaranteeCpu": "CPU virtual {{n}} garantizada",
     "runtimeLeft": "Tiempo de ejecución a este ritmo",
     "tsSlotN": "1 de las ranuras {{n}}",
-    "sshKeyChange": "Cambiar"
+    "sshKeyChange": "Cambiar",
+    "sshCacheCount": "{{n}} en caché"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "regenerated": "Se emitió un nuevo enlace de acceso.",
     "sshDirectInHint": "Conéctese directamente al nodo desde el interior de la red de la oficina, sin pasar por la puerta de enlace.",
     "sshNeedKey": "No hay ninguna clave pública SSH registrada",
-    "sshNeedKeyHint": "Registre o genere una abajo: las sesiones en ejecución la aplican de inmediato."
+    "sshNeedKeyHint": "Registre o genere una abajo: las sesiones en ejecución la aplican de inmediato.",
+    "webConnectNewWindow": "Abre una terminal de navegador en una nueva ventana; no se necesita clave ni comando SSH."
   },
   "account": {
     "title": "Mi configuración",
@@ -464,7 +470,8 @@
     "sshGenerate": "Generar y descargar clave",
     "sshGenerated": "Clave generada. Guarde a buen recaudo la clave privada descargada: no se puede volver a descargar.",
     "sshGenFail": "No se pudo generar la clave SSH.",
-    "sshGenerateHint": "¿Aún sin clave? Pulse «Generar y descargar clave». La clave privada (.pem) se descarga una sola vez y la pública se registra automáticamente. Conexión: ssh -i clave-descargada.pem …"
+    "sshGenerateHint": "¿Aún sin clave? Pulse «Generar y descargar clave». La clave privada (.pem) se descarga una sola vez y la pública se registra automáticamente. Conexión: ssh -i clave-descargada.pem …",
+    "activeScope": "Activo"
   },
   "notify": {
     "title": "Notificaciones",
@@ -493,7 +500,19 @@
     "webhooks": "Webhooks registrados",
     "sev_err": "Error",
     "sev_info": "Información",
-    "sev_warn": "Advertencia"
+    "sev_warn": "Advertencia",
+    "inboxTitle": "Bandeja de entrada",
+    "readAll": "Marcar todo como leído",
+    "mSessCpu": "Utilización de CPU de sesión",
+    "prev": "Anterior",
+    "next": "Próximo",
+    "rulesHint": "Las reglas de alerta y notificaciones son por cuenta y se comparten entre todos los equipos. Las métricas de sesión se evalúan en la sesión seleccionada.",
+    "mSessVram": "Utilización de VRAM de sesión",
+    "mSessGpu": "Utilización de GPU de sesión",
+    "selectSession": "Seleccione una sesión",
+    "inboxEmpty": "Aún no hay notificaciones.",
+    "scopeAccount": "Cuenta completa",
+    "noSession": "Sin sesiones de carrera"
   },
   "wallet": {
     "title": "Monedero / Créditos",
@@ -535,7 +554,15 @@
     "topupSend": "Enviar solicitud",
     "topupSent": "Solicitud enviada (pendiente de aprobación del administrador del grupo)",
     "desc_storage": "Almacenamiento ({{ref}})",
-    "desc_gpu": "Uso de GPU ({{ref}})"
+    "desc_gpu": "Uso de GPU ({{ref}})",
+    "rechargeSoon": "Pronto",
+    "nextRecharge": "Próxima recarga",
+    "session": "Sesión",
+    "consumedCol": "Consumado",
+    "rechargeEvery": "Cada {{n}} días",
+    "viewBySession": "Grupo por sesión",
+    "searchPh": "Buscar sesiones, tipos, detalles.",
+    "viewAll": "Todas las entradas"
   },
   "volume": {
     "title": "Datos / Volúmenes",
@@ -596,7 +623,16 @@
     "created": "Creación de volumen solicitada",
     "quotaHint": "Límite de almacenamiento por usuario para sus volúmenes personales (independiente del grupo). Los nuevos volúmenes se bloquean una vez que lo excede.",
     "thisVol": "este volumen",
-    "afterUse": "Usado después"
+    "afterUse": "Usado después",
+    "personal": "Personal",
+    "teamFail": "No se pudo cambiar de equipo",
+    "teamQuota": "Supera la cuota de volumen del equipo objetivo.",
+    "teamHint": "La cuota de capacidad y los créditos de almacenamiento de este volumen provienen del equipo seleccionado. Tú sigues siendo el dueño.",
+    "sharedBy": "Compartido por",
+    "changeTeam": "Cambiar equipo",
+    "teamHome": "Facturado al equipo",
+    "changeTeamTitle": "Cambiar de equipo — {{name}}",
+    "teamChanged": "equipo cambiado"
   },
   "gmembers": {
     "title": "Miembros",

@@ -5,6 +5,7 @@ import { useConsole } from '../../context/ConsoleContext';
 import { useAuth } from '../../context/AuthContext';
 import { useSystemConfig } from '../../context/SystemConfigContext';
 import { getMembershipContext } from '../../api/console/membership';
+import { clickable as clickableProps } from '../../utils/a11y';
 
 // 탑바 도메인 셀렉터(사용자 뷰).
 //  조직 → 팀 2뎁스. 사용자는 여러 조직·여러 팀에 속할 수 있으므로 먼저 조직을 고르고,
@@ -87,7 +88,9 @@ export default function OrgGroupSelector({ variant, ns }) {
   const cell = (labelKey, labelDefault, icon, valueNode, opened, onToggle, clickable) => {
     const Icon = icon;
     return (
-      <div className="proj" role="button" style={{ cursor: clickable ? 'pointer' : 'default' }} onClick={clickable ? onToggle : undefined}>
+      <div className="proj" style={{ cursor: clickable ? 'pointer' : 'default' }}
+        aria-expanded={clickable ? !!opened : undefined} aria-haspopup={clickable ? 'menu' : undefined}
+        {...clickableProps(clickable ? onToggle : undefined)}>
         <small>{t(labelKey, { defaultValue: labelDefault })}</small>
         <span className="flex gap" style={{ gap: 6, alignItems: 'center' }}>
           <Icon size={13} /> {valueNode}
@@ -98,7 +101,7 @@ export default function OrgGroupSelector({ variant, ns }) {
   };
 
   const menu = (items, activeId, onPick, emptyKey, emptyDefault, headKey, headDefault) => (
-    <div style={{
+    <div role="menu" style={{
       position: 'absolute', top: 'calc(100% + 6px)', left: 0, minWidth: 240, zIndex: 70,
       background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12,
       boxShadow: '0 16px 40px rgba(10,15,28,.22)', padding: 8,
@@ -108,7 +111,7 @@ export default function OrgGroupSelector({ variant, ns }) {
       {items.map((it) => {
         const on = it.id === activeId;
         return (
-          <div key={it.id} onClick={() => onPick(it)}
+          <div key={it.id} {...clickableProps(() => onPick(it), { role: 'menuitem' })} aria-current={on || undefined}
             style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', borderRadius: 8, cursor: 'pointer', background: on ? 'var(--primary-soft)' : 'transparent', color: on ? 'var(--primary)' : 'var(--text)', fontWeight: on ? 700 : 500 }}>
             {it.icon}
             <span style={{ flex: 1, fontSize: 13 }}>{it.label}</span>

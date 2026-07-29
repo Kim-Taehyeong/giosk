@@ -67,7 +67,9 @@
       "submitting": "กำลังส่ง...",
       "submit": "ขอสมัคร",
       "errorAdvisor": "นักศึกษาระดับปริญญาตรีและบัณฑิตศึกษาจะต้องจัดให้มีที่ปรึกษา",
-      "errorPasswordMismatch": "รหัสผ่านไม่ตรงกัน"
+      "errorPasswordMismatch": "รหัสผ่านไม่ตรงกัน",
+      "pwMismatch": "รหัสผ่านไม่ตรงกัน",
+      "pwMatch": "รหัสผ่านตรงกัน"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "โหนด {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "โหนด {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "โหนด {{up}}/{{total}} · GPU —",
+    "rolePlatformSub": "ผู้ดูแลระบบขั้นสูง",
+    "alerts": "การแจ้งเตือน",
+    "noAlerts": "ยังไม่มีการแจ้งเตือน",
+    "unreadN": "{{n}} ยังไม่ได้อ่าน",
+    "rolePlatform": "ทั้งแพลตฟอร์ม",
+    "creditBalance": "ยอดเครดิต",
+    "clusterStatus": "สถานะคลัสเตอร์",
+    "orgWhole": "ทั้งองค์กร",
+    "viewAll": "ดูทั้งหมดในศูนย์การแจ้งเตือน"
+  },
+  "table": {
+    "empty": "ไม่มีข้อมูล"
+  },
+  "refill": {
+    "note": "เติมตามจำนวนนี้ในแต่ละรอบ (0 ปิดใช้งาน) วงจรต้องไม่ยาวกว่ารอบหลักและจะถูกต่อยอดโดยอัตโนมัติ",
+    "amount": "เครดิตต่อรอบ",
+    "title": "เติมเงินซ้ำ",
+    "carryOff": "หมดอายุ",
+    "maxHint": "ขีดจำกัดรอบหลัก: {{n}} วันหรือน้อยกว่า",
+    "interval": "รอบการเติม (วัน)",
+    "carryOn": "ยกไป",
+    "carryover": "ยกยอด"
+  },
+  "select": {
+    "placeholder": "เลือก",
+    "search": "ค้นหา…",
+    "noMatch": "ไม่มีการแข่งขัน"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "ทีม {{target}} มีเครดิตน้อย",
+      "teamBody": "เครดิตของทีม {{target}} อยู่ที่ {{value}} ซึ่งต่ำกว่าเกณฑ์ {{threshold}} เซสชันในทีมนี้อาจหยุดเร็วๆ นี้"
+    }
+  },
+  "close": "ปิด"
 }

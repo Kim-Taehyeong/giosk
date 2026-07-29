@@ -157,7 +157,11 @@
     "kpiBilling": "과금",
     "kpiFree": "자유 (무제한)",
     "kpiNodes": "가용 노드",
-    "noticePinned": "고정"
+    "noticePinned": "고정",
+    "hamiShared": "HAMi 분할",
+    "slots": "슬롯",
+    "exclusiveWhole": "전용 (통 카드)",
+    "hamiFractional": "분할 (VRAM·코어 단위)"
   },
   "newSession": {
     "crumb": "세션",
@@ -311,7 +315,8 @@
     "hoursApprox": "약 {{n}}시간",
     "notEnough": "크레딧 부족 — 최소 1시간치 필요",
     "tsSlotN": "슬롯 1개 / {{n}}",
-    "sshKeyChange": "변경"
+    "sshKeyChange": "변경",
+    "sshCacheCount": "캐시 {{n}}개"
   },
   "session": {
     "title": "세션",
@@ -423,7 +428,8 @@
     "regenerate": "재생성",
     "regenerated": "새 접속 링크를 발급했습니다.",
     "sshNeedKey": "SSH 공개키가 등록되어 있지 않습니다",
-    "sshNeedKeyHint": "아래에서 등록하거나 키를 생성하세요. 실행 중인 세션에도 바로 반영됩니다."
+    "sshNeedKeyHint": "아래에서 등록하거나 키를 생성하세요. 실행 중인 세션에도 바로 반영됩니다.",
+    "webConnectNewWindow": "새 창에서 브라우저 터미널이 열립니다 (SSH 키·명령 불필요)."
   },
   "account": {
     "title": "내 정보·설정",
@@ -465,7 +471,8 @@
     "sshGenerate": "키 생성 & 다운로드",
     "sshGenerated": "키를 생성했습니다. 내려받은 개인키 파일을 안전하게 보관하세요(다시 받을 수 없습니다).",
     "sshGenFail": "SSH 키 생성에 실패했습니다.",
-    "sshGenerateHint": "키가 없으면 \"키 생성 & 다운로드\"를 누르세요. 개인키 파일(.pem)이 한 번만 내려받아지고 공개키는 자동 등록됩니다. 접속: ssh -i 내려받은키.pem ..."
+    "sshGenerateHint": "키가 없으면 \"키 생성 & 다운로드\"를 누르세요. 개인키 파일(.pem)이 한 번만 내려받아지고 공개키는 자동 등록됩니다. 접속: ssh -i 내려받은키.pem ...",
+    "activeScope": "활성"
   },
   "notify": {
     "title": "알림 센터",
@@ -494,7 +501,19 @@
     "mGpu": "GPU 사용률",
     "sev_err": "오류",
     "sev_warn": "경고",
-    "sev_info": "정보"
+    "sev_info": "정보",
+    "mSessGpu": "세션 GPU 사용률",
+    "mSessCpu": "세션 CPU 사용률",
+    "mSessVram": "세션 VRAM 사용률",
+    "inboxTitle": "받은 알림",
+    "readAll": "모두 읽음",
+    "inboxEmpty": "받은 알림이 없습니다.",
+    "scopeAccount": "계정 전체",
+    "prev": "이전",
+    "next": "다음",
+    "rulesHint": "알림 규칙과 받은 알림은 계정 단위입니다(모든 팀 공통). 세션 지표는 대상 세션에서 평가됩니다.",
+    "selectSession": "세션 선택",
+    "noSession": "실행 중 세션 없음"
   },
   "wallet": {
     "title": "지갑 / 크레딧",
@@ -536,7 +555,15 @@
     "reasonPh": "충전 사유를 입력하세요",
     "free": "무료",
     "desc_gpu": "GPU 사용 ({{ref}})",
-    "desc_storage": "스토리지 ({{ref}})"
+    "desc_storage": "스토리지 ({{ref}})",
+    "rechargeSoon": "곧",
+    "nextRecharge": "다음 리필",
+    "rechargeEvery": "{{n}}일 주기",
+    "searchPh": "검색(세션·유형·내용)",
+    "viewAll": "전체 내역",
+    "viewBySession": "세션별 묶기",
+    "session": "세션",
+    "consumedCol": "소모"
   },
   "volume": {
     "title": "데이터 / 볼륨",
@@ -597,7 +624,16 @@
     "afterUse": "생성 후 사용",
     "afterRemain": "생성 후 남음",
     "quotaHint": "개인 볼륨에 적용되는 사용자 단위 저장 한도입니다 (그룹과 무관). 한도를 넘으면 새 볼륨을 만들 수 없습니다.",
-    "overQuota": "남은 용량({{remain}} GB)을 초과했습니다"
+    "overQuota": "남은 용량({{remain}} GB)을 초과했습니다",
+    "teamQuota": "대상 팀 볼륨 쿼터를 초과합니다",
+    "teamFail": "팀 변경 실패",
+    "teamChanged": "귀속 팀을 변경했습니다",
+    "teamHome": "귀속 팀",
+    "personal": "개인",
+    "changeTeam": "팀 변경",
+    "sharedBy": "공유자",
+    "changeTeamTitle": "귀속 팀 변경 — {{name}}",
+    "teamHint": "이 볼륨의 용량 쿼터와 스토리지 크레딧이 선택한 팀에서 나갑니다. 소유는 그대로 본인입니다."
   },
   "gmembers": {
     "title": "멤버 관리",

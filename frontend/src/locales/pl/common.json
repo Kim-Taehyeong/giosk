@@ -67,7 +67,9 @@
       "errorRequired": "Proszę wypełnić wszystkie wymagane pola.",
       "errorGroup": "Musisz wybrać organizację i grupę.",
       "errorGeneric": "Rejestracja nie powiodła się.",
-      "errorPasswordMismatch": "Hasła nie pasują."
+      "errorPasswordMismatch": "Hasła nie pasują.",
+      "pwMismatch": "Hasła nie pasują",
+      "pwMatch": "Hasła się zgadzają"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Węzły {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "Węzły {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "Węzły {{up}}/{{total}} · GPU —",
+    "rolePlatformSub": "Super administrator",
+    "viewAll": "Zobacz wszystko w Centrum powiadomień",
+    "orgWhole": "Cała organizacja",
+    "alerts": "Alerty",
+    "clusterStatus": "Stan klastra",
+    "rolePlatform": "Cała platforma",
+    "creditBalance": "Bilans kredytowy",
+    "noAlerts": "Nie ma jeszcze żadnych alertów.",
+    "unreadN": "{{n}} nieprzeczytane"
+  },
+  "table": {
+    "empty": "Brak danych"
+  },
+  "refill": {
+    "amount": "Kredyty na cykl",
+    "carryOff": "Wygasać",
+    "carryOn": "Przenieść dokądś",
+    "carryover": "Przeniesienie",
+    "interval": "Cykl uzupełniania (dni)",
+    "title": "Powtarzające się uzupełnianie",
+    "note": "Uzupełnia tę ilość w każdym cyklu (0 wyłącza tę funkcję). Cykl nie może być dłuższy od cyklu rodzica i jest ograniczany automatycznie.",
+    "maxHint": "Limit cykli nadrzędnych: {{n}} dni lub mniej"
+  },
+  "select": {
+    "placeholder": "Wybierać",
+    "search": "Szukaj…",
+    "noMatch": "Brak dopasowania"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "Zespołowi {{target}} brakuje kredytów",
+      "teamBody": "Kredyty zespołu {{target}} są na poziomie {{value}}, poniżej progu {{threshold}}. Sesje w tym zespole mogą wkrótce zostać zakończone."
+    }
+  },
+  "close": "Zamknąć"
 }

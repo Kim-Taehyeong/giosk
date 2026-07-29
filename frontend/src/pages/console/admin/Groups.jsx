@@ -82,19 +82,19 @@ export default function Groups() {
 
       <Modal open={openCreate} title={t('groups.createTitle')} onClose={() => setOpenCreate(false)} width={600}
         footer={<button className="btn primary" onClick={submitCreate}>{t('common.create')}</button>}>
-        <label className="fld" style={{ marginTop: 0 }}>{t('groups.org')}<Req /></label>
-        <select value={form.orgId} onChange={(e) => setForm({ ...form, orgId: Number(e.target.value) })}>
+        <label className="fld" htmlFor="admin-groups-fld-0" style={{ marginTop: 0 }}>{t('groups.org')}<Req /></label>
+        <select id="admin-groups-fld-0" value={form.orgId} onChange={(e) => setForm({ ...form, orgId: Number(e.target.value) })}>
           <option value={0}>{t('groups.select')}</option>
           {orgs.map((o) => <option key={o.id} value={o.id}>{o.displayName}</option>)}
         </select>
         <div className="grid cols-2" style={{ gap: 14 }}>
           <div>
-            <label className="fld">{t('groups.ident')}<Req /></label>
-            <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="ml-lab" />
+            <label className="fld" htmlFor="admin-groups-fld-1">{t('groups.ident')}<Req /></label>
+            <input id="admin-groups-fld-1" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="ml-lab" />
           </div>
           <div>
-            <label className="fld">{t('groups.display')}</label>
-            <input type="text" value={form.displayName} onChange={(e) => setForm({ ...form, displayName: e.target.value })} />
+            <label className="fld" htmlFor="admin-groups-fld-2">{t('groups.display')}</label>
+            <input id="admin-groups-fld-2" type="text" value={form.displayName} onChange={(e) => setForm({ ...form, displayName: e.target.value })} />
           </div>
         </div>
         <Advanced title={t('groups.admin')} hint={t('groups.adminHintOpt')} defaultOpen={!!form.adminAccount}>
@@ -104,16 +104,16 @@ export default function Groups() {
           <Advanced title={t('groups.initCredit', { defaultValue: '초기 크레딧 · 정기 리필' })} hint={t('groups.initCreditHint', { defaultValue: '팀 생성과 함께 조직 풀에서 배분·리필 설정(선택). 나중에 팀 상세에서도 가능.' })} defaultOpen={!!form.initialCredit || !!form.recurring}>
             <div className="grid cols-2" style={{ gap: 14 }}>
               <div>
-                <label className="fld" style={{ marginTop: 0 }}>{t('groups.initCreditAmt', { defaultValue: '초기 크레딧' })}</label>
-                <input type="number" min={0} value={form.initialCredit} onChange={(e) => setForm({ ...form, initialCredit: Math.max(0, Number(e.target.value)) })} placeholder="0" />
+                <label className="fld" htmlFor="admin-groups-fld-3" style={{ marginTop: 0 }}>{t('groups.initCreditAmt', { defaultValue: '초기 크레딧' })}</label>
+                <input id="admin-groups-fld-3" type="number" min={0} value={form.initialCredit} onChange={(e) => setForm({ ...form, initialCredit: Math.max(0, Number(e.target.value)) })} placeholder="0" />
               </div>
               <div>
-                <label className="fld" style={{ marginTop: 0 }}>{t('groups.refillAmt', { defaultValue: '정기 리필(회당)' })}</label>
-                <input type="number" min={0} value={form.recurring} onChange={(e) => setForm({ ...form, recurring: Math.max(0, Number(e.target.value)) })} placeholder="0" />
+                <label className="fld" htmlFor="admin-groups-fld-4" style={{ marginTop: 0 }}>{t('groups.refillAmt', { defaultValue: '정기 리필(회당)' })}</label>
+                <input id="admin-groups-fld-4" type="number" min={0} value={form.recurring} onChange={(e) => setForm({ ...form, recurring: Math.max(0, Number(e.target.value)) })} placeholder="0" />
               </div>
               <div>
-                <label className="fld" style={{ marginTop: 0 }}>{t('groups.refillInterval', { defaultValue: '리필 주기(일)' })}</label>
-                <input type="number" min={1} value={form.interval} onChange={(e) => setForm({ ...form, interval: Math.max(1, Number(e.target.value)) })} />
+                <label className="fld" htmlFor="admin-groups-fld-5" style={{ marginTop: 0 }}>{t('groups.refillInterval', { defaultValue: '리필 주기(일)' })}</label>
+                <input id="admin-groups-fld-5" type="number" min={1} value={form.interval} onChange={(e) => setForm({ ...form, interval: Math.max(1, Number(e.target.value)) })} />
               </div>
               <label className="flex gap" style={{ alignItems: 'center', gap: 8, marginTop: 24 }}>
                 <input type="checkbox" checked={form.carryover} onChange={(e) => setForm({ ...form, carryover: e.target.checked })} />

@@ -21,16 +21,21 @@ const (
 	KeyQuotaMaxVramGB   = "quota_max_vram_gb"
 	KeyQuotaMaxVolGiB   = "quota_max_volume_gib"
 	KeyQuotaMaxSessions = "quota_max_concurrent_sessions"
-	KeyBrandName        = "brand_name"
-	KeyBrandAccent      = "brand_accent"
-	KeyBrandSubtitle    = "brand_subtitle"
-	KeyBrandIcon        = "brand_icon"
-	KeyBrandIconUrl     = "brand_icon_url"
-	KeySignupRequest    = "feature_signup_request"
-	KeyDatasetRegister  = "feature_dataset_register"
-	KeyWorkloadAlerts   = "feature_workload_alerts"
-	KeyGroupJoinRequest = "feature_group_join"
-	KeyCreditRequest    = "feature_credit_request"
+	// 중단 세션 상한·임시 디스크 상한도 정책 탭에서 편집한다. 이 키가 없던 동안
+	// SetGlobal 이 두 값을 저장할 곳이 없어, 화면에서 바꿔도 저장이 안 되고
+	// 저장 시 Resolved 에서 누락돼 0(무제한)으로 덮여 있었다.
+	KeyQuotaMaxStopped   = "quota_max_stopped_sessions"
+	KeyQuotaMaxEphemeral = "quota_max_ephemeral_gib"
+	KeyBrandName         = "brand_name"
+	KeyBrandAccent       = "brand_accent"
+	KeyBrandSubtitle     = "brand_subtitle"
+	KeyBrandIcon         = "brand_icon"
+	KeyBrandIconUrl      = "brand_icon_url"
+	KeySignupRequest     = "feature_signup_request"
+	KeyDatasetRegister   = "feature_dataset_register"
+	KeyWorkloadAlerts    = "feature_workload_alerts"
+	KeyGroupJoinRequest  = "feature_group_join"
+	KeyCreditRequest     = "feature_credit_request"
 )
 
 // BoolKeys는 PUT 으로 갱신 가능한 불리언 런타임 키 집합.

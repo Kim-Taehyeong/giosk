@@ -67,7 +67,9 @@
       "errorRequired": "Udfyld venligst alle obligatoriske felter.",
       "errorGroup": "Du skal vælge en organisation og en gruppe.",
       "errorPasswordShort": "Adgangskoden skal være på mindst 8 tegn.",
-      "errorPasswordMismatch": "Adgangskoder stemmer ikke overens."
+      "errorPasswordMismatch": "Adgangskoder stemmer ikke overens.",
+      "pwMatch": "Adgangskoder matcher",
+      "pwMismatch": "Adgangskoder stemmer ikke overens"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Noder {{up}}/{{total}} · GPU {{gpu}} %",
-    "nodeBadgeNoGpu": "Noder {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "Noder {{up}}/{{total}} · GPU —",
+    "rolePlatformSub": "Super admin",
+    "orgWhole": "Hele organisationen",
+    "creditBalance": "Kreditsaldo",
+    "clusterStatus": "Klyngestatus",
+    "noAlerts": "Ingen advarsler endnu.",
+    "unreadN": "{{n}} ulæst",
+    "rolePlatform": "Hele platformen",
+    "alerts": "Advarsler",
+    "viewAll": "Se alt i Notifikationscenter"
+  },
+  "table": {
+    "empty": "Ingen data"
+  },
+  "refill": {
+    "carryOff": "Udløbe",
+    "title": "Tilbagevendende genopfyldning",
+    "carryOn": "Bær over",
+    "maxHint": "Forældrecyklusgrænse: {{n}} dage eller derunder",
+    "interval": "Genopfyldningscyklus (dage)",
+    "amount": "Kreditter pr. cyklus",
+    "note": "Genfylder med denne mængde hver cyklus (0 deaktiverer den). Cyklusen kan ikke være længere end forældrenes og begrænses automatisk.",
+    "carryover": "Overførsel"
+  },
+  "select": {
+    "placeholder": "Vælge",
+    "search": "Søge…",
+    "noMatch": "Ingen match"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "{{target}}-holdet mangler kreditter",
+      "teamBody": "{{target}}-holdkreditter er på {{value}}, under {{threshold}}-tærsklen. Sessioner i dette team stopper muligvis snart."
+    }
+  },
+  "close": "Tæt"
 }

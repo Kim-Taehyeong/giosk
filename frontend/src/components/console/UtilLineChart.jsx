@@ -22,7 +22,7 @@ export default function UtilLineChart({ labels, values, height = 220, percent = 
     const primary = cssVar('--primary', '#4f46e5');
     const warn = cssVar('--warn', '#f59e0b');
     const grid = cssVar('--border', '#e5e7eb');
-    const muted = cssVar('--muted', '#6b7280');
+    const muted = cssVar('--muted', '#66707c');
     const mkFill = (color) => (ctx) => {
       const { ctx: c, chartArea } = ctx.chart;
       if (!chartArea) return 'transparent';

@@ -53,7 +53,8 @@
     "back": "Rug",
     "edit": "Bewerking",
     "optional": "(optioneel)",
-    "advanced": "Meer instellingen"
+    "advanced": "Meer instellingen",
+    "prev": "Vorig"
   },
   "dash": {
     "title": "Dashboard",
@@ -197,7 +198,10 @@
     "advBelong": "Lidmaatschap · rol · wachtwoord",
     "colMemberRole": "Organisatie-/teamrol",
     "prev": "Vorige",
-    "totalN": "{{n}}-gebruikers"
+    "totalN": "{{n}}-gebruikers",
+    "colRefill": "Terugkerende bijvulling",
+    "refillDefault": "Standaard",
+    "colBalance": "Huidig ​​saldo"
   },
   "groups": {
     "title": "Groepen",
@@ -248,7 +252,18 @@
     "adminOpt": "Groepsbeheerder (optioneel)",
     "bulkDone": "Bulk-toegevoegde {{n}}-groepen",
     "createFail": "Kan groep niet maken",
-    "grantFail": "Kan geen krediet verlenen."
+    "grantFail": "Kan geen krediet verlenen.",
+    "colRefill": "Terugkerende bijvulling",
+    "refillDefault": "Standaard",
+    "refillInterval": "Bijvulcyclus (dagen)",
+    "deleteFail": "Verwijderen is mislukt",
+    "hasMembers": "Dit team heeft nog steeds leden. Verplaats of verwijder ze voordat u ze verwijdert.",
+    "initCredit": "Initiële tegoeden en terugkerende aanvullingen",
+    "cantDeleteDefault": "Het standaardteam kan niet worden verwijderd.",
+    "carryover": "Draag ongebruikte tegoeden over",
+    "initCreditHint": "Optioneel toewijzen vanuit de organisatiepool en een aanvulling instellen bij het aanmaken van het team. Je kunt dit ook later doen op de teamdetailpagina.",
+    "initCreditAmt": "Initiële kredieten",
+    "refillAmt": "Terugkerende bijvulling (per cyclus)"
   },
   "orgs": {
     "title": "Organisaties",
@@ -292,7 +307,11 @@
     "adminHintOpt": "Laat dit leeg om alleen de groep 'Algemeen' te maken en later een beheerder toe te wijzen, via Organisatiedetail → Algemeen → Lid toevoegen met de rol Organisatiebeheerder.",
     "grantHint": "Onmiddellijk toegepast op de organisatiepool en vastgelegd in het auditlogboek.",
     "grantReasonPh": "Voer een reden in",
-    "grantAmount": "Bedrag (C)"
+    "grantAmount": "Bedrag (C)",
+    "deleteFail": "Verwijderen is mislukt",
+    "colRefill": "Terugkerende bijvulling",
+    "refillDefault": "Standaard",
+    "hasUsers": "Deze organisatie heeft nog steeds gebruikers. Verplaats of verwijder ze voordat u ze verwijdert."
   },
   "billing": {
     "title": "Facturering",
@@ -318,7 +337,12 @@
     "tabOrg": "Door org",
     "vsBudget": "versus budget",
     "vsBudget2": "versus budget",
-    "vsAlloc": "versus alloc"
+    "vsAlloc": "versus alloc",
+    "period7d": "Laatste 7 dagen",
+    "periodLastMonth": "Vorige maand",
+    "periodAll": "Altijd",
+    "periodMonth": "Deze maand",
+    "periodNote": "Het weergegeven verbruik en de GPU-uren zijn wat er in de geselecteerde periode is gebeurd, volgens het grootboek. Budgetten en pools zijn niet periodegebonden."
   },
   "audit": {
     "title": "Auditlogboek",
@@ -476,7 +500,10 @@
     "impMissing": "Voer naam, eigenaar, NFS-server en pad in.",
     "impOwnerHint": "Kies een account uit de lijst om te importeren.",
     "impOwnerPicked": "Geselecteerd: {{name}} ({{id}})",
-    "metricsOffNotice": "Monitoring (DCGM/Prometheus) is niet geïnstalleerd, dus GPU-gebruik en VRAM kunnen niet worden getoond. Schakel monitoring in om live-metrieken te zien."
+    "metricsOffNotice": "Monitoring (DCGM/Prometheus) is niet geïnstalleerd, dus GPU-gebruik en VRAM kunnen niet worden getoond. Schakel monitoring in om live-metrieken te zien.",
+    "cordon": "Cordon",
+    "uncordon": "Ontkoppel",
+    "noMetrics": "Geen statistieken"
   },
   "mset": {
     "title": "Instellingen",
@@ -599,7 +626,21 @@
     "removed": "Verwijderd uit groep",
     "moveFail": "Verplaatsen mislukt",
     "removeConfirm": "Verwijder deze gebruiker uit {{group}}.",
-    "removeTitle": "Verwijderen uit groep"
+    "removeTitle": "Verwijderen uit groep",
+    "restore": "Herstellen",
+    "suspend": "Opschorten",
+    "statusConfirm": "Hierdoor verandert de status van de gebruiker.",
+    "addFail": "Kan niet toevoegen",
+    "granted": "Toegekend {{n}} C",
+    "grantFail": "Subsidie ​​is mislukt",
+    "grantTitle": "Kredietverlening — {{name}}",
+    "addMembership": "Lidmaatschap toevoegen",
+    "memberAdded": "Lidmaatschap toegevoegd.",
+    "pickOrg": "Selecteer een organisatie",
+    "grant": "Krediet toekennen",
+    "noTeamsInOrg": "Deze organisatie heeft geen teams.",
+    "grantHint": "Direct toegepast op het persoonlijke tegoed en als eenmalige aanpassing vastgelegd in het auditlogboek.",
+    "grantAmount": "Te verlenen kredieten (C; negatieve aftrek)"
   },
   "clusters": {
     "title": "Clusters",
@@ -699,7 +740,12 @@
     "extSshOnly": "Zonder VSCode/Jupyter/aangepaste poort zijn sessies op deze image alleen SSH.",
     "needRef": "Voer een afbeeldingsreferentie in",
     "webName": "Kanaalnaam (optioneel)",
-    "imgRef": "Afbeelding ref"
+    "imgRef": "Afbeelding ref",
+    "notCached": "Niet in de cache opgeslagen",
+    "notFound": "Afbeelding niet gevonden.",
+    "loading": "…",
+    "logsHint": "Laadt build- en scanlogboeken.",
+    "info": "Afbeeldingsinformatie"
   },
   "anotify": {
     "title": "Meldingen",
@@ -886,7 +932,23 @@
     "brandingNote": "Pas de servicenaam en logokleur aan voor uw organisatie. Direct toegepast op login en consoleheader.",
     "brandAccentHint": "Laat leeg om de themakleur te gebruiken.",
     "leaseHead": "Sessieverlenging (wie het eerst komt)",
-    "featuresHead": "Gebruikersfuncties"
+    "featuresHead": "Gebruikersfuncties",
+    "rechargeTitle": "Terugkerende kredietaanvulling (standaard en limiet)",
+    "carryoverOn": "Draag ongebruikte tegoeden over",
+    "rechargeInterval": "Standaard bijvulcyclus (dagen) · limiet voor lagere niveaus",
+    "brandIcon": "Icon",
+    "rechargeNote": "De standaard bijvulcyclus en het overdrachtsbeleid van het platform. Organisaties, teams en individuen kunnen een kortere cyclus kiezen, maar nooit een langere, en wanneer een ouder overdracht niet toestaat, vervallen ongebruikte credits daaronder op die grens.",
+    "carryoverOff": "Verloopt elke cyclus",
+    "rechargeSaved": "Bijvulinstellingen opgeslagen.",
+    "rechargeEnabled": "Schakel terugkerend bijvullen in",
+    "brandSubtitle": "Ondertitel",
+    "rechargeCarryover": "Overdracht toestaan",
+    "brandIconClear": "Verwijderen",
+    "brandIconTooBig": "Het pictogram moet 120 KB of kleiner zijn.",
+    "brandIconUploadHint": "Een geüpload pictogram heeft voorrang op het Lucide-pictogram hierboven. PNG of SVG van minder dan 120 KB aanbevolen.",
+    "rechargeAmountHint": "Stel de aanvulbedragen, cycli en overdrachten per organisatie, per team en per gebruiker in op hun detailpagina's. Een cyclus kan nooit langer zijn dan die van de ouders.",
+    "brandSubtitleHint": "Kleine tekst naast het logo. Laat leeg om het te verbergen.",
+    "brandIconUpload": "Upload een pictogram (optioneel)"
   },
   "datasets": {
     "title": "Gegevenssets",
@@ -932,7 +994,40 @@
     "dlInto": "Laden in /dataset/{{name}}",
     "assign": "Knooppunten toewijzen",
     "rejected": "Verzoek afgewezen",
-    "notCached": "Niet in de cache opgeslagen"
+    "notCached": "Niet in de cache opgeslagen",
+    "phaseCopy": "Kopiëren",
+    "phaseDownload": "Downloaden",
+    "descFail": "Kan beschrijving niet opslaan",
+    "description": "Beschrijving",
+    "cache": "Knoopcache",
+    "descPh": "Beschrijf deze dataset",
+    "sizeClass": "Maatklasse",
+    "regNeedName": "Voer een gegevenssetnaam in.",
+    "cacheFail": "Cacheverzoek is mislukt",
+    "notFound": "Gegevensset niet gevonden.",
+    "sizeClassSaved": "Maatklasse opgeslagen.",
+    "phaseExtract": "Extraheren",
+    "descSaved": "Beschrijving opgeslagen.",
+    "info": "Dataset-informatie",
+    "registering": "Registreren",
+    "upTaken": "Er bestaat al een gegevensset met die naam.",
+    "regStarted": "Registratie gestart: volg de voortgang in de lijst.",
+    "regRefresh": "Vernieuwen",
+    "regFail": "Registratie mislukt",
+    "regNeedUrl": "Voer een URL in.",
+    "regUrl": "URL (wget)",
+    "regBusy": "Registreren…",
+    "regTitle": "Gegevensset registreren",
+    "regSizeClass": "Maatklasse",
+    "regNfs": "NFS-kopie (SCP)",
+    "upScope": "Zichtbaarheid",
+    "extracting": "Extraheren…",
+    "regUrlField": "Download-URL",
+    "regInboxFile": "Inbox-bestand",
+    "regNeedFile": "Selecteer een bestand uit de inbox.",
+    "regNfsHint": "Kopieer een archief (zip, tar, tar.gz) naar het onderstaande pad en kies vervolgens het bestand om het te registreren. Door te registreren wordt het uit de inbox verwijderd en automatisch uitgepakt.",
+    "regUrlHint": "De server downloadt deze URL rechtstreeks; er wordt niets vanuit uw browser geüpload. Volg de voortgang in de lijst.",
+    "regInboxEmpty": "De inbox is leeg. Kopieer een bestand naar het bovenstaande pad en vernieuw vervolgens."
   },
   "announce": {
     "title": "Aankondigingen",
@@ -1054,7 +1149,8 @@
     "removeConfirm": "Als u het '{{name}}'-beleid verwijdert, neemt het over van het bovenstaande bereik. Doorgaan?",
     "globalHint": "Globaal is de fallback voor iedereen; het mag niet leeg zijn en moet minimaal 1 zijn. Org-/groeps-/gebruikersbereiken kunnen dit overschrijven.",
     "searchUser": "Zoek gebruiker",
-    "globalNeedsValue": "Alle vier de globale limieten moeten minimaal 1 zijn"
+    "globalNeedsValue": "Alle vier de globale limieten moeten minimaal 1 zijn",
+    "capHint": "Maximaal toegestaan ​​— GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · volume ≤ {{vol}}GiB · gelijktijdige sessies ≤ {{sess}}"
   },
   "roles": {
     "org_admin": "Organisatiebeheerder",
@@ -1070,7 +1166,16 @@
     "subtitle": "Identificatie {{name}} · beheer hier de groepen, gebruikers en credits",
     "inGroup": "Beheer in groep",
     "usersCapped": "toont eerste {{shown}} van {{total}}",
-    "usersHint": "Rol is de rol van de gebruiker binnen zijn/haar groep. Wijzig dit via het ledenbeheer van die groep."
+    "usersHint": "Rol is de rol van de gebruiker binnen zijn/haar groep. Wijzig dit via het ledenbeheer van die groep.",
+    "recurringAmount": "Credits per cyclus",
+    "recurringInterval": "Bijvulcyclus (dagen)",
+    "recurringCarryover": "Overdracht",
+    "carryOn": "Overdragen",
+    "carryOff": "Verlopen",
+    "recurringTitle": "Terugkerende kredieten",
+    "recurringNote": "Vult de organisatiepool elke cyclus met dit bedrag aan (0 schakelt deze uit).",
+    "recurringSaved": "Terugkerende credits opgeslagen.",
+    "maxIntervalHint": "Platformlimiet: {{n}} dagen of minder"
   },
   "gdetail": {
     "title": "Groep",
@@ -1098,7 +1203,25 @@
     "moveTitle": "Groep verplaatsen — {{name}}",
     "removeConfirm": "'{{name}}' uit deze groep verwijderen?",
     "roleSet": "De rol van {{name}} gewijzigd in {{role}}",
-    "moveHint": "De rol wordt overgedragen. Het tegoed dat in deze groep is toegewezen, geldt niet en de gebruiksgeschiedenis blijft bij deze groep."
+    "moveHint": "De rol wordt overgedragen. Het tegoed dat in deze groep is toegewezen, geldt niet en de gebruiksgeschiedenis blijft bij deze groep.",
+    "refilledNow": "Nu bijgevuld: +{{n}} C",
+    "refillCol": "Terugkerende bijvulling",
+    "noRecurring": "Er is geen terugkerend bijvulbedrag ingesteld",
+    "refillFail": "Bijvullen mislukt",
+    "refillTitle": "Terugkerende aanvulling voor het team",
+    "noRecurringShort": "Geen terugkerende bijvulling",
+    "nextRefill": "Volgende vulling",
+    "refillCarryover": "Draag ongebruikte tegoeden over",
+    "refillNow": "Nu bijvullen",
+    "refillSaved": "Terugkerende bijvulling opgeslagen.",
+    "memberRefillSet": "Stel terugkerende bijvulling in",
+    "memberRefillSaved": "Terugkerende bijvulling opgeslagen",
+    "memberRefillTitle": "Terugkerende bijvulling — {{name}}",
+    "memberRefillHint": "Dit bedrag wordt elke cyclus in de portemonnee van het lid gestort. Gebruik ‘Nu bijvullen’ om direct te betalen.",
+    "refillInheritPh": "Geërfd",
+    "refillMenu": "Bijvullen",
+    "refillAmount": "Terugkerend bijvulbedrag (C)",
+    "refillInterval": "Cyclus (dagen) — laat leeg voor de teamstandaard"
   },
   "picker": {
     "allOrgs": "Alle organisaties",
@@ -1125,5 +1248,8 @@
   "brand": "Giosk-console",
   "confirmDelete": "Dit verwijderen? Dit kan niet ongedaan worden gemaakt.",
   "confirmTerminate": "Deze sessie geforceerd beëindigen? Het lopende werk stopt onmiddellijk.",
-  "confirmRemoveMember": "Dit lid uit de groep verwijderen?"
+  "confirmRemoveMember": "Dit lid uit de groep verwijderen?",
+  "paged": {
+    "range": "{{from}}–{{to}} of {{total}}"
+  }
 }

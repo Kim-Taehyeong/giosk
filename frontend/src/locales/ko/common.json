@@ -67,7 +67,9 @@
       "errorGroup": "소속 조직과 그룹을 반드시 선택해야 합니다.",
       "errorPasswordShort": "비밀번호는 8자 이상이어야 합니다.",
       "errorGeneric": "가입에 실패했습니다.",
-      "errorPasswordMismatch": "비밀번호가 일치하지 않습니다."
+      "errorPasswordMismatch": "비밀번호가 일치하지 않습니다.",
+      "pwMatch": "비밀번호가 일치합니다",
+      "pwMismatch": "비밀번호가 일치하지 않습니다"
     },
     "signup": {
       "title": "Giosk Console 가입",
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "노드 {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "노드 {{up}}/{{total}} · GPU —"
+    "nodeBadgeNoGpu": "노드 {{up}}/{{total}} · GPU —",
+    "rolePlatform": "플랫폼 전체",
+    "rolePlatformSub": "최고 관리자",
+    "orgWhole": "조직 전체",
+    "clusterStatus": "클러스터 현황",
+    "creditBalance": "크레딧 잔액",
+    "alerts": "알림",
+    "unreadN": "안 읽음 {{n}}",
+    "noAlerts": "받은 알림이 없습니다.",
+    "viewAll": "알림센터에서 전체 보기"
+  },
+  "table": {
+    "empty": "데이터가 없습니다"
+  },
+  "close": "닫기",
+  "refill": {
+    "title": "정기 리필",
+    "note": "주기마다 이 양으로 리필합니다(0이면 리필 안 함). 주기는 상위보다 길 수 없어 자동 제한됩니다.",
+    "amount": "주기당 크레딧",
+    "interval": "리필 주기(일)",
+    "carryover": "이월",
+    "carryOn": "이월",
+    "carryOff": "소멸",
+    "maxHint": "상위 주기 상한: {{n}}일 이하"
+  },
+  "select": {
+    "placeholder": "선택",
+    "search": "검색…",
+    "noMatch": "일치하는 항목 없음"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "{{target}} 팀 크레딧 부족",
+      "teamBody": "{{target}} 팀 크레딧이 {{value}} 로 임계({{threshold}}) 이하입니다. 이 팀 세션이 곧 중단될 수 있어요."
+    }
   }
 }

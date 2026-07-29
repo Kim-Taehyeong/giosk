@@ -67,7 +67,9 @@
       "errorTerms": "برای ثبت نام باید شرایط را بپذیرید.",
       "submit": "درخواست ثبت نام",
       "errorGroup": "شما باید یک سازمان و یک گروه را انتخاب کنید.",
-      "errorPasswordMismatch": "گذرواژه ها مطابقت ندارند."
+      "errorPasswordMismatch": "گذرواژه ها مطابقت ندارند.",
+      "pwMismatch": "گذرواژه ها مطابقت ندارند",
+      "pwMatch": "گذرواژه ها مطابقت دارند"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "نود {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "نود {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "نود {{up}}/{{total}} · GPU —",
+    "rolePlatformSub": "فوق ادمین",
+    "orgWhole": "کل سازمان",
+    "clusterStatus": "وضعیت خوشه",
+    "alerts": "هشدارها",
+    "creditBalance": "مانده اعتباری",
+    "viewAll": "همه را در مرکز اطلاع رسانی ببینید",
+    "rolePlatform": "کل پلت فرم",
+    "unreadN": "{{n}} خوانده نشده",
+    "noAlerts": "هنوز هیچ هشداری وجود ندارد."
+  },
+  "table": {
+    "empty": "داده ای وجود ندارد"
+  },
+  "refill": {
+    "carryover": "حمل و نقل",
+    "carryOn": "حمل کنید",
+    "carryOff": "منقضی شود",
+    "note": "در هر چرخه با این مقدار دوباره پر می شود (0 آن را غیرفعال می کند). چرخه نمی تواند طولانی تر از چرخه والدین باشد و به طور خودکار محدود می شود.",
+    "title": "پر کردن مجدد",
+    "interval": "چرخه پر کردن مجدد (روزها)",
+    "amount": "اعتبار در هر چرخه",
+    "maxHint": "محدودیت چرخه والدین: {{n}} روز یا کمتر"
+  },
+  "select": {
+    "placeholder": "انتخاب کنید",
+    "search": "جستجو…",
+    "noMatch": "مطابقت ندارد"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "اعتبار تیم {{target}} کم است",
+      "teamBody": "اعتبار تیم {{target}} در {{value}}، زیر آستانه {{threshold}} است. ممکن است جلسات این تیم به زودی متوقف شود."
+    }
+  },
+  "close": "بستن"
 }

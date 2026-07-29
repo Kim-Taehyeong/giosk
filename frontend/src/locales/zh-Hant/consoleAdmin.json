@@ -53,7 +53,8 @@
     "create": "創造",
     "edit": "編輯",
     "advanced": "更多設定",
-    "optional": "（選修的）"
+    "optional": "（選修的）",
+    "prev": "以前的"
   },
   "dash": {
     "title": "儀表板",
@@ -197,7 +198,10 @@
     "bulkDone": "批量添加{{n}}用戶",
     "colMemberRole": "組織/團隊角色",
     "advBelong": "會員·角色·密碼",
-    "groupPickOrgFirst": "首先選擇一個組織"
+    "groupPickOrgFirst": "首先選擇一個組織",
+    "colRefill": "定期補充",
+    "refillDefault": "預設",
+    "colBalance": "當前餘額"
   },
   "groups": {
     "title": "團體",
@@ -248,7 +252,18 @@
     "insufficientOrgPool": "組織信用池餘額不足。",
     "deleted": "群組“{{name}}”已刪除",
     "bulkDone": "批量添加{{n}}組",
-    "grantFail": "未能授予信用。"
+    "grantFail": "未能授予信用。",
+    "colRefill": "定期補充",
+    "deleteFail": "刪除失敗",
+    "refillInterval": "補充週期（天）",
+    "refillDefault": "預設",
+    "refillAmt": "定期補充（每個週期）",
+    "cantDeleteDefault": "預設團隊無法刪除。",
+    "initCredit": "初始積分和定期充值",
+    "carryover": "結轉未使用的積分",
+    "hasMembers": "這個團隊還有成員。在刪除之前移動或刪除它們。",
+    "initCreditHint": "可以選擇從組織池中指派並在建立團隊時設定補充。您也可以稍後在團隊詳細資訊頁面中執行此操作。",
+    "initCreditAmt": "初始學分"
   },
   "orgs": {
     "title": "組織機構",
@@ -292,7 +307,11 @@
     "deleteConfirm": "刪除（存檔）組織“{{name}}”？",
     "bulkDone": "批量添加 {{n}} 組織",
     "createFail": "創建組織失敗",
-    "adminHintOpt": "留空以僅建立「常規」群組，並稍後從組織詳細資​​料 → 常規 → 新增具有組織管理員角色的成員指派管理員。"
+    "adminHintOpt": "留空以僅建立「常規」群組，並稍後從組織詳細資​​料 → 常規 → 新增具有組織管理員角色的成員指派管理員。",
+    "deleteFail": "刪除失敗",
+    "colRefill": "定期補充",
+    "refillDefault": "預設",
+    "hasUsers": "這個組織仍然有使用者。在刪除之前移動或刪除它們。"
   },
   "billing": {
     "title": "計費",
@@ -318,7 +337,12 @@
     "subtitle": "按組織/群組/使用者劃分的使用情況和統計資料（內部積分）",
     "byOrg": "按組織劃分的消耗",
     "csv": "⤓ CSV",
-    "byGroup": "團體消費（展示）"
+    "byGroup": "團體消費（展示）",
+    "periodMonth": "本月",
+    "periodAll": "所有時間",
+    "periodLastMonth": "上個月",
+    "period7d": "過去 7 天",
+    "periodNote": "顯示的消耗和 GPU 小時數是根據分類帳在選定時間內發生的情況。預算和資金池沒有時間範圍。"
   },
   "audit": {
     "title": "審核日誌",
@@ -476,7 +500,10 @@
     "impPath": "NFS 路徑（導出）",
     "impOwnerHint": "請從清單中選擇一個帳號以匯入。",
     "impOwnerPicked": "已選擇：{{name}}（{{id}}）",
-    "metricsOffNotice": "未安裝監控（DCGM/Prometheus），因此無法顯示 GPU 使用率與顯示記憶體。啟用監控後即可看到即時指標。"
+    "metricsOffNotice": "未安裝監控（DCGM/Prometheus），因此無法顯示 GPU 使用率與顯示記憶體。啟用監控後即可看到即時指標。",
+    "uncordon": "解除警戒線",
+    "cordon": "警戒線",
+    "noMetrics": "沒有指標"
   },
   "mset": {
     "title": "設定",
@@ -599,7 +626,21 @@
     "noDatasets": "沒有數據集。",
     "noDatasetReq": "沒有資料集請求。",
     "noJoinReq": "沒有加入請求。",
-    "moved": "移至{{group}}"
+    "moved": "移至{{group}}",
+    "addFail": "無法新增",
+    "grant": "授予學分",
+    "suspend": "暫停",
+    "restore": "恢復",
+    "pickOrg": "選擇一個組織",
+    "addMembership": "新增會員資格",
+    "grantFail": "授予失敗",
+    "granted": "授予 {{n}} C",
+    "grantAmount": "授予學分（C；負扣除）",
+    "noTeamsInOrg": "這個組織沒有團隊。",
+    "memberAdded": "已新增會員。",
+    "statusConfirm": "這會更改使用者的狀態。",
+    "grantTitle": "授予學分 — {{name}}",
+    "grantHint": "立即應用於個人信用餘額並記錄在審計日誌中作為一次性調整。"
   },
   "clusters": {
     "title": "叢集",
@@ -699,7 +740,12 @@
     "imgRefHint": "原樣拉取並使用 Docker Hub/外部登錄機碼映像（無需建置）。例如codercom/代碼伺服器：最新",
     "rebuildStarted": "重建開始",
     "extRegistered": "已註冊外部影像",
-    "extFail": "註冊外部圖片失敗"
+    "extFail": "註冊外部圖片失敗",
+    "notFound": "未找到圖像。",
+    "notCached": "未快取",
+    "loading": "……",
+    "info": "圖片訊息",
+    "logsHint": "載入建置和掃描日誌。"
   },
   "anotify": {
     "title": "通知",
@@ -886,7 +932,23 @@
     "brandingNote": "為您的組織自訂服務名稱和徽標顏色。立即套用於登入和控制台標頭。",
     "runtimeNote": "僅適用簡單的策略。計費模型、並發和資料集在安裝時固定。",
     "leaseHead": "會議延期（先到先得）",
-    "brandAccentHint": "留空以使用主題顏色。"
+    "brandAccentHint": "留空以使用主題顏色。",
+    "rechargeCarryover": "允許結轉",
+    "carryoverOn": "結轉未使用的積分",
+    "rechargeTitle": "定期信用充值（預設和限額）",
+    "brandSubtitle": "字幕",
+    "rechargeSaved": "已儲存補充設定。",
+    "brandIcon": "圖示",
+    "rechargeInterval": "預設補充週期（天） · 較低等級的限制",
+    "brandIconClear": "消除",
+    "rechargeNote": "平台預設的儲值週期和結轉政策。組織、團隊和個人可以選擇較短的周期，但絕不能選擇較長的周期，當父母不允許結轉時，低於其的未使用積分將在該邊界到期。",
+    "carryoverOff": "每個週期到期",
+    "rechargeEnabled": "啟用定期補充",
+    "rechargeAmountHint": "在其詳細資訊頁面上設定每個組織、每個團隊和每個使用者的補充金額、週期和結轉。一個週期永遠不會比它的父週期長。",
+    "brandSubtitleHint": "標誌旁邊的小文字。留空以隱藏它。",
+    "brandIconUpload": "上傳圖標（可選）",
+    "brandIconUploadHint": "上傳的圖標優先於上面的 Lucide 圖標。建議使用 120KB 以下的 PNG 或 SVG。",
+    "brandIconTooBig": "圖示必須為 120KB 或更小。"
   },
   "datasets": {
     "title": "數據集",
@@ -932,7 +994,40 @@
     "notCached": "未快取",
     "dlHint": "完成後，您可以在下面分配節點本地快取。",
     "assignHint": "選擇哪些節點快取此資料集。它從 NFS 提取到節點本地以供立即使用。",
-    "assignTitle": "快取節點分配"
+    "assignTitle": "快取節點分配",
+    "notFound": "未找到資料集。",
+    "phaseExtract": "提取",
+    "phaseCopy": "複印",
+    "phaseDownload": "正在下載",
+    "info": "資料集資訊",
+    "sizeClass": "尺寸等級",
+    "description": "描述",
+    "cacheFail": "快取請求失敗",
+    "cache": "節點快取",
+    "descFail": "無法保存描述",
+    "descSaved": "說明已儲存。",
+    "regFail": "註冊失敗",
+    "extracting": "正在提取...",
+    "registering": "註冊",
+    "regTitle": "註冊資料集",
+    "regBusy": "註冊…",
+    "regNeedFile": "從收件匣中選擇一個檔案。",
+    "upTaken": "具有該名稱的資料集已存在。",
+    "regNeedName": "輸入資料集名稱。",
+    "sizeClassSaved": "尺寸類別已儲存。",
+    "descPh": "描述這個資料集",
+    "regNeedUrl": "輸入 URL。",
+    "regUrl": "網址（wget）",
+    "regSizeClass": "尺寸等級",
+    "regRefresh": "重新整理",
+    "regUrlField": "下載地址",
+    "upScope": "能見度",
+    "regNfsHint": "將檔案（zip、tar、tar.gz）複製到以下路徑，然後選擇該檔案進行註冊。註冊會將其移出收件匣並自動提取。",
+    "regStarted": "註冊開始 — 追蹤清單中的進度。",
+    "regNfs": "NFS 副本 (SCP)",
+    "regUrlHint": "伺服器直接下載此 URL — 不會從您的瀏覽器上傳任何內容。追蹤列表中的進度。",
+    "regInboxFile": "收件匣文件",
+    "regInboxEmpty": "收件匣是空的。將檔案複製到上面的路徑，然後刷新。"
   },
   "announce": {
     "title": "公告",
@@ -1054,7 +1149,8 @@
     "globalNeedsValue": "所有四個全域限制必須至少為 1",
     "removeConfirm": "刪除“{{name}}”策略會使其繼承上述範圍。繼續？",
     "needTarget": "選擇範圍和目標",
-    "globalHint": "Global 是每個人的後備方案 — 它不能為空且必須至少為 1。組織/群組/使用者範圍可以覆蓋它。"
+    "globalHint": "Global 是每個人的後備方案 — 它不能為空且必須至少為 1。組織/群組/使用者範圍可以覆蓋它。",
+    "capHint": "允許的最大值 — GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · 卷 ≤ {{vol}}GiB · 並發會話 ≤ {{sess}}"
   },
   "roles": {
     "org_admin": "組織管理員",
@@ -1070,7 +1166,16 @@
     "inGroup": "分組管理",
     "subtitle": "標識符 {{name}} · 在此管理其群組、使用者和積分",
     "usersHint": "角色是使用者在其群組中的角色。從該群組的成員管理中更改它。",
-    "usersCapped": "顯示 {{total}} 中的第一個 {{shown}}"
+    "usersCapped": "顯示 {{total}} 中的第一個 {{shown}}",
+    "recurringAmount": "每個週期學分",
+    "recurringInterval": "補充週期（天）",
+    "recurringCarryover": "結轉",
+    "carryOn": "結轉",
+    "carryOff": "到期",
+    "recurringTitle": "經常性學分",
+    "recurringNote": "每個週期按此數量重新填充組織池（0 禁用它）。",
+    "recurringSaved": "已保存經常性積分。",
+    "maxIntervalHint": "平台限制：{{n}}天或更短"
   },
   "gdetail": {
     "title": "團體",
@@ -1098,7 +1203,25 @@
     "moveTitle": "移動組 — {{name}}",
     "removed": "刪除了{{name}}",
     "addFail": "新增會員失敗",
-    "moveHint": "這個角色繼續存在。在此組中分配的信用不會，並且使用歷史記錄保留在該組中。"
+    "moveHint": "這個角色繼續存在。在此組中分配的信用不會，並且使用歷史記錄保留在該組中。",
+    "refillFail": "儲值失敗",
+    "refilledNow": "立即補充：+{{n}} C",
+    "refillCol": "定期補充",
+    "nextRefill": "下次補充",
+    "refillNow": "立即補充",
+    "refillMenu": "補充裝",
+    "refillInheritPh": "遺傳",
+    "refillCarryover": "結轉未使用的積分",
+    "refillSaved": "已保存定期補充。",
+    "memberRefillTitle": "定期補充 — {{name}}",
+    "refillTitle": "團隊定期補充",
+    "noRecurringShort": "無重複補充",
+    "memberRefillSaved": "已保存定期補充",
+    "memberRefillSet": "設定定期補充",
+    "refillAmount": "經常性補充量 (C)",
+    "refillInterval": "週期（天）－團隊預設留空",
+    "memberRefillHint": "這筆金額每個週期都會存入會員的錢包。使用「立即儲值」立即付款。",
+    "noRecurring": "未設定重複儲值金額"
   },
   "picker": {
     "allOrgs": "所有組織",
@@ -1125,5 +1248,8 @@
   "brand": "Giosk 控制台",
   "confirmDelete": "刪除這個？此操作無法撤銷。",
   "confirmTerminate": "強制終止此會話？正在運作的工作立即停止。",
-  "confirmRemoveMember": "將此成員從群組中刪除嗎？"
+  "confirmRemoveMember": "將此成員從群組中刪除嗎？",
+  "paged": {
+    "range": "{{total}} 的 {{from}}–{{to}}"
+  }
 }

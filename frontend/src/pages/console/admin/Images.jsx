@@ -138,27 +138,27 @@ export default function Images() {
 
       <Modal open={open} title={t('images.buildTitle')} onClose={() => setOpen(false)} width={560}
         footer={<button className="btn primary" onClick={build}>{t('images.buildBtn')}</button>}>
-        <label className="fld" style={{ marginTop: 0 }}>{t('images.imgName')}</label>
-        <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="my-train" />
-        <label className="fld">{t('images.imgDesc')}</label>
-        <input type="text" value={form.desc} onChange={(e) => setForm({ ...form, desc: e.target.value })} placeholder={t('images.imgDescPh')} />
-        <label className="fld">{t('images.baseImg')}</label>
-        <input type="text" value={form.base} onChange={(e) => setForm({ ...form, base: e.target.value })} placeholder="codercom/code-server:latest" />
+        <label className="fld" htmlFor="admin-images-fld-0" style={{ marginTop: 0 }}>{t('images.imgName')}</label>
+        <input id="admin-images-fld-0" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="my-train" />
+        <label className="fld" htmlFor="admin-images-fld-1">{t('images.imgDesc')}</label>
+        <input id="admin-images-fld-1" type="text" value={form.desc} onChange={(e) => setForm({ ...form, desc: e.target.value })} placeholder={t('images.imgDescPh')} />
+        <label className="fld" htmlFor="admin-images-fld-2">{t('images.baseImg')}</label>
+        <input id="admin-images-fld-2" type="text" value={form.base} onChange={(e) => setForm({ ...form, base: e.target.value })} placeholder="codercom/code-server:latest" />
         <div className="legend">{t('images.baseHint')}</div>
-        <label className="fld">{t('images.aptPkgs')}</label>
-        <input type="text" value={form.apt} onChange={(e) => setForm({ ...form, apt: e.target.value })} placeholder="git curl build-essential" />
-        <label className="fld">{t('images.pipPkgs')}</label>
-        <input type="text" value={form.pip} onChange={(e) => setForm({ ...form, pip: e.target.value })} placeholder="torch pandas scikit-learn" />
+        <label className="fld" htmlFor="admin-images-fld-3">{t('images.aptPkgs')}</label>
+        <input id="admin-images-fld-3" type="text" value={form.apt} onChange={(e) => setForm({ ...form, apt: e.target.value })} placeholder="git curl build-essential" />
+        <label className="fld" htmlFor="admin-images-fld-4">{t('images.pipPkgs')}</label>
+        <input id="admin-images-fld-4" type="text" value={form.pip} onChange={(e) => setForm({ ...form, pip: e.target.value })} placeholder="torch pandas scikit-learn" />
         <div className="legend">{t('images.pkgHint')}</div>
 
         {/* 제공 채널 — Dockerfile LABEL에서 자동 감지, 관리자가 확인·조정. SSH는 표준 런처가 항상 주입. */}
-        <label className="fld">{t('images.selectChannels')}</label>
+        <label className="fld" htmlFor="admin-images-fld-5">{t('images.selectChannels')}</label>
         <div className="flex gap wrap" style={{ gap: 16, marginTop: 4 }}>
           {['VSCode', 'Jupyter', 'SSH'].map((c) => {
             const locked = c === 'SSH';
             return (
               <label key={c} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, cursor: locked ? 'default' : 'pointer', opacity: locked ? 0.7 : 1 }}>
-                <input type="checkbox" checked={locked ? true : !!form.channels[c]} disabled={locked}
+                <input id="admin-images-fld-5" type="checkbox" checked={locked ? true : !!form.channels[c]} disabled={locked}
                   onChange={(e) => setForm({ ...form, channels: { ...form.channels, [c]: e.target.checked } })} />
                 {c}
               </label>
@@ -176,19 +176,19 @@ export default function Images() {
           <button className="btn primary" onClick={submitExt}>{t('images.addExternal')}</button>
         </>}>
         {ext && (<>
-          <label className="fld" style={{ marginTop: 0 }}>{t('images.imgRef')}</label>
-          <input type="text" value={ext.ref} onChange={(e) => setExt({ ...ext, ref: e.target.value })} placeholder="codercom/code-server:latest" />
+          <label className="fld" htmlFor="admin-images-fld-6" style={{ marginTop: 0 }}>{t('images.imgRef')}</label>
+          <input id="admin-images-fld-6" type="text" value={ext.ref} onChange={(e) => setExt({ ...ext, ref: e.target.value })} placeholder="codercom/code-server:latest" />
           <div className="legend">{t('images.imgRefHint')}</div>
-          <label className="fld">{t('images.imgDesc')}</label>
-          <input type="text" value={ext.desc} onChange={(e) => setExt({ ...ext, desc: e.target.value })} placeholder={t('images.imgDescPh')} />
+          <label className="fld" htmlFor="admin-images-fld-7">{t('images.imgDesc')}</label>
+          <input id="admin-images-fld-7" type="text" value={ext.desc} onChange={(e) => setExt({ ...ext, desc: e.target.value })} placeholder={t('images.imgDescPh')} />
 
-          <label className="fld">{t('images.selectChannels')}</label>
+          <label className="fld" htmlFor="admin-images-fld-8">{t('images.selectChannels')}</label>
           <div className="flex gap wrap" style={{ gap: 16, marginTop: 4 }}>
             {['VSCode', 'Jupyter', 'SSH'].map((c) => {
               const locked = c === 'SSH';
               return (
                 <label key={c} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, cursor: locked ? 'default' : 'pointer', opacity: locked ? 0.7 : 1 }}>
-                  <input type="checkbox" checked={locked ? true : !!ext.channels[c]} disabled={locked}
+                  <input id="admin-images-fld-8" type="checkbox" checked={locked ? true : !!ext.channels[c]} disabled={locked}
                     onChange={(e) => setExt({ ...ext, channels: { ...ext.channels, [c]: e.target.checked } })} />
                   {c}
                 </label>
@@ -198,12 +198,12 @@ export default function Images() {
           {/* 표준(8080/8888) 외 웹앱 — 관리자가 포트 입력 시 포트포워딩 채널로 노출. */}
           <div className="grid cols-2" style={{ gap: 12, marginTop: 10 }}>
             <div>
-              <label className="fld" style={{ marginTop: 0 }}>{t('images.webPort')}</label>
-              <input type="number" value={ext.webPort} onChange={(e) => setExt({ ...ext, webPort: e.target.value })} placeholder="8501" />
+              <label className="fld" htmlFor="admin-images-fld-9" style={{ marginTop: 0 }}>{t('images.webPort')}</label>
+              <input id="admin-images-fld-9" type="number" value={ext.webPort} onChange={(e) => setExt({ ...ext, webPort: e.target.value })} placeholder="8501" />
             </div>
             <div>
-              <label className="fld" style={{ marginTop: 0 }}>{t('images.webName')}</label>
-              <input type="text" value={ext.webName} onChange={(e) => setExt({ ...ext, webName: e.target.value })} placeholder="app" />
+              <label className="fld" htmlFor="admin-images-fld-10" style={{ marginTop: 0 }}>{t('images.webName')}</label>
+              <input id="admin-images-fld-10" type="text" value={ext.webName} onChange={(e) => setExt({ ...ext, webName: e.target.value })} placeholder="app" />
             </div>
           </div>
           <div className="legend mt">{t('images.extSshOnly')}</div>

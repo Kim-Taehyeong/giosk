@@ -2,6 +2,9 @@ package group
 
 import (
 	"errors"
+	"time"
+
+	"giosk/pkg/dayspine"
 
 	"gorm.io/gorm"
 )
@@ -166,12 +169,44 @@ func (r *gormRepo) Usage(groupID int64) ([]UsageRow, error) {
 }
 
 // UsageTrend는 그룹의 최근 days일 일자별 GPU 사용시간(시간) 추이(gpu_usage 원장).
+//
+// 사용이 없던 날도 0으로 채워 반드시 days개를 돌려준다 — GROUP BY 는 원장 행이 있는 날만
+// 주므로, 그대로 넘기면 "최근 N일"이 아니라 "쓴 날들"이 되고 카테고리 축 차트에서
+// 열흘 떨어진 두 점이 바로 옆에 붙어 그려진다(x축이 거짓말을 한다).
 func (r *gormRepo) UsageTrend(groupID int64, days int) []UsageTrendPoint {
-	var out []UsageTrendPoint
-	r.db.Raw(`SELECT DATE_FORMAT(created_at,'%m/%d') AS date, CAST(ROUND(SUM(seconds)/3600) AS SIGNED) AS hours
+	if days < 1 {
+		return []UsageTrendPoint{}
+	}
+	var rows []struct {
+		Day   string
+		Hours int
+	}
+	// 스파인이 오늘 포함 days 일이므로 하한도 days-1 일 전(기존 INTERVAL days DAY 는 하루 더 긁었다).
+	r.db.Raw(`SELECT DATE_FORMAT(created_at,'%Y-%m-%d') AS day, CAST(ROUND(SUM(seconds)/3600) AS SIGNED) AS hours
 		FROM gpu_usage WHERE group_id = ? AND created_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
-		GROUP BY DATE_FORMAT(created_at,'%m/%d') ORDER BY MIN(created_at)`, groupID, days).Scan(&out)
+		GROUP BY day ORDER BY day`, groupID, days-1).Scan(&rows)
+
+	byDay := make(map[string]int, len(rows))
+	for _, x := range rows {
+		byDay[x.Day] = x.Hours
+	}
+	out := make([]UsageTrendPoint, 0, days)
+	for _, k := range dayspine.Keys(r.dbToday(), days) {
+		// 표시는 MM/DD, 매칭·정렬은 ISO 키(짧은 포맷을 키로 쓰면 연말에 순서가 뒤집힌다).
+		out = append(out, UsageTrendPoint{Date: k[5:7] + "/" + k[8:10], Hours: byDay[k]})
+	}
 	return out
+}
+
+// dbToday는 DB 기준 오늘(스파인 기준점). Go 시계를 쓰면 DB 서버 타임존이 다를 때
+// 스파인과 WHERE 절(CURDATE 기준)이 하루 어긋난다. 실패하면 Go 시계로 폴백.
+func (r *gormRepo) dbToday() time.Time {
+	var s string
+	r.db.Raw(`SELECT DATE_FORMAT(CURDATE(),'%Y-%m-%d')`).Scan(&s)
+	if t, err := time.Parse(dayspine.Layout, s); err == nil {
+		return t
+	}
+	return time.Now()
 }
 
 // UsageBySession은 그룹의 세션별 GPU 사용시간(시간)을 반환한다(세션 삭제돼도 원장 유지, 상위 50).

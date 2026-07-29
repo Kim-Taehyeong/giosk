@@ -53,7 +53,8 @@
     "optional": "(valinnainen)",
     "edit": "Muokata",
     "advanced": "Lisää asetuksia",
-    "empty": "Ei dataa"
+    "empty": "Ei dataa",
+    "prev": "Edellinen"
   },
   "dash": {
     "title": "Kojelauta",
@@ -197,7 +198,10 @@
     "totalN": "{{n}} käyttäjät",
     "colMemberRole": "Organisaatio/joukkuerooli",
     "prev": "Ed",
-    "advBelong": "Jäsenyys · rooli · salasana"
+    "advBelong": "Jäsenyys · rooli · salasana",
+    "colRefill": "Toistuva täyttö",
+    "refillDefault": "Oletus",
+    "colBalance": "Nykyinen saldo"
   },
   "groups": {
     "title": "ryhmät",
@@ -248,7 +252,18 @@
     "grantHintOrg": "Vähennetään organisaatiosi poolista ja lisätään tämän ryhmän joukkoon. Ei voi ylittää organisaation poolsaldoa.",
     "adminHintOpt": "Jätä tyhjäksi luodaksesi ryhmän ilman ryhmän ylläpitäjää. Lisää jäsen ryhmän tiedoista ja aseta hänen roolinsa Ryhmän ylläpitäjäksi.",
     "insufficientOrgPool": "Riittämätön organisaation luottopoolin saldo.",
-    "grantFail": "Luoton myöntäminen epäonnistui."
+    "grantFail": "Luoton myöntäminen epäonnistui.",
+    "colRefill": "Toistuva täyttö",
+    "deleteFail": "Poistaminen epäonnistui",
+    "refillInterval": "Täyttöjakso (päiviä)",
+    "refillDefault": "Oletus",
+    "initCreditAmt": "Alkupisteet",
+    "carryover": "Siirrä käyttämättömät lainat",
+    "refillAmt": "Toistuva täyttö (jaksoa kohti)",
+    "hasMembers": "Tässä joukkueessa on vielä jäseniä. Siirrä tai poista ne ennen poistamista.",
+    "initCredit": "Alkupisteet ja toistuva täyttö",
+    "cantDeleteDefault": "Oletustiimiä ei voi poistaa.",
+    "initCreditHint": "Valinnaisesti allokoi organisaatiovarannosta ja aseta täyttö tiimiä luotaessa. Voit tehdä tämän myös myöhemmin joukkueen tietosivulla."
   },
   "orgs": {
     "title": "Organisaatiot",
@@ -292,7 +307,11 @@
     "grantAmount": "Summa (C)",
     "grantReasonPh": "Anna syy",
     "adminHintOpt": "Jätä tyhjäksi luodaksesi vain 'Yleiset'-ryhmän ja määritä järjestelmänvalvoja myöhemmin kohdasta Organisaation tiedot → Yleiset → Lisää jäsen, jolla on organisaation järjestelmänvalvojan rooli.",
-    "grantHint": "Käytetty organisaatiopooliin välittömästi ja kirjattu tarkastuslokiin."
+    "grantHint": "Käytetty organisaatiopooliin välittömästi ja kirjattu tarkastuslokiin.",
+    "deleteFail": "Poistaminen epäonnistui",
+    "colRefill": "Toistuva täyttö",
+    "refillDefault": "Oletus",
+    "hasUsers": "Tällä organisaatiolla on edelleen käyttäjiä. Siirrä tai poista ne ennen poistamista."
   },
   "billing": {
     "title": "Laskutus",
@@ -318,7 +337,12 @@
     "tabOrg": "org",
     "byUser": "Kulutus käyttäjän mukaan",
     "vsAlloc": "vs alloc",
-    "byGroup": "Kulutus ryhmittäin (esittely)"
+    "byGroup": "Kulutus ryhmittäin (esittely)",
+    "periodAll": "Koko ajan",
+    "period7d": "Viimeiset 7 päivää",
+    "periodLastMonth": "Viime kuussa",
+    "periodMonth": "Tämä kuukausi",
+    "periodNote": "Näytetyt kulutus- ja GPU-tunnit ovat valitulla ajanjaksolla tapahtuneita reskontrakohtaisia ​​​​tunteja. Budjetit ja poolit eivät ole kausiluonteisia."
   },
   "audit": {
     "title": "Tarkastusloki",
@@ -476,7 +500,10 @@
     "impDone": "Tuotu määrä {{name}} kohteeseen {{user}}.",
     "impOwnerHint": "Valitse tuotava tili luettelosta.",
     "impOwnerPicked": "Valittu: {{name}} ({{id}})",
-    "metricsOffNotice": "Valvontaa (DCGM/Prometheus) ei ole asennettu, joten GPU-käyttöä ja VRAM-muistia ei voi näyttää. Ota valvonta käyttöön nähdäksesi reaaliaikaiset mittarit."
+    "metricsOffNotice": "Valvontaa (DCGM/Prometheus) ei ole asennettu, joten GPU-käyttöä ja VRAM-muistia ei voi näyttää. Ota valvonta käyttöön nähdäksesi reaaliaikaiset mittarit.",
+    "uncordon": "Uncordon",
+    "cordon": "Cordon",
+    "noMetrics": "Ei mittareita"
   },
   "mset": {
     "title": "Asetukset",
@@ -599,7 +626,21 @@
     "removeTitle": "Poista ryhmästä",
     "moveTo": "Kohderyhmä",
     "pickGroup": "Valitse ryhmä",
-    "removed": "Poistettu ryhmästä"
+    "removed": "Poistettu ryhmästä",
+    "grantFail": "Grant epäonnistui",
+    "granted": "Myönnetty {{n}} C",
+    "memberAdded": "Jäsenyys lisätty.",
+    "addFail": "Ei voitu lisätä",
+    "suspend": "Keskeyttää",
+    "restore": "Palauttaa",
+    "pickOrg": "Valitse organisaatio",
+    "addMembership": "Lisää jäsenyys",
+    "grantTitle": "Apurahapisteet — {{name}}",
+    "grant": "Myönnä luottoja",
+    "noTeamsInOrg": "Tällä organisaatiolla ei ole tiimejä.",
+    "statusConfirm": "Tämä muuttaa käyttäjän tilan.",
+    "grantAmount": "Myönnettävät hyvitykset (C; negatiiviset vähennykset)",
+    "grantHint": "Sovelletaan välittömästi henkilökohtaiseen luottosaldoon ja kirjataan tarkastuslokiin kertaluonteisena oikaisuna."
   },
   "clusters": {
     "title": "Klusterit",
@@ -699,7 +740,12 @@
     "webPort": "Muokattu verkkoportti (valinnainen)",
     "imgRefHint": "Vedä ja käytä Docker Hub / ulkoista rekisteriotosta sellaisenaan (ei koontiversiota). esim. codercom/code-server: uusin",
     "webName": "Kanavan nimi (valinnainen)",
-    "extSshOnly": "Ilman VSCode/Jupyter/mukautettua porttia tämän kuvan istunnot ovat vain SSH:ta."
+    "extSshOnly": "Ilman VSCode/Jupyter/mukautettua porttia tämän kuvan istunnot ovat vain SSH:ta.",
+    "notFound": "Kuvaa ei löydy.",
+    "notCached": "Ei välimuistissa",
+    "loading": "…",
+    "logsHint": "Lataa rakennus- ja skannauslokit.",
+    "info": "Kuvan tiedot"
   },
   "anotify": {
     "title": "Ilmoitukset",
@@ -886,7 +932,23 @@
     "leaseHead": "Istuntolaajennus (ensi tullutta)",
     "brandingNote": "Mukauta organisaatiosi palvelun nimi ja logon väri. Sovelletaan välittömästi sisäänkirjautumiseen ja konsolin otsikkoon.",
     "brandAccentHint": "Jätä tyhjäksi, jos haluat käyttää teemaväriä.",
-    "brandPreview": "Esikatselu"
+    "brandPreview": "Esikatselu",
+    "carryoverOn": "Siirrä käyttämättömät lainat",
+    "rechargeTitle": "Toistuva luottotäyttö (oletus ja raja)",
+    "rechargeEnabled": "Ota toistuva täyttö käyttöön",
+    "rechargeCarryover": "Salli siirto",
+    "rechargeSaved": "Täyttöasetukset tallennettu.",
+    "carryoverOff": "Päätä jokainen sykli",
+    "rechargeNote": "Alustan oletusarvoinen täyttöjakso ja siirtokäytäntö. Organisaatiot, tiimit ja yksilöt voivat valita lyhyemmän jakson, mutta ei koskaan pidempää, ja kun vanhempi kieltää siirron, sen alapuolella olevat käyttämättömät hyvitykset vanhenevat kyseisellä rajalla.",
+    "rechargeInterval": "Oletus täyttöjakso (päiviä) · raja alemmille tasoille",
+    "rechargeAmountHint": "Aseta organisaatio-, tiimi- ja käyttäjäkohtaiset täyttömäärät, jaksot ja siirrot tietosivuillaan. Kierto ei voi koskaan olla pidempi kuin sen vanhempi.",
+    "brandIconClear": "Poistaa",
+    "brandSubtitle": "Tekstitys",
+    "brandIcon": "Kuvake",
+    "brandSubtitleHint": "Logon vieressä pieni teksti. Jätä tyhjäksi piilottaaksesi sen.",
+    "brandIconTooBig": "Kuvakkeen tulee olla 120 kt tai pienempi.",
+    "brandIconUpload": "Lataa kuvake (valinnainen)",
+    "brandIconUploadHint": "Ladattu kuvake on etusijalla yllä olevaan Lucide-kuvakkeeseen nähden. PNG tai SVG alle 120 kt suositellaan."
   },
   "datasets": {
     "title": "Tietojoukot",
@@ -932,7 +994,40 @@
     "measuring": "Mitataan…",
     "assignTitle": "Välimuistisolmun määritys",
     "notCached": "Ei välimuistissa",
-    "assignHint": "Valitse, mitkä solmut tallentavat tämän tietojoukon välimuistiin. Se puretaan NFS:stä solmupaikalliseen käyttöön välitöntä käyttöä varten."
+    "assignHint": "Valitse, mitkä solmut tallentavat tämän tietojoukon välimuistiin. Se puretaan NFS:stä solmupaikalliseen käyttöön välitöntä käyttöä varten.",
+    "cacheFail": "Välimuistipyyntö epäonnistui",
+    "descSaved": "Kuvaus tallennettu.",
+    "notFound": "Tietojoukkoa ei löydy.",
+    "descFail": "Kuvausta ei voitu tallentaa",
+    "phaseDownload": "Ladataan",
+    "description": "Kuvaus",
+    "phaseCopy": "Kopioidaan",
+    "info": "Tietojoukon tiedot",
+    "cache": "Solmun välimuisti",
+    "regNeedName": "Anna tietojoukon nimi.",
+    "phaseExtract": "Purkaminen",
+    "sizeClassSaved": "Kokoluokka tallennettu.",
+    "descPh": "Kuvaile tätä tietojoukkoa",
+    "sizeClass": "Kokoluokka",
+    "regNeedUrl": "Anna URL-osoite.",
+    "regNeedFile": "Valitse tiedosto postilaatikosta.",
+    "upTaken": "Tietojoukko tällä nimellä on jo olemassa.",
+    "extracting": "Puretaan…",
+    "regFail": "Rekisteröinti epäonnistui",
+    "registering": "Rekisteröityminen",
+    "regStarted": "Rekisteröinti aloitettu — seuraa edistymistä luettelossa.",
+    "regNfsHint": "Kopioi arkisto (zip, tar, tar.gz) alla olevaan polkuun ja rekisteröi tiedosto valitsemalla se. Rekisteröityminen siirtää sen pois postilaatikosta ja purkaa sen automaattisesti.",
+    "regRefresh": "Päivitä",
+    "regSizeClass": "Kokoluokka",
+    "regNfs": "NFS-kopio (SCP)",
+    "regUrl": "URL (wget)",
+    "regBusy": "Rekisteröidään…",
+    "upScope": "Näkyvyys",
+    "regTitle": "Rekisteröi tietojoukko",
+    "regUrlField": "Lataa URL-osoite",
+    "regInboxFile": "Saapuneet-tiedosto",
+    "regInboxEmpty": "Saapuneet-kansio on tyhjä. Kopioi tiedosto yllä olevaan polkuun ja päivitä sitten.",
+    "regUrlHint": "Palvelin lataa tämän URL-osoitteen suoraan – selaimestasi ei lähetetä mitään. Seuraa edistymistä luettelosta."
   },
   "announce": {
     "title": "Ilmoitukset",
@@ -1054,7 +1149,8 @@
     "removed": "Poistettu käytäntö \"{{name}}\"",
     "globalHint": "Globaali on varavaihtoehto kaikille – se ei voi olla tyhjä, ja sen on oltava vähintään 1. Organisaatio-/ryhmä-/käyttäjäalueet voivat ohittaa sen.",
     "removeTitle": "Poista käytäntö",
-    "searchUser": "Etsi käyttäjä"
+    "searchUser": "Etsi käyttäjä",
+    "capHint": "Suurin sallittu – GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · äänenvoimakkuus ≤ {{vol}}GiB · samanaikaiset istunnot ≤ {{sess}}"
   },
   "roles": {
     "org_admin": "Organisaation järjestelmänvalvoja",
@@ -1070,7 +1166,16 @@
     "subtitle": "Tunniste {{name}} · hallita sen ryhmiä, käyttäjiä ja krediittejä täällä",
     "manage": "Hallitse",
     "inGroup": "Hallitse ryhmässä",
-    "usersCapped": "näyttää {{total}}:n ensimmäinen {{shown}}"
+    "usersCapped": "näyttää {{total}}:n ensimmäinen {{shown}}",
+    "recurringAmount": "Krediittejä per jakso",
+    "recurringInterval": "Täyttöjakso (päiviä)",
+    "recurringCarryover": "Siirto",
+    "carryOn": "Siirtää",
+    "carryOff": "Vanhenee",
+    "maxIntervalHint": "Alustan raja: {{n}} päivää tai vähemmän",
+    "recurringSaved": "Toistuvat krediitit tallennettu.",
+    "recurringTitle": "Toistuvat krediitit",
+    "recurringNote": "Täyttää organisaation poolin tällä määrällä joka jakso (0 poistaa sen käytöstä)."
   },
   "gdetail": {
     "title": "ryhmä",
@@ -1098,7 +1203,25 @@
     "moveFail": "Liikkuminen epäonnistui",
     "roleSet": "Muutettiin {{name}}:n rooliksi {{role}}",
     "roleHint": "Organisaation järjestelmänvalvojan ja ryhmän järjestelmänvalvojan oikeudet tulevat tästä roolista (erillään alustan roolista).",
-    "moveHint": "Rooli jatkuu. Tähän ryhmään jaettu luotto ei ole, ja käyttöhistoria säilyy tässä ryhmässä."
+    "moveHint": "Rooli jatkuu. Tähän ryhmään jaettu luotto ei ole, ja käyttöhistoria säilyy tässä ryhmässä.",
+    "refilledNow": "Täytetty nyt: +{{n}} C",
+    "refillCol": "Toistuva täyttö",
+    "refillFail": "Täyttö epäonnistui",
+    "refillTitle": "Joukkueen toistuva täyttö",
+    "noRecurringShort": "Ei toistuvaa täyttöä",
+    "noRecurring": "Toistuvaa täyttömäärää ei ole asetettu",
+    "refillMenu": "Täytä uudelleen",
+    "refillCarryover": "Siirrä käyttämättömät lainat",
+    "nextRefill": "Seuraava täyttö",
+    "refillNow": "Täytä nyt",
+    "refillSaved": "Toistuva täyttö tallennettu.",
+    "memberRefillSaved": "Toistuva täyttö tallennettu",
+    "memberRefillSet": "Aseta toistuva täyttö",
+    "memberRefillTitle": "Toistuva täyttö — {{name}}",
+    "refillInterval": "Jakso (päiviä) — jätä tyhjäksi joukkueen oletuksena",
+    "memberRefillHint": "Tämä summa maksetaan jäsenen lompakkoon joka sykli. Käytä \"Täytä nyt\" maksaaksesi sen välittömästi.",
+    "refillAmount": "Toistuva täyttömäärä (C)",
+    "refillInheritPh": "Peritty"
   },
   "picker": {
     "allOrgs": "Kaikki organisaatiot",
@@ -1125,5 +1248,8 @@
   "brand": "Giosk konsoli",
   "confirmDelete": "Poistetaanko tämä? Tätä ei voi kumota.",
   "confirmTerminate": "Pakotetaanko tämä istunto lopettamaan? Ajotyö pysähtyy välittömästi.",
-  "confirmRemoveMember": "Poistetaanko tämä jäsen ryhmästä?"
+  "confirmRemoveMember": "Poistetaanko tämä jäsen ryhmästä?",
+  "paged": {
+    "range": "{{from}}–{{to}} ja {{total}}"
+  }
 }

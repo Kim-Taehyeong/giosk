@@ -113,11 +113,11 @@ export default function Policies() {
             { key: 'maxStoppedSessions', header: t('limits.maxStoppedSessions'), render: (r) => val(r.maxStoppedSessions) },
             { key: 'act', header: t('policies.act'), className: 'flex', render: (r) => (r._fixed
               ? (isPlatform && <button className="btn sm" onClick={() => setEdit({ scope: 'global', id: 0, name: r.name, limits: {
-                  maxGpu: r.maxGpu, maxVramGb: r.maxVramGb, maxVolumeGib: r.maxVolumeGib, maxConcurrentSessions: r.maxConcurrentSessions, maxStoppedSessions: r.maxStoppedSessions } })}>
+                  maxGpu: r.maxGpu, maxVramGb: r.maxVramGb, maxVolumeGib: r.maxVolumeGib, maxConcurrentSessions: r.maxConcurrentSessions, maxStoppedSessions: r.maxStoppedSessions, maxEphemeralGib: r.maxEphemeralGib } })}>
                   <Pencil size={13} /> {t('common.edit')}</button>)
               : <span className="flex gap">
                   <button className="btn sm" onClick={() => setEdit({ scope: r.scope, id: r.id, name: r.name, limits: {
-                    maxGpu: r.maxGpu, maxVramGb: r.maxVramGb, maxVolumeGib: r.maxVolumeGib, maxConcurrentSessions: r.maxConcurrentSessions, maxStoppedSessions: r.maxStoppedSessions } })}>
+                    maxGpu: r.maxGpu, maxVramGb: r.maxVramGb, maxVolumeGib: r.maxVolumeGib, maxConcurrentSessions: r.maxConcurrentSessions, maxStoppedSessions: r.maxStoppedSessions, maxEphemeralGib: r.maxEphemeralGib } })}>
                     <Pencil size={13} /> {t('common.edit')}</button>
                   <button className="btn sm danger" onClick={() => remove(r)}><Trash2 size={13} /> {t('common.delete')}</button>
                 </span>) },
@@ -135,21 +135,21 @@ export default function Policies() {
           {/* 새로 추가할 때만 범위·대상을 고른다(기존 행은 범위가 정해져 있음). */}
           {!edit.name && (
             <>
-              <div style={{ marginBottom: 12 }}><label className="fld" style={{ marginTop: 0 }}>{t('policies.scope')}</label>
-                <Select value={edit.scope} onChange={(v) => setEdit({ ...edit, scope: v, id: 0, account: '' })}
+              <div style={{ marginBottom: 12 }}><label className="fld" id="admin-policies-fld-0-lbl" style={{ marginTop: 0 }}>{t('policies.scope')}</label>
+                <Select ariaLabelledBy="admin-policies-fld-0-lbl" value={edit.scope} onChange={(v) => setEdit({ ...edit, scope: v, id: 0, account: '' })}
                   width="100%"
                   options={[
                     { value: 'org', label: t('policies.scope_org') },
                     { value: 'group', label: t('policies.scope_group') },
                     { value: 'user', label: t('policies.scope_user') },
                   ]} /></div>
-              <div><label className="fld" style={{ marginTop: 0 }}>{t('policies.target')}</label>
+              <div><label className="fld" id="admin-policies-fld-1-lbl" style={{ marginTop: 0 }}>{t('policies.target')}</label>
                 {/* 사용자는 수백 명이 될 수 있어 드롭다운 대신 검색(UserPicker). 조직/그룹은 수가 적어 드롭다운 유지. */}
                 {edit.scope === 'user'
                   ? <UserPicker value={edit.account || ''} placeholder={t('policies.searchUser')}
                       onChange={(v) => setEdit((e) => ({ ...e, account: v }))}
                       onPick={(u) => setEdit((e) => ({ ...e, id: u ? u.id : 0, account: u ? u.username : e.account }))} />
-                  : <Select value={edit.id} placeholder={t('policies.pickTarget')} width="100%"
+                  : <Select ariaLabelledBy="admin-policies-fld-1-lbl" value={edit.id} placeholder={t('policies.pickTarget')} width="100%"
                       onChange={(v) => setEdit({ ...edit, id: Number(v) })} options={targets[edit.scope] || []} />}</div>
             </>
           )}

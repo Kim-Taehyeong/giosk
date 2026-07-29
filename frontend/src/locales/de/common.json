@@ -67,7 +67,9 @@
       "submit": "Anmeldung anfordern",
       "subtitle": "Füllen Sie das untenstehende Formular aus. Sie können sich anmelden, sobald ein Administrator Ihre Anfrage genehmigt.",
       "errorGeneric": "Die Anmeldung ist fehlgeschlagen.",
-      "errorPasswordMismatch": "Passwörter stimmen nicht überein."
+      "errorPasswordMismatch": "Passwörter stimmen nicht überein.",
+      "pwMismatch": "Passwörter stimmen nicht überein",
+      "pwMatch": "Passwörter stimmen überein"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Knoten {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "Knoten {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "Knoten {{up}}/{{total}} · GPU —",
+    "alerts": "Warnungen",
+    "orgWhole": "Gesamte Organisation",
+    "clusterStatus": "Clusterstatus",
+    "viewAll": "Alles im Benachrichtigungscenter anzeigen",
+    "unreadN": "{{n}} ungelesen",
+    "rolePlatform": "Gesamte Plattform",
+    "rolePlatformSub": "Super Admin",
+    "creditBalance": "Guthaben",
+    "noAlerts": "Noch keine Benachrichtigungen."
+  },
+  "table": {
+    "empty": "Keine Daten"
+  },
+  "refill": {
+    "title": "Wiederkehrende Nachfüllung",
+    "interval": "Nachfüllzyklus (Tage)",
+    "carryOff": "Erlöschen",
+    "note": "Wird bei jedem Zyklus um diesen Betrag aufgefüllt (0 deaktiviert es). Der Zyklus kann nicht länger sein als der des Elternzyklus und wird automatisch begrenzt.",
+    "carryOn": "Übertragen",
+    "carryover": "Übertragung",
+    "amount": "Credits pro Zyklus",
+    "maxHint": "Obergrenze für den übergeordneten Zyklus: {{n}} Tage oder weniger"
+  },
+  "select": {
+    "search": "Suchen…",
+    "noMatch": "Keine Übereinstimmung",
+    "placeholder": "Wählen"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "Das {{target}}-Team hat nur noch wenige Credits",
+      "teamBody": "Die Team-Credits von {{target}} liegen bei {{value}}, also unter dem Schwellenwert von {{threshold}}. Die Sitzungen in diesem Team werden möglicherweise bald beendet."
+    }
+  },
+  "close": "Schließen"
 }

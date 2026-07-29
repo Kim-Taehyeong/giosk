@@ -67,7 +67,9 @@
       "errorGroup": "您必須選擇一個組織和一個群組。",
       "errorAdvisor": "本科生和研究生必須提供一名顧問。",
       "errorTerms": "您必須接受條款才能註冊。",
-      "errorPasswordMismatch": "密碼不符。"
+      "errorPasswordMismatch": "密碼不符。",
+      "pwMismatch": "密碼不匹配",
+      "pwMatch": "密碼匹配"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "節點 {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "節點 {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "節點 {{up}}/{{total}} · GPU —",
+    "orgWhole": "整個組織",
+    "clusterStatus": "集群狀態",
+    "rolePlatform": "整個平台",
+    "rolePlatformSub": "超管理員",
+    "alerts": "警報",
+    "creditBalance": "貸方餘額",
+    "unreadN": "{{n}} 未讀",
+    "noAlerts": "還沒有警報。",
+    "viewAll": "在通知中心查看全部內容"
+  },
+  "table": {
+    "empty": "無數據"
+  },
+  "refill": {
+    "title": "定期補充",
+    "carryOff": "到期",
+    "carryOn": "結轉",
+    "carryover": "結轉",
+    "amount": "每個週期學分",
+    "maxHint": "母週期限制：{{n}} 天或更少",
+    "note": "每個週期重新填充此數量（0 禁用它）。此週期不能比父代的週期長，並且會自動設定上限。",
+    "interval": "補充週期（天）"
+  },
+  "select": {
+    "search": "搜尋…",
+    "placeholder": "選擇",
+    "noMatch": "沒有匹配"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamBody": "{{target}} 團隊積分為 {{value}}，低於 {{threshold}} 閾值。該團隊的會議可能很快就會停止。",
+      "teamTitle": "{{target}} 團隊積分不足"
+    }
+  },
+  "close": "關閉"
 }

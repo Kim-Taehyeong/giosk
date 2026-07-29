@@ -53,7 +53,8 @@
     "back": "Tillbaka",
     "optional": "(frivillig)",
     "empty": "Inga data",
-    "advanced": "Fler inställningar"
+    "advanced": "Fler inställningar",
+    "prev": "Tidigare"
   },
   "dash": {
     "title": "Instrumentbräda",
@@ -197,7 +198,10 @@
     "bulkEmpty": "Inga rader att lägga till (kolla mallen)",
     "duplicate": "Användarnamn eller e-postadress finns redan",
     "advBelong": "Medlemskap · roll · lösenord",
-    "totalN": "{{n}} användare"
+    "totalN": "{{n}} användare",
+    "colRefill": "Återkommande påfyllning",
+    "colBalance": "Nuvarande saldo",
+    "refillDefault": "Standard"
   },
   "groups": {
     "title": "Grupper",
@@ -248,7 +252,18 @@
     "grantFail": "Det gick inte att bevilja kredit.",
     "grantHintSuper": "Undantag för plattformsadministratörer. För integritet läggs samma belopp till automatiskt till den överordnade organisationspoolen.",
     "insufficientOrgPool": "Otillräckligt saldo i organisationens kreditpool.",
-    "grantHintOrg": "Dras av från din organisationspool och läggs till denna grupps pool. Kan inte överskrida organisationspoolens saldo."
+    "grantHintOrg": "Dras av från din organisationspool och läggs till denna grupps pool. Kan inte överskrida organisationspoolens saldo.",
+    "colRefill": "Återkommande påfyllning",
+    "deleteFail": "Det gick inte att ta bort",
+    "refillInterval": "Påfyllningscykel (dagar)",
+    "refillAmt": "Återkommande påfyllning (per cykel)",
+    "hasMembers": "Det här laget har fortfarande medlemmar. Flytta eller ta bort dem innan du tar bort dem.",
+    "carryover": "Överför oanvända krediter",
+    "initCredit": "Inledande krediter och återkommande påfyllning",
+    "cantDeleteDefault": "Standardlaget kan inte tas bort.",
+    "initCreditAmt": "Inledande poäng",
+    "refillDefault": "Standard",
+    "initCreditHint": "Valfritt allokera från organisationspoolen och ställ in en refill när du skapar teamet. Du kan också göra detta senare på teamets detaljsida."
   },
   "orgs": {
     "title": "Organisationer",
@@ -292,7 +307,11 @@
     "grantHint": "Tillämpas på organisationspoolen omedelbart och registreras i granskningsloggen.",
     "adminHintOpt": "Lämna tomt för att bara skapa gruppen \"Allmänt\" och tilldela en administratör senare, från Organisationsdetalj → Allmänt → Lägg till medlem med rollen Organisationsadministratör.",
     "grantAmount": "Belopp (C)",
-    "bulkDone": "Masstillagda {{n}}-organisationer"
+    "bulkDone": "Masstillagda {{n}}-organisationer",
+    "deleteFail": "Det gick inte att ta bort",
+    "colRefill": "Återkommande påfyllning",
+    "refillDefault": "Standard",
+    "hasUsers": "Denna organisation har fortfarande användare. Flytta eller ta bort dem innan du tar bort dem."
   },
   "billing": {
     "title": "Fakturering",
@@ -318,7 +337,12 @@
     "byUser": "Konsumtion per användare",
     "byOrg": "Förbrukning per org",
     "consumed": "Krediter",
-    "byGroup": "Konsumtion per grupp (showback)"
+    "byGroup": "Konsumtion per grupp (showback)",
+    "period7d": "Senaste 7 dagarna",
+    "periodAll": "Hela tiden",
+    "periodLastMonth": "Förra månaden",
+    "periodMonth": "Denna månad",
+    "periodNote": "Förbrukning och GPU-timmar som visas är vad som inträffade under den valda perioden, enligt reskontran. Budgetar och pooler är inte periodiserade."
   },
   "audit": {
     "title": "Revisionslogg",
@@ -476,7 +500,10 @@
     "impMissing": "Ange namn, ägare, NFS-server och sökväg.",
     "impOwnerHint": "Välj ett konto i listan för att importera.",
     "impOwnerPicked": "Valt: {{name}} ({{id}})",
-    "metricsOffNotice": "Övervakning (DCGM/Prometheus) är inte installerad, så GPU-användning och VRAM kan inte visas. Aktivera övervakning för att se realtidsmått."
+    "metricsOffNotice": "Övervakning (DCGM/Prometheus) är inte installerad, så GPU-användning och VRAM kan inte visas. Aktivera övervakning för att se realtidsmått.",
+    "cordon": "Avspärrning",
+    "noMetrics": "Inga mätvärden",
+    "uncordon": "Uncordon"
   },
   "mset": {
     "title": "Inställningar",
@@ -599,7 +626,21 @@
     "removed": "Borttagen från gruppen",
     "moveFail": "Flytten misslyckades",
     "moved": "Flyttade till {{group}}",
-    "removeConfirm": "Ta bort den här användaren från {{group}}."
+    "removeConfirm": "Ta bort den här användaren från {{group}}.",
+    "granted": "Beviljas {{n}} C",
+    "addFail": "Kunde inte lägga till",
+    "memberAdded": "Medlemskap har lagts till.",
+    "restore": "Återställa",
+    "suspend": "Uppskjuta",
+    "statusConfirm": "Detta ändrar användarens status.",
+    "grantAmount": "Krediter att bevilja (C; negativa avdrag)",
+    "noTeamsInOrg": "Denna organisation har inga lag.",
+    "grant": "Bevilja krediter",
+    "grantTitle": "Grant credits – {{name}}",
+    "grantFail": "Grant misslyckades",
+    "pickOrg": "Välj en organisation",
+    "addMembership": "Lägg till medlemskap",
+    "grantHint": "Tillämpas på det personliga saldot omedelbart och registreras i revisionsloggen som en engångsjustering."
   },
   "clusters": {
     "title": "Kluster",
@@ -699,7 +740,12 @@
     "extTitle": "Registrera extern bild",
     "webName": "Kanalnamn (valfritt)",
     "buildBtn": "Börja bygga",
-    "extRegistered": "Extern bild registrerad"
+    "extRegistered": "Extern bild registrerad",
+    "loading": "…",
+    "notCached": "Ej cachad",
+    "notFound": "Bilden hittades inte.",
+    "logsHint": "Laddar bygg- och skannaloggar.",
+    "info": "Bildinformation"
   },
   "anotify": {
     "title": "Aviseringar",
@@ -886,7 +932,23 @@
     "brandAccent": "Logotyp färg",
     "brandingNote": "Anpassa tjänstens namn och logotypfärg för din organisation. Tillämpas direkt på inloggning och konsolhuvud.",
     "brandName": "Tjänstens namn",
-    "brandAccentHint": "Lämna tomt för att använda temafärgen."
+    "brandAccentHint": "Lämna tomt för att använda temafärgen.",
+    "carryoverOn": "Överför oanvända krediter",
+    "carryoverOff": "Gå ut varje cykel",
+    "rechargeEnabled": "Aktivera återkommande påfyllning",
+    "rechargeCarryover": "Tillåt överföring",
+    "rechargeSaved": "Påfyllningsinställningar sparade.",
+    "brandSubtitle": "Texta",
+    "brandIcon": "Ikon",
+    "rechargeNote": "Plattformens standardpåfyllningscykel och överföringspolicy. Organisationer, team och individer kan välja en kortare cykel men aldrig en längre, och när en förälder inte tillåter överföring upphör oanvända krediter under den vid den gränsen.",
+    "rechargeInterval": "Standard påfyllningscykel (dagar) · gräns för lägre nivåer",
+    "rechargeTitle": "Återkommande kreditpåfyllning (standard och gräns)",
+    "brandIconClear": "Ta bort",
+    "brandIconTooBig": "Ikonen måste vara 120 kB eller mindre.",
+    "brandSubtitleHint": "Liten text bredvid logotypen. Lämna tomt för att dölja det.",
+    "brandIconUpload": "Ladda upp en ikon (valfritt)",
+    "brandIconUploadHint": "En uppladdad ikon har företräde framför Lucide-ikonen ovan. PNG eller SVG under 120 kB rekommenderas.",
+    "rechargeAmountHint": "Ställ in påfyllnadsbelopp per organisation, per team och per användare, cykler och överföringar på deras detaljsidor. En cykel kan aldrig vara längre än sin förälders."
   },
   "datasets": {
     "title": "Datauppsättningar",
@@ -932,7 +994,40 @@
     "dlHint": "När du är klar kan du tilldela nodlokala cacher nedan.",
     "dlTitle": "NFS-nedladdningsförlopp",
     "notCached": "Ej cachad",
-    "assignHint": "Välj vilka noder som cachelagrar denna datauppsättning. Den extraheras från NFS till nodlokal för omedelbar användning."
+    "assignHint": "Välj vilka noder som cachelagrar denna datauppsättning. Den extraheras från NFS till nodlokal för omedelbar användning.",
+    "phaseExtract": "Extrahera",
+    "descSaved": "Beskrivning sparad.",
+    "cacheFail": "Cachebegäran misslyckades",
+    "descFail": "Det gick inte att spara beskrivningen",
+    "notFound": "Dataset hittades inte.",
+    "description": "Beskrivning",
+    "info": "Datauppsättning info",
+    "descPh": "Beskriv denna datauppsättning",
+    "phaseDownload": "Laddar ner",
+    "phaseCopy": "Kopiering",
+    "sizeClassSaved": "Storleksklass sparad.",
+    "sizeClass": "Storleksklass",
+    "cache": "Nodcache",
+    "regNeedName": "Ange ett datauppsättningsnamn.",
+    "regNeedUrl": "Ange en URL.",
+    "regNeedFile": "Välj en fil från inkorgen.",
+    "regUrl": "URL (wget)",
+    "regNfs": "NFS-kopia (SCP)",
+    "regTitle": "Registrera dataset",
+    "regRefresh": "Uppdatera",
+    "upTaken": "En datauppsättning med det namnet finns redan.",
+    "regNfsHint": "Kopiera ett arkiv (zip, tar, tar.gz) till sökvägen nedan och välj sedan filen för att registrera den. Registrering flyttar den ut från inkorgen och extraherar den automatiskt.",
+    "regStarted": "Registrering påbörjad — spåra framsteg i listan.",
+    "regSizeClass": "Storleksklass",
+    "upScope": "Synlighet",
+    "registering": "Registrerar",
+    "regFail": "Registreringen misslyckades",
+    "extracting": "Extraherar...",
+    "regBusy": "Registrerar...",
+    "regUrlField": "Ladda ner URL",
+    "regUrlHint": "Servern laddar ner denna URL direkt - ingenting laddas upp från din webbläsare. Spåra framsteg i listan.",
+    "regInboxEmpty": "Inkorgen är tom. Kopiera en fil till sökvägen ovan och uppdatera sedan.",
+    "regInboxFile": "Inkorgsfil"
   },
   "announce": {
     "title": "Meddelanden",
@@ -1054,7 +1149,8 @@
     "everyone": "Alla användare",
     "searchUser": "Sök användare",
     "removeTitle": "Ta bort policy",
-    "pickTarget": "Välj mål"
+    "pickTarget": "Välj mål",
+    "capHint": "Maximalt tillåtet — GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · volym ≤ {{vol}}GiB · samtidiga sessioner ≤ {{sess}}"
   },
   "roles": {
     "org_admin": "Organisationsadministratör",
@@ -1070,7 +1166,16 @@
     "manage": "Hantera",
     "usersCapped": "visar första {{shown}} av {{total}}",
     "usersHint": "Roll är användarens roll inom sin grupp. Ändra det från den gruppens medlemshantering.",
-    "inGroup": "Hantera i grupp"
+    "inGroup": "Hantera i grupp",
+    "recurringAmount": "Krediter per cykel",
+    "recurringInterval": "Påfyllningscykel (dagar)",
+    "recurringCarryover": "Överföring",
+    "carryOn": "Överföra",
+    "carryOff": "Upphöra",
+    "recurringTitle": "Återkommande krediter",
+    "recurringSaved": "Återkommande krediter sparade.",
+    "recurringNote": "Fyller på organisationspoolen med detta belopp varje cykel (0 inaktiverar den).",
+    "maxIntervalHint": "Plattformsgräns: {{n}} dagar eller färre"
   },
   "gdetail": {
     "title": "Grupp",
@@ -1098,7 +1203,25 @@
     "needTarget": "Välj en målgrupp",
     "removed": "Tog bort {{name}}",
     "moveHint": "Rollen bär över. Kredit som tilldelas i den här gruppen gör det inte, och användningshistoriken förblir hos den här gruppen.",
-    "moved": "Flyttade {{name}} till {{group}}"
+    "moved": "Flyttade {{name}} till {{group}}",
+    "refilledNow": "Påfylld nu: +{{n}} C",
+    "refillCol": "Återkommande påfyllning",
+    "refillMenu": "Påfyllning",
+    "refillFail": "Påfyllning misslyckades",
+    "refillSaved": "Återkommande påfyllning sparad.",
+    "memberRefillSaved": "Återkommande påfyllning sparad",
+    "refillTitle": "Team återkommande påfyllning",
+    "refillCarryover": "Överför oanvända krediter",
+    "memberRefillSet": "Ställ in återkommande påfyllning",
+    "nextRefill": "Nästa påfyllning",
+    "noRecurring": "Ingen återkommande påfyllningsmängd är inställd",
+    "memberRefillTitle": "Återkommande påfyllning — {{name}}",
+    "noRecurringShort": "Ingen återkommande påfyllning",
+    "refillNow": "Fyll på nu",
+    "refillInterval": "Cykel (dagar) — lämna tomt för lagets standard",
+    "refillAmount": "Återkommande påfyllningsmängd (C)",
+    "memberRefillHint": "Detta belopp betalas in i medlemmens plånbok varje cykel. Använd \"Fyll på nu\" för att betala omedelbart.",
+    "refillInheritPh": "Ärvt"
   },
   "picker": {
     "allOrgs": "Alla organisationer",
@@ -1125,5 +1248,8 @@
   "brand": "Giosk konsol",
   "confirmTerminate": "Tvinga avbryta den här sessionen? Pågående arbete upphör omedelbart.",
   "confirmDelete": "Ta bort detta? Detta kan inte ångras.",
-  "confirmRemoveMember": "Vill du ta bort den här medlemmen från gruppen?"
+  "confirmRemoveMember": "Vill du ta bort den här medlemmen från gruppen?",
+  "paged": {
+    "range": "{{from}}–{{to}} av {{total}}"
+  }
 }

@@ -115,8 +115,8 @@ func main() {
 			MaxVramGB:             cfgStore.IntOr(systemconfig.KeyQuotaMaxVramGB, cfg.Quota.MaxVramGB),
 			MaxVolumeGiB:          cfgStore.IntOr(systemconfig.KeyQuotaMaxVolGiB, cfg.Quota.VolumeQuotaGB),
 			MaxConcurrentSessions: cfgStore.IntOr(systemconfig.KeyQuotaMaxSessions, cfg.Quota.MaxConcurrentSessions),
-			MaxStoppedSessions:    cfg.Quota.MaxStoppedSessions, // 전역 폴백(설치값; 계층 오버라이드는 정책 컬럼으로)
-			MaxEphemeralGiB:       cfg.Quota.MaxEphemeralGiB,    // 전역 폴백(런타임 오버라이드 키 없음 — 설치값 사용)
+			MaxStoppedSessions:    cfgStore.IntOr(systemconfig.KeyQuotaMaxStopped, cfg.Quota.MaxStoppedSessions),
+			MaxEphemeralGiB:       cfgStore.IntOr(systemconfig.KeyQuotaMaxEphemeral, cfg.Quota.MaxEphemeralGiB),
 		}
 	}
 	limitResolver := policy.NewResolver(policyRepo, orgSvc, globalQuota)
@@ -131,16 +131,16 @@ func main() {
 	sessionSvc.WithExpose(cfg.K8s.SessionExpose)                                              // 웹 노출 모드
 	sessionSvc.WithGateway(cfg.K8s.GatewaySecret, cfg.K8s.GatewayScheme, cfg.K8s.GatewayHost, // 접속 게이트웨이(단기 토큰)
 		cfg.K8s.GatewaySSHPort, cfg.K8s.SessionSSHDImage, cfg.K8s.SessionSSHDPubKey)
-	sessionSvc.WithGatewayProxyJump(cfg.K8s.GatewayJump)                                             // 외부 접속용 -J 점프 호스트(빈값=미표시)
-	sessionSvc.WithGatewaySSHKey([]byte(cfg.K8s.GatewaySSHKey))                                      // 물리 세션 웹터미널 SSH 관리키(빈값=물리 웹터미널 비활성)
-	sessionSvc.WithScratch(cfg.Storage.ScratchEnabled, cfg.Storage.ScratchHostPath)                  // 노드로컬 스크래치
-	sessionSvc.WithLocalHome(cfg.PhysicalNodes.Enabled, cfg.Storage.PhysicalHomeHost)                // 로컬 Home 특수 볼륨(hostPath+노드핀)
-	sessionSvc.WithUIDBase(cfg.PhysicalNodes.UIDBase)                                                // 컨테이너 안정 UID(물리 SSH 와 동일) → NFS 권한 일관
-	sessionSvc.WithSharedHome(cfg.Storage.SharedHome)                                                // 영속 home(~/nfs) 사용 여부(설치시 고정)
-	sessionSvc.WithLocalClass(cfg.Storage.LocalClass)                                                // 세션 전용 홈(/home/work) 로컬 스토리지클래스(속도 위해 노드로컬)
-	sessionSvc.WithMaxStopped(cfg.Quota.MaxStoppedSessions)                                          // 중단(대기) 세션 상한(로컬 홈 PVC 누적 방지)
-	sessionSvc.WithMemBurst(cfg.Quota.MemBurst)                                                      // 메모리 limit 배수(노드 RAM 고갈 → 남의 세션 축출 차단)
-	sessionSvc.WithHomeReap(func() (int, int) { // 중단 세션 홈 회수(T1) — 운영 정책이라 라이브 read
+	sessionSvc.WithGatewayProxyJump(cfg.K8s.GatewayJump)                              // 외부 접속용 -J 점프 호스트(빈값=미표시)
+	sessionSvc.WithGatewaySSHKey([]byte(cfg.K8s.GatewaySSHKey))                       // 물리 세션 웹터미널 SSH 관리키(빈값=물리 웹터미널 비활성)
+	sessionSvc.WithScratch(cfg.Storage.ScratchEnabled, cfg.Storage.ScratchHostPath)   // 노드로컬 스크래치
+	sessionSvc.WithLocalHome(cfg.PhysicalNodes.Enabled, cfg.Storage.PhysicalHomeHost) // 로컬 Home 특수 볼륨(hostPath+노드핀)
+	sessionSvc.WithUIDBase(cfg.PhysicalNodes.UIDBase)                                 // 컨테이너 안정 UID(물리 SSH 와 동일) → NFS 권한 일관
+	sessionSvc.WithSharedHome(cfg.Storage.SharedHome)                                 // 영속 home(~/nfs) 사용 여부(설치시 고정)
+	sessionSvc.WithLocalClass(cfg.Storage.LocalClass)                                 // 세션 전용 홈(/home/work) 로컬 스토리지클래스(속도 위해 노드로컬)
+	sessionSvc.WithMaxStopped(cfg.Quota.MaxStoppedSessions)                           // 중단(대기) 세션 상한(로컬 홈 PVC 누적 방지)
+	sessionSvc.WithMemBurst(cfg.Quota.MemBurst)                                       // 메모리 limit 배수(노드 RAM 고갈 → 남의 세션 축출 차단)
+	sessionSvc.WithHomeReap(func() (int, int) {                                       // 중단 세션 홈 회수(T1) — 운영 정책이라 라이브 read
 		return cfgStore.IntOr(systemconfig.KeyStoppedTTLDays, cfg.Quota.StoppedTTLDays),
 			cfgStore.IntOr(systemconfig.KeyHomeReapPct, cfg.Quota.HomeReapPct)
 	})
@@ -367,6 +367,9 @@ func main() {
 					systemconfig.KeyQuotaMaxVramGB:   g.MaxVramGB,
 					systemconfig.KeyQuotaMaxVolGiB:   g.MaxVolumeGiB,
 					systemconfig.KeyQuotaMaxSessions: g.MaxConcurrentSessions,
+					// 0 도 유효한 설정이다(중단 상한·임시 디스크는 0=무제한) → 그대로 저장한다.
+					systemconfig.KeyQuotaMaxStopped:   g.MaxStoppedSessions,
+					systemconfig.KeyQuotaMaxEphemeral: g.MaxEphemeralGiB,
 				} {
 					if err := cfgStore.Set(k, strconv.Itoa(v)); err != nil {
 						return err
