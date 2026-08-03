@@ -12,6 +12,7 @@ import Advanced, { Req } from '../../../components/console/Advanced';
 import { useToast } from '../../../components/console/Toast';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { useAuth } from '../../../context/AuthContext';
+import { activeLevelOf } from '../../../config/consoleRoles';
 import { getUsers, grantUserCredit, updateUserStatus, createUser, bulkCreateUsers } from '../../../api/console/misc';
 import { getOrgs, getGroups } from '../../../api/console/governance';
 import { c, cU } from '../../../lib/credit';
@@ -26,8 +27,8 @@ const PAGE_SIZE = 50;
 export default function Users() {
   const { t } = useTranslation('consoleAdmin');
   const { config } = useSystemConfig();
-  const { user } = useAuth();
-  const isPlatform = user?.role === 'admin'; // 생성/정지/부여는 플랫폼 전용(백엔드도 /admin 게이트)
+  const { user, activeScope } = useAuth();
+  const isPlatform = activeLevelOf(user, activeScope) === 'platform'; // 생성/정지/부여는 플랫폼 전용(백엔드도 /admin 게이트)
   const creditMode = config.billing.mode === 'credit';
   const [data, setData] = useState(null);
   const [q, setQ] = useState('');

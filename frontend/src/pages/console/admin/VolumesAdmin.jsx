@@ -12,14 +12,15 @@ import PagedTable from '../../../components/console/PagedTable';
 import UserPicker from '../../../components/console/UserPicker';
 import { useToast } from '../../../components/console/Toast';
 import { useAuth } from '../../../context/AuthContext';
+import { activeLevelOf } from '../../../config/consoleRoles';
 import { getAdminVolumes, getScopedVolumes, getAdminStorage, importNfsVolume } from '../../../api/console/nodes';
 
 const statusVariant = { bound: 'ok', pending: 'wait', failed: 'err' };
 
 export default function VolumesAdmin() {
   const { t } = useTranslation('consoleAdmin');
-  const { user } = useAuth();
-  const isPlatform = user?.role === 'admin';
+  const { user, activeScope } = useAuth();
+  const isPlatform = activeLevelOf(user, activeScope) === 'platform';
   const navigate = useNavigate();
   const { toast } = useToast();
 

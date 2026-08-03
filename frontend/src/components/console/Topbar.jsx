@@ -18,7 +18,7 @@ import { cU } from '../../lib/credit';
 // 콘솔 탑바 (.topbar 그리드 영역).
 export default function Topbar({ variant, ns }) {
   const { t } = useTranslation(ns);
-  const { user } = useAuth();
+  const { user, activeScope } = useAuth();
   const { summary, setSummary } = useConsole();
   const { config } = useSystemConfig();
   const creditMode = config.billing.mode === 'credit';
@@ -74,7 +74,8 @@ export default function Topbar({ variant, ns }) {
     getWallet()
       .then((w) => setSummary((s) => ({ ...s, credit: w.balance })))
       .catch(() => {});
-  }, [variant, isAdmin, creditMode, setSummary]);
+    // activeScope 포함 — 팀(스코프) 전환 시 새 팀 지갑 잔액으로 배지를 다시 채운다.
+  }, [variant, isAdmin, creditMode, setSummary, activeScope]);
   // 모드 토글 노출 여부: 관리 권한(플랫폼 admin 또는 org/group 스코프)이 있어야 관리자↔사용자 전환 가능.
   const hasRoles = isAdmin || (user?.scopes?.length > 0);
 

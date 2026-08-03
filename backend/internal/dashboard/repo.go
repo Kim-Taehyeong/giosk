@@ -8,7 +8,7 @@ import (
 
 // Repository는 대시보드 집계(읽기 전용 프로젝션) 계약.
 type Repository interface {
-	UserWallet(userID int64) (balance, cap int)
+	UserWallet(userID, groupID int64) (balance, cap int)
 	UserActiveSessions(userID int64) int
 	ActiveSessions() int
 	NameCredits(scope string, limit int) []NameCredit  // scope: group | org
@@ -80,7 +80,16 @@ func NewRepository(db *gorm.DB) Repository { return &gormRepo{db: db} }
 
 // UserWallet은 (잔액, 전체) 를 반환한다. 전체 = 현재 잔액 + 누적 소모(= 지금까지 부여받은 총 크레딧).
 // monthly_cap 은 별도 한도 개념이라 대시보드의 "전체/남은" 표시엔 쓰지 않는다.
-func (r *gormRepo) UserWallet(userID int64) (balance, total int) {
+// UserWallet은 활성 팀(groupID>0)의 지갑 잔액/총액을 반환한다. groupID=0 이면 전 팀 합산(폴백).
+// per-membership 지갑이라 대시보드/배지/알림이 모두 활성 팀 기준으로 일치해야 한다(안 그러면
+// 대시보드는 합산 999,814, 배지는 활성 팀 0 처럼 어긋난다).
+func (r *gormRepo) UserWallet(userID, groupID int64) (balance, total int) {
+	if groupID > 0 {
+		r.db.Raw(`SELECT COALESCE(balance,0) FROM user_wallets WHERE user_id=? AND group_id=?`, userID, groupID).Scan(&balance)
+		var consumed int
+		r.db.Raw(`SELECT COALESCE(SUM(-amount),0) FROM credit_transactions WHERE user_id=? AND group_id=? AND type='consume'`, userID, groupID).Scan(&consumed)
+		return balance, balance + consumed
+	}
 	r.db.Raw(`SELECT COALESCE(SUM(balance),0) FROM user_wallets WHERE user_id = ?`, userID).Scan(&balance)
 	var consumed int
 	r.db.Raw(`SELECT COALESCE(SUM(-amount),0) FROM credit_transactions WHERE user_id = ? AND type = 'consume'`, userID).Scan(&consumed)

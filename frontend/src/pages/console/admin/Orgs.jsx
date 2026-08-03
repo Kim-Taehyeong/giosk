@@ -14,13 +14,14 @@ import { c, cU } from '../../../lib/credit';
 import { useToast } from '../../../components/console/Toast';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { useAuth } from '../../../context/AuthContext';
+import { activeLevelOf } from '../../../config/consoleRoles';
 import { getOrgs, createOrg } from '../../../api/console/governance';
 
 export default function Orgs() {
   const { t } = useTranslation('consoleAdmin');
   const { config } = useSystemConfig();
-  const { user } = useAuth();
-  const isPlatform = user?.role === 'admin'; // 조직 생성은 최고관리자 전용. 매니저는 자기 조직만 열람.
+  const { user, activeScope } = useAuth();
+  const isPlatform = activeLevelOf(user, activeScope) === 'platform'; // 조직 생성은 최고관리자 전용. 매니저(또는 스코프 채택)는 자기 조직만 열람.
   const creditMode = config.billing.mode === 'credit';
   const navigate = useNavigate();
   const [rows, setRows] = useState(null);

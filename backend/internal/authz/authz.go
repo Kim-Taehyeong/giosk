@@ -118,7 +118,7 @@ const scopeKey = "giosk.scope"
 
 // RequireManager는 플랫폼/조직/그룹 관리자를 통과시키고 Scope 를 컨텍스트에 넣는다.
 // 일반 멤버는 403. 이후 핸들러는 authz.CurrentScope(c) 로 범위를 읽는다.
-func RequireManager(sr ScopeReader) gin.HandlerFunc {
+func RequireManager(sr ScopeReader, og OrgOfGroupReader) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		u := auth.CurrentUser(c)
 		if u == nil {
@@ -126,7 +126,21 @@ func RequireManager(sr ScopeReader) gin.HandlerFunc {
 			return
 		}
 		if u.Role == auth.RoleAdmin {
-			c.Set(scopeKey, Scope{Level: "platform"})
+			// 최고관리자는 전권이라 기본 platform. 단 콘솔에서 특정 조직/그룹을 "역할"로 고르면
+			// (X-Console-Scope) 그 스코프로 내려가서 그 담당자 시점으로 화면을 좁힌다.
+			// admin 은 ManagerScopes 에 없으므로 소속 검증 없이 헤더를 신뢰(전권), 부모 조직만 보강.
+			chosen := Scope{Level: "platform"}
+			if sel := c.GetHeader("X-Console-Scope"); sel != "" && sel != "platform" {
+				if s, ok := parseScopeSel(sel); ok {
+					if s.Level == "group" && s.OrgID == 0 && og != nil {
+						if orgID, found := og.OrgOfGroup(s.GroupID); found {
+							s.OrgID = orgID
+						}
+					}
+					chosen = s
+				}
+			}
+			c.Set(scopeKey, chosen)
 			c.Next()
 			return
 		}
@@ -149,6 +163,27 @@ func RequireManager(sr ScopeReader) gin.HandlerFunc {
 		c.Set(scopeKey, chosen)
 		c.Next()
 	}
+}
+
+// parseScopeSel은 "org:10" / "group:2" 를 소속 검증 없이 Scope 로 파싱한다(최고관리자 전용 — 전권이라
+// 보유 집합 대조가 필요 없다). 형식 오류면 (zero, false). group 의 OrgID 는 호출측에서 보강.
+func parseScopeSel(sel string) (Scope, bool) {
+	i := strings.IndexByte(sel, ':')
+	if i <= 0 {
+		return Scope{}, false
+	}
+	level := sel[:i]
+	id, err := strconv.ParseInt(sel[i+1:], 10, 64)
+	if err != nil || id <= 0 {
+		return Scope{}, false
+	}
+	switch level {
+	case "org":
+		return Scope{Level: "org", OrgID: id}, true
+	case "group":
+		return Scope{Level: "group", GroupID: id}, true
+	}
+	return Scope{}, false
 }
 
 // matchScope는 "org:10" / "group:2" 선택 문자열을 보유 스코프 집합에서 찾는다.

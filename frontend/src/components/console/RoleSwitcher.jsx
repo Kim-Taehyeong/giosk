@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Building2, FolderKanban, ChevronsUpDown, Check, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { getAllOrgs, getAllGroups } from '../../api/console/governance';
+import { getConsoleScope } from '../../api/client';
 
 // scopeKey — 백엔드 X-Console-Scope 형식("org:10"|"group:2").
 const keyOf = (s) => `${s.level}:${s.level === 'org' ? s.orgId : s.groupId}`;
@@ -30,18 +32,42 @@ export default function RoleSwitcher({ ns }) {
   const isAdmin = user?.role === 'admin';
   const scopes = user?.scopes || [];
 
-  const opts = [];
-  if (isAdmin) opts.push({ id: 'platform', icon: ShieldCheck, label: t('topbar.rolePlatform', { defaultValue: '플랫폼 전체' }), sub: t('topbar.rolePlatformSub', { defaultValue: '최고 관리자' }) });
-  scopes.filter((s) => s.level === 'org').forEach((s) => opts.push({ id: keyOf(s), scope: s, icon: Building2, label: s.orgName || '—', sub: t('topbar.scopeOrg', { defaultValue: '조직' }) }));
-  scopes.filter((s) => s.level === 'group').forEach((s) => opts.push({ id: keyOf(s), scope: s, icon: FolderKanban, label: s.groupName || '—', sub: t('topbar.scopeGroup', { defaultValue: '그룹' }) }));
+  // 최고관리자는 임의 조직/그룹을 "역할"로 채택할 수 있어야 하므로 전체 목록을 불러온다
+  // (본인 scopes 는 비어 있음). 일반 매니저는 보유 scopes 만.
+  const [adminOrgs, setAdminOrgs] = useState([]);
+  const [adminGroups, setAdminGroups] = useState([]);
+  useEffect(() => {
+    if (!isAdmin) return;
+    getAllOrgs().then((d) => setAdminOrgs(d.items)).catch(() => {});
+    getAllGroups().then((d) => setAdminGroups(d.items)).catch(() => {});
+  }, [isAdmin]);
 
-  if (opts.length === 0) return null; // 스코프 없는 순수 사용자 → OrgGroupSelector 가 대신 표시
+  const opts = [];
+  if (isAdmin) {
+    opts.push({ id: 'platform', icon: ShieldCheck, label: t('topbar.rolePlatform', { defaultValue: '플랫폼 전체' }), sub: t('topbar.rolePlatformSub', { defaultValue: '최고 관리자' }) });
+    adminOrgs.forEach((o) => opts.push({ id: `org:${o.id}`, icon: Building2, label: o.displayName || o.name || '—', sub: t('topbar.scopeOrg', { defaultValue: '조직' }) }));
+    adminGroups.forEach((g) => opts.push({ id: `group:${g.id}`, icon: FolderKanban, label: g.displayName || g.name || '—', sub: (g.orgName ? `${t('topbar.scopeGroup', { defaultValue: '그룹' })} · ${g.orgName}` : t('topbar.scopeGroup', { defaultValue: '그룹' })) }));
+  } else {
+    scopes.filter((s) => s.level === 'org').forEach((s) => opts.push({ id: keyOf(s), scope: s, icon: Building2, label: s.orgName || '—', sub: t('topbar.scopeOrg', { defaultValue: '조직' }) }));
+    scopes.filter((s) => s.level === 'group').forEach((s) => opts.push({ id: keyOf(s), scope: s, icon: FolderKanban, label: s.groupName || '—', sub: t('topbar.scopeGroup', { defaultValue: '그룹' }) }));
+  }
 
   // 현재 스코프.
   let currentId;
   if (activeScope && opts.some((o) => o.id === activeScope)) currentId = activeScope;
   else if (isAdmin) currentId = 'platform';
-  else currentId = opts[0].id;
+  else currentId = opts[0]?.id;
+
+  // 이 뷰(관리자)의 선택 스코프를 실제 요청 헤더와 동기화한다. 사용자 뷰(OrgGroupSelector)가
+  // 같은 스코프 키를 group:N 으로 덮어썼을 수 있으므로, 관리자 뷰로 돌아오면 표시=헤더가 어긋나지 않게 맞춘다.
+  useEffect(() => {
+    if (!currentId) return;
+    const want = currentId === 'platform' ? null : currentId;
+    if (getConsoleScope() !== (want || null)) setActiveScope(want);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentId]);
+
+  if (opts.length === 0) return null; // 스코프 없는 순수 사용자 → OrgGroupSelector 가 대신 표시
   const current = opts.find((o) => o.id === currentId) || opts[0];
 
   const inAdmin = location.pathname.startsWith('/console/admin');
@@ -66,7 +92,7 @@ export default function RoleSwitcher({ ns }) {
         <div className="scope-menu" style={{
           position: 'absolute', top: '100%', left: 0, marginTop: 6, minWidth: 240, zIndex: 50,
           background: 'var(--surface, #fff)', border: '1px solid var(--border, #e5e7eb)', borderRadius: 8,
-          boxShadow: '0 8px 24px rgba(0,0,0,.12)', padding: 6,
+          boxShadow: '0 8px 24px rgba(0,0,0,.12)', padding: 6, maxHeight: 380, overflowY: 'auto',
         }}>
           <div className="muted" style={{ fontSize: 11, padding: '4px 8px' }}>{t('topbar.switchScope', { defaultValue: '조직 / 스코프 전환' })}</div>
           {opts.map((o) => {

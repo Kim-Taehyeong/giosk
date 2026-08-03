@@ -93,9 +93,9 @@ func (s *Service) scopedSessionStats(orgID, groupID int64) SessionStats {
 	}
 }
 
-// User는 사용자 대시보드를 만든다.
-func (s *Service) User(ctx context.Context, userID int64) UserDashboard {
-	balance, cap := s.repo.UserWallet(userID)
+// User는 사용자 대시보드를 만든다. groupID=활성 팀(스코프); 잔액/총액을 그 팀 지갑으로 산정.
+func (s *Service) User(ctx context.Context, userID, groupID int64) UserDashboard {
+	balance, cap := s.repo.UserWallet(userID, groupID)
 	used, total := s.userVRAM(ctx, userID)
 	burn := s.repo.UserConsume7d(userID) / 7 // 일일 평균 소비(최근 7일)
 	eta := 0
