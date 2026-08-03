@@ -350,6 +350,138 @@ func (s *Service) Register(userID int64, req RegisterReq) error {
 	return nil
 }
 
+// ErrUploadDisabled — NFS 마운트 미설정 등으로 파일 업로드 불가.
+var ErrUploadDisabled = fmt.Errorf("upload disabled")
+
+// ErrChunkOffset — 청크 offset 이 서버 현재 크기와 불일치(클라이언트가 반환된 offset 으로 재동기화해야 함).
+var ErrChunkOffset = fmt.Errorf("chunk offset mismatch")
+
+// validName은 데이터셋 이름이 NFS 경로로 안전한지 확인한다(경로 조작·구분자 차단).
+func validName(name string) error {
+	if name == "" || strings.ContainsAny(name, "/\\") || strings.Contains(name, "..") {
+		return fmt.Errorf("잘못된 데이터셋 이름")
+	}
+	return nil
+}
+
+// partPath는 업로드 중 아카이브의 NFS 경로(<mount>/dataset/<name>/<archive>)를 만든다.
+func (s *Service) partPath(name, filename string) string {
+	return filepath.Join(s.nfsMount, "dataset", name, safeArchiveName(filename))
+}
+
+// UploadInit은 청크 업로드를 시작(또는 재개)한다. 디렉터리/파트 파일을 준비하고 현재 크기(=재개 offset)를 반환한다.
+// Cloudflare 100MB 리밋을 청크로 우회하고, 파트 파일 크기 자체가 재개 지점이라 새로고침 후에도 이어올릴 수 있다.
+func (s *Service) UploadInit(name, filename string) (int64, error) {
+	if !s.UploadEnabled() {
+		return 0, ErrUploadDisabled
+	}
+	if err := validName(name); err != nil {
+		return 0, err
+	}
+	if s.repo.NameTaken(name) {
+		return 0, ErrNameTaken
+	}
+	dir := filepath.Join(s.nfsMount, "dataset", name)
+	if err := os.MkdirAll(dir, 0o777); err != nil {
+		return 0, fmt.Errorf("데이터셋 디렉터리 생성 실패: %w", err)
+	}
+	p := s.partPath(name, filename)
+	if fi, err := os.Stat(p); err == nil {
+		return fi.Size(), nil // 재개: 이미 올라온 만큼 이어서
+	}
+	f, err := os.Create(p)
+	if err != nil {
+		return 0, fmt.Errorf("업로드 파일 생성 실패: %w", err)
+	}
+	_ = f.Close()
+	return 0, nil
+}
+
+// UploadChunk는 offset 위치에 청크를 이어붙인다. offset 이 서버 현재 크기와 다르면 ErrChunkOffset 과
+// 함께 실제 크기를 돌려줘 클라이언트가 그 지점부터 재전송하게 한다. 성공 시 새 크기를 반환한다.
+func (s *Service) UploadChunk(name, filename string, offset int64, r io.Reader) (int64, error) {
+	if !s.UploadEnabled() {
+		return 0, ErrUploadDisabled
+	}
+	if err := validName(name); err != nil {
+		return 0, err
+	}
+	p := s.partPath(name, filename)
+	f, err := os.OpenFile(p, os.O_WRONLY, 0o644)
+	if err != nil {
+		return 0, err
+	}
+	defer f.Close()
+	fi, err := f.Stat()
+	if err != nil {
+		return 0, err
+	}
+	if offset != fi.Size() {
+		return fi.Size(), ErrChunkOffset // 클라이언트가 반환된 크기부터 재전송
+	}
+	if _, err := f.Seek(offset, io.SeekStart); err != nil {
+		return fi.Size(), err
+	}
+	n, err := io.Copy(f, r)
+	if err != nil {
+		return offset + n, err
+	}
+	return offset + n, nil
+}
+
+// UploadStatus는 현재까지 올라온 바이트(파트 파일 크기)를 반환한다(재개 지점 조회). 없으면 0.
+func (s *Service) UploadStatus(name, filename string) int64 {
+	if err := validName(name); err != nil {
+		return 0
+	}
+	fi, err := os.Stat(s.partPath(name, filename))
+	if err != nil {
+		return 0
+	}
+	return fi.Size()
+}
+
+// UploadFinish는 청크 전송이 끝난 파트 파일을 데이터셋으로 확정한다 — 크기 검증 후 레코드 생성(loading) +
+// 해제 Job(dl-ds-<id>). 이후 리컨실러가 PVC 바인딩+ready.
+func (s *Service) UploadFinish(ctx context.Context, userID int64, name, scope, ownerName, filename string, size int64) error {
+	if !s.UploadEnabled() {
+		return ErrUploadDisabled
+	}
+	if err := validName(name); err != nil {
+		return err
+	}
+	if s.repo.NameTaken(name) {
+		return ErrNameTaken
+	}
+	p := s.partPath(name, filename)
+	fi, err := os.Stat(p)
+	if err != nil {
+		return fmt.Errorf("업로드 파일이 없습니다: %w", err)
+	}
+	if size > 0 && fi.Size() != size {
+		return fmt.Errorf("불완전한 업로드입니다(%d/%d 바이트)", fi.Size(), size)
+	}
+	if scope == "" {
+		scope = ScopeGlobal
+	}
+	status := StatusActive
+	if scope == ScopePersonal {
+		status = StatusPrivate
+	}
+	d := &Dataset{
+		Name: name, Scope: scope, Owner: ownerName, OwnerUserID: &userID,
+		SizeBytes: fi.Size() * 3, Status: status, LoadStatus: "loading",
+	}
+	if err := s.repo.CreateDataset(d); err != nil {
+		return err
+	}
+	if err := s.prov.RunDatasetExtract(ctx, s.namespace, fmt.Sprintf("dl-ds-%d", d.ID), s.nfsServer, s.nfsBase, d.Name); err != nil {
+		log.Printf("[dataset] 업로드 해제 Job 실패 ds %d: %v", d.ID, err)
+		_ = s.repo.SetLoadStatus(d.ID, "failed")
+	}
+	return nil
+}
+
 // safeArchiveName은 업로드 파일명을 안전한 기본명으로 정리한다(경로 조작 방지).
 // 허용 확장자(zip/tar/tar.gz/tgz)만; 그 외는 단일 파일로 그대로 저장(해제 잡이 스킵).
 func safeArchiveName(fn string) string {

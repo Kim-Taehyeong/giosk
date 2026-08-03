@@ -78,6 +78,74 @@ func (h *Handler) Upload(c *gin.Context) {
 	httpx.Created(c, gin.H{"ok": true})
 }
 
+// ── 청크(이어올리기) 업로드 — Cloudflare 100MB 리밋 우회 + 새로고침 재개 ──
+
+// UploadInit: {name, filename} → {offset} (재개 지점).
+func (h *Handler) UploadInit(c *gin.Context) {
+	var req struct{ Name, Filename string }
+	if err := c.ShouldBindJSON(&req); err != nil || strings.TrimSpace(req.Name) == "" {
+		httpx.BadRequest(c, "name·filename 필요")
+		return
+	}
+	off, err := h.svc.UploadInit(strings.TrimSpace(req.Name), req.Filename)
+	if err != nil {
+		h.uploadErr(c, err)
+		return
+	}
+	httpx.OK(c, gin.H{"offset": off})
+}
+
+// UploadChunk: 본문=청크 바이트, 쿼리 name·filename·offset → {offset} (새 크기). offset 불일치면 409+서버 offset.
+func (h *Handler) UploadChunk(c *gin.Context) {
+	name := strings.TrimSpace(c.Query("name"))
+	filename := c.Query("filename")
+	offset, _ := strconv.ParseInt(c.Query("offset"), 10, 64)
+	newOff, err := h.svc.UploadChunk(name, filename, offset, c.Request.Body)
+	if errors.Is(err, ErrChunkOffset) {
+		httpx.Err(c, 409, "offset_mismatch", strconv.FormatInt(newOff, 10)) // 클라이언트가 이 offset 부터 재전송
+		return
+	}
+	if err != nil {
+		h.uploadErr(c, err)
+		return
+	}
+	httpx.OK(c, gin.H{"offset": newOff})
+}
+
+// UploadStatus: ?name=&filename= → {offset} (재개용, 새로고침 후 조회).
+func (h *Handler) UploadStatus(c *gin.Context) {
+	httpx.OK(c, gin.H{"offset": h.svc.UploadStatus(strings.TrimSpace(c.Query("name")), c.Query("filename"))})
+}
+
+// UploadFinish: {name, scope, filename, size} → 데이터셋 확정(해제 시작).
+func (h *Handler) UploadFinish(c *gin.Context) {
+	var req struct {
+		Name, Scope, Filename string
+		Size                  int64
+	}
+	if err := c.ShouldBindJSON(&req); err != nil || strings.TrimSpace(req.Name) == "" {
+		httpx.BadRequest(c, "name 필요")
+		return
+	}
+	u := auth.CurrentUser(c)
+	if err := h.svc.UploadFinish(c.Request.Context(), u.ID, strings.TrimSpace(req.Name), req.Scope, u.Username, req.Filename, req.Size); err != nil {
+		h.uploadErr(c, err)
+		return
+	}
+	httpx.Created(c, gin.H{"ok": true})
+}
+
+func (h *Handler) uploadErr(c *gin.Context, err error) {
+	switch {
+	case errors.Is(err, ErrNameTaken):
+		httpx.Err(c, 409, "name_taken", "이미 같은 이름의 데이터셋이 있습니다")
+	case errors.Is(err, ErrUploadDisabled):
+		httpx.Err(c, 503, "upload_disabled", "파일 업로드가 비활성화되어 있습니다(데이터셋 NFS 마운트 필요)")
+	default:
+		httpx.Internal(c, "업로드 실패: "+err.Error())
+	}
+}
+
 func (h *Handler) Delete(c *gin.Context) {
 	if err := h.svc.Delete(idParam(c)); err != nil {
 		httpx.Internal(c, "삭제 실패")

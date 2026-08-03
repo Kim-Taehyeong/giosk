@@ -203,11 +203,14 @@ func main() {
 	userMetric := func(ctx context.Context, metric string) (map[int64]float64, bool) {
 		switch metric {
 		case "credit_balance":
+			// per-membership 지갑(유저×팀)이라 유저당 행이 여러 개다. 유저 단위로 합산해야
+			// 한 유저의 빈 팀(0) 행이 다른 팀 잔액을 덮어써 잘못된 "0" 알림을 반복 발화하지 않는다.
+			// (팀별 저잔액은 세션 과금이 그 팀 지갑을 소진하면 RunBiller 가 직접 중단시킨다.)
 			var rows []struct {
 				UserID  int64
 				Balance int
 			}
-			if err := db.Raw(`SELECT user_id, balance FROM user_wallets`).Scan(&rows).Error; err != nil {
+			if err := db.Raw(`SELECT user_id, COALESCE(SUM(balance),0) AS balance FROM user_wallets GROUP BY user_id`).Scan(&rows).Error; err != nil {
 				return nil, false
 			}
 			out := make(map[int64]float64, len(rows))
@@ -246,7 +249,7 @@ func main() {
 		},
 		Wallet:   func(id int64) (any, error) { return walletSvc.MyWallet(id, 0) },
 		Volumes:  func(id int64) (any, error) { return volumeSvc.List(id) },
-		Sessions: func(ctx context.Context, id int64) (any, error) { return sessionSvc.List(ctx, id) },
+		Sessions: func(ctx context.Context, id int64) (any, error) { return sessionSvc.List(ctx, id, 0) },
 		Datasets: func(ctx context.Context, id int64) (any, error) { return datasetSvc.List(ctx, id) },
 		JoinReqs: func(id int64) (any, error) { return groupSvc.MyJoinRequests(id) },
 		Usage: func(id int64) any { // billing.ByUser 전체에서 대상 사용자 1행(누적 GPU시간·소비)

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"strconv"
+	"strings"
 
 	"giosk/internal/auth"
 	"giosk/internal/k8s"
@@ -35,12 +36,22 @@ func (h *Handler) Create(c *gin.Context) {
 }
 
 func (h *Handler) List(c *gin.Context) {
-	items, err := h.svc.List(c.Request.Context(), uid(c))
+	items, err := h.svc.List(c.Request.Context(), uid(c), scopeGroup(c))
 	if err != nil {
 		httpx.Internal(c, "세션 조회 실패")
 		return
 	}
 	httpx.OK(c, gin.H{"items": items})
+}
+
+// scopeGroup은 X-Console-Scope("group:N")에서 활성 팀 id 를 읽는다(없으면 0=전 팀).
+// 그룹 단위 분리: 활성 팀 컨텍스트에선 그 팀 세션만 조회한다.
+func scopeGroup(c *gin.Context) int64 {
+	if sel := c.GetHeader("X-Console-Scope"); strings.HasPrefix(sel, "group:") {
+		id, _ := strconv.ParseInt(sel[len("group:"):], 10, 64)
+		return id
+	}
+	return 0
 }
 
 func (h *Handler) Connection(c *gin.Context) {
