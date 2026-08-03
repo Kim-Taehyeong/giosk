@@ -9,6 +9,7 @@ func RegisterUser(authed gin.IRouter, h *Handler) {
 	authed.DELETE("/instances/:id", h.Delete)
 	authed.POST("/instances/:id/stop", h.Stop)
 	authed.POST("/instances/:id/start", h.Start)
+	authed.POST("/instances/:id/reconfigure", h.Reconfigure) // 중단 세션 자원 변경(GPU 붙이기/떼기)
 	authed.POST("/instances/:id/extend", h.Extend)
 	authed.GET("/instances/:id/connection", h.Connection)
 	authed.POST("/instances/:id/access", h.Access)

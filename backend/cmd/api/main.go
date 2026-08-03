@@ -144,6 +144,19 @@ func main() {
 		return cfgStore.IntOr(systemconfig.KeyStoppedTTLDays, cfg.Quota.StoppedTTLDays),
 			cfgStore.IntOr(systemconfig.KeyHomeReapPct, cfg.Quota.HomeReapPct)
 	})
+	// 가용성 관문 — 자리가 없으면 생성·재시작 모두 거절(대기열 없음).
+	// 판정 소스는 세션 마법사가 보는 Availability 와 동일해야 화면과 API 가 갈라지지 않는다.
+	sessionSvc.WithCapacityGate(func(ctx context.Context, p session.PlaceSpec) bool {
+		return resourceSvc.CanPlace(ctx, resource.PlaceReq{
+			GpuMode: p.GpuMode, GpuType: p.GpuType, GpuCount: p.GpuCount,
+			VramMB: p.VramMB, CorePercent: p.CorePercent, Node: p.Node,
+		})
+	})
+	// 배치 잠금 — "관문 통과 → 예약"을 한 번에 하나만 지나게 한다(동시 요청이 같은 자리를 두 번 받는 것 차단).
+	// API replica 가 늘어나도 유효하도록 DB 이름잠금을 쓴다(프로세스 뮤텍스는 세션 서비스가 항상 함께 건다).
+	sessionSvc.WithAdmissionLock(func(ctx context.Context) (func(), error) {
+		return store.NamedLock(ctx, db, "giosk_session_admission", 10*time.Second)
+	})
 	sessionSvc.WithSurge(cfg.Billing.Credit.Pricing == "dynamic", cfg.Billing.Credit.SurgeIncrement, // 동적/서지 가격
 		func(ctx context.Context, gt string) (int, int) {
 			for _, t := range resourceSvc.Availability(ctx).ByType {

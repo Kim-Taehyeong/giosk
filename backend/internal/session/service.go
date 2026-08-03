@@ -2,9 +2,11 @@ package session
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"strconv"
+	"sync"
 	"time"
 
 	"giosk/internal/audit"
@@ -98,6 +100,16 @@ type Service struct {
 	surgeDynamic   bool                                                        // 동적(서지) 가격 활성
 	surgeIncrement int                                                         // 최대 가산 크레딧/시간(가용성 0일 때)
 	availFn        func(ctx context.Context, gpuType string) (free, total int) // GPU 타입별 가용 조회
+	// canPlaceFn은 "지금 이 세션이 들어갈 자리가 있는가"를 답한다(대기열 없음 정책의 관문).
+	// 생성·재시작 두 경로가 같은 함수를 타야 규칙이 화면마다 갈리지 않는다.
+	canPlaceFn func(ctx context.Context, p PlaceSpec) bool
+
+	// admitMu·admitLock은 "관문 통과 → 예약 기록"을 한 번에 하나만 지나게 한다.
+	// 이 구간을 열어두면 동시에 들어온 요청들이 모두 같은 여유를 보고 통과해(TOCTOU)
+	// 뒤에 온 세션이 Pending 으로 매달린다 — 대기열을 두지 않는 제품에서 가장 나쁜 상태다.
+	// admitMu 는 프로세스 안, admitLock 은 replica 를 넘는 잠금(주입 없으면 프로세스 안까지만).
+	admitMu   sync.Mutex
+	admitLock func(ctx context.Context) (release func(), err error)
 
 	scratchEnabled  bool   // 노드로컬 스크래치 마운트 활성
 	scratchHostPath string // 스크래치 루트(/scratch). 계정폴더 = <root>/<username>
@@ -147,6 +159,68 @@ func (s *Service) WithGatewaySSHKey(pemKey []byte) *Service {
 func (s *Service) WithGatewayProxyJump(jump string) *Service { s.gatewayJump = jump; return s }
 
 // WithSurge는 동적/서지 가격(가용성↓→단가↑)을 설정한다. dynamic=false면 정적 단가.
+// WithCapacityGate는 가용성 관문을 주입한다. 미주입이면 게이트 미적용(기존 동작).
+func (s *Service) WithCapacityGate(fn func(ctx context.Context, p PlaceSpec) bool) *Service {
+	s.canPlaceFn = fn
+	return s
+}
+
+// WithAdmissionLock은 replica 를 넘는 배치 잠금을 주입한다(예: MySQL GET_LOCK).
+// 미주입이면 프로세스 안 뮤텍스만으로도 단일 replica 배포에서는 충분하다.
+func (s *Service) WithAdmissionLock(fn func(ctx context.Context) (func(), error)) *Service {
+	s.admitLock = fn
+	return s
+}
+
+// admit은 "검사 → 예약"을 상호배제 구간에서 실행한다. fn 안에서 관문(상한·크레딧·가용성)을 통과시키고
+// 반드시 예약까지(=세션 행 기록/phase 전이) 마쳐야 한다 — 그래야 다음 요청이 이 자리를 다시 보지 않는다.
+// Pod 생성·PVC 대기 같은 느린 작업은 fn 밖에서 한다(잠금을 오래 쥐면 전체가 직렬화된다).
+func (s *Service) admit(ctx context.Context, fn func() error) error {
+	s.admitMu.Lock()
+	defer s.admitMu.Unlock()
+	if s.admitLock != nil {
+		release, err := s.admitLock(ctx)
+		if err == nil {
+			defer release()
+		} else {
+			// 분산 잠금을 못 얻어도 진행한다 — 프로세스 안 뮤텍스는 이미 쥐었고, 잠금 배관 문제로
+			// 세션 생성을 통째로 막는 편이 더 나쁘다. 다만 조용히 넘어가지는 않는다.
+			log.Printf("[session] admission lock unavailable, falling back to in-process lock: %v", err)
+		}
+	}
+	return fn()
+}
+
+// PlaceSpec은 가용성 관문에 넘기는 배치 요청이다. Node 가 비면 클러스터 전체,
+// 채워지면 그 노드 한 대 안에서만 자리를 묻는다(노드 고정 세션).
+type PlaceSpec struct {
+	Node        string
+	GpuMode     string
+	GpuType     string
+	GpuCount    int
+	VramMB      int
+	CorePercent int
+}
+
+// checkCapacity는 세션 사양으로 관문을 통과시킨다. 자리가 없으면 ErrNoCapacity.
+func (s *Service) checkCapacity(ctx context.Context, sess *Session) error {
+	return s.checkCapacityOn(ctx, sess, "")
+}
+
+// checkCapacityOn은 node 를 지정해 그 노드 안에서만 자리를 묻는다(빈 문자열이면 전체).
+func (s *Service) checkCapacityOn(ctx context.Context, sess *Session, node string) error {
+	if s.canPlaceFn == nil || sess == nil || sess.Env == "ssh" {
+		return nil // 물리(SSH)는 임대 경로가 따로 판정한다(ErrLeaseUnavailable)
+	}
+	if s.canPlaceFn(ctx, PlaceSpec{
+		Node: node, GpuMode: sess.GpuMode, GpuType: sess.GpuType,
+		GpuCount: sess.GpuCount, VramMB: sess.VramMB, CorePercent: sess.CorePercent,
+	}) {
+		return nil
+	}
+	return ErrNoCapacity
+}
+
 func (s *Service) WithSurge(dynamic bool, increment int, avail func(ctx context.Context, gpuType string) (int, int)) *Service {
 	s.surgeDynamic, s.surgeIncrement, s.availFn = dynamic, increment, avail
 	return s
@@ -296,6 +370,16 @@ func (s *Service) checkHardLimits(userID int64, sess *Session) error {
 	if lim.MaxConcurrentSessions > 0 && s.repo.CountActive(userID) >= lim.MaxConcurrentSessions {
 		return ErrSessionLimit
 	}
+	return s.checkResourceLimits(userID, sess)
+}
+
+// checkResourceLimits는 사양 자체의 상한(GPU 개수·VRAM)만 본다 — 세션 수(동시·중단) 상한은 제외.
+// 중단 세션 재구성은 세션 수를 늘리지 않으므로 개수 상한을 다시 물으면 안 된다(이미 세어진 세션).
+func (s *Service) checkResourceLimits(userID int64, sess *Session) error {
+	if s.limits == nil {
+		return nil
+	}
+	lim := s.limits.Resolve(userID)
 	if lim.MaxGpu > 0 && sess.GpuCount > lim.MaxGpu {
 		return ErrHardLimit
 	}
@@ -403,14 +487,25 @@ func (s *Service) Create(ctx context.Context, userID int64, username string, req
 	if s.charger != nil && sess.GroupID == nil {
 		return nil, ErrMustJoinTeam
 	}
-	if err := s.checkHardLimits(userID, sess); err != nil {
-		return nil, err // 1차: 하드 정책(크레딧 무관 절대 벽)
-	}
-	if err := s.checkAffordable(userID, gidOf(sess), sess.PricePerHour); err != nil {
-		return nil, err // 2차: 크레딧 모드 잔액 부족 → 생성 거부
-	}
 	imageRef, err := s.repo.ImageRef(req.ImageID)
 	if err != nil {
+		return nil, err
+	}
+	// 관문 통과와 예약(세션 행 기록)은 한 덩어리로 처리한다. 예전에는 Pod 를 다 만든 뒤에야 행을 남겨,
+	// 그 사이에 들어온 요청이 같은 자리를 또 승인받고 뒤에 온 세션이 Pending 으로 매달렸다.
+	// 이제 행이 곧 예약이다 — 이 시점부터 다른 요청의 가용성 계산에 즉시 반영된다.
+	if err := s.admit(ctx, func() error {
+		if err := s.checkHardLimits(userID, sess); err != nil {
+			return err // 1차: 하드 정책(크레딧 무관 절대 벽)
+		}
+		if err := s.checkAffordable(userID, gidOf(sess), sess.PricePerHour); err != nil {
+			return err // 2차: 크레딧 모드 잔액 부족 → 생성 거부
+		}
+		if err := s.checkCapacity(ctx, sess); err != nil {
+			return err // 3차: 지금 들어갈 자리 — 없으면 대기시키지 않고 거절
+		}
+		return s.repo.Create(sess) // 예약 확정
+	}); err != nil {
 		return nil, err
 	}
 	ns := s.namespaceOf(sess)
@@ -425,7 +520,7 @@ func (s *Service) Create(ctx context.Context, userID int64, username string, req
 	if req.LocalHomeNode != "" {
 		lh, err := s.resolveLocalHome(ctx, userID, username, req.LocalHomeNode)
 		if err != nil {
-			return nil, err
+			return nil, s.rollback(ctx, sess, err)
 		}
 		mounts = append(mounts, lh) // 물리노드 로컬 디스크 home → /home/work (노드핀, 노드 디스크에 영속)
 		requireNode = req.LocalHomeNode
@@ -433,7 +528,7 @@ func (s *Service) Create(ctx context.Context, userID int64, username string, req
 		// 세션 전용 영속 홈: 중단해도 데이터 유지, 삭제 시 함께 제거. (예전 emptyDir=중단 시 유실이었음)
 		homePVC, err := s.ensureSessionHome(ctx, ns, sess.InstanceID)
 		if err != nil {
-			return nil, err
+			return nil, s.rollback(ctx, sess, err)
 		}
 		mounts = append(mounts, k8s.VolMountSpec{PVCName: homePVC, MountPath: homeMount})
 	}
@@ -442,7 +537,7 @@ func (s *Service) Create(ctx context.Context, userID int64, username string, req
 	if s.sharedHome {
 		persistPVC, err := s.ensureHome(ctx, ns, userID)
 		if err != nil {
-			return nil, err
+			return nil, s.rollback(ctx, sess, err)
 		}
 		mounts = append(mounts, k8s.VolMountSpec{PVCName: persistPVC, MountPath: homeMount + "/nfs"})
 	}
@@ -464,14 +559,21 @@ func (s *Service) Create(ctx context.Context, userID int64, username string, req
 		preferNodes = s.repo.CachedNodes(req.ImageID)
 	}
 	if err := s.provision(ctx, ns, sess, imageRef, "", mounts, preferNodes, requireNode); err != nil {
-		return nil, err // home 은 mounts(emptyDir/hostPath)로 들어가므로 HomePVC 는 비움
-	}
-	if err := s.repo.Create(sess); err != nil {
-		return nil, err
+		return nil, s.rollback(ctx, sess, err) // home 은 mounts(emptyDir/hostPath)로 들어가므로 HomePVC 는 비움
 	}
 	s.attachMounts(sess.ID, userID, req)
 	s.recordCreate(userID, username, sess.InstanceID)
 	return sess, nil
+}
+
+// rollback은 예약(세션 행)을 만든 뒤 프로비저닝이 실패했을 때 그 예약을 되돌린다.
+// 되돌리지 않으면 아무것도 뜨지 않은 세션이 남아 남의 자리를 계속 막는다(유령 예약).
+// 원래 실패 사유를 그대로 돌려주고, 정리 실패는 로그로만 남긴다(사용자에게 알릴 것은 원인 하나).
+func (s *Service) rollback(ctx context.Context, sess *Session, cause error) error {
+	if err := s.deleteSession(ctx, sess); err != nil {
+		log.Printf("[session] rollback failed for %s: %v (cause: %v)", sess.InstanceID, err, cause)
+	}
+	return cause
 }
 
 // createSSH는 물리노드 임대 세션을 만든다(Pod/PVC 없음; node-agent 가 물리 Home 프로비저닝).
@@ -495,16 +597,24 @@ func (s *Service) createSSH(ctx context.Context, userID int64, username string, 
 		StartedAt: &now,
 	}
 	sess.PricePerHour = s.priceOf(ctx, sess) // 노드 대여 단가(=GPU타입 단가×노드 GPU수)
-	if err := s.checkHardLimits(userID, sess); err != nil {
-		return nil, err // 1차: 하드 정책(노드 GPU수가 상한 초과면 임대 거부)
-	}
-	if err := s.checkAffordable(userID, gidOf(sess), sess.PricePerHour); err != nil {
-		return nil, err // 2차: 크레딧 모드 잔액 부족 → 물리 임대 거부
-	}
-	if err := s.leaser.CreateLeaseFor(ctx, req.Node, userID, sess.InstanceID); err != nil {
-		return nil, err
-	}
-	if err := s.repo.Create(sess); err != nil {
+	// 노드 임대 자체는 이미 원자적이지만(AcquireLease), 동시 세션 상한 검사와 세션 행 기록까지
+	// 한 구간에 묶어야 "동시에 두 개가 상한을 통과"하는 창이 사라진다.
+	if err := s.admit(ctx, func() error {
+		if err := s.checkHardLimits(userID, sess); err != nil {
+			return err // 1차: 하드 정책(노드 GPU수가 상한 초과면 임대 거부)
+		}
+		if err := s.checkAffordable(userID, gidOf(sess), sess.PricePerHour); err != nil {
+			return err // 2차: 크레딧 모드 잔액 부족 → 물리 임대 거부
+		}
+		if err := s.leaser.CreateLeaseFor(ctx, req.Node, userID, sess.InstanceID); err != nil {
+			return err
+		}
+		if err := s.repo.Create(sess); err != nil {
+			_ = s.leaser.ReleaseLeaseFor(ctx, sess.InstanceID) // 행이 없으면 반납할 길이 없어진다(유령 임대)
+			return err
+		}
+		return nil
+	}); err != nil {
 		return nil, err
 	}
 	s.attachMounts(sess.ID, userID, req)
@@ -518,6 +628,15 @@ func (s *Service) recordCreate(userID int64, username, instanceID string) {
 	}
 	uid := userID
 	_ = s.audit.Insert(&audit.Log{ActorID: &uid, ActorUsername: username, Action: "session_create", Target: instanceID, Result: "success"})
+}
+
+// recordAct는 세션 대상 감사 로그 1건을 남긴다(사용자명은 저장소에서 조회).
+func (s *Service) recordAct(userID int64, action, instanceID string) {
+	if s.audit == nil {
+		return
+	}
+	uid := userID
+	_ = s.audit.Insert(&audit.Log{ActorID: &uid, ActorUsername: s.usernameOf(userID), Action: action, Target: instanceID, Result: "success"})
 }
 
 // homePVCPrefix는 세션 전용 홈 PVC 이름 접두사. 고아 탐지(T0)가 이 접두사로 훑는다.
@@ -1542,7 +1661,16 @@ func (s *Service) Start(ctx context.Context, instanceID string, userID int64) er
 		if s.leaser == nil {
 			return ErrLeaseUnavailable
 		}
+		// 물리도 같은 CAS 로 중복 시작을 막는다(임대 자체는 원자적이지만 과금 시작점이 두 번 리셋되는 것 방지).
+		ok, err := s.repo.ClaimForStart(instanceID)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return ErrAlreadyStarting
+		}
 		if err := s.leaser.CreateLeaseFor(ctx, sess.Node, sess.UserID, instanceID); err != nil {
+			_ = s.repo.SetPhase(instanceID, PhaseStopped)
 			return err
 		}
 		_ = s.repo.ResetBilling(instanceID, s.now()) // 재개 = 새 가동분
@@ -1555,18 +1683,49 @@ func (s *Service) Start(ctx context.Context, instanceID string, userID int64) er
 	if err != nil {
 		return err
 	}
+	// 재시작도 생성과 같은 관문을 탄다. 예전에는 여기에 검사가 없어, 자리가 없어도 Pod 가 Pending 으로
+	// 매달려 "보이지 않는 대기열"이 됐다 — 신규 생성은 막히는데 중단 세션을 가진 사람만 줄을 설 수 있어
+	// 중단 세션이 사실상 대기표가 되는 역효과가 있었다.
+	//
+	// 판정은 이 세션이 묶인 노드 기준이다. 홈(/home/work)이 노드 로컬이라 재개는 그 노드에서만 되므로,
+	// 클러스터 전체 여유로 통과시키면 "승인은 됐는데 뜨지는 않는" Pending 이 된다.
+	// phase 전이(=예약)를 관문과 같은 구간에서 끝내, 다음 요청이 이 자리를 다시 보지 않게 한다.
+	if err := s.admit(ctx, func() error {
+		if err := s.checkCapacityOn(ctx, sess, sess.Node); err != nil {
+			if sess.Node != "" && s.checkCapacity(ctx, sess) == nil {
+				return ErrNodePinned // 클러스터엔 자리가 있는데 이 노드만 막힌 경우 — 사용자가 할 일이 다르다
+			}
+			return err
+		}
+		// 예약 확정 — stopped 일 때만 성공하는 조건부 전이라 연타·동시 요청이 같은 세션을 두 번 띄우지 못한다.
+		ok, err := s.repo.ClaimForStart(instanceID)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return ErrAlreadyStarting
+		}
+		return nil
+	}); err != nil {
+		return err
+	}
+	// 여기서부터 실패하면 예약(phase)을 중단 상태로 되돌린다 — 안 그러면 뜨지도 않은 세션이 자리를 문다.
+	resume := func(err error) error {
+		_ = s.repo.SetPhase(instanceID, PhaseStopped)
+		return err
+	}
 	ns := s.namespaceOf(sess)
 	// 재시작도 동일: 세션 전용 영속 홈 재마운트(중단 전 데이터 그대로 복원) + (sharedHome 시) ~/nfs 영속.
 	mounts := s.restartMounts(ctx, ns, sess.UserID, sess.ID)
 	homePVC, err := s.ensureSessionHome(ctx, ns, sess.InstanceID)
 	if err != nil {
-		return err
+		return resume(err)
 	}
 	mounts = append(mounts, k8s.VolMountSpec{PVCName: homePVC, MountPath: homeMount})
 	if s.sharedHome {
 		persistPVC, err := s.ensureHome(ctx, ns, sess.UserID)
 		if err != nil {
-			return err
+			return resume(err)
 		}
 		mounts = append(mounts, k8s.VolMountSpec{PVCName: persistPVC, MountPath: homeMount + "/nfs"})
 	}
@@ -1578,14 +1737,112 @@ func (s *Service) Start(ctx context.Context, instanceID string, userID int64) er
 		preferNodes = s.repo.CachedNodes(*sess.ImageID)
 	}
 	if err := s.provision(ctx, ns, sess, imageRef, "", mounts, preferNodes, dsNode); err != nil {
-		return err
+		return resume(err)
 	}
 	// 중단 구간 종료 — 마지막 델타까지 스토리지 정산한 뒤 시작점을 비운다.
 	// ResetBilling 은 billed_credits 만 0으로 되돌리므로 스토리지 누적(storage_billed_credits)은 보존된다.
 	s.settleStorage(ctx, sess)
 	_ = s.repo.ClearStopped(instanceID, 0)
 	_ = s.repo.ResetBilling(instanceID, s.now()) // 재개 = 새 가동분
-	return s.repo.SetPhase(instanceID, PhaseProvisioning)
+	return nil                                   // phase 는 관문에서 이미 provisioning 으로 예약됐다
+}
+
+// Reconfigure는 중단된 컨테이너 세션의 계산자원을 바꾼다(CPU로 데이터 준비 → GPU 붙여 학습, 그 반대도).
+// 홈(/home/work)·볼륨·데이터셋은 그대로 두고 "다음에 어떤 자원으로 뜰지"만 갱신한다 —
+// 세션을 새로 만들면 준비해 둔 데이터를 다시 옮겨야 하므로, 자원만 갈아끼우는 길을 준다.
+//
+// 실행 중에는 불가하다(ErrNotStopped): GPU 자원은 Pod 스펙에 박히고 k8s 는 이를 in-place 로 못 바꾼다.
+// 생성과 같은 관문(하드 상한 → 크레딧 → 가용성)을 다시 통과해야 하며, 가용성은 클러스터 전체가 아니라
+// 이 세션이 묶인 노드 기준으로 묻는다 — 홈 PVC(local-path)가 그 노드에 바인딩돼 있어 다른 노드로는
+// 뜰 수 없기 때문이다(전체 기준으로 통과시키면 재개가 영구 Pending 이 된다).
+func (s *Service) Reconfigure(ctx context.Context, instanceID string, userID int64, req ReconfigureReq) (*Session, error) {
+	sess, err := s.repo.Get(instanceID, userID)
+	if err != nil {
+		return nil, err
+	}
+	if sess.Env == "ssh" {
+		return nil, ErrReconfigureUnavailable // 물리 임대는 노드 통째 대여 — 바꿀 사양이 없다
+	}
+	if sess.Phase != PhaseStopped {
+		return nil, ErrNotStopped
+	}
+	next, err := s.nextSpec(ctx, sess, req)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.checkResourceLimits(userID, next); err != nil {
+		return nil, err
+	}
+	if err := s.checkAffordable(userID, gidOf(next), next.PricePerHour); err != nil {
+		return nil, err
+	}
+	if err := s.checkCapacityOn(ctx, next, sess.Node); err != nil {
+		// 노드 기준으로만 막혔다면 원인은 "자리 없음"이 아니라 "홈이 이 노드에 묶여 있음"이다.
+		// 둘은 사용자가 할 일이 다르다(기다린다 vs 새 세션으로 옮긴다) → 오류를 갈라 알려준다.
+		if sess.Node != "" && s.checkCapacity(ctx, next) == nil {
+			return nil, ErrNodePinned
+		}
+		return nil, err
+	}
+	if err := s.repo.UpdateSpec(instanceID, next); err != nil {
+		return nil, err
+	}
+	s.recordAct(userID, "session_reconfigure", instanceID)
+	if req.Start {
+		if err := s.Start(ctx, instanceID, userID); err != nil {
+			return next, err // 사양은 이미 저장됨 — 사용자는 재시작만 다시 누르면 된다
+		}
+	}
+	return next, nil
+}
+
+// nextSpec은 재구성 요청을 검증·정규화해 "다음 사양"을 만든다(생성 경로 buildSession 과 같은 규칙).
+func (s *Service) nextSpec(ctx context.Context, sess *Session, req ReconfigureReq) (*Session, error) {
+	next := *sess
+	switch req.GpuMode {
+	case "cpu", "shared", "exclusive":
+	default:
+		return nil, ErrBadSpec
+	}
+	next.GpuMode, next.GpuType, next.GpuCount = req.GpuMode, req.GpuType, req.GpuCount
+	next.OfferingID, next.VramMB, next.CorePercent = req.OfferingID, 0, 0
+	if req.ImageID != nil {
+		if _, err := s.repo.ImageRef(*req.ImageID); err != nil {
+			return nil, ErrBadSpec // 없는 이미지
+		}
+		next.ImageID = req.ImageID
+	}
+	if next.ImageID == nil {
+		return nil, ErrBadSpec // 컨테이너 세션은 이미지가 있어야 뜬다
+	}
+	if next.OfferingID != nil {
+		if err := s.applyOffering(&next, *next.OfferingID); err != nil {
+			return nil, err
+		}
+	}
+	// 이하 정규화는 buildSession 과 동일 — 화면에 표기되는 사양과 실제 Pod 스펙이 갈라지지 않게.
+	if next.GpuMode != "shared" {
+		next.VramMB, next.CorePercent = 0, 0
+		next.OfferingID = nil // 오퍼링은 분할 전용 개념(전용/CPU 로 가면 남겨두지 않는다)
+	}
+	if next.GpuMode == "cpu" {
+		next.GpuType, next.GpuCount = "", 0
+		next.CPUCores, next.MemGB = 0, 0 // CPU 모드는 GPU 지분 개념이 없어 보장을 걸지 않는다
+	} else if next.GpuType == "" {
+		return nil, ErrBadSpec // GPU 모드인데 모델이 없으면 스케줄 불가
+	}
+	if next.GpuMode == "exclusive" && next.GpuCount < 1 {
+		next.GpuCount = 1
+	}
+	if next.GpuMode == "shared" {
+		next.GpuCount = 1
+		if next.VramMB <= 0 || next.CorePercent <= 0 {
+			return nil, ErrBadSpec // 분할은 오퍼링(VRAM·코어%)이 있어야 한다
+		}
+	}
+	s.applyGuarantee(ctx, &next) // CPU·메모리 보장은 서버가 GPU 지분에서 산출(클라이언트 값 불신)
+	next.PricePerHour = s.priceOf(ctx, &next)
+	return &next, nil
 }
 
 // restartMounts는 재시작 시 세션에 이미 붙어있던 볼륨을 다시 해석해 복원한다(권한 재판정 포함).
@@ -2004,9 +2261,44 @@ func (s *Service) RunPhaseReconciler(ctx context.Context, interval time.Duration
 			}
 			for i := range rows {
 				s.refreshLive(ctx, &rows[i])
+				s.reapUnschedulable(ctx, &rows[i])
 			}
 		}
 	}
+}
+
+// unschedulableGrace는 "스케줄 안 됨"을 실패로 볼 때까지 기다리는 시간.
+// 짧은 미스케줄은 정상이다(PVC 바인딩·이미지 풀·노드 재기동 중) — 그 창은 봐주고,
+// 그보다 오래 매달리면 대기열이 되므로 정리한다.
+const unschedulableGrace = 3 * time.Minute
+
+// reapUnschedulable은 노드를 못 잡고 매달린 세션을 중단시킨다.
+//
+// 관문(CanPlace)이 있어도 완벽하진 않다 — CPU/메모리·볼륨 노드 어피니티·taint 처럼 관문이 보지 않는
+// 이유로도 스케줄은 실패할 수 있다. 그때 Pod 를 그대로 두면 사용자에겐 "준비 중"으로만 보이는
+// 무기한 대기가 된다(이 제품이 두지 않기로 한 바로 그 상태). 차라리 중단시켜 사유를 남기고,
+// 사용자가 다시 시도하거나 다른 자원을 고르게 한다. 자리는 즉시 남에게 돌아간다.
+func (s *Service) reapUnschedulable(ctx context.Context, sess *Session) {
+	if sess.Env == "ssh" || sess.Phase != PhaseProvisioning || sess.Node != "" {
+		return // 물리 세션·이미 배치된 세션은 대상 아님
+	}
+	since := sess.StartedAt
+	if since == nil || s.now().Sub(*since) < unschedulableGrace {
+		return
+	}
+	st, err := s.prov.PodStatus(ctx, s.namespaceOf(sess), sess.InstanceID)
+	if errors.Is(err, k8s.ErrNotFound) {
+		// Pod 가 없는데 준비 중으로 남은 세션 — 외부에서 지워졌거나 생성이 중간에 끊긴 경우다.
+		// 이 상태로 두면 아무것도 뜨지 않은 세션이 영원히 남의 자리를 문다(유령 예약).
+		s.autoStop(ctx, sess, "session_orphaned",
+			fmt.Sprintf("[scheduler] stopped %s — pod missing for %s", sess.InstanceID, unschedulableGrace))
+		return
+	}
+	if err != nil || st == nil || !st.Unschedulable {
+		return
+	}
+	s.autoStop(ctx, sess, "session_unschedulable",
+		fmt.Sprintf("[scheduler] stopped %s — unschedulable for %s: %s", sess.InstanceID, unschedulableGrace, st.Reason))
 }
 
 // idleStop은 유휴 세션을 정지한다(자동 정지 공통 경로 사용).

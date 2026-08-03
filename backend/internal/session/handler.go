@@ -124,6 +124,21 @@ func (h *Handler) Audit(c *gin.Context) {
 	httpx.OK(c, gin.H{"items": items})
 }
 
+// Reconfigure는 중단된 세션의 계산자원을 바꾼다(GPU 붙이기/떼기). start=true 면 적용 후 재개.
+func (h *Handler) Reconfigure(c *gin.Context) {
+	var req ReconfigureReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		httpx.BadRequest(c, "본문 오류")
+		return
+	}
+	sess, err := h.svc.Reconfigure(c.Request.Context(), c.Param("id"), uid(c), req)
+	if err != nil {
+		h.writeErr(c, err, "세션 재구성 실패")
+		return
+	}
+	httpx.OK(c, sess)
+}
+
 func (h *Handler) Stop(c *gin.Context)  { h.act(c, h.svc.Stop, "정지 실패") }
 func (h *Handler) Start(c *gin.Context) { h.act(c, h.svc.Start, "시작 실패") }
 
@@ -177,6 +192,18 @@ func (h *Handler) writeErr(c *gin.Context, err error, msg string) {
 		httpx.Err(c, 400, "must_join_team", "세션을 만들려면 먼저 팀에 소속되어야 합니다")
 	case errors.Is(err, ErrHardLimit):
 		httpx.Err(c, 403, "hard_limit", "허용된 리소스 상한(GPU·VRAM)을 초과했습니다")
+	case errors.Is(err, ErrNotStopped):
+		httpx.Err(c, 409, "not_stopped", "실행 중에는 자원을 바꿀 수 없습니다. 세션을 중단한 뒤 다시 시도하세요")
+	case errors.Is(err, ErrReconfigureUnavailable):
+		httpx.Err(c, 409, "reconfigure_unavailable", "이 세션은 자원을 바꿀 수 없습니다")
+	case errors.Is(err, ErrAlreadyStarting):
+		httpx.Err(c, 409, "already_starting", "이미 시작 중인 세션입니다")
+	case errors.Is(err, ErrNodePinned):
+		httpx.Err(c, 409, "node_pinned", "이 세션의 홈 디스크가 특정 노드에 있어 그 노드에서만 재개됩니다. 해당 노드에서 쓸 수 있는 GPU를 선택하세요")
+	case errors.Is(err, ErrBadSpec):
+		httpx.Err(c, 400, "bad_spec", "요청한 자원 사양이 올바르지 않습니다")
+	case errors.Is(err, ErrNoCapacity):
+		httpx.Err(c, 409, "no_capacity", "지금은 사용 가능한 GPU가 없습니다. 잠시 후 다시 시도하거나 다른 오퍼링을 선택하세요")
 	case errors.Is(err, k8s.ErrNoCluster):
 		httpx.Err(c, 503, "k8s_unavailable", "클러스터를 사용할 수 없습니다")
 	default:

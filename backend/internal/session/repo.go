@@ -37,6 +37,28 @@ var ErrMustJoinTeam = errors.New("must belong to a team")
 // ErrHardLimit는 하드 리소스 상한(GPU 개수·VRAM 등, 크레딧 무관) 초과로 세션 생성 거부.
 var ErrHardLimit = errors.New("hard resource limit exceeded")
 
+// ErrNoCapacity는 지금 그 GPU 를 넣을 자리가 없어 세션 생성·재시작을 거부할 때.
+// 이 제품은 대기열을 두지 않는다 — 자리가 없으면 Pending 으로 매달아 두는 대신 즉시 거절하고
+// 사용자가 다시 시도할지 다른 오퍼링을 고를지 결정하게 한다(순서 정책 없이 매달아 두면
+// 보이지 않는 새치기 줄이 생긴다).
+var ErrNoCapacity = errors.New("no capacity")
+
+// 세션 재구성(중단 상태에서 GPU 붙이기/떼기) 관련 오류.
+var (
+	// ErrNotStopped는 실행 중 세션의 사양을 바꾸려 할 때. 컨테이너 스펙(GPU 자원)은 Pod 생성 시
+	// 확정되므로 실행 중에는 바꿀 수 없다 — 중단 후 재구성해 재개하는 경로만 허용한다.
+	ErrNotStopped = errors.New("session is not stopped")
+	// ErrReconfigureUnavailable는 재구성 대상이 아닌 세션(물리 SSH 임대 — 노드 통째 대여라 사양 개념이 없다).
+	ErrReconfigureUnavailable = errors.New("reconfigure unavailable")
+	// ErrBadSpec은 요청 사양이 유효하지 않을 때(알 수 없는 모드, GPU 모드인데 GPU 타입 없음 등).
+	ErrBadSpec = errors.New("invalid spec")
+	// ErrAlreadyStarting은 이미 시작(전이) 중인 세션을 또 시작하려 할 때 — 버튼 연타·중복 요청.
+	ErrAlreadyStarting = errors.New("session already starting")
+	// ErrNodePinned는 클러스터에는 자리가 있지만 이 세션이 묶인 노드에는 그 사양을 넣을 수 없을 때.
+	// 세션 홈(/home/work)은 노드 로컬 디스크(local-path)라 세션은 그 노드에서만 재개된다.
+	ErrNodePinned = errors.New("session pinned to node")
+)
+
 // Repository는 session 영속성 계약. 이미지/오퍼링 스펙은 read 프로젝션으로 조회.
 type Repository interface {
 	Create(s *Session) error
@@ -44,6 +66,10 @@ type Repository interface {
 	Get(instanceID string, userID int64) (*Session, error)
 	UpdateLive(instanceID, phase, node, ip string) error
 	SetPhase(instanceID, phase string) error
+	UpdateSpec(instanceID string, s *Session) error // 중단 세션 계산자원 재구성(GPU 붙이기/떼기)
+	// ClaimForStart는 stopped → provisioning 전이를 조건부(CAS)로 시도한다(false=이미 누가 시작함).
+	// 재시작 버튼 연타·동시 요청이 같은 세션을 두 번 띄우는 것을 DB 수준에서 막는다.
+	ClaimForStart(instanceID string) (bool, error)
 	SetBilled(instanceID string, billed int) error                                 // 정산 누적 갱신
 	RecordGpuUsage(userID, groupID int64, ref string, seconds, gpuCount int) error // 사용시간 원장 적립(세션 삭제와 무관)
 	ResetBilling(instanceID string, startedAt time.Time) error                     // 재개 시 가동 시작/정산 초기화
@@ -151,6 +177,39 @@ func (r *gormRepo) UpdateLive(instanceID, phase, node, ip string) error {
 
 func (r *gormRepo) SetPhase(instanceID, phase string) error {
 	return r.db.Model(&Session{}).Where("instance_id = ?", instanceID).Update("phase", phase).Error
+}
+
+// UpdateSpec은 중단 세션의 계산자원(모드·GPU·오퍼링·이미지·보장 CPU/Mem·단가)만 갱신한다.
+// 홈/볼륨/데이터셋·과금 누적·phase 는 건드리지 않는다 — 재구성은 "무엇으로 다시 뜰지"만 바꾼다.
+// offering_id/image_id 는 nil 로 지우는 경우(CPU 전환)가 있어 map 갱신을 쓴다(zero value 무시 방지).
+func (r *gormRepo) UpdateSpec(instanceID string, s *Session) error {
+	var offering, image any
+	if s.OfferingID != nil {
+		offering = *s.OfferingID
+	}
+	if s.ImageID != nil {
+		image = *s.ImageID
+	}
+	return r.db.Model(&Session{}).Where("instance_id = ?", instanceID).Updates(map[string]any{
+		"gpu_mode":       s.GpuMode,
+		"gpu_type":       s.GpuType,
+		"gpu_count":      s.GpuCount,
+		"offering_id":    offering,
+		"image_id":       image,
+		"vram_mb":        s.VramMB,
+		"core_percent":   s.CorePercent,
+		"cpu_cores":      s.CPUCores,
+		"mem_gb":         s.MemGB,
+		"price_per_hour": s.PricePerHour,
+	}).Error
+}
+
+func (r *gormRepo) ClaimForStart(instanceID string) (bool, error) {
+	res := r.db.Exec(`UPDATE sessions SET phase='provisioning' WHERE instance_id = ? AND phase='stopped'`, instanceID)
+	if res.Error != nil {
+		return false, res.Error
+	}
+	return res.RowsAffected > 0, nil
 }
 
 func (r *gormRepo) SetBilled(instanceID string, billed int) error {
