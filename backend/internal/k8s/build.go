@@ -139,10 +139,13 @@ func (c *Client) RunDatasetFetch(ctx context.Context, ns, jobName, nfsServer, nf
 	_ = c.DeleteBuildJob(ctx, ns, jobName)
 	dir := "/nfs/dataset/" + name
 	// 백그라운드 curl + 2초마다 파일 크기를 "PROGRESS <bytes>" 로 로그에 출력 → API 가 로그를 파싱해 진행률(%) 산출.
-	// (Prometheus 스크랩 주기에 의존하지 않는 실측 진행률)
+	// (Prometheus 스크랩 주기에 의존하지 않는 실측 진행률). 다운로드 후 아카이브면 제자리 해제하되
+	// 원본 아카이브는 보존한다 — slow 마운트는 이 폴더를 그대로 쓰므로 해제본이 NFS 에 있어야 세션이 바로
+	// 읽고, fast 캐싱은 이 아카이브(zip) 하나만 노드로 복사해 로컬에서 해제한다(대용량 다중파일 복사 회피).
 	script := "set -e; mkdir -p '" + dir + "'"
 	if url != "" {
 		script += `
+apk add --no-cache curl unzip tar >/dev/null 2>&1 || true
 fn=$(basename "` + url + `" | sed 's/[?].*//'); [ -z "$fn" ] && fn=download.bin
 ( curl -fSL --retry 3 -o "` + dir + `/$fn" "` + url + `" ) &
 pid=$!
@@ -152,11 +155,19 @@ while kill -0 "$pid" 2>/dev/null; do
   sleep 2
 done
 wait "$pid"
-echo "PROGRESS DONE"`
+echo "PROGRESS DONE"
+case "$fn" in
+  *.zip) echo "EXTRACT zip"; unzip -o -q "` + dir + `/$fn" -d "` + dir + `" || echo "extract failed(아카이브만 보관)" ;;
+  *.tar.gz|*.tgz) echo "EXTRACT tar.gz"; tar -xzf "` + dir + `/$fn" -C "` + dir + `" || echo "extract failed(아카이브만 보관)" ;;
+  *.tar) echo "EXTRACT tar"; tar -xf "` + dir + `/$fn" -C "` + dir + `" || echo "extract failed(아카이브만 보관)" ;;
+  *) echo "no-extract(단일파일 데이터셋)" ;;
+esac
+echo "EXTRACT DONE"`
 	}
 	vol := []corev1.Volume{{Name: "nfs", VolumeSource: corev1.VolumeSource{NFS: &corev1.NFSVolumeSource{Server: nfsServer, Path: nfsBase}}}}
 	mounts := []corev1.VolumeMount{{Name: "nfs", MountPath: "/nfs"}}
-	return c.runSimpleJobCmd(ctx, ns, jobName, "curlimages/curl:latest", []string{"sh", "-c", script}, nil, nil, vol, mounts)
+	// alpine: apk 로 curl/unzip/tar 확보(root 실행 → apk 가능; curlimages 는 non-root 라 apk 불가).
+	return c.runSimpleJobCmd(ctx, ns, jobName, "alpine:3.20", []string{"sh", "-c", script}, nil, nil, vol, mounts)
 }
 
 // RunDatasetCache는 특정 노드에 핀되어 데이터셋 NFS(<nfsServer>:<nfsDatasetPath>, RO)를
@@ -171,7 +182,33 @@ func (c *Client) RunDatasetCache(ctx context.Context, ns, jobName, node, nfsServ
 	}
 	_ = c.DeleteBuildJob(ctx, ns, jobName)
 	dst := "/dst/" + name
-	script := "set -e; mkdir -p '" + dst + "'; cp -a /src/. '" + dst + "/'; echo cached"
+	// fast 캐싱: NFS(/src)에는 아카이브(zip 등) + 해제본이 함께 있다. 해제본을 통째로 복사하면
+	// (cp -a) 수많은 작은 파일이 NFS 를 오가 느리다 → 아카이브 1개만 노드로 복사(단일 대용량=빠름)한 뒤
+	// 노드 로컬에서 해제한다. 아카이브가 없으면(단일파일 데이터셋) 폴더 통째 복사로 폴백.
+	// 복사 진행률을 "PROGRESS <cur> <total>" 로 출력 → API 가 파싱해 %.
+	script := "set -e; apk add --no-cache unzip tar >/dev/null 2>&1 || true; mkdir -p '" + dst + `'
+arc=$(ls /src/*.zip /src/*.tar.gz /src/*.tgz /src/*.tar 2>/dev/null | head -1)
+if [ -n "$arc" ]; then
+  bn=$(basename "$arc"); total=$(stat -c %s "$arc" 2>/dev/null || echo 0)
+  ( cp "$arc" '` + dst + `/'"$bn" ) &
+  pid=$!
+  while kill -0 "$pid" 2>/dev/null; do
+    cur=$(stat -c %s '` + dst + `/'"$bn" 2>/dev/null || echo 0)
+    echo "PROGRESS $cur $total"; sleep 2
+  done
+  wait "$pid"
+  echo "PROGRESS $total $total"
+  echo "EXTRACT"
+  case "$bn" in
+    *.zip) unzip -o -q '` + dst + `/'"$bn" -d '` + dst + `' ;;
+    *.tar.gz|*.tgz) tar -xzf '` + dst + `/'"$bn" -C '` + dst + `' ;;
+    *.tar) tar -xf '` + dst + `/'"$bn" -C '` + dst + `' ;;
+  esac
+  rm -f '` + dst + `/'"$bn"
+else
+  cp -a /src/. '` + dst + `/'
+fi
+echo cached`
 	hostType := corev1.HostPathDirectoryOrCreate
 	vols := []corev1.Volume{
 		{Name: "src", VolumeSource: corev1.VolumeSource{NFS: &corev1.NFSVolumeSource{Server: nfsServer, Path: nfsDatasetPath, ReadOnly: true}}},
@@ -181,7 +218,7 @@ func (c *Client) RunDatasetCache(ctx context.Context, ns, jobName, node, nfsServ
 		{Name: "src", MountPath: "/src", ReadOnly: true},
 		{Name: "dst", MountPath: "/dst"},
 	}
-	return c.runSimpleJobNode(ctx, ns, jobName, node, "busybox:1.36", []string{"sh", "-c", script}, vols, mounts)
+	return c.runSimpleJobNode(ctx, ns, jobName, node, "alpine:3.20", []string{"sh", "-c", script}, vols, mounts)
 }
 
 // RunDatasetUncache는 특정 노드의 로컬 캐시 디렉터리(<hostBase>/<name>)를 삭제하는 Job 을 만든다.

@@ -14,8 +14,7 @@ import { useToast } from '../../../components/console/Toast';
 import { useConfirm } from '../../../components/console/Confirm';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { useAuth } from '../../../context/AuthContext';
-import { getUserDetail, grantUserCredit, updateUserStatus, setUserRefill } from '../../../api/console/misc';
-import RefillCard from '../../../components/console/RefillCard';
+import { getUserDetail, grantUserCredit, updateUserStatus } from '../../../api/console/misc';
 import { getGroups, getOrgs, addMember, updateMember, moveMember, removeMember } from '../../../api/console/governance';
 
 const MROLES = ['org_admin', 'project_admin', 'member'];
@@ -101,12 +100,6 @@ export default function UserDetail() {
     if (!(await confirm({ title: msg, message: t('userDetail.statusConfirm', { defaultValue: '이 사용자의 상태를 변경합니다.' }), confirmText: msg, danger: status !== 'approved' }))) return;
     await updateUserStatus(u.id, status); toast(msg); load();
   };
-  // 개인 정기 리필 설정 — 주기는 팀 상한으로 백엔드가 클램프.
-  const submitUserRefill = async (spec) => {
-    try { await setUserRefill(u.id, spec); toast(t('userDetail.refillSaved', { defaultValue: '정기 리필을 설정했습니다.' })); }
-    catch { toast(t('userDetail.refillFail', { defaultValue: '설정 실패' })); }
-    load();
-  };
 
   const wallet = d.wallet || {};
   const usage = d.usage || {};
@@ -180,14 +173,8 @@ export default function UserDetail() {
         )}
       </div>
 
-      {/* 개인 정기 리필 — 팀장/관리자가 개인 지갑 리필을 설정(주기는 팀 상한) */}
-      {creditMode && isPlatform && (
-        <div className="mb">
-          <RefillCard key={u.id} title={t('userDetail.refillTitle', { defaultValue: '개인 정기 리필' })}
-            current={{ recurringCredit: wallet.recurringCredit, refillIntervalDays: wallet.refillIntervalDays, carryover: wallet.carryover }}
-            onSave={submitUserRefill} />
-        </div>
-      )}
+      {/* 개인 정기 리필은 폐지 — 크레딧/리필은 팀 단위로 관리한다(팀 상세의 '팀 정기 리필' +
+          팀→멤버 배분). 개인은 세션이 뜨는 팀 컨텍스트의 크레딧을 사용한다. */}
 
       <Section icon={Server} title={t('userDetail.sessionsTitle')} count={sessions.length} empty={t('userDetail.noSessions')}>
         <DataTable rows={sessions} rowKey={(r) => r.id}

@@ -54,10 +54,11 @@ type GlobalItem struct {
 	Downloaded int64 `gorm:"-" json:"downloaded"` // 현재까지 받은 바이트(loading)
 }
 
-// DatasetCache — 노드 로컬 캐시 1건(노드 + 상태).
+// DatasetCache — 노드 로컬 캐시 1건(노드 + 상태 + 진행률).
 type DatasetCache struct {
-	Node   string `json:"node"`
-	Status string `json:"status"` // caching|cached|failed
+	Node     string `json:"node"`
+	Status   string `json:"status"`   // caching|cached|failed
+	Progress int    `json:"progress"` // 복사 진행률 %(caching 일 때만; 미측정=0, 해제 단계=97)
 }
 
 // ListRes — /datasets 응답.

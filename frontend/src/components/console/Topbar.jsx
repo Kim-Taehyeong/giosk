@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShieldCheck, LayoutGrid, Coins, Server, Bell } from 'lucide-react';
+import { Coins, Server, Bell } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useConsole } from '../../context/ConsoleContext';
 import { useSystemConfig } from '../../context/SystemConfigContext';
-import { isManager } from '../../config/consoleRoles';
 import { getWallet } from '../../api/console/wallet';
 import { getAdminDashboard } from '../../api/console/dashboard';
 import { getInboxUnread, getInbox, markInboxRead } from '../../api/console/notify';
 import OrgGroupSelector from './OrgGroupSelector';
-import ScopeSwitcher from './ScopeSwitcher';
+import RoleSwitcher from './RoleSwitcher';
 import UserMenu from './UserMenu';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { notifyText } from '../../utils/notify';
@@ -75,12 +74,14 @@ export default function Topbar({ variant, ns }) {
       .then((w) => setSummary((s) => ({ ...s, credit: w.balance })))
       .catch(() => {});
   }, [variant, isAdmin, creditMode, setSummary]);
-  const manager = isManager(user);
+  // 역할/뷰 전환기: 관리 권한(플랫폼 admin 또는 org/group 스코프 보유)이 있으면 통합 RoleSwitcher,
+  // 순수 사용자는 소속 조직/그룹 정적 표시(OrgGroupSelector).
+  const hasRoles = isAdmin || (user?.scopes?.length > 0);
 
   return (
     <div className="topbar">
-      {manager ? (
-        <ScopeSwitcher ns={ns} />
+      {hasRoles ? (
+        <RoleSwitcher ns={ns} />
       ) : (
         <OrgGroupSelector variant={variant} ns={ns} />
       )}
@@ -97,12 +98,7 @@ export default function Topbar({ variant, ns }) {
         </div>
       ) : null}
 
-      {/* 콘솔 전환(단일 콘솔): 관리자(플랫폼/조직/그룹) ↔ 사용자 화면. */}
-      {(isAdmin || manager) && (
-        variant === 'admin'
-          ? <button className="btn sm" onClick={() => navigate('/console')} title={t('topbar.toUser')}><LayoutGrid size={14} /> {t('topbar.toUser')}</button>
-          : <button className="btn sm" onClick={() => navigate('/console/admin')} title={t('topbar.toAdmin')}><ShieldCheck size={14} /> {t('topbar.toAdmin')}</button>
-      )}
+      {/* 관리↔사용자 뷰 전환은 좌측 RoleSwitcher 로 통합(플랫폼/조직/그룹/내 콘솔 한 셀렉터). */}
 
       {/* 인앱 알림 종 — 최근 알림 드롭다운. 전체는 알림센터에서. */}
       <div style={{ position: 'relative', display: 'inline-flex' }}>
