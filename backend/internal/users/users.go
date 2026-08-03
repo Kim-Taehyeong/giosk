@@ -228,6 +228,9 @@ func (r *repo) SetStatus(id int64, status string) error {
 				ON DUPLICATE KEY UPDATE status='active'`, *gid, id).Error; err != nil {
 				return err
 			}
+			// 자체가입은 group_join_requests(pending)도 함께 남긴다. 여기서 active 멤버십을 만들면서
+			// 그 신청도 approved 로 해소하지 않으면 "내 가입 신청 현황"이 영구 "대기 중"으로 남는다.
+			tx.Exec(`UPDATE group_join_requests SET status='approved' WHERE user_id=? AND group_id=? AND status='pending'`, id, *gid)
 			tx.Exec(`UPDATE users SET signup_group_id=NULL WHERE id=?`, id)
 		}
 		return nil

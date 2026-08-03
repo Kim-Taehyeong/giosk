@@ -105,8 +105,10 @@ func (s *Service) History(ctx context.Context, sess *Session, hours int) ([]Hist
 		gpuUtil = s.rangeMap(ctx, fmt.Sprintf(`avg(%s)`, metrics.DCGMPodSeries("DCGM_FI_DEV_GPU_UTIL", pod)), start, end, step)
 		vramUsedMB = s.rangeMap(ctx, fmt.Sprintf(`sum(%s)`, metrics.DCGMPodSeries("DCGM_FI_DEV_FB_USED", pod)), start, end, step)
 	case gpuSrcHAMi:
-		gpuUtil = s.rangeMap(ctx, fmt.Sprintf(`avg(Device_utilization_desc_of_container{podname=%q})`, pod), start, end, step)
-		vramB := s.rangeMap(ctx, fmt.Sprintf(`sum(vGPU_device_memory_usage_in_bytes{podname=%q})`, pod), start, end, step)
+		// HAMi v2.9.0 메트릭명(hami_* 접두, 라벨 exported_pod). 옛 Device_utilization_desc_of_container/
+		// vGPU_device_memory_usage_in_bytes{podname=} 는 v2.9.0 에서 사라져 이력이 항상 빈 값→"미가용"이 됐다.
+		gpuUtil = s.rangeMap(ctx, fmt.Sprintf(`avg(hami_container_device_utilization_ratio{exported_pod=%q})`, pod), start, end, step)
+		vramB := s.rangeMap(ctx, fmt.Sprintf(`sum(hami_vgpu_memory_used_bytes{exported_pod=%q})`, pod), start, end, step)
 		vramUsedMB = map[int64]float64{}
 		for t, v := range vramB {
 			vramUsedMB[t] = v / (1024 * 1024)

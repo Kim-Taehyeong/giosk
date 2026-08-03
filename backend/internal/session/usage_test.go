@@ -21,7 +21,9 @@ func fakeProm(t *testing.T, series map[string]map[string]float64) *metrics.Clien
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		q, _ := url.QueryUnescape(r.URL.Query().Get("query"))
 		label := "pod"
-		if strings.Contains(q, "podname") {
+		if strings.Contains(q, "by(exported_pod)") {
+			label = "exported_pod" // HAMi v2.9.0 쿼리는 exported_pod 로 그룹핑(DCGM 은 by(pod))
+		} else if strings.Contains(q, "podname") {
 			label = "podname"
 		}
 		var result []map[string]any
@@ -57,9 +59,9 @@ func TestUsageOf_SourceBySharingMode(t *testing.T) {
 	met := fakeProm(t, map[string]map[string]float64{
 		"container_cpu_usage_seconds_total":    {"ses-excl": 2.5, "ses-hami": 1.0, "ses-slice": 0.5, "ses-cpu": 3.0},
 		"container_memory_working_set_bytes":   {"ses-excl": 2 * 1024 * 1024 * 1024},
-		"DCGM_FI_DEV_GPU_UTIL":                 {"ses-excl": 73},
-		"Device_utilization_desc_of_container": {"ses-hami": 42},
-		"vGPU_device_memory_usage_in_bytes":    {"ses-hami": 3 * 1024 * 1024 * 1024},
+		"DCGM_FI_DEV_GPU_UTIL":                    {"ses-excl": 73},
+		"hami_container_device_utilization_ratio": {"ses-hami": 42},
+		"hami_vgpu_memory_used_bytes":             {"ses-hami": 3 * 1024 * 1024 * 1024},
 	})
 	svc := &Service{met: met}
 
@@ -87,7 +89,7 @@ func TestUsageOf_SourceBySharingMode(t *testing.T) {
 		t.Errorf("exclusive memUsedMb = %v, want 2048 (bytes→MiB)", excl.MemUsedMB)
 	}
 
-	// 분할(HAMi) — DCGM 이 아니라 vGPUmonitor(podname 라벨)에서 온다.
+	// 분할(HAMi) — DCGM 이 아니라 vGPUmonitor(hami_* 메트릭, exported_pod 라벨)에서 온다.
 	hami := got["ses-hami"]
 	if hami.GpuSource != gpuSrcHAMi {
 		t.Fatalf("shared source = %q, want hami", hami.GpuSource)

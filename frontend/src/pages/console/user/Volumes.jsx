@@ -48,10 +48,14 @@ export default function Volumes() {
   const remove = async (id) => { if (!(await confirm({ title: t('volume.delete'), message: t('confirmDelete'), confirmText: t('volume.delete') }))) return; await deleteVolume(id); toast(t('volume.deleted')); load(); };
 
   const submitShare = async () => {
-    const body = share.target === 'user'
-      ? { username: share.value, permission: share.permission }
-      : { groupId: Number(share.value), permission: share.permission };
-    await shareVolume(openShare.id, body);
+    if (!share.value) { toast(t('volume.selectPh')); return; } // 대상 미선택 → 조용히 무동작 방지
+    // 백엔드 ShareReq 는 {target, value, permission} 이다(value=username|groupId). 예전엔
+    // {username|groupId, permission} 로 보내 매핑이 안 돼 공유가 조용히 실패했다.
+    try {
+      await shareVolume(openShare.id, { target: share.target, value: share.value, permission: share.permission });
+    } catch (e) {
+      toast(e?.message || '공유에 실패했습니다'); return;
+    }
     setData((d) => ({ ...d, owned: d.owned.map((v) => (v.id === openShare.id
       ? { ...v, sharedWith: [...(v.sharedWith || []), { type: share.target, name: share.value, perm: share.permission }] } : v)) }));
     setOpenShare(null); toast(t('volume.shareSet'));

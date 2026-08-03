@@ -108,15 +108,26 @@ func (c *Client) get(ctx context.Context, u string) (*promResp, bool) {
 	return &pr, true
 }
 
-// scalarOf는 Prometheus 값(문자열로 인코딩된 float)을 파싱한다.
+// scalarOf는 Prometheus 값을 파싱한다. 샘플 값은 문자열("0.5")이지만 range/instant 의
+// 타임스탬프(pair[0])는 JSON 숫자(float)로 온다 — 둘 다 받아야 한다. 문자열만 받으면
+// matrix 타임스탬프가 전부 0 으로 파싱돼 range 결과가 한 점(t=0)으로 붕괴한다(노드·세션 이력 1점 버그).
 func scalarOf(v any) (float64, bool) {
-	s, ok := v.(string)
-	if !ok {
+	switch x := v.(type) {
+	case string:
+		f, err := strconv.ParseFloat(x, 64)
+		if err != nil {
+			return 0, false
+		}
+		return f, true
+	case float64:
+		return x, true
+	case json.Number:
+		f, err := x.Float64()
+		if err != nil {
+			return 0, false
+		}
+		return f, true
+	default:
 		return 0, false
 	}
-	f, err := strconv.ParseFloat(s, 64)
-	if err != nil {
-		return 0, false
-	}
-	return f, true
 }

@@ -1684,8 +1684,24 @@ func (s *Service) isIdle(ctx context.Context, sess *Session, windowMin int) (idl
 		return v < idleCPUThreshold, true
 	}
 	// GPU 대여 세션 — 윈도 평균 GPU 사용률로만 판정(CPU 무시).
-	// DCGM 의 워크로드 Pod 라벨은 배포에 따라 pod/exported_pod 로 갈린다(metrics.DCGMPodScalar 참조).
-	// pod 만 보면 항상 빈 결과 → ok=false → GPU 세션이 유휴로 판정된 적이 없었다.
+	// 분할(HAMi)은 DCGM 이 Pod 단위로 보고하지 않는다(vGPUmonitor 의 hami_* / exported_pod 라벨).
+	// 예전엔 분할 세션도 DCGM 을 봐서 항상 빈 결과 → ok=false → 유휴로 판정된 적이 없어 리퍼가 무력했다.
+	if sess.GpuMode == "shared" {
+		q := fmt.Sprintf(`avg(avg_over_time(hami_container_device_utilization_ratio{exported_pod=%q}[%dm]))`, sess.InstanceID, windowMin)
+		if v, got := s.met.Scalar(ctx, q); got {
+			return v < idleGPUThreshold, true
+		}
+		// 컨테이너 시리즈가 아예 없음 = CUDA 미기동(GPU 미사용). 모니터가 살아있으면(host 시리즈 존재)
+		// GPU 를 안 쓰는 유휴로 확정한다. 모니터 자체가 죽었으면 보수적으로 판정 불가.
+		if v, got := s.met.Scalar(ctx, `count(hami_host_gpu_utilization_ratio)`); got && v > 0 {
+			return true, true
+		}
+		return false, false
+	}
+	if sess.GpuMode == "timeslice" {
+		return false, false // 타임슬라이싱은 컨테이너별 GPU 계측 지점이 없어 유휴 판정 불가
+	}
+	// 전용(exclusive/mig) — DCGM 이 곧 그 세션 사용량. 워크로드 Pod 라벨은 pod/exported_pod 로 갈린다.
 	inner := fmt.Sprintf(`avg_over_time(DCGM_FI_DEV_GPU_UTIL{%%s}[%dm])`, windowMin)
 	q := fmt.Sprintf(`avg(%s)`, metrics.DCGMPodScalar(inner, fmt.Sprintf("%q", sess.InstanceID)))
 	v, got := s.met.Scalar(ctx, q)
