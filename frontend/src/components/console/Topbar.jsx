@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Coins, Server, Bell } from 'lucide-react';
+import { Coins, Server, Bell, ShieldCheck, LayoutGrid } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useConsole } from '../../context/ConsoleContext';
 import { useSystemConfig } from '../../context/SystemConfigContext';
@@ -98,7 +98,13 @@ export default function Topbar({ variant, ns }) {
         </div>
       ) : null}
 
-      {/* 관리↔사용자 뷰 전환은 좌측 RoleSwitcher 로 통합(플랫폼/조직/그룹/내 콘솔 한 셀렉터). */}
+      {/* 모드 토글: 관리자 화면 ↔ 사용자 화면. 좌측 RoleSwitcher(조직/스코프)와 분리 —
+          모드는 여기서, 조직 컨텍스트는 항상 좌측에서 보이게(멀티 org 사용자도 소속 조직 확인 가능). */}
+      {hasRoles && (
+        variant === 'admin'
+          ? <button className="btn sm" onClick={() => navigate('/console')} title={t('topbar.toUser', { defaultValue: '사용자 화면' })}><LayoutGrid size={14} /> {t('topbar.toUser', { defaultValue: '사용자 화면' })}</button>
+          : <button className="btn sm" onClick={() => navigate('/console/admin')} title={t('topbar.toAdmin', { defaultValue: '관리자 화면' })}><ShieldCheck size={14} /> {t('topbar.toAdmin', { defaultValue: '관리자 화면' })}</button>
+      )}
 
       {/* 인앱 알림 종 — 최근 알림 드롭다운. 전체는 알림센터에서. */}
       <div style={{ position: 'relative', display: 'inline-flex' }}>

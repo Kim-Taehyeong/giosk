@@ -22,7 +22,7 @@ export default function Groups() {
   const [rows, setRows] = useState(null);
   const [orgs, setOrgs] = useState([]);
   const [openCreate, setOpenCreate] = useState(false);
-  const [form, setForm] = useState({ orgId: 0, name: '', displayName: '', adminAccount: '' });
+  const [form, setForm] = useState({ orgId: 0, name: '', displayName: '', adminAccount: '', initialCredit: 0, recurring: 0, interval: 30, carryover: false });
   const { toast } = useToast();
 
   const [orgFilter, setOrgFilter] = useState('all');
@@ -33,7 +33,7 @@ export default function Groups() {
 
   const submitCreate = async () => {
     try { await createGroup(form); } catch (e) { toast(e?.code === 'admin_unknown' ? t('groups.adminUnknown') : (e?.message || t('groups.createFail'))); return; }
-    setOpenCreate(false); setForm({ orgId: 0, name: '', displayName: '', adminAccount: '' }); toast(t('groups.created')); load();
+    setOpenCreate(false); setForm({ orgId: 0, name: '', displayName: '', adminAccount: '', initialCredit: 0, recurring: 0, interval: 30, carryover: false }); toast(t('groups.created')); load();
   };
 
   const TPL_HEADER = ['그룹 식별자', '표시 이름', '조직'];
@@ -99,6 +99,28 @@ export default function Groups() {
         <Advanced title={t('groups.admin')} hint={t('groups.adminHintOpt')} defaultOpen={!!form.adminAccount}>
           <UserPicker value={form.adminAccount} onChange={(v) => setForm({ ...form, adminAccount: v })} placeholder={t('groups.adminSearchPh')} />
         </Advanced>
+        {creditMode && (
+          <Advanced title={t('groups.initCredit', { defaultValue: '초기 크레딧 · 정기 리필' })} hint={t('groups.initCreditHint', { defaultValue: '팀 생성과 함께 조직 풀에서 배분·리필 설정(선택). 나중에 팀 상세에서도 가능.' })} defaultOpen={!!form.initialCredit || !!form.recurring}>
+            <div className="grid cols-2" style={{ gap: 14 }}>
+              <div>
+                <label className="fld" style={{ marginTop: 0 }}>{t('groups.initCreditAmt', { defaultValue: '초기 크레딧' })}</label>
+                <input type="number" min={0} value={form.initialCredit} onChange={(e) => setForm({ ...form, initialCredit: Math.max(0, Number(e.target.value)) })} placeholder="0" />
+              </div>
+              <div>
+                <label className="fld" style={{ marginTop: 0 }}>{t('groups.refillAmt', { defaultValue: '정기 리필(회당)' })}</label>
+                <input type="number" min={0} value={form.recurring} onChange={(e) => setForm({ ...form, recurring: Math.max(0, Number(e.target.value)) })} placeholder="0" />
+              </div>
+              <div>
+                <label className="fld" style={{ marginTop: 0 }}>{t('groups.refillInterval', { defaultValue: '리필 주기(일)' })}</label>
+                <input type="number" min={1} value={form.interval} onChange={(e) => setForm({ ...form, interval: Math.max(1, Number(e.target.value)) })} />
+              </div>
+              <label className="flex gap" style={{ alignItems: 'center', gap: 8, marginTop: 24 }}>
+                <input type="checkbox" checked={form.carryover} onChange={(e) => setForm({ ...form, carryover: e.target.checked })} />
+                {t('groups.carryover', { defaultValue: '미사용분 이월' })}
+              </label>
+            </div>
+          </Advanced>
+        )}
       </Modal>
 
     </div>

@@ -12,9 +12,10 @@ const (
 	TxAdminGrant = "admin_grant"
 )
 
-// UserWallet은 user_wallets 테이블 매핑.
+// UserWallet은 user_wallets 테이블 매핑. 지갑은 멤버십(유저×팀) 단위 — PK=(user_id, group_id).
 type UserWallet struct {
 	UserID             int64      `gorm:"primaryKey;column:user_id" json:"-"`
+	GroupID            int64      `gorm:"primaryKey;column:group_id" json:"groupId"` // 팀(그룹) id — 지갑이 귀속된 팀
 	Balance            int        `gorm:"column:balance" json:"balance"`
 	Reserved           int        `gorm:"column:reserved" json:"reserved"`
 	MonthlyCap         int        `gorm:"column:monthly_cap" json:"cap"`

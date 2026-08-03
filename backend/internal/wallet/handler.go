@@ -3,6 +3,7 @@ package wallet
 import (
 	"errors"
 	"strconv"
+	"strings"
 
 	"giosk/internal/auth"
 	"giosk/internal/authz"
@@ -18,7 +19,8 @@ func NewHandler(svc *Service) *Handler { return &Handler{svc: svc} }
 
 // ── 사용자 ──────────────────────────────
 func (h *Handler) MyWallet(c *gin.Context) {
-	w, err := h.svc.MyWallet(auth.CurrentUser(c).ID)
+	// 활성 스코프(팀) 기준 지갑 — 프론트가 X-Console-Scope: group:N 을 보낸다. 팀 아니면 0(대표 팀).
+	w, err := h.svc.MyWallet(auth.CurrentUser(c).ID, scopeGroup(c))
 	if err != nil {
 		httpx.Internal(c, "지갑 조회 실패")
 		return
@@ -71,7 +73,8 @@ func (h *Handler) GrantUser(c *gin.Context) {
 		return
 	}
 	actor := auth.CurrentUser(c).ID
-	if err := h.svc.AllocateUser(gid(c), req.Amount, true, req.Reason, &actor); err != nil {
+	// super grant 대상 팀: 요청 스코프(group:N)면 그 팀, 아니면 대표 팀(0→resolve). gid(c)=대상 사용자.
+	if err := h.svc.AllocateUser(gid(c), scopeGroup(c), req.Amount, true, req.Reason, &actor); err != nil {
 		httpx.Internal(c, "크레딧 부여 실패")
 		return
 	}
@@ -109,7 +112,8 @@ func (h *Handler) AllocateMember(c *gin.Context) {
 		return
 	}
 	actor := auth.CurrentUser(c).ID
-	if err := h.svc.AllocateUser(req.UserID, req.Amount, false, req.Reason, &actor); err != nil {
+	// 대상 팀 = 경로의 그룹(:id). 그 팀 풀에서 차감해 (member, 그 팀) 지갑에 배분.
+	if err := h.svc.AllocateUser(req.UserID, gid(c), req.Amount, false, req.Reason, &actor); err != nil {
 		switch {
 		case errors.Is(err, ErrInsufficientGroupPool):
 			httpx.Err(c, 400, "insufficient_group_pool", "그룹 크레딧 풀 잔여가 부족합니다")
@@ -145,7 +149,7 @@ func (h *Handler) SetUserRefill(c *gin.Context) {
 		return
 	}
 	uid, _ := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err := h.svc.SetUserRefill(uid, req); err != nil {
+	if err := h.svc.SetUserRefill(uid, scopeGroup(c), req); err != nil {
 		httpx.Internal(c, "개인 리필 설정 실패")
 		return
 	}
@@ -153,3 +157,12 @@ func (h *Handler) SetUserRefill(c *gin.Context) {
 }
 
 func gid(c *gin.Context) int64 { id, _ := strconv.ParseInt(c.Param("id"), 10, 64); return id }
+
+// scopeGroup은 X-Console-Scope 헤더가 group:N 이면 N 을, 아니면 0(대표 팀 폴백)을 반환한다.
+func scopeGroup(c *gin.Context) int64 {
+	if sel := c.GetHeader("X-Console-Scope"); strings.HasPrefix(sel, "group:") {
+		id, _ := strconv.ParseInt(sel[len("group:"):], 10, 64)
+		return id
+	}
+	return 0
+}

@@ -28,11 +28,11 @@ type AuditReader interface {
 	Insert(l *audit.Log) error
 }
 
-// Charger는 세션 사용량을 사용자 지갑에서 차감한다(wallet.Service 가 구현).
-// 잔액 부족이면 (false, nil).
+// Charger는 세션 사용량을 (user,team) 멤버십 지갑에서 차감한다(wallet.Service 가 구현).
+// groupID=세션이 뜬 팀(네임스페이스). 잔액 부족이면 (false, nil).
 type Charger interface {
-	Consume(userID int64, credits int, ref string) (bool, error)
-	Balance(userID int64) int // 세션 생성 전 잔액 검사용
+	Consume(userID, groupID int64, credits int, ref string) (bool, error)
+	Balance(userID, groupID int64) int // 세션 생성 전 잔액 검사용
 }
 
 // NodeLeaser는 물리노드 임대 생성/해제(node.Service 가 구현).
@@ -230,11 +230,19 @@ func (s *Service) WithCharger(c Charger) *Service { s.charger = c; return s }
 // checkAffordable는 크레딧 모드에서 잔액이 최소 1시간 단가 이상인지 검사한다.
 // 비크레딧 모드(charger nil)·무료(단가 0) 세션은 통과. 부족하면 ErrInsufficientCredit.
 // (생성 시 막지 않으면 1크레딧 누적 전까지 0잔액으로도 잠시 돌아가는 구멍이 생김.)
-func (s *Service) checkAffordable(userID int64, pricePerHour int) error {
+// gidOf는 세션의 팀 id(nil=0)를 반환한다(정산/잔액검사 대상 팀 지갑).
+func gidOf(sess *Session) int64 {
+	if sess.GroupID != nil {
+		return *sess.GroupID
+	}
+	return 0
+}
+
+func (s *Service) checkAffordable(userID, groupID int64, pricePerHour int) error {
 	if s.charger == nil || pricePerHour <= 0 {
 		return nil
 	}
-	if s.charger.Balance(userID) < pricePerHour {
+	if s.charger.Balance(userID, groupID) < pricePerHour {
 		return ErrInsufficientCredit
 	}
 	return nil
@@ -325,10 +333,20 @@ func (s *Service) Create(ctx context.Context, userID int64, username string, req
 	if err != nil {
 		return nil, err
 	}
+	// 팀 없는 세션 금지 — 세션은 항상 팀 컨텍스트에서(크레딧이 팀 지갑에 귀속). GroupID 미지정이면
+	// 사용자의 대표 팀으로 채운다. 크레딧 모드에서 소속 팀이 전혀 없으면 거부(차감할 팀 지갑 없음).
+	if sess.GroupID == nil && s.limits != nil {
+		if _, gid := s.limits.HierOfUser(userID); gid > 0 {
+			sess.GroupID = &gid
+		}
+	}
+	if s.charger != nil && sess.GroupID == nil {
+		return nil, ErrMustJoinTeam
+	}
 	if err := s.checkHardLimits(userID, sess); err != nil {
 		return nil, err // 1차: 하드 정책(크레딧 무관 절대 벽)
 	}
-	if err := s.checkAffordable(userID, sess.PricePerHour); err != nil {
+	if err := s.checkAffordable(userID, gidOf(sess), sess.PricePerHour); err != nil {
 		return nil, err // 2차: 크레딧 모드 잔액 부족 → 생성 거부
 	}
 	imageRef, err := s.repo.ImageRef(req.ImageID)
@@ -412,7 +430,7 @@ func (s *Service) createSSH(ctx context.Context, userID int64, username string, 
 	if err := s.checkHardLimits(userID, sess); err != nil {
 		return nil, err // 1차: 하드 정책(노드 GPU수가 상한 초과면 임대 거부)
 	}
-	if err := s.checkAffordable(userID, sess.PricePerHour); err != nil {
+	if err := s.checkAffordable(userID, gidOf(sess), sess.PricePerHour); err != nil {
 		return nil, err // 2차: 크레딧 모드 잔액 부족 → 물리 임대 거부
 	}
 	if err := s.leaser.CreateLeaseFor(ctx, req.Node, userID, sess.InstanceID); err != nil {
@@ -1572,7 +1590,11 @@ func (s *Service) settle(ctx context.Context, sess *Session, final bool) {
 	if due <= 0 {
 		return
 	}
-	ok, err := s.charger.Consume(sess.UserID, due, sess.InstanceID)
+	gid := int64(0) // 세션이 뜬 팀 지갑에서 차감(팀 없는 세션은 금지 → 항상 팀). 0이면 wallet 이 대표 팀으로.
+	if sess.GroupID != nil {
+		gid = *sess.GroupID
+	}
+	ok, err := s.charger.Consume(sess.UserID, gid, due, sess.InstanceID)
 	if err != nil {
 		return
 	}
@@ -1587,10 +1609,6 @@ func (s *Service) settle(ctx context.Context, sess *Session, final bool) {
 	_ = s.repo.SetBilled(sess.InstanceID, totalDue)
 	// 사용시간 원장 적립 — 이번 틱에 과금된 크레딧이 나타내는 시간(초). 세션 삭제와 무관하게 누적 보존.
 	if secs := int(float64(due) / float64(sess.PricePerHour) * 3600.0); secs > 0 {
-		gid := int64(0)
-		if sess.GroupID != nil {
-			gid = *sess.GroupID
-		}
 		_ = s.repo.RecordGpuUsage(sess.UserID, gid, sess.InstanceID, secs, sess.GpuCount)
 	}
 }
@@ -1685,12 +1703,9 @@ func (s *Service) isIdle(ctx context.Context, sess *Session, windowMin int) (idl
 		return false, false // 물리(SSH) 세션은 Pod 메트릭이 없어 유휴 리퍼 대상 아님
 	}
 	if sess.GpuMode == "cpu" {
-		q := fmt.Sprintf(`sum(rate(container_cpu_usage_seconds_total{pod=%q,container!=""}[%dm]))`, sess.InstanceID, windowMin)
-		v, got := s.met.Scalar(ctx, q)
-		if !got {
-			return false, false
-		}
-		return v < idleCPUThreshold, true
+		// CPU 세션은 유휴로 종료하지 않는다(사용자 정책: "CPU 유휴로 끄면 안 됨").
+		// 유휴 리퍼는 희소 자원인 GPU 세션만 회수한다.
+		return false, false
 	}
 	// GPU 대여 세션 — 윈도 평균 GPU 사용률로만 판정(CPU 무시).
 	// 분할(HAMi)은 DCGM 이 Pod 단위로 보고하지 않는다(vGPUmonitor 의 hami_* / exported_pod 라벨).
@@ -1710,9 +1725,10 @@ func (s *Service) isIdle(ctx context.Context, sess *Session, windowMin int) (idl
 	if sess.GpuMode == "timeslice" {
 		return false, false // 타임슬라이싱은 컨테이너별 GPU 계측 지점이 없어 유휴 판정 불가
 	}
-	// 전용(exclusive/mig) — DCGM 이 곧 그 세션 사용량. 워크로드 Pod 라벨은 pod/exported_pod 로 갈린다.
-	inner := fmt.Sprintf(`avg_over_time(DCGM_FI_DEV_GPU_UTIL{%%s}[%dm])`, windowMin)
-	q := fmt.Sprintf(`avg(%s)`, metrics.DCGMPodScalar(inner, fmt.Sprintf("%q", sess.InstanceID)))
+	// 전용(exclusive/mig) — 노드 GPU 가 곧 세션 사용량. HAMi 가 클러스터 전체 device-plugin 이라 DCGM 의
+	// pod 매핑이 불가(워크로드 pod 라벨 없음) → 예전엔 by-pod 쿼리가 항상 빈 결과라 전용 세션이 유휴로
+	// 판정된 적이 없었다(미종료 버그). 세션이 놓인 노드로 귀속한다(dcgm-exporter pod→node = kube_pod_info).
+	q := fmt.Sprintf(`avg(avg_over_time(DCGM_FI_DEV_GPU_UTIL[%dm]) * on(pod,namespace) group_left(node) kube_pod_info{node=%q})`, windowMin, sess.Node)
 	v, got := s.met.Scalar(ctx, q)
 	if !got {
 		return false, false // GPU 메트릭 미가용 → 정지하지 않음(보수적)

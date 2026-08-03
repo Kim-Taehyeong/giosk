@@ -160,6 +160,8 @@ func (h *Handler) writeErr(c *gin.Context, err error, msg string) {
 		httpx.Err(c, 409, "extend_unavailable", "임대를 연장할 수 없습니다")
 	case errors.Is(err, ErrInsufficientCredit):
 		httpx.Err(c, 402, "insufficient_credit", "크레딧이 부족합니다(최소 1시간 단가 이상 필요)")
+	case errors.Is(err, ErrMustJoinTeam):
+		httpx.Err(c, 400, "must_join_team", "세션을 만들려면 먼저 팀에 소속되어야 합니다")
 	case errors.Is(err, ErrHardLimit):
 		httpx.Err(c, 403, "hard_limit", "허용된 리소스 상한(GPU·VRAM)을 초과했습니다")
 	case errors.Is(err, k8s.ErrNoCluster):

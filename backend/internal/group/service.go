@@ -14,10 +14,22 @@ var (
 	ErrSameGroup    = errors.New("source and target group are identical")
 )
 
+// GroupWalletSeeder는 팀 생성 시 초기 크레딧/리필을 세팅한다(wallet.Service 구현; import 사이클 방지 위해 로컬 인터페이스).
+type GroupWalletSeeder interface {
+	CreditGroup(groupID int64, amount int, actor *int64) error
+	SetGroupRefillVals(groupID int64, recurring, intervalDays int, carryover bool) error
+}
+
 // Service는 group 비즈니스 로직.
-type Service struct{ repo Repository }
+type Service struct {
+	repo   Repository
+	wallet GroupWalletSeeder // nil=비크레딧/미주입 → 초기크레딧·리필 생략
+}
 
 func NewService(repo Repository) *Service { return &Service{repo: repo} }
+
+// WithWallet은 팀 생성 시 초기 크레딧/리필 세팅용 지갑 시더를 주입한다.
+func (s *Service) WithWallet(w GroupWalletSeeder) *Service { s.wallet = w; return s }
 
 func (s *Service) ListAll() ([]Summary, error) { return s.repo.ListAll() }
 
@@ -47,6 +59,19 @@ func (s *Service) Create(req CreateReq) (*Group, error) {
 	if adminUID > 0 { // 지정 계정을 팀 관리자(project_admin)로 배정
 		if err := s.repo.UpsertMembership(g.ID, adminUID, RoleProjectAdmin, MemberActive); err != nil {
 			return g, err
+		}
+	}
+	// 초기 크레딧/정기 리필(크레딧 모드·시더 주입 시). 실패해도 팀은 이미 생성됐으니 로그성 반환.
+	if s.wallet != nil {
+		if req.InitialCredit > 0 {
+			if err := s.wallet.CreditGroup(g.ID, req.InitialCredit, nil); err != nil {
+				return g, err
+			}
+		}
+		if req.Recurring > 0 {
+			if err := s.wallet.SetGroupRefillVals(g.ID, req.Recurring, req.Interval, req.Carryover); err != nil {
+				return g, err
+			}
 		}
 	}
 	return g, nil

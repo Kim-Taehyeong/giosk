@@ -84,6 +84,7 @@ func main() {
 	orgRepo := org.NewRepository(db)
 	orgSvc := org.NewService(orgRepo).WithBootstrapper(groupSvc)              // 조직 생성 시 기본 그룹+org_admin 배정
 	walletSvc := wallet.NewService(wallet.NewRepository(db)).WithPool(orgSvc) // 할당 시 조직 풀에서 차감(enforce)
+	groupSvc.WithWallet(walletSvc)                                            // 팀 생성 시 초기 크레딧/리필 세팅(크레딧 모드)
 	topupSvc := topup.NewService(topup.NewRepository(db), crediter{wallet: walletSvc, orgRepo: orgRepo})
 	met := metrics.New(cfg.PrometheusURL)
 	// 스토리지 단일화: 볼륨은 NFS(RWX) 클래스로 프로비저닝 → 교차-ns 공유·물리노드 직접 마운트 일관.
@@ -242,7 +243,7 @@ func main() {
 			}
 			return u, e
 		},
-		Wallet:   func(id int64) (any, error) { return walletSvc.MyWallet(id) },
+		Wallet:   func(id int64) (any, error) { return walletSvc.MyWallet(id, 0) },
 		Volumes:  func(id int64) (any, error) { return volumeSvc.List(id) },
 		Sessions: func(ctx context.Context, id int64) (any, error) { return sessionSvc.List(ctx, id) },
 		Datasets: func(ctx context.Context, id int64) (any, error) { return datasetSvc.List(ctx, id) },
