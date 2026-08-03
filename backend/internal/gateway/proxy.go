@@ -32,8 +32,13 @@ func NewProxy(cfg Config) *Proxy {
 
 // ServeHTTP는 요청을 처리한다: ①?access=<토큰> 교환 → 쿠키 발급·리다이렉트, ②쿠키 검증 → 대상 세션으로 프록시.
 func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// ws 업그레이드만 로깅한다(정적 자원 GET 은 스팸이라 제외). 접속 문제 진단의 관심사는
+	// WebSocket 이고, 거절은 아래에서 사유와 함께 별도로 남긴다.
+	isWS := strings.EqualFold(r.Header.Get("Upgrade"), "websocket")
+
 	sub, ok := p.subdomain(r.Host)
 	if !ok {
+		log.Printf("[gateway] DENY host=%s reason=unknown-host", r.Host)
 		http.Error(w, "Giosk gateway: unknown host", http.StatusNotFound)
 		return
 	}
@@ -47,15 +52,22 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// ② 세션 쿠키 검증.
 	ck, err := r.Cookie(cookieName)
 	if err != nil {
+		log.Printf("[gateway] DENY host=%s reason=no-cookie ws=%v", r.Host, isWS)
 		p.denied(w, "세션이 만료되었거나 접속 링크가 필요합니다. 콘솔에서 다시 열어주세요.")
 		return
 	}
 	claims, err := Verify(ck.Value, p.cfg.Secret, p.now())
 	if err != nil || claims.Typ != TypCookie || sub != claims.IID+"-"+claims.Ch {
+		log.Printf("[gateway] DENY host=%s reason=bad-cookie verifyErr=%v typ=%v subMatch=%v",
+			r.Host, err, func() any { if claims != nil { return claims.Typ }; return "nil" }(),
+			claims != nil && sub == claims.IID+"-"+claims.Ch)
 		p.denied(w, "세션 쿠키가 유효하지 않습니다. 콘솔에서 다시 열어주세요.")
 		return
 	}
 
+	if isWS {
+		log.Printf("[gateway] ws %s -> %s:%d", r.Host, claims.ServiceHost(), claims.Port)
+	}
 	p.reverseProxy(claims).ServeHTTP(w, r)
 }
 
@@ -110,7 +122,12 @@ func (p *Proxy) reverseProxy(claims *Claims) *httputil.ReverseProxy {
 	base := rp.Director
 	rp.Director = func(req *http.Request) {
 		base(req)
-		req.Host = target.Host
+		// Host 헤더는 원본(외부 서브도메인)을 그대로 둔다 — code-server·jupyter 는 WebSocket
+		// 업그레이드 때 Origin 을 Host 와 대조하는 CSRF 검사를 한다. Host 를 내부 서비스 주소로
+		// 덮으면 브라우저가 보낸 Origin(외부 호스트)과 불일치해 백엔드가 403 을 반환하고, 브라우저는
+		// 이를 ws 1006 으로 본다(HTTP 자원은 Origin 이 없어 통과 → 페이지만 뜨고 ws 만 죽는 증상).
+		// 업스트림 접속은 req.URL.Host(target)로 다이얼하므로 Host 헤더를 바꿀 필요가 없다
+		// (표준 nginx `proxy_set_header Host $host` 와 동일).
 		injectRequestAuth(claims, req) // jupyter: Authorization 헤더 주입
 	}
 	rp.ErrorHandler = func(w http.ResponseWriter, _ *http.Request, err error) {
