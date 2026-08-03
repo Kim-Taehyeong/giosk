@@ -268,7 +268,7 @@ export default function NewSession() {
 
   const toggleVol = (v) => setSelVols((cur) => cur.some((x) => x.id === v.id)
     ? cur.filter((x) => x.id !== v.id)
-    : [...cur, { id: v.id, name: v.name, mountPath: `/data/${v.name}`, perm: v.perm }]);
+    : [...cur, { id: v.id, name: v.name, mountPath: `/home/work/${v.name}`, perm: v.perm }]);
   const setMount = (id, p) => setSelVols((cur) => cur.map((x) => (x.id === id ? { ...x, mountPath: p } : x)));
 
   const sharedOfferings = useMemo(() => offerings.filter((o) => o.gpuType && o.mode === 'fractional'), [offerings]);

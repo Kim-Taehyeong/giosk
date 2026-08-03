@@ -31,8 +31,11 @@ const filterNav = (groups, { creditMode, approvalsActive, joinOn, datasetsOn, gr
 // 공유 콘솔 셸: CSS-grid(logo/top/nav/main). variant: admin | user | manage.
 //  manage = 조직/그룹 관리자 공용 콘솔 (scope 는 로그인 사용자의 레벨로 결정).
 export default function ConsoleLayout({ variant = 'user' }) {
-  const { user, activeScope } = useAuth();
+  const { user, activeScope, reloadScopeForConsole } = useAuth();
   const { config } = useSystemConfig();
+  // 이 콘솔(관리자/사용자)의 스코프를 그 콘솔 전용 키에서 다시 로드 — 다른 콘솔에서 고른 스코프를
+  // 상태로 물고 넘어오는 SPA 이동 누수를 막는다(관리자 콘솔이 사용자 팀 스코프를 물려받던 버그).
+  React.useEffect(() => { reloadScopeForConsole?.(); }, [variant]); // eslint-disable-line react-hooks/exhaustive-deps
   const creditMode = config.billing.mode === 'credit';
   const approvalsActive = config.features.signupRequest || (creditMode && config.features.creditRequest);
   const joinOn = config.features.groupJoinRequest;

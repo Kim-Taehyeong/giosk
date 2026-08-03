@@ -11,6 +11,8 @@ type Repository interface {
 	ByGroupScoped(orgID, groupID int64) []GroupRow
 	ByUserScoped(orgID, groupID int64) []UserRow
 	ByOrgScoped(orgID, groupID int64) []OrgRow
+	// UserOneScoped: 단일 사용자의 소비/세션/GPU시간을 그 스코프 범위로만 집계(팀 관점 사용자 상세).
+	UserOneScoped(userID, orgID, groupID int64) *UserRow
 }
 
 type gormRepo struct{ db *gorm.DB }
@@ -121,6 +123,51 @@ func (r *gormRepo) ByUserScoped(orgID, groupID int64) []UserRow {
 		WHERE m.status = 'active' `+where+`
 		ORDER BY consumed DESC`, args...).Scan(&out)
 	return out
+}
+
+// UserOneScoped — 단일 사용자의 세션 수·GPU시간·소비를 스코프 범위로만 집계한다.
+// groupID>0 이면 그 팀에서의 사용만, orgID>0 이면 그 조직 산하 사용만, 둘 다 0 이면 전역.
+// ByUserScoped 는 "어떤 사용자가 나오는지"만 걸렀고 per-user 집계는 전역이라, 팀 관점 사용자 상세엔
+// 이 메서드로 서브쿼리 자체에 스코프를 걸어야 "내 팀에서 쓴 만큼"만 나온다.
+func (r *gormRepo) UserOneScoped(userID, orgID, groupID int64) *UserRow {
+	// 각 서브쿼리에 붙일 스코프 절(팀 > 조직 > 전역).
+	var scS, scGU, scS2 string
+	var scopeArg any
+	scoped := false
+	switch {
+	case groupID > 0:
+		scS, scGU, scS2 = " AND s.group_id = ?", " AND gu.group_id = ?", " AND s2.group_id = ?"
+		scopeArg, scoped = groupID, true
+	case orgID > 0:
+		gsub := " IN (SELECT id FROM `groups` WHERE org_id = ?)"
+		scS, scGU, scS2 = " AND s.group_id"+gsub, " AND gu.group_id"+gsub, " AND s2.group_id"+gsub
+		scopeArg, scoped = orgID, true
+	}
+	q := `
+		SELECT u.id, u.username AS name,
+		       COALESCE((SELECT g.display_name FROM ` + "`groups`" + ` g WHERE g.id = ?),'') AS ` + "`group`" + `,
+		       (SELECT COUNT(*) FROM sessions s WHERE s.user_id = ?` + scS + `) AS sessions,
+		       COALESCE(ROUND((SELECT SUM(gu.seconds) FROM gpu_usage gu WHERE gu.user_id = ?` + scGU + `)/3600,1),0) AS gpu_hours,
+		       COALESCE((SELECT SUM(s2.billed_credits) FROM sessions s2 WHERE s2.user_id = ?` + scS2 + `),0) AS consumed
+		FROM users u WHERE u.id = ?`
+	args := []any{groupID, userID}
+	if scoped {
+		args = append(args, scopeArg)
+	}
+	args = append(args, userID)
+	if scoped {
+		args = append(args, scopeArg)
+	}
+	args = append(args, userID)
+	if scoped {
+		args = append(args, scopeArg)
+	}
+	args = append(args, userID)
+	var row UserRow
+	if err := r.db.Raw(q, args...).Scan(&row).Error; err != nil || row.ID == 0 {
+		return nil
+	}
+	return &row
 }
 
 // ByOrgScoped — 조직 범위 필터. org=자기 조직, group=부모 조직(읽기용).

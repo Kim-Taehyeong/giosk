@@ -5,14 +5,26 @@ import { translateError } from '../i18n/translateError';
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 const KEY = 'giosk_sessionkey';
-const SCOPE_KEY = 'giosk_console_scope'; // 멀티롤 활성 스코프("org:10" | "group:2")
+// 스코프는 콘솔별로 분리 저장한다 — 관리자 콘솔(RoleSwitcher)과 사용자 콘솔(팀 선택)이 서로의
+// 스코프를 오염시키면(예전엔 한 키를 공유) org 관리자가 사용자 뷰에서 고른 팀 스코프를 물려받아
+// "내 조직이 안 보임 / 남의 팀이 보임" 같은 버그가 났다. 요청은 현재 콘솔(경로)에 맞는 키를 보낸다.
+const SCOPE_KEY = 'giosk_console_scope';   // 관리자/매니저 콘솔 관리 스코프("org:10" | "group:2")
+const USER_SCOPE_KEY = 'giosk_user_scope'; // 사용자 콘솔 활성 팀 스코프("group:2")
 
 export const getSessionKey = () => localStorage.getItem(KEY);
 export const setSessionKey = (k) => (k ? localStorage.setItem(KEY, k) : localStorage.removeItem(KEY));
 
-// 활성 콘솔 스코프 — 멀티롤 사용자가 전환기로 고른 역할. /console/* 요청에 X-Console-Scope 로 전송.
+const inAdminConsole = () => typeof window !== 'undefined' && window.location.pathname.startsWith('/console/admin');
+
+// 관리자 콘솔 스코프(RoleSwitcher 전용).
 export const getConsoleScope = () => localStorage.getItem(SCOPE_KEY);
 export const setConsoleScope = (s) => (s ? localStorage.setItem(SCOPE_KEY, s) : localStorage.removeItem(SCOPE_KEY));
+// 사용자 콘솔 팀 스코프(OrgGroupSelector 전용).
+export const getUserScope = () => localStorage.getItem(USER_SCOPE_KEY);
+export const setUserScope = (s) => (s ? localStorage.setItem(USER_SCOPE_KEY, s) : localStorage.removeItem(USER_SCOPE_KEY));
+// 현재 콘솔(경로)에 맞는 스코프 — 요청 헤더/컨텍스트 초기화에 사용.
+export const getScopeForRoute = () => (inAdminConsole() ? getConsoleScope() : getUserScope());
+export const setScopeForRoute = (s) => (inAdminConsole() ? setConsoleScope(s) : setUserScope(s));
 
 // wsURL은 웹터미널 등 WebSocket 접속 URL 을 만든다. http→ws / https→wss 변환하고,
 // 브라우저 WebSocket 은 Authorization 헤더를 못 붙이므로 세션키를 access_token 쿼리로 실어 보낸다.
@@ -30,7 +42,7 @@ async function request(method, path, body) {
   const headers = { 'Content-Type': 'application/json' };
   const key = getSessionKey();
   if (key) headers.Authorization = `Bearer ${key}`;
-  const scope = getConsoleScope();
+  const scope = getScopeForRoute();
   if (scope) headers['X-Console-Scope'] = scope;
 
   const res = await fetch(BASE + path, {
@@ -59,7 +71,7 @@ export async function apiUpload(path, formData) {
   const headers = {};
   const key = getSessionKey();
   if (key) headers.Authorization = `Bearer ${key}`;
-  const scope = getConsoleScope();
+  const scope = getScopeForRoute();
   if (scope) headers['X-Console-Scope'] = scope;
   const res = await fetch(BASE + path, { method: 'POST', headers, body: formData });
   const text = await res.text();
@@ -83,7 +95,7 @@ export function apiUploadProgress(path, formData, onProgress) {
     xhr.open('POST', BASE + path);
     const key = getSessionKey();
     if (key) xhr.setRequestHeader('Authorization', `Bearer ${key}`);
-    const scope = getConsoleScope();
+    const scope = getScopeForRoute();
     if (scope) xhr.setRequestHeader('X-Console-Scope', scope);
     xhr.upload.onprogress = (e) => {
       if (onProgress && e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100));
@@ -106,7 +118,7 @@ export async function apiPutRaw(path, body) {
   const headers = {};
   const key = getSessionKey();
   if (key) headers.Authorization = `Bearer ${key}`;
-  const scope = getConsoleScope();
+  const scope = getScopeForRoute();
   if (scope) headers['X-Console-Scope'] = scope;
   const res = await fetch(BASE + path, { method: 'PUT', headers, body });
   const text = await res.text();

@@ -271,13 +271,18 @@ func (s *Service) WithLimits(r *policy.Resolver) *Service { s.limits = r; return
 func (s *Service) checkHardLimits(userID int64, sess *Session) error {
 	// 중단(대기) 세션 상한 — 각 중단 세션이 로컬 홈 PVC(노드 디스크)를 점유하므로 무한정 쌓이면 안 된다.
 	// 초과 시 새 세션 생성을 막아 기존 중단 세션 삭제를 유도한다. (물리 SSH 는 로컬 PVC 없음 → 제외)
-	if s.maxStopped > 0 && sess.Env != "ssh" && s.repo.CountStopped(userID) >= s.maxStopped {
-		return ErrStoppedLimit
-	}
+	// 리졸버가 없으면 전역 config 값(s.maxStopped)으로 폴백.
 	if s.limits == nil {
+		if s.maxStopped > 0 && sess.Env != "ssh" && s.repo.CountStopped(userID) >= s.maxStopped {
+			return ErrStoppedLimit
+		}
 		return nil
 	}
 	lim := s.limits.Resolve(userID)
+	// 중단 상한은 계층 해석값(개인→그룹→조직→전역). 전역 폴백은 globalQuota(=cfg.Quota.MaxStoppedSessions).
+	if lim.MaxStoppedSessions > 0 && sess.Env != "ssh" && s.repo.CountStopped(userID) >= lim.MaxStoppedSessions {
+		return ErrStoppedLimit
+	}
 	if lim.MaxConcurrentSessions > 0 && s.repo.CountActive(userID) >= lim.MaxConcurrentSessions {
 		return ErrSessionLimit
 	}
