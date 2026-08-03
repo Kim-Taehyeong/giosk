@@ -107,7 +107,7 @@ function WebPane({ info, urlLabel, openLabel, expiresAt, t, onRegenerate, regene
     <div className="tabpane active">
       <label className="fld" style={{ marginTop: 0 }}>{urlLabel}</label>
       <CodeRow text={info.url} />
-      <div className="mt">
+      <div className="mt" style={{ marginTop: 12 }}>
         <a className="btn primary" href={info.url} target="_blank" rel="noreferrer"><ExternalLink size={14} /> {openLabel}</a>
       </div>
       {tokenized ? <ExpiryHint expiresAt={expiresAt} t={t} onRegenerate={onRegenerate} regenerating={regenerating} /> : null}

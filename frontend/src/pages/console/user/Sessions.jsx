@@ -27,6 +27,7 @@ export default function Sessions() {
   const colCount = 9 + ((creditMode || dynamicMode) ? 1 : 0);
   const [rows, setRows] = useState(null);
   const [conn, setConn] = useState(null);
+  const [connTab, setConnTab] = useState(null); // 클릭한 채널(모달 초기 탭) — 안 넘기면 항상 VSCode 로 열린다
   const [openId, setOpenId] = useState(null);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -145,7 +146,7 @@ export default function Sessions() {
                 {dynamicMode && <td>{r.mode === 'cpu' ? '—' : leaseLeftText(r)}</td>}
                 <td className="flex">
                   {r.status === 'running' && r.conn.length
-                    ? r.conn.map((c) => { const k = c.toLowerCase(); const Icon = CONN_ICON[k] || TerminalSquare; return <button key={c} className="btn sm" onClick={() => setConn(r)} title={c}><Icon size={13} /> {CONN_LABEL[k] || c}</button>; })
+                    ? r.conn.map((c) => { const k = c.toLowerCase(); const Icon = CONN_ICON[k] || TerminalSquare; return <button key={c} className="btn sm" onClick={() => { setConnTab(k); setConn(r); }} title={c}><Icon size={13} /> {CONN_LABEL[k] || c}</button>; })
                     : <span className="muted">—</span>}
                 </td>
                 <td><ChevronRight size={15} style={{ color: 'var(--muted)' }} /></td>
@@ -155,7 +156,7 @@ export default function Sessions() {
         </table>
       </div>
 
-      <ConnectionModal session={conn} onClose={() => setConn(null)} />
+      <ConnectionModal session={conn} initialTab={connTab} onClose={() => setConn(null)} />
     </div>
   );
 }

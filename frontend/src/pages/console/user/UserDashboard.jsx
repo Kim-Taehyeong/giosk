@@ -37,6 +37,8 @@ export default function UserDashboard() {
   const freeMode = config.billing.mode === 'free';
   const dyn = config.billing.dynamic;
   const creditLimit = config.billing.credit.maxConcurrentSessions;
+  // free 모드라도 전역 정책 쿼터(최대 동시 세션)는 유효하다 → ∞ 대신 이 상한을 보여준다.
+  const quotaSessions = config.quota?.maxConcurrentSessions;
   const [d, setD] = useState(null);
   const [connSession, setConnSession] = useState(null); // 접속 모달 대상 세션
   const [connTab, setConnTab] = useState(null); // 클릭한 채널(모달 초기 탭)
@@ -81,7 +83,7 @@ export default function UserDashboard() {
                     <div className="flex" style={{ gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                       <span style={{ fontWeight: 800, fontSize: 14.5, color: s.fg }}>{n.title}</span>
                       {n.pinned && <span style={{ fontSize: 11, fontWeight: 700, color: s.fg, opacity: .7 }}>· {t('dash.noticePinned')}</span>}
-                      <span className="muted" style={{ fontSize: 12 }}>{n.createdAt}</span>
+                      <span className="muted" style={{ fontSize: 12 }}>{n.createdAt ? new Date(n.createdAt).toLocaleString() : ''}</span>
                     </div>
                     {n.body && <div style={{ fontSize: 13, marginTop: 3, lineHeight: 1.55 }}>{n.body}</div>}
                   </div>
@@ -148,7 +150,9 @@ export default function UserDashboard() {
       <div className="grid cols-4 mb">
         {freeMode ? (
           <>
-            <StatCard icon={Layers} tone="free" label={t('dash.kpiConcurrent')} value={`${k.activeSessions}`} unit="/ ∞" />
+            <StatCard icon={Layers} tone="free" label={t('dash.kpiConcurrent')} value={`${k.activeSessions}`}
+              unit={quotaSessions ? `/ ${quotaSessions}` : '/ ∞'}
+              bar={quotaSessions ? { value: k.activeSessions, max: quotaSessions, variant: 'free' } : undefined} />
             <StatCard icon={Clock} tone="gpu" label={t('dash.kpiGpuHours')} value={`${k.gpuHoursMonth}`} unit={t('dash.hoursUnit')} />
             <StatCard icon={Zap} tone="free" label={t('dash.kpiBilling')} value={t('dash.kpiFree')} />
             <StatCard icon={Server} tone="gpu" label={t('dash.kpiNodes')} value={`${avail.byNode.length}`} />
@@ -245,11 +249,12 @@ export default function UserDashboard() {
                   </span>
                 : <span className="muted">—</span>
             ) },
-            { key: 'status', header: t('dash.colStatus'), render: (r) => (
-              r.status === 'running'
-                ? <Pill variant="run" dot>{t('dash.running')}</Pill>
-                : <Pill variant="wait" dot>{r.status}</Pill>
-            ) },
+            { key: 'status', header: t('dash.colStatus'), render: (r) => {
+              // 모든 상태를 i18n 라벨로 — running 만 번역하고 나머지를 raw enum(영문)으로 찍던 버그 수정.
+              const map = { running: ['run', 'running'], provisioning: ['wait', 'provisioning'], queued: ['wait', 'queued'], paused: ['pause', 'paused'], stopped: ['pause', 'paused'], terminated: ['pause', 'terminated'], failed: ['err', 'terminated'] };
+              const [v, k] = map[r.status] || ['wait', null];
+              return <Pill variant={v} dot>{k ? t('session.' + k, { defaultValue: r.status }) : r.status}</Pill>;
+            } },
           ]}
           rows={d.sessions}
           rowKey={(r) => r.id}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Server, Cpu, MemoryStick, HeartPulse, ChevronRight } from 'lucide-react';
+import { Server, Cpu, MemoryStick, HeartPulse, ChevronRight, Info } from 'lucide-react';
 import PageHead from '../../../components/console/PageHead';
 import StatCard from '../../../components/console/StatCard';
 import Pill from '../../../components/console/Pill';
@@ -12,8 +12,18 @@ import { getDatasets } from '../../../api/console/datasets';
 import { getAdminNodes, cordonNode, uncordonNode, getAdminStorage } from '../../../api/console/nodes';
 import { getAdminDashboard } from '../../../api/console/dashboard';
 
+// 안전한 퍼센트: max<=0(=지표 없음) 이면 0 을 반환해 NaN%(브라우저가 꽉 채움) 버그를 막는다.
+const barPct = (v, m) => (m > 0 ? Math.min(100, Math.max(0, (v / m) * 100)) : 0);
+
 function MiniMon({ n }) {
-  const rows = n.total !== undefined
+  const { t } = useTranslation('consoleAdmin');
+  const isGpu = n.total !== undefined;
+  // GPU 노드인데 VRAM 총량이 없음 = DCGM/Prometheus 미설치로 지표를 못 받는 상태.
+  const noMetrics = isGpu && !(n.total > 0);
+  if (noMetrics) {
+    return <span className="muted" style={{ fontSize: 11.5, fontWeight: 600 }}>{t('nodes.noMetrics', { defaultValue: '지표 없음' })}</span>;
+  }
+  const rows = isGpu
     ? [{ label: 'GPU', value: n.util, max: 100, txt: `${n.util}%`, variant: 'gpu' },
        { label: 'VRAM', value: n.used, max: n.total, txt: `${n.used}/${n.total}G`, variant: 'warn' }]
     : [{ label: 'CPU', value: n.cpuUtil, max: 100, txt: `${n.cpuUtil}%`, variant: 'free' },
@@ -26,7 +36,7 @@ function MiniMon({ n }) {
             <span>{r.label}</span><span>{r.txt}</span>
           </div>
           <div style={{ height: 6, borderRadius: 4, background: 'var(--surface-2)', overflow: 'hidden' }}>
-            <div style={{ height: '100%', width: `${Math.min(100, (r.value / r.max) * 100)}%`, background: `var(--${r.variant})`, borderRadius: 4 }} />
+            <div style={{ height: '100%', width: `${barPct(r.value, r.max)}%`, background: `var(--${r.variant})`, borderRadius: 4 }} />
           </div>
         </div>
       ))}
@@ -46,6 +56,10 @@ export default function Nodes() {
   const [datasets, setDatasets] = useState([]);
   const [kpis, setKpis] = useState(null);
   const [storage, setStorage] = useState(null);
+
+  // GPU 노드가 있는데 전부 VRAM 총량이 없으면 = DCGM/Prometheus 미설치로 지표 미가용.
+  const gpuNodes = nodes.filter((r) => r.total !== undefined);
+  const metricsOff = gpuNodes.length > 0 && gpuNodes.every((r) => !(r.total > 0));
 
   useEffect(() => { getDatasets().then((d) => setDatasets(d.global)); }, []);
   useEffect(() => { getAdminNodes().then(setNodes); }, []);
@@ -103,6 +117,15 @@ export default function Nodes() {
   return (
     <div>
       <PageHead title={t('nodes.title')} subtitle={t('nodes.subtitle')} />
+
+      {metricsOff && (
+        <div className="card mb" style={{ display: 'flex', alignItems: 'center', gap: 10, borderLeft: '3px solid var(--warn)' }}>
+          <Info size={18} style={{ color: 'var(--warn)', flex: '0 0 auto' }} />
+          <span style={{ fontSize: 13, color: 'var(--muted)' }}>
+            {t('nodes.metricsOffNotice', { defaultValue: '모니터링(DCGM·Prometheus)이 설치되지 않아 GPU 사용률·VRAM 지표를 표시할 수 없습니다. 모니터링을 활성화하면 실시간 지표가 나타납니다.' })}
+          </span>
+        </div>
+      )}
 
       <div className="grid cols-4 mb">
         <StatCard icon={Cpu} tone="gpu" label={t('nodes.gpuUtil')} value={`${kpis?.gpuUtil ?? 0}%`} bar={{ value: kpis?.gpuUtil ?? 0, max: 100, variant: 'gpu' }} />
