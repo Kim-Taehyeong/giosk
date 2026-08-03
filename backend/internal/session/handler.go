@@ -159,6 +159,8 @@ func (h *Handler) writeErr(c *gin.Context, err error, msg string) {
 		httpx.NotFound(c, "세션을 찾을 수 없습니다")
 	case errors.Is(err, ErrSessionLimit):
 		httpx.Err(c, 409, "session_limit", "동시 실행 가능한 세션 수를 초과했습니다")
+	case errors.Is(err, ErrStoppedLimit):
+		httpx.Err(c, 409, "stopped_limit", "중단된 세션이 너무 많습니다. 새 세션을 만들려면 기존 중단 세션을 삭제하세요")
 	case errors.Is(err, node.ErrNodeBusy):
 		httpx.Err(c, 409, "node_busy", "이미 다른 사용자가 점유 중인 노드입니다")
 	case errors.Is(err, ErrNodeRequired):

@@ -7,13 +7,16 @@ import (
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
+	storagev1 "k8s.io/api/storage/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// WaitPVCsBound은 지정한 PVC 들이 모두 Bound 될 때까지(또는 timeout) 기다린다.
-// PVC 는 생성 즉시 바인딩되지 않는데(비동기), hami-scheduler 는 unbound PVC 로 스케줄 실패 시
-// 재큐잉하지 않아 Pod 가 영구 Pending 이 된다 → Pod 생성 전에 바인딩을 보장한다.
+// WaitPVCsBound은 지정한 PVC 들이 스케줄 가능해질 때까지(또는 timeout) 기다린다.
+// Immediate 바인딩 PVC(NFS 등)는 생성 즉시 바인딩되지 않는데(비동기), hami-scheduler 는 unbound
+// immediate PVC 로 스케줄 실패 시 재큐잉하지 않아 Pod 가 영구 Pending 이 된다 → Pod 생성 전에 바인딩을 보장한다.
+// 단, WaitForFirstConsumer(local-path 등) PVC 는 Pod 스케줄 시점에 바인딩되는 게 정상이므로 기다리지 않는다
+// (여기서 Bound 를 기다리면 영원히 Pending → 타임아웃). Pending+WFFC 는 "준비됨"으로 취급한다.
 func (c *Client) WaitPVCsBound(ctx context.Context, ns string, names []string, timeout time.Duration) {
 	if !c.Available() || len(names) == 0 {
 		return
@@ -21,15 +24,23 @@ func (c *Client) WaitPVCsBound(ctx context.Context, ns string, names []string, t
 	ctx2, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 	for {
-		allBound := true
+		allReady := true
 		for _, n := range names {
 			pvc, err := c.cs.CoreV1().PersistentVolumeClaims(ns).Get(ctx2, n, metav1.GetOptions{})
-			if err != nil || pvc.Status.Phase != corev1.ClaimBound {
-				allBound = false
+			if err != nil {
+				allReady = false
 				break
 			}
+			if pvc.Status.Phase == corev1.ClaimBound {
+				continue
+			}
+			if c.pvcIsWaitForFirstConsumer(ctx2, pvc) {
+				continue // WFFC: Pod 스케줄 시 바인딩 → 블로커 아님
+			}
+			allReady = false
+			break
 		}
-		if allBound {
+		if allReady {
 			return
 		}
 		select {
@@ -40,32 +51,48 @@ func (c *Client) WaitPVCsBound(ctx context.Context, ns string, names []string, t
 	}
 }
 
+// pvcIsWaitForFirstConsumer는 PVC 의 스토리지클래스 바인딩 모드가 WaitForFirstConsumer 인지 본다.
+func (c *Client) pvcIsWaitForFirstConsumer(ctx context.Context, pvc *corev1.PersistentVolumeClaim) bool {
+	scName := ""
+	if pvc.Spec.StorageClassName != nil {
+		scName = *pvc.Spec.StorageClassName
+	}
+	if scName == "" {
+		return false
+	}
+	sc, err := c.cs.StorageV1().StorageClasses().Get(ctx, scName, metav1.GetOptions{})
+	if err != nil || sc.VolumeBindingMode == nil {
+		return false
+	}
+	return *sc.VolumeBindingMode == storagev1.VolumeBindingWaitForFirstConsumer
+}
+
 // SessionSpec은 세션 Pod 프로비저닝 입력(도메인 → k8s 변환 결과).
 type SessionSpec struct {
-	Namespace   string
-	Name        string // = instance_id
-	Image       string // repo:tag
-	GpuType     string // 노드 라벨 값(빈값=CPU 전용/지정 없음)
-	GpuMode     string // shared | exclusive | cpu
-	GpuCount    int
-	VramMB      int
-	CorePercent int
-	CPUCores    int
-	MemGB       int
-	EphemeralGiB int             // 컨테이너 쓰기레이어+emptyDir 상한(GiB). 0=기본 캡. 노드 루트디스크 무단점유(DoS) 방지.
-	Labels      map[string]string
-	UID         int              // 안정 사용자 UID(uidBase+userID). 컨테이너를 이 UID 로 실행 → NFS 볼륨 파일 소유가 물리 SSH 와 일관.
-	HomePVC     string           // 홈 영속 PVC 이름(/home/work 마운트). 빈값이면 미마운트.
-	Volumes     []VolMountSpec   // 추가 볼륨 마운트(PVC 기반)
-	WebChannels []WebChannelSpec // 활성 웹 채널(code-server/jupyter): 포트 + 인증 env
-	SSHDImage   string           // 컨테이너 SSH 사이드카 이미지(빈값=사이드카 없음). 직접 SSH·게이트웨이 프록시 공용.
-	SSHDPubKey  string           // 사이드카 sshd 가 신뢰할 게이트웨이 공개키(authorized_keys). 게이트웨이 off 면 빈값.
+	Namespace    string
+	Name         string // = instance_id
+	Image        string // repo:tag
+	GpuType      string // 노드 라벨 값(빈값=CPU 전용/지정 없음)
+	GpuMode      string // shared | exclusive | cpu
+	GpuCount     int
+	VramMB       int
+	CorePercent  int
+	CPUCores     int
+	MemGB        int
+	EphemeralGiB int // 컨테이너 쓰기레이어+emptyDir 상한(GiB). 0=기본 캡. 노드 루트디스크 무단점유(DoS) 방지.
+	Labels       map[string]string
+	UID          int              // 안정 사용자 UID(uidBase+userID). 컨테이너를 이 UID 로 실행 → NFS 볼륨 파일 소유가 물리 SSH 와 일관.
+	HomePVC      string           // 홈 영속 PVC 이름(/home/work 마운트). 빈값이면 미마운트.
+	Volumes      []VolMountSpec   // 추가 볼륨 마운트(PVC 기반)
+	WebChannels  []WebChannelSpec // 활성 웹 채널(code-server/jupyter): 포트 + 인증 env
+	SSHDImage    string           // 컨테이너 SSH 사이드카 이미지(빈값=사이드카 없음). 직접 SSH·게이트웨이 프록시 공용.
+	SSHDPubKey   string           // 사이드카 sshd 가 신뢰할 게이트웨이 공개키(authorized_keys). 게이트웨이 off 면 빈값.
 	// 사용자 등록 공개키를 담은 Secret 이름(키: authorized_keys). 사이드카에 read-only 로 마운트되어
 	// sshd 가 접속마다 다시 읽는다 → 키 등록/교체가 실행 중 세션에도 즉시 반영. 빈값/미존재면 마운트 생략(Optional).
 	UserKeysSecret string
-	ScratchHost string           // 노드로컬 스크래치 계정폴더(hostPath). 빈값이면 미마운트.
-	PreferNodes []string         // 이미지 캐시된 노드(소프트 선호) — 빠른 시작. nodeSelector(타입) 안에서만 효과.
-	RequireNode string           // 하드 핀(required nodeAffinity hostname) — 데이터셋 노드 로컬 캐시 hostPath 마운트용.
+	ScratchHost    string   // 노드로컬 스크래치 계정폴더(hostPath). 빈값이면 미마운트.
+	PreferNodes    []string // 이미지 캐시된 노드(소프트 선호) — 빠른 시작. nodeSelector(타입) 안에서만 효과.
+	RequireNode    string   // 하드 핀(required nodeAffinity hostname) — 데이터셋 노드 로컬 캐시 hostPath 마운트용.
 }
 
 // VolMountSpec은 세션 Pod 에 붙일 PVC 마운트 1건.
@@ -165,8 +192,8 @@ type ContainerState struct {
 	Name         string `json:"name"`
 	Ready        bool   `json:"ready"`
 	RestartCount int32  `json:"restartCount"`
-	State        string `json:"state"`             // running | waiting | terminated
-	Reason       string `json:"reason,omitempty"`  // CrashLoopBackOff | ImagePullBackOff | OOMKilled | Error ...
+	State        string `json:"state"`            // running | waiting | terminated
+	Reason       string `json:"reason,omitempty"` // CrashLoopBackOff | ImagePullBackOff | OOMKilled | Error ...
 	Message      string `json:"message,omitempty"`
 	ExitCode     int32  `json:"exitCode,omitempty"`
 	Image        string `json:"image,omitempty"`

@@ -94,12 +94,12 @@ func main() {
 	volumeSvc.WithLocalHome(cfg.PhysicalNodes.Enabled) // 물리 활성 시 로컬 Home 특수 볼륨 노출
 	nodeSvc := node.NewService(node.NewRepository(db), kc, met,
 		cfg.PhysicalNodes.NFS.Server, cfg.PhysicalNodes.NFS.Path).
-		WithScratch(cfg.Storage.ScratchHostPath).                                            // 물리노드 스크래치 루트(노드별 활성은 DB)
-		WithUIDBase(cfg.PhysicalNodes.UIDBase).                                              // 전역 안정 UID 베이스(재사용 방지)
-		WithLocalHomeHost(cfg.Storage.PhysicalHomeHost).                                     // 물리 SSH 로컬 home 루트(/home/giosk)
-		WithFreeMode(cfg.IsFree()).                                                          // 자유 모드: 임대 영속·계정 재사용·동시접속
+		WithScratch(cfg.Storage.ScratchHostPath).                                             // 물리노드 스크래치 루트(노드별 활성은 DB)
+		WithUIDBase(cfg.PhysicalNodes.UIDBase).                                               // 전역 안정 UID 베이스(재사용 방지)
+		WithLocalHomeHost(cfg.Storage.PhysicalHomeHost).                                      // 물리 SSH 로컬 home 루트(/home/giosk)
+		WithFreeMode(cfg.IsFree()).                                                           // 자유 모드: 임대 영속·계정 재사용·동시접속
 		WithDevicePluginConfig(cfg.K8s.DevicePluginConfigNS, cfg.K8s.DevicePluginConfigName). // 타임셰어링 웹 설정 → device plugin 즉시 반영
-		WithPhysicalLabel(cfg.PhysicalNodes.Label)                                           // 물리 임대 토글이 이 라벨을 k8s 노드에 적용
+		WithPhysicalLabel(cfg.PhysicalNodes.Label)                                            // 물리 임대 토글이 이 라벨을 k8s 노드에 적용
 	cfgStore := systemconfig.NewStore(db) // 런타임 설정(유휴·기능 토글·전역 상한) 저장소
 	platIntervalFn := func() int { return cfgStore.IntOr(systemconfig.KeyRechargeIntervalDays, 30) }
 	orgSvc.WithPlatformInterval(platIntervalFn)    // 조직 리필 주기 캡(플랫폼 기본)
@@ -136,6 +136,8 @@ func main() {
 	sessionSvc.WithLocalHome(cfg.PhysicalNodes.Enabled, cfg.Storage.PhysicalHomeHost)                // 로컬 Home 특수 볼륨(hostPath+노드핀)
 	sessionSvc.WithUIDBase(cfg.PhysicalNodes.UIDBase)                                                // 컨테이너 안정 UID(물리 SSH 와 동일) → NFS 권한 일관
 	sessionSvc.WithSharedHome(cfg.Storage.SharedHome)                                                // 영속 home(~/nfs) 사용 여부(설치시 고정)
+	sessionSvc.WithLocalClass(cfg.Storage.LocalClass)                                                // 세션 전용 홈(/home/work) 로컬 스토리지클래스(속도 위해 노드로컬)
+	sessionSvc.WithMaxStopped(cfg.Quota.MaxStoppedSessions)                                          // 중단(대기) 세션 상한(로컬 홈 PVC 누적 방지)
 	sessionSvc.WithSurge(cfg.Billing.Credit.Pricing == "dynamic", cfg.Billing.Credit.SurgeIncrement, // 동적/서지 가격
 		func(ctx context.Context, gt string) (int, int) {
 			for _, t := range resourceSvc.Availability(ctx).ByType {
@@ -237,7 +239,7 @@ func main() {
 			SELECT uw.user_id, uw.group_id, g.display_name AS name, uw.balance,
 			  (EXISTS(SELECT 1 FROM sessions s WHERE s.user_id=uw.user_id AND s.group_id=uw.group_id AND s.phase IN ('provisioning','running'))
 			   OR EXISTS(SELECT 1 FROM memberships m WHERE m.user_id=uw.user_id AND m.group_id=uw.group_id AND m.consumed>0)) AS active
-			FROM user_wallets uw JOIN `+"`groups`"+` g ON g.id=uw.group_id
+			FROM user_wallets uw JOIN ` + "`groups`" + ` g ON g.id=uw.group_id
 			WHERE uw.group_id>0 AND EXISTS(SELECT 1 FROM memberships m WHERE m.user_id=uw.user_id AND m.group_id=uw.group_id AND m.status='active')`).Scan(&rows).Error
 		if err != nil {
 			return nil
@@ -258,9 +260,9 @@ func main() {
 	// 데이터셋 — 정규 NFS 경로(<base>/dataset/<name>) 적재 + 리컨실러(다운로드 완료 시 PVC 바인딩).
 	datasetSvc := dataset.NewService(dataset.NewRepository(db)).
 		WithStorage(kc, cfg.Storage.NFSClass, cfg.K8s.NamespacePrefix+"datasets",
-					cfg.Storage.Datasets.NFS.Server, cfg.Storage.Datasets.NFS.Path, cfg.Storage.DatasetCacheHost).
+									cfg.Storage.Datasets.NFS.Server, cfg.Storage.Datasets.NFS.Path, cfg.Storage.DatasetCacheHost).
 		WithUploadMount(cfg.Storage.Datasets.LocalMount). // zip/tar 직접 업로드(설정 시 API 가 NFS 에 직접 기록)
-		WithMetrics(met) // 다운로드 진행률(%)
+		WithMetrics(met)                                  // 다운로드 진행률(%)
 	go datasetSvc.RunReconciler(context.Background(), 10*time.Second)
 	sessionSvc.WithDatasetCache(datasetSvc) // 세션이 캐시된 노드선 데이터셋을 hostPath 로 마운트
 	// 세션 생성 UI: 노드별 "캐시된 데이터셋" 표시(dataset_node_cache). 노드-선호 선택용.

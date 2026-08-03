@@ -62,6 +62,10 @@ billing:
 
 # ── 스토리지 전략 ──────────────────────────────────────────────────
 storage:
+  # 세션 전용 홈(/home/work) 로컬 스토리지클래스. 노드 로컬 디스크(WFFC)라 빠르다 — 홈 I/O 를
+  # NFS 로 보내면 느려서 안 됨. 중단 시 데이터 보존(노드에 잔존), 삭제 시 PVC 와 함께 제거.
+  # WFFC 라 Pod 스케줄 시 그 노드에 바인딩되고, 재시작은 PV 노드 어피니티로 같은 노드로 돌아간다.
+  localClass: local-path
   # 영속 home(~/nfs) 스토리지클래스. 사용자의 모든 세션이 공유하는 노드 무관 저장소이므로
   # 반드시 RWX(ReadWriteMany)·노드 독립 클래스여야 한다(NFS·CephFS·Longhorn-RWX 등).
   # ⚠️ local-path/hostPath 같은 노드 로컬 클래스는 PV 가 노드에 고정돼, 다른 GPU 타입(다른 노드)
@@ -255,6 +259,7 @@ quota:
   maxGpuCount: 64
   maxVramGb: 512
   maxConcurrentSessions: 50
+  maxStoppedSessions: 5   # 사용자당 중단(대기) 세션 상한(0=무제한). 중단 세션은 로컬 홈 PVC 로 노드 디스크 점유.
   volumeQuotaGb: 2000
 
 branding:
