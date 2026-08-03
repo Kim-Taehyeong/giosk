@@ -98,7 +98,7 @@ data:
   {{- if .Values.gateway.enabled }}
   # ── 접속 게이트웨이 ──
   # API 는 이 값들로 세션 접속 URL/SSH 명령을 만든다. 비밀(GIOSK_GATEWAY_SECRET)은 Secret 에서 주입.
-  # ⚠️ DOMAIN 이 비면 config 기본값(gw.giosk.local)이 먹어 실제로 열리지 않는 링크가 나간다.
+  # DOMAIN 이 비면 config 기본값(gw.giosk.local)이 먹어 실제로 열리지 않는 링크가 나간다.
   GIOSK_GATEWAY_DOMAIN: {{ required "gateway.enabled=true 면 gateway.domain 필수(<iid>-<ch>.<domain> 와일드카드 DNS)" .Values.gateway.domain | quote }}
   GIOSK_GATEWAY_SCHEME: {{ .Values.gateway.scheme | default "https" | quote }}
   # SSH 접속 호스트 — 미지정 시 게이트웨이 LB IP(MetalLB), 그것도 없으면 도메인.

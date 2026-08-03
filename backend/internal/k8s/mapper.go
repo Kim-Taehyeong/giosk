@@ -318,7 +318,7 @@ func gpuLimits(s SessionSpec) corev1.ResourceList {
 			limits[resGPUCores] = *resource.NewQuantity(int64(s.CorePercent), resource.DecimalSI)
 		}
 	}
-	// ephemeral-storage 상한 — ⚠️ 이 limit 의 강제 수단은 kubelet 의 "eviction"(초과 시 세션 파드 강제 종료)이다.
+	// ephemeral-storage 상한 — 이 limit 의 강제 수단은 kubelet 의 "eviction"(초과 시 세션 파드 강제 종료)이다.
 	// 기본으로 걸면 임시 디스크를 넘긴 사용자의 세션이 갑자기 죽는 위험이 있어, 정책(MaxEphemeralGiB)이
 	// 명시로 값을 준 경우(>0)에만 건다. 0(무제한)=미설정이면 걸지 않는다(다른 하드리밋과 동일: 0=무제한).
 	if s.EphemeralGiB > 0 {

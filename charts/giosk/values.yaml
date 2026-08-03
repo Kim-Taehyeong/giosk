@@ -1,6 +1,5 @@
-# Giosk Helm values — 설치 시점/DB 스키마 영향 설정의 단일 출처.
-# 이 값들이 ConfigMap/Secret → 환경변수(GIOSK_*) → backend/internal/config 로 주입된다.
-# (런타임 토글이 아닌, 설치 시 고정되는 모드/스토리지/물리노드 설정)
+# Giosk Helm values — 설치 시점에 고정되는 설정.
+# ConfigMap/Secret → 환경변수(GIOSK_*) → backend/internal/config 로 주입된다.
 
 image:
   api:
@@ -15,18 +14,16 @@ image:
   gateway:
     repository: giosk-gateway
     tag: latest
-  # 컨테이너 세션 SSH 사이드카(sshd). session.ssh.enabled=true 면 모든 컨테이너 세션에 붙어
-  # 사용자 등록 공개키로 "게이트웨이 없이도" 직접 SSH 가 된다(게이트웨이는 그 위에 얹는 추가 경로).
+  # 컨테이너 세션 SSH 사이드카. session.ssh 참고.
   sshd:
     repository: giosk-sshd
     tag: latest
-  # 노드에 ctr import 한 로컬 이미지를 쓰므로 IfNotPresent(있으면 로컬 사용, 당겨오지 않음)
+  # 노드에 ctr import 한 로컬 이미지를 쓰므로 IfNotPresent
   pullPolicy: IfNotPresent
 
 # ── 컨트롤플레인 상주 컴포넌트 스케줄 ───────────────────────────────
-# 웹터미널·게이트웨이 등 "제어/접속 평면" 컴포넌트는 GPU 워커노드가 아니라 컨트롤노드에 두는 게 낫다
-# (워커는 GPU 작업 전용으로 비우고, 접속/제어는 안정적인 컨트롤노드에 집중). enabled=true 면 api·gateway 를
-# 컨트롤플레인 노드에 고정(nodeSelector) + 컨트롤플레인 taint 를 tolerate 한다.
+# api·gateway 를 컨트롤노드에 고정한다(nodeSelector + taint tolerate).
+# GPU 워커는 작업 전용으로 비워 두는 편이 낫다.
 controlPlane:
   enabled: false
   nodeSelector:
@@ -44,8 +41,7 @@ deployment:
   mode: container        # hybrid 로 두면 SSH 물리노드 임대 기능 활성
 
 # ── 과금 축 (credit | dynamic | free) ──────────────────────────────
-# free = 자유 모드: 크레딧·임대·동시세션 제한이 모두 없음. 세션 생성 자유(중복 허용),
-#        hybrid 와 함께 쓰면 물리노드는 첫 SSH 사용 시 계정 생성 후 영속(삭제 안 함)·동시접속 허용.
+# free = 크레딧·임대·동시세션 제한 없음. hybrid 와 함께 쓰면 물리 계정은 첫 SSH 때 만들어져 남는다.
 billing:
   mode: credit
   credit:
@@ -62,48 +58,34 @@ billing:
 
 # ── 스토리지 전략 ──────────────────────────────────────────────────
 storage:
-  # 세션 전용 홈(/home/work) 로컬 스토리지클래스. 노드 로컬 디스크(WFFC)라 빠르다 — 홈 I/O 를
-  # NFS 로 보내면 느려서 안 됨. 중단 시 데이터 보존(노드에 잔존), 삭제 시 PVC 와 함께 제거.
-  # WFFC 라 Pod 스케줄 시 그 노드에 바인딩되고, 재시작은 PV 노드 어피니티로 같은 노드로 돌아간다.
+  # 세션 홈(/home/work) 스토리지클래스. 노드 로컬(WFFC)이라 빠르다 — 홈 I/O 를 NFS 로 보내면 못 쓴다.
+  # 중지해도 남고 삭제할 때만 정리한다.
   localClass: local-path
-  # 영속 home(~/nfs) 스토리지클래스. 사용자의 모든 세션이 공유하는 노드 무관 저장소이므로
-  # 반드시 RWX(ReadWriteMany)·노드 독립 클래스여야 한다(NFS·CephFS·Longhorn-RWX 등).
-  # ⚠️ local-path/hostPath 같은 노드 로컬 클래스는 PV 가 노드에 고정돼, 다른 GPU 타입(다른 노드)
-  #    세션이 "volume node affinity conflict"로 스케줄 불가하거나 동시 세션이 multi-attach 로 막힌다.
-  #    (deployment.mode=container/hybrid 와 무관 — home 은 항상 RWX 로 생성된다.)
+  # 영속 home(~/nfs) 스토리지클래스. 노드 무관 저장소라 RWX 필수(NFS·CephFS·Longhorn-RWX).
+  # 노드 로컬 클래스를 쓰면 PV 가 노드에 묶여 volume node affinity conflict 로 스케줄이 막힌다.
   persistence:
-    # sharedHome=true: 사용자별 영속 home(~/nfs) PVC 를 만들어 모든 세션이 공유(노드 무관). storageClass 는 RWX 필수.
-    # sharedHome=false(기본): 컨테이너 세션은 영속 home 미사용 → emptyDir 로컬 임시 home 만(비영속, RWX 불필요).
-    #   영속이 필요하면 사용자가 볼륨을 따로 만들어 붙인다(opt-in). 물리노드 모드는 이 값과 무관하게 노드 로컬 홈을
-    #   자동 제공한다(비영속). 컨테이너 세션에 지속 저장을 자동으로 붙이지 않는 것이 기본 정책.
+    # true = 사용자별 영속 home PVC 를 만들어 모든 세션이 공유. false = emptyDir 임시 홈만(RWX 불필요),
+    # 영속이 필요하면 사용자가 볼륨을 붙인다.
     sharedHome: false
-    # RWX StorageClass 이름. nfsProvisioner.install=true 면 그 provisioner 가 만드는
-    # nfsProvisioner.storageClassName(기본 nfs)와 일치시킨다. 기존 RWX SC 를 쓰면 그 이름으로.
+    # nfsProvisioner.install=true 면 nfsProvisioner.storageClassName 과 일치시킨다.
     storageClass: nfs
-  # 데이터셋 기능: 켜면 NFS server+path 가 반드시 필요(미지정 시 설치 실패).
-  # 데이터셋은 정규경로 <path>/dataset/<이름> 에 저장되어 세션/물리노드가 직접 마운트한다.
-  # → 쓰기 가능한 NFS export 를 지정해야 한다(예: server=10.0.0.5, path=/export).
+  # 데이터셋. 켜면 NFS server+path 필수(미지정 시 설치 실패).
+  # <path>/dataset/<이름> 에 저장되고 세션·물리노드가 직접 마운트하므로 쓰기 가능한 export 여야 한다.
   datasets:
     enabled: false
     nfs:
       server: ""   # 데이터셋 NFS 서버 (datasets.enabled 시 필수)
       path: ""     # 데이터셋 NFS 베이스 export 경로 (datasets.enabled 시 필수)
-    # 노드 로컬 캐시 루트(hostPath). 캐시 배치 시 NFS 데이터셋을 각 물리노드 로컬 디스크로 복사,
-    # 세션은 캐시된 노드에서 이 경로를 직접 마운트(NFS보다 빠름). 노드에 충분한 로컬 디스크 필요.
+    # 노드 로컬 캐시 루트(hostPath). NFS 데이터셋을 노드 디스크로 복사해 두면 세션이 여기서 읽는다.
     cacheHostPath: /dataset-cache
-  # Scratch: 노드 로컬 고속 임시 디스크. enabled=true 면 모든 세션 pod 에 /scratch(hostPath, 계정폴더)
-  # 자동 마운트(컨테이너·물리 공통). 노드에 hostPath 가 root 로 생성되므로 initContainer 가 세션 UID 로 chown.
+  # 노드 로컬 고속 임시 디스크. 켜면 모든 세션에 /scratch 가 계정 폴더로 마운트된다.
   scratch:
     enabled: false
     hostPath: /scratch
 
 # ── 노드 디스크 정리 DaemonSet ──────────────────────────────────────
-# Scratch·로컬 Home 은 노드 로컬 디스크라 사용자별 쿼터가 없다. 방치하면 노드 디스크가 100% 가 되고
-# kubelet DiskPressure 로 파드가 축출돼 노드가 통째로 빠진다. 이 DaemonSet 이 사용률이 임계를 넘으면
-# 접근(atime)이 오래된 파일부터 지워 임계 아래로 되돌린다.
-#   scratch : 임시 공간이라 계약대로 바로 정리(기본 85%).
-#   home    : 사용자 작업물이라 더 늦게(기본 92%), 그리고 minAgeDays 보다 오래된 파일만 지운다.
-#             지워지기 전에 관리자가 알도록 알림센터의 disk_usage 규칙(기본 85%)이 먼저 울린다.
+# scratch 와 로컬 home 은 사용자별 쿼터가 없다. 방치하면 DiskPressure 로 노드가 통째로 빠지므로,
+# 임계를 넘으면 atime 이 오래된 파일부터 지운다. scratch 는 임시 공간이라 먼저, home 은 더 늦게.
 # scratch.enabled 또는 physicalNodes.enabled 일 때만 배포된다.
 nodeCleaner:
   enabled: true
@@ -112,19 +94,17 @@ nodeCleaner:
   homeThreshold: 92
   homeMinAgeDays: 3     # 이보다 최근에 쓴 파일은 지우지 않는다(작업 중인 파일 보호)
 
-# ── 인클러스터 이미지 레지스트리 (이미지 빌드 파이프라인) ───────────────
-# enabled=true 면 차트가 클러스터 내 registry(registry:2, Deployment+Service+PVC)를 배포하고
-# GIOSK_REGISTRY 를 <release>-giosk-registry:<port> 로 자동 설정한다.
-# 이미지 빌드(Kaniko 푸시)·세션 풀이 이 레지스트리를 사용한다.
-# 외부 레지스트리를 쓰려면 enabled=false + external 에 host:port 지정(비우면 빌드 비활성).
+# ── 인클러스터 이미지 레지스트리 (이미지 빌드용) ────────────────────
+# Kaniko 빌드 푸시와 세션 이미지 풀이 여기를 쓴다. 외부 레지스트리를 쓰려면
+# install=false + external 지정(둘 다 비우면 빌드 기능이 꺼진다).
 registry:
   install: false         # true=인클러스터 레지스트리 번들 설치. false=외부 레지스트리(아래 external) 사용.
   external: ""           # install=false 일 때 사용할 외부 레지스트리(host:port)
   image: registry:2
   port: 5000
-  # 세션 풀은 노드 containerd 가 수행 → 클러스터 Service DNS 해석 불가.
-  # type=LoadBalancer + loadBalancerIP(MetalLB) 로 노드도달 주소를 주면 GIOSK_REGISTRY 가 그 주소를 쓰고
-  # 빌드(Kaniko)·풀 모두 동일 주소 사용(노드엔 hosts.toml insecure 필요). 기본 ClusterIP=빌드 전용.
+  # 세션 이미지 풀은 노드 containerd 가 하므로 클러스터 Service DNS 를 못 푼다. 풀까지 이 레지스트리로
+  # 받으려면 LoadBalancer + 고정 IP 로 노드가 닿는 주소를 준다(노드에 hosts.toml insecure 필요).
+  # 기본 ClusterIP 는 빌드 전용.
   service:
     type: ClusterIP
     loadBalancerIP: ""
@@ -154,15 +134,13 @@ monitoring:
   dcgm:
     install: true         # true=dcgm-exporter 번들(GPU 유틸/VRAM/온도). GPU Operator 가 DCGM 을 제공하면 false.
     namespace: gpu-operator  # DCGM 파드 네임스페이스(PodMonitor 스크레이프 대상)
-  # 분할(shared) 세션의 "세션별" GPU 지표 소스. DCGM 은 물리 카드 단위라 한 카드를 나눠 쓰면
-  # 세션별로 값이 갈리지 않는다 → HAMi vGPUmonitor(컨테이너별 실사용)를 함께 스크레이프한다.
+  # DCGM 은 물리 카드 단위라 분할 세션은 값이 갈리지 않는다. 세션별로 보려면 HAMi vGPUmonitor 도 함께 긁는다.
   hami:
     scrape: false         # HAMi 메트릭 스크레이프(분할 세션 관측). hami.install 과 함께 켠다.
     namespace: ""         # 비우면 릴리스 네임스페이스
 
 # ── GPU 분할 스케줄러 (HAMi) ───────────────────────────────────────
-# fractional GPU(분할) 사용 시 필요. nvidia.com/gpumem·gpucores 자원 광고/스케줄.
-# 분할/vGPU 세션을 안 쓰면 불필요(전용·CPU 세션은 device-plugin 만으로 동작).
+# 공유(분할) GPU 세션에만 필요하다. 전용·CPU 세션은 device-plugin 만으로 동작한다.
 hami:
   install: false          # true=HAMi 스케줄러를 별도 릴리스로 번들 설치
 
@@ -174,9 +152,8 @@ metallb:
   ipRange: ""             # install=true 필수. 예: 10.0.0.200-10.0.0.220 (사내망 유휴 대역)
 
 # ── 동적 RWX PV 생성기 (NFS provisioner) ───────────────────────────
-# NFS 는 container/hybrid 어떤 모드에서도 필수(영속 home ~/nfs 가 RWX). NFS "서버"는 외부 하드웨어/VM 이라
-# 항상 준비돼 있어야 하고, 그 서버에 동적으로 PV 를 만드는 provisioner 만 차트가 번들할 수 있다.
-# install=false 면 이미 있는 RWX StorageClass(storage.persistence.storageClass)를 그대로 쓴다.
+# NFS 서버 자체는 외부에 미리 있어야 하고, 차트가 번들하는 것은 그 위에 PV 를 만드는 provisioner 뿐이다.
+# install=false 면 이미 있는 RWX StorageClass 를 그대로 쓴다.
 nfsProvisioner:
   install: true           # true=nfs-subdir-external-provisioner 번들 설치 + storageClassName 생성.
   server: ""              # NFS 서버 주소 (install=true 필수)
@@ -187,11 +164,10 @@ nfsProvisioner:
 # 활성 시 외부 NFS 필수(대여 시 물리 마운트 대상) + node-agent DaemonSet 배포
 physicalNodes:
   enabled: false
-  # 물리 계정 UID = uidBase + 사용자ID (전역 안정, 재사용 안 함). 시스템/LDAP UID 충돌을 피하려 높게 둔다.
-  # 같은 사용자는 모든 노드에서 동일 UID → NFS 권한 일관 + 재임대 시 스크래치/홈 소유권 회복.
+  # 물리 계정 UID = uidBase + 사용자ID. 재사용하지 않으며 모든 노드에서 같은 값이라 NFS 권한이 일관된다.
+  # 시스템/LDAP UID 와 겹치지 않게 높게 잡는다.
   uidBase: 100000
-  # 물리 SSH 로컬 home 루트(<root>/<user>). node-agent 의 useradd 홈이자 "로컬 Home" 특수 볼륨의 원천.
-  # 노드 로컬 디스크라 쿼터가 없다 → nodeCleaner 가 노드 디스크를 보호한다.
+  # 물리 SSH 계정의 home 루트(<root>/<user>). 노드 로컬이라 쿼터가 없어 nodeCleaner 가 지킨다.
   homeHostPath: /home/giosk
   nfs:                   # 외부 NFS (server+path 필수)
     server: ""
@@ -209,40 +185,34 @@ features:
   groupJoinRequest: true
   creditRequest: true
 
-# ── 세션 웹(VSCode/code-server) 노출 ────────────────────────────────
-# loadbalancer = 세션마다 LoadBalancer Service(MetalLB 가 IP 할당) → http://<IP>:8080
-# nodeport     = 워커 NodeIP:NodePort (기본 — 인그레스/게이트웨이 없이 바로 접속)
-# 인증은 Giosk 가 세션마다 생성하는 랜덤 비밀번호(code-server)로 강제 — 인그레스/DNS 불필요.
+# ── 세션 웹 노출 ───────────────────────────────────────────────────
+# loadbalancer = 세션마다 LoadBalancer Service, nodeport = NodeIP:NodePort(기본).
+# 인증은 세션마다 생성되는 랜덤 비밀번호/토큰이라 인그레스나 DNS 가 없어도 된다.
 session:
   expose: nodeport
-  # 컨테이너 세션 SSH — 기본 경로다. 켜면 sshd 사이드카(image.sshd)가 항상 붙고 세션 Service 에
-  # 22 포트가 열려, 사용자가 콘솔에 등록한 공개키로 바로 SSH 할 수 있다(게이트웨이 불요).
-  # 노출 주소는 expose 를 따른다: loadbalancer(MetalLB 우선) > nodeport. 키 미등록 사용자는
-  # 웹 터미널로 접속하거나 콘솔에서 키를 등록하면 실행 중 세션에도 즉시 반영된다.
+  # 컨테이너 세션 직접 SSH. 켜면 sshd 사이드카가 붙고 사용자가 등록한 공개키로 바로 접속된다.
+  # 키를 나중에 등록해도 실행 중 세션에 바로 반영된다. 주소는 expose 를 따른다.
   ssh:
     enabled: true
 
-# ── 접속 게이트웨이 (Vast.ai 식 도메인·SSH 단일 접점) ────────────────────
-# enabled=true 면 giosk-gateway(리버스 프록시 + SSH 프록시)를 배포하고, 세션 접속을
-#   웹: https://<세션>-<채널>.<domain>/  (와일드카드 DNS *.<domain> → 게이트웨이 LB IP)
-#   SSH: ssh -p <sshPort> <1회토큰>@<host|domain>
-# 로 단일화한다. 사용자는 단기 토큰만 받고, 게이트웨이가 실제 비밀(code-server 비번/jupyter 토큰/
-# SSH 키)을 대신 주입한다. secret/sshPrivateKey/sshPublicKey 는 deploy.sh 가 생성·주입(고정)한다.
+# ── 접속 게이트웨이 (도메인·SSH 단일 접점) ──────────────────────────
+# 세션 접속을 웹 https://<세션>-<채널>.<domain>/ 과 ssh -p <sshPort> <토큰>@<host> 로 단일화한다.
+# 사용자는 단기 토큰만 받고 실제 비밀(code-server 비번, jupyter 토큰, SSH 키)은 게이트웨이가 주입한다.
+# 와일드카드 DNS *.<domain> 이 필요하다. 비밀값은 비워 두면 deploy.sh 가 생성한다.
 gateway:
   enabled: false
   domain: gw.giosk.local     # 서브도메인 = <iid>-<ch>.<domain>. 와일드카드 DNS 필요.
   scheme: https              # 웹 URL 스킴(테스트베드 HTTP 는 "http")
   host: ""                   # SSH 접속 호스트(빈값=domain). 예: 게이트웨이 LB IP.
   sshPort: 2222              # 게이트웨이 SSH 프록시 외부 포트
-  # 외부(사내망/VPN 밖) 접속용 SSH 점프 호스트(user@host). 지정하면 콘솔이 `ssh -J <이 값> …` 명령도
-  # 함께 보여준다. 게이트웨이는 MetalLB LB IP(사내망)로만 열리므로 밖에서는 이 경유가 필요.
+  # 사내망 밖에서 들어올 때 쓸 점프 호스트(user@host). 지정하면 콘솔이 ssh -J 명령도 함께 보여준다.
   sshProxyJump: ""
   cookieTTL: 28800           # 웹 세션 쿠키 수명(초)
   consoleURL: ""             # 접근거부 페이지의 "콘솔에서 다시 열기" 버튼 링크(예: https://console.example.org). 빈값=버튼 숨김
   secret: ""                 # API↔게이트웨이 공유 토큰키(빈값=deploy.sh 생성 / 랜덤)
   sshPrivateKey: ""          # 게이트웨이 SSH 관리 개인키(PEM). 백엔드로 재접속용.
   sshPublicKey: ""           # 위 개인키의 공개키(OpenSSH). sshd 사이드카·물리계정이 신뢰.
-  # 컨테이너 SSH 사이드카 이미지(빈값=컨테이너 SSH 비활성, 물리 SSH 만). SESSION_UID/GATEWAY_PUBKEY env 계약.
+  # 컨테이너 SSH 사이드카 이미지(빈값이면 물리 SSH 만).
   sshdImage: ""
   replicas: 1
   service:
@@ -261,16 +231,13 @@ quota:
   maxConcurrentSessions: 50
   maxStoppedSessions: 5   # 사용자당 중단(대기) 세션 상한(0=무제한). 중단 세션은 로컬 홈 PVC 로 노드 디스크 점유.
   volumeQuotaGb: 2000
-  # 메모리 limit 배수(limit = GPU 지분 비례 보장 × 배수, 1 이하=상한 없음).
-  # 메모리는 압축 불가라 상한이 없으면 한 세션이 노드 RAM 을 고갈시켜 kubelet 이 남의 세션을 축출한다.
+  # 메모리 limit 배수(limit = GPU 지분 비례 보장 × 배수, 1 이하면 상한 없음).
+  # 메모리는 압축이 안 돼서 상한이 없으면 한 세션이 노드 RAM 을 말리고 kubelet 이 남의 세션을 축출한다.
   memBurst: 2
-  # 중단 세션 홈 회수(T1) — 방치 stoppedTtlDays 일 초과 + 노드 디스크 homeReapPct% 초과일 때만 집행.
-  # 여유가 있으면 오래된 중단 세션도 그대로 둔다(scratch/로컬홈 정리 DaemonSet 과 같은 계약).
-  # ⚠️ 아래 둘은 "초기값"일 뿐이다 — 유휴 타임아웃과 같은 운영 정책이라 관리자 설정(PUT /admin/config)에서
-  #    바꾸면 그 값이 우선하고 재배포 없이 다음 틱부터 반영된다. 여기 값을 고쳐도 이미 저장된 설정은 안 바뀐다.
-  # stoppedTtlDays: 0 이면 자동 회수 비활성 → 개수 상한과 스토리지 과금만으로 억제.
+  # 중단 세션 홈 회수 — 방치 일수와 노드 디스크 사용률을 둘 다 넘겼을 때만 집행한다(0=비활성).
+  # 여기 값은 초기값일 뿐이라, 관리자 설정에서 바꾸면 그쪽이 우선한다.
   stoppedTtlDays: 14
-  homeReapPct: 88         # nodeCleaner scratch(85) 와 home(92) 사이 — 임시공간 → 세션홈 → 작업홈 순으로 개입
+  homeReapPct: 88         # nodeCleaner 의 scratch(85)와 home(92) 사이에서 개입
 
 branding:
   name: Giosk
@@ -306,18 +273,15 @@ api:
 
 # ── K8s 연동 ───────────────────────────────────────────────────────
 k8s:
-  # 노드 GPU 종류 라벨. GFD/fake-gpu-operator 표준. (구 kind 개발=giosk.io/gpu-type)
-  gpuTypeLabel: nvidia.com/gpu.product
-  # 노드 CUDA(드라이버) 버전 라벨. GFD 가 부여. 없으면 콘솔에 "—" 표기.
-  cudaLabel: nvidia.com/cuda.driver-version
+  gpuTypeLabel: nvidia.com/gpu.product          # 노드 GPU 종류 라벨(GFD)
+  cudaLabel: nvidia.com/cuda.driver-version     # 드라이버 버전 라벨(GFD). 없으면 콘솔에 "—"
 
 # ── 프론트엔드 (nginx: 정적 + /api 프록시) ──────────────────────────
 frontend:
   replicas: 1
   domain: ""             # 콘솔 도메인(예: console.example.한국). server_name·HTTPS 리다이렉트에 사용. 비우면 아무 호스트(_)
-  # TLS: secretName 지정 시 프론트 nginx 가 443 에서 HTTPS 종단하고 80→443 리다이렉트한다.
-  # 와일드카드 인증서(*.example.한국)면 콘솔·게이트웨이 서브도메인까지 한 인증서로 커버된다.
-  # 사전에 kubernetes.io/tls Secret 을 같은 네임스페이스에 만들어 둘 것(아래 설치 안내 참고).
+  # secretName 을 주면 nginx 가 443 에서 HTTPS 를 종단하고 80 은 리다이렉트한다.
+  # kubernetes.io/tls Secret 을 같은 네임스페이스에 미리 만들어 둬야 한다.
   tls:
     secretName: ""       # 예: giosk-wildcard-tls. 비우면 HTTP(80)만.
   service:

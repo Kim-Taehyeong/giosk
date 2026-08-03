@@ -166,7 +166,7 @@ func driverMaxCuda(driver string) string {
 // cudaVersionOf는 노드 CUDA 툴킷(런타임) 버전을 라벨에서 뽑는다(예: 12.2, 11.8).
 // GFD 조각 라벨 nvidia.com/cuda.runtime.major/.minor 를 우선 "major.minor" 로 합성한다.
 // 없으면 설정된 단일 라벨(운영에서 combined 런타임 라벨을 쓰는 경우)을 본다.
-// ⚠️ 드라이버 버전(nvidia.com/cuda.driver-version=535 등)은 CUDA 버전이 아니므로 쓰지 않는다.
+// 드라이버 버전(nvidia.com/cuda.driver-version=535 등)은 CUDA 버전이 아니므로 쓰지 않는다.
 func cudaVersionOf(labels map[string]string, primary string) string {
 	if maj := labels["nvidia.com/cuda.runtime.major"]; maj != "" {
 		if min := labels["nvidia.com/cuda.runtime.minor"]; min != "" {

@@ -146,7 +146,7 @@ distribute_images(){
   done
 
   # 노드 목록(이름 InternalIP). control(자기 자신)은 로컬 import, 워커는 SSH import.
-  # ⚠️ 루프 입력은 fd3 으로 읽는다. fd0(stdin)으로 읽으면 내부 ssh 가 노드 목록을
+  # 루프 입력은 fd3 으로 읽는다. fd0(stdin)으로 읽으면 내부 ssh 가 노드 목록을
   #    먹어버려 첫 워커만 처리되고 끝난다(전형적 함정). ssh 도 -n 으로 stdin 차단.
   local self; self=$(hostname)
   while read -r name ip <&3; do
@@ -169,7 +169,7 @@ distribute_images(){
 }
 
 # ── 5a) 모니터링: kube-prometheus-stack 을 '별도 릴리스'로 설치 ───────
-# ⚠️ 서브차트로 넣으면 CRD(Prometheus/ServiceMonitor/PodMonitor/PrometheusRule)가
+# 서브차트로 넣으면 CRD(Prometheus/ServiceMonitor/PodMonitor/PrometheusRule)가
 #    매니페스트보다 먼저 안 깔려 "ensure CRDs are installed first" 로 실패한다.
 #    직접(top-level) 설치하면 CRD 가 정상 적용된다. giosk DCGM PodMonitor 보다 먼저.
 install_monitoring(){
