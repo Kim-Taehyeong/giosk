@@ -73,6 +73,15 @@ type AdminDashboard struct {
 	Snapshots    []Snapshot       `json:"snapshots"`   // 최근 24h 인프라 스냅샷(우리 DB, 감시 트렌드)
 	SessionStats SessionStats     `json:"sessionStats"`
 	ActiveUsers  []ActiveUser     `json:"activeUsers"` // 현재 실행 세션 보유 사용자
+	Metrics      MetricsStatus    `json:"metrics"`     // 지표 수집 스택 설치 여부(0 표시와 "미설치" 구분용)
+}
+
+// MetricsStatus는 대시보드 지표의 출처가 실제로 살아 있는지 알려준다.
+// 둘 다 꺼진 배포에서 GPU 사용률 0% 를 그대로 보여주면 "GPU 가 노는 중"으로 오해된다 →
+// 프론트가 값 대신 "모니터링 미설치" 안내를 띄우도록 상태를 함께 내려준다.
+type MetricsStatus struct {
+	Prometheus bool `json:"prometheus"` // Prometheus 연동(URL 설정 + 응답)
+	DCGM       bool `json:"dcgm"`       // DCGM exporter GPU 시리즈 존재
 }
 
 type AdminKPIs struct {

@@ -513,6 +513,7 @@
     }
   },
   "topbar": {
-    "nodeBadge": "Nodes {{up}}/{{total}} · GPU {{gpu}}%"
+    "nodeBadge": "Nodes {{up}}/{{total}} · GPU {{gpu}}%",
+    "nodeBadgeNoGpu": "Nodes {{up}}/{{total}} · GPU —"
   }
 }

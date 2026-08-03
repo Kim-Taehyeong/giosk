@@ -14,5 +14,6 @@ func Register(api gin.IRouter, h *Handler) {
 	authed := api.Group("", h.RequireAuth())
 	authed.GET("/auth/me", h.Me)
 	authed.PUT("/auth/me/ssh-key", h.SetSSHKey)
+	authed.POST("/auth/me/ssh-key/generate", h.GenerateSSHKey) // 서버 생성 키쌍(개인키 1회 반환)
 	authed.PUT("/auth/me/password", h.ChangePassword)
 }

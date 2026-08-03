@@ -117,7 +117,10 @@
     "mode_free": "Free",
     "opsHint": "Operations",
     "modeHint_dynamic": "First-come mode — no credits; grab capacity when available. Monitor via session/idle stats and alerts.",
-    "modeHint_free": "Free mode — no credit limits. Monitor utilization via session/idle stats and GPU hours."
+    "modeHint_free": "Free mode — no credit limits. Monitor utilization via session/idle stats and GPU hours.",
+    "metricsOffTitle": "Monitoring stack is not installed",
+    "metricsOffAll": "GPU utilization, VRAM and temperature cannot be shown without Prometheus and the DCGM exporter. Enable monitoring to see live metrics.",
+    "metricsOffDcgm": "Prometheus is connected but no DCGM exporter metrics were found. Install dcgm-exporter to see live GPU utilization, VRAM and temperature."
   },
   "approvals": {
     "title": "Approvals",
@@ -472,7 +475,10 @@
     "impMissing": "Enter name, owner, NFS server and path.",
     "impNoUser": "Account not found.",
     "impDone": "Imported volume {{name}} to {{user}}.",
-    "impFail": "Import failed"
+    "impFail": "Import failed",
+    "impOwnerHint": "Pick an account from the list to import.",
+    "impOwnerPicked": "Selected: {{name}} ({{id}})",
+    "metricsOffNotice": "Monitoring (DCGM/Prometheus) is not installed, so GPU utilization and VRAM cannot be shown. Enable monitoring to see live metrics."
   },
   "mset": {
     "title": "Settings",

@@ -142,7 +142,20 @@ func (s *Service) Admin(ctx context.Context) AdminDashboard {
 		Snapshots:    s.repo.SnapshotsSince(time.Now().Add(-24 * time.Hour)),
 		SessionStats: s.clusterSessionStats(),
 		ActiveUsers:  s.repo.ActiveUsers(8),
+		Metrics:      s.metricsStatus(ctx),
 	}
+}
+
+// metricsStatus는 지표 스택 설치 여부를 확인한다. DCGM 은 시리즈가 실제로 존재해야 true —
+// Prometheus 만 있고 dcgm-exporter 가 없으면 GPU 지표는 영원히 0 이므로 구분해야 한다.
+func (s *Service) metricsStatus(ctx context.Context) MetricsStatus {
+	st := MetricsStatus{Prometheus: s.met.Enabled()}
+	if st.Prometheus {
+		if v, ok := s.met.Scalar(ctx, "count(DCGM_FI_DEV_GPU_UTIL)"); ok && v > 0 {
+			st.DCGM = true
+		}
+	}
+	return st
 }
 
 // Ops는 운영 대시보드(사용·거버넌스)를 스코프+과금모드로 반환한다.

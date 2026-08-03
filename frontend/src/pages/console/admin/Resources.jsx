@@ -24,7 +24,7 @@ function Field({ label, children, w = 150 }) {
 }
 
 /* ---------------- 오퍼링 ---------------- */
-function OfferingsTab({ creditMode, onGotoPricing }) {
+function OfferingsTab({ creditMode, onGotoPricing, title }) {
   const { t } = useTranslation('consoleAdmin');
   const [rows, setRows] = useState([]);
   const [gpuTypes, setGpuTypes] = useState([]);
@@ -43,8 +43,10 @@ function OfferingsTab({ creditMode, onGotoPricing }) {
   const remove = async (r) => { if (!(await confirm({ title: t('res.delete'), message: t('confirmDelete'), confirmText: t('res.delete'), danger: true }))) return; await deleteOffering(r.id); setEdit(null); toast(t('res.offeringOff')); load(); };
 
   return (
-    <>
-      <div className="flex" style={{ justifyContent: 'flex-end', marginBottom: 10 }}>
+    <div className="card">
+      {/* 제목 줄에 추가 버튼을 함께 둔다 — 버튼만 있는 빈 줄이 생기지 않게. */}
+      <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+        <h3 style={{ margin: 0 }}><Boxes size={16} /> {title}</h3>
         <button className="btn primary" onClick={() => setEdit({ ...blank })}>{t('res.addOffering')}</button>
       </div>
       <table>
@@ -102,7 +104,7 @@ function OfferingsTab({ creditMode, onGotoPricing }) {
           </div>
         )}
       </Modal>
-    </>
+    </div>
   );
 }
 
@@ -287,10 +289,7 @@ export default function Resources() {
         {creditMode && <span className={`st${tab === 'pricing' ? ' active' : ''}`} onClick={() => setTab('pricing')}>{t('res.tabPricing')}</span>}
       </div>
       {tab === 'offerings' ? (
-        <div className="card">
-          <h3><Boxes size={16} /> {title}</h3>
-          <OfferingsTab creditMode={creditMode} onGotoPricing={() => setTab('pricing')} />
-        </div>
+        <OfferingsTab creditMode={creditMode} title={title} onGotoPricing={() => setTab('pricing')} />
       ) : (
         <PricingTab />
       )}

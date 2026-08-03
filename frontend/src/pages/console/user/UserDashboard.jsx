@@ -12,6 +12,7 @@ import { getUserDashboard } from '../../../api/console/dashboard';
 import { getAvailability } from '../../../api/console/resources';
 import { getAnnouncements } from '../../../api/console/announcements';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
+import { useAuth } from '../../../context/AuthContext';
 
 // 공지 레벨별 스타일. critical 은 사용자가 닫을 수 없음(고정 노출).
 const NOTICE_STYLE = {
@@ -32,6 +33,7 @@ const CONN_CH = {
 export default function UserDashboard() {
   const { t } = useTranslation('consoleUser');
   const { config } = useSystemConfig();
+  const { user } = useAuth();
   const hybrid = config.deploymentMode === 'hybrid';
   const creditMode = config.billing.mode === 'credit';
   const freeMode = config.billing.mode === 'free';
@@ -55,7 +57,7 @@ export default function UserDashboard() {
   const visibleNotices = notices.filter((n) => n.active && (n.level === 'critical' || !dismissed.includes(n.id)));
   if (!d) return <div className="muted">{t('common.loading')}</div>;
   const k = d.kpis;
-  const hasSsh = !!localStorage.getItem('giosk_sshkey');
+  const hasSsh = !!user?.sshPublicKey; // 계정에 등록된 공개키(서버 권위 — 예전 localStorage 판단은 기기마다 달랐다)
   const closeBanner = () => { localStorage.setItem('giosk_welcome_closed', '1'); setBannerClosed(true); };
 
   const quick = [

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Server, Cpu, MemoryStick, HeartPulse, ChevronRight, Info } from 'lucide-react';
+import { Server, Cpu, MemoryStick, HeartPulse, ChevronRight } from 'lucide-react';
 import PageHead from '../../../components/console/PageHead';
 import StatCard from '../../../components/console/StatCard';
 import Pill from '../../../components/console/Pill';
 import Bar from '../../../components/console/Bar';
 import { useToast } from '../../../components/console/Toast';
+import MetricsOffNotice from '../../../components/console/MetricsOffNotice';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { getDatasets } from '../../../api/console/datasets';
 import { getAdminNodes, cordonNode, uncordonNode, getAdminStorage } from '../../../api/console/nodes';
@@ -61,7 +62,11 @@ export default function Nodes() {
   const gpuNodes = nodes.filter((r) => r.total !== undefined);
   const metricsOff = gpuNodes.length > 0 && gpuNodes.every((r) => !(r.total > 0));
 
-  useEffect(() => { getDatasets().then((d) => setDatasets(d.global)); }, []);
+  // 데이터셋 기능이 꺼진 배포에선 라우트 자체가 없다(404) → 켜져 있을 때만 조회.
+  useEffect(() => {
+    if (!datasetsOn) return;
+    getDatasets().then((d) => setDatasets(d.global || [])).catch(() => {});
+  }, [datasetsOn]);
   useEffect(() => { getAdminNodes().then(setNodes); }, []);
   useEffect(() => { getAdminDashboard().then((d) => setKpis(d.kpis)); }, []);
   useEffect(() => { getAdminStorage().then(setStorage).catch(() => {}); }, []);
@@ -118,14 +123,7 @@ export default function Nodes() {
     <div>
       <PageHead title={t('nodes.title')} subtitle={t('nodes.subtitle')} />
 
-      {metricsOff && (
-        <div className="card mb" style={{ display: 'flex', alignItems: 'center', gap: 10, borderLeft: '3px solid var(--warn)' }}>
-          <Info size={18} style={{ color: 'var(--warn)', flex: '0 0 auto' }} />
-          <span style={{ fontSize: 13, color: 'var(--muted)' }}>
-            {t('nodes.metricsOffNotice', { defaultValue: '모니터링(DCGM·Prometheus)이 설치되지 않아 GPU 사용률·VRAM 지표를 표시할 수 없습니다. 모니터링을 활성화하면 실시간 지표가 나타납니다.' })}
-          </span>
-        </div>
-      )}
+      {metricsOff && <MetricsOffNotice />}
 
       <div className="grid cols-4 mb">
         <StatCard icon={Cpu} tone="gpu" label={t('nodes.gpuUtil')} value={`${kpis?.gpuUtil ?? 0}%`} bar={{ value: kpis?.gpuUtil ?? 0, max: 100, variant: 'gpu' }} />

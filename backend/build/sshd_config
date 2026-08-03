@@ -8,7 +8,11 @@ KbdInteractiveAuthentication no
 PermitEmptyPasswords no
 PubkeyAuthentication yes
 # 신뢰 키는 root 소유 경로에서만 읽는다(공유 홈은 사용자가 쓸 수 있어 신뢰 불가).
-AuthorizedKeysFile /etc/ssh/authorized_keys/%u
+#   1) /etc/ssh/authorized_keys/%u  — 게이트웨이 관리키(entrypoint 가 기동 시 기록)
+#   2) /etc/giosk/ssh/authorized_keys — 사용자 등록 공개키(k8s Secret 마운트, read-only)
+#      Secret 볼륨은 내용이 바뀌면 파일이 갱신되고 sshd 는 접속마다 이 파일을 다시 읽는다
+#      → 사용자가 키를 등록/교체하면 실행 중인 세션에도 즉시 반영된다(재시작 불필요).
+AuthorizedKeysFile /etc/ssh/authorized_keys/%u /etc/giosk/ssh/authorized_keys
 PermitUserEnvironment no
 X11Forwarding no
 PrintMotd no

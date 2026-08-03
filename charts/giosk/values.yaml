@@ -15,6 +15,11 @@ image:
   gateway:
     repository: giosk-gateway
     tag: latest
+  # 컨테이너 세션 SSH 사이드카(sshd). session.ssh.enabled=true 면 모든 컨테이너 세션에 붙어
+  # 사용자 등록 공개키로 "게이트웨이 없이도" 직접 SSH 가 된다(게이트웨이는 그 위에 얹는 추가 경로).
+  sshd:
+    repository: giosk-sshd
+    tag: latest
   # 노드에 ctr import 한 로컬 이미지를 쓰므로 IfNotPresent(있으면 로컬 사용, 당겨오지 않음)
   pullPolicy: IfNotPresent
 
@@ -205,6 +210,12 @@ features:
 # 인증은 Giosk 가 세션마다 생성하는 랜덤 비밀번호(code-server)로 강제 — 인그레스/DNS 불필요.
 session:
   expose: portforward
+  # 컨테이너 세션 SSH — 기본 경로다. 켜면 sshd 사이드카(image.sshd)가 항상 붙고 세션 Service 에
+  # 22 포트가 열려, 사용자가 콘솔에 등록한 공개키로 바로 SSH 할 수 있다(게이트웨이 불요).
+  # 노출 주소는 expose 를 따른다: loadbalancer(MetalLB 우선) > nodeport. 키 미등록 사용자는
+  # 웹 터미널로 접속하거나 콘솔에서 키를 등록하면 실행 중 세션에도 즉시 반영된다.
+  ssh:
+    enabled: true
 
 # ── 접속 게이트웨이 (Vast.ai 식 도메인·SSH 단일 접점) ────────────────────
 # enabled=true 면 giosk-gateway(리버스 프록시 + SSH 프록시)를 배포하고, 세션 접속을

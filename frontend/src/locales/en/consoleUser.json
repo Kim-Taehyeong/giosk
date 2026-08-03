@@ -229,7 +229,7 @@
     "connByImage": "Connection methods are determined by the image",
     "reviewStart": "Review and start",
     "sessionName": "Session name",
-    "sshKey": "SSH public key (empty = password login)",
+    "sshKey": "SSH public key (lets you SSH straight into the session)",
     "type": "Type",
     "offering": "Offering",
     "image": "Image",
@@ -310,7 +310,8 @@
     "runtimeLeft": "Runtime at this rate",
     "hoursApprox": "~{{n}} hours",
     "notEnough": "Not enough credit — 1 hour minimum required",
-    "tsSlotN": "1 of {{n}} slots"
+    "tsSlotN": "1 of {{n}} slots",
+    "sshKeyChange": "Change"
   },
   "session": {
     "title": "Sessions",
@@ -413,7 +414,9 @@
     "sshDirect": "Direct (intranet)",
     "sshDirectInHint": "Connect straight to the node from inside the office network — bypassing the gateway.",
     "regenerate": "Regenerate",
-    "regenerated": "Issued a fresh access link."
+    "regenerated": "Issued a fresh access link.",
+    "sshNeedKey": "No SSH public key registered",
+    "sshNeedKeyHint": "Register or generate one below — running sessions pick it up immediately."
   },
   "account": {
     "title": "My Settings",
@@ -430,7 +433,7 @@
     "noGroup": "No group",
     "memberRole": "Group role",
     "ssh": "SSH public key",
-    "sshHint": "Injected into the container on session creation.",
+    "sshHint": "Injected into session containers and physical nodes automatically — running sessions pick it up immediately.",
     "save": "Save",
     "sshSaved": "SSH key saved",
     "pwTitle": "Change password",
@@ -449,7 +452,13 @@
     "dark": "Dark",
     "homeTitle": "SSH home quota",
     "homeHint": "Your physical node home directory usage in hybrid (SSH) mode.",
-    "localAcctNote": "A local account is provisioned for you on each physical node."
+    "localAcctNote": "A local account is provisioned for you on each physical node.",
+    "sshBad": "Invalid public key. Paste a single line such as \"ssh-ed25519 AAAA...\".",
+    "sshFail": "Failed to save the SSH public key.",
+    "sshGenerate": "Generate & download key",
+    "sshGenerated": "Key generated. Keep the downloaded private key safe — it cannot be downloaded again.",
+    "sshGenFail": "Failed to generate an SSH key.",
+    "sshGenerateHint": "No key yet? Click \"Generate & download key\". The private key (.pem) downloads once and the public key is registered automatically. Connect with: ssh -i downloaded-key.pem ..."
   },
   "notify": {
     "title": "Notifications",

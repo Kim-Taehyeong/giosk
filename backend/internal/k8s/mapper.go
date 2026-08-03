@@ -60,6 +60,18 @@ func buildPod(s SessionSpec, gpuTypeLabel string) *corev1.Pod {
 	// 홈(/home/work)을 공유하고 게이트웨이 공개키만 신뢰한다. root 로 실행(22 바인드·useradd)하되
 	// 로그인 계정 work 은 세션 UID 로 생성해 파일 소유를 세션 컨테이너와 일치시킨다.
 	if s.SSHDImage != "" && s.UID > 0 {
+		// 사용자 공개키 Secret 은 Optional — 아직 키를 등록하지 않은 사용자도 세션은 떠야 하고,
+		// 나중에 등록하면 Secret 이 생기면서 sshd 가 다음 접속부터 그 키를 신뢰한다.
+		if s.UserKeysSecret != "" {
+			optional := true
+			spec.Volumes = append(spec.Volumes, corev1.Volume{
+				Name: userKeysVolume,
+				VolumeSource: corev1.VolumeSource{Secret: &corev1.SecretVolumeSource{
+					SecretName: s.UserKeysSecret,
+					Optional:   &optional,
+				}},
+			})
+		}
 		spec.Containers = append(spec.Containers, sshdSidecar(s, mounts))
 	}
 	// scratch(hostPath)는 kubelet 이 root 로 생성 → FSGroup 미적용이라 비-root 세션이 못 쓴다.
@@ -95,6 +107,10 @@ func sshdSidecar(s SessionSpec, homeMounts []corev1.VolumeMount) corev1.Containe
 			mounts = append(mounts, m)
 		}
 	}
+	// 사용자 등록 공개키(Secret) — read-only 마운트. sshd_config 의 AuthorizedKeysFile 두 번째 경로.
+	if s.UserKeysSecret != "" {
+		mounts = append(mounts, corev1.VolumeMount{Name: userKeysVolume, MountPath: userKeysMount, ReadOnly: true})
+	}
 	return corev1.Container{
 		Name:  "sshd",
 		Image: s.SSHDImage,
@@ -118,6 +134,13 @@ func itoa(n int) string { return fmt.Sprintf("%d", n) }
 
 // homeMount는 세션 홈 마운트 경로(/home/work). HOME/WorkingDir 를 여기로 맞춰 ~ 가 마운트 위치와 같게 한다.
 const homeMount = "/home/work"
+
+// 사용자 등록 공개키 Secret 의 볼륨명/마운트 경로. sshd_config 의 AuthorizedKeysFile 두 번째 경로와 일치해야 한다
+// (/etc/giosk/ssh/authorized_keys). Secret 의 데이터 키 이름도 authorized_keys 여야 파일명이 맞는다.
+const (
+	userKeysVolume = "giosk-ssh-keys"
+	userKeysMount  = "/etc/giosk/ssh"
+)
 
 // scratchMount는 노드로컬 스크래치 마운트 경로. 홈 하위(~/scratch)에 두어 접근 편의를 높인다
 // (물리노드도 ~/scratch 심링크로 동일 관례). 홈 볼륨 위에 하위경로로 겹쳐 마운트된다.

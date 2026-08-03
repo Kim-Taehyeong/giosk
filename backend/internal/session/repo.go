@@ -49,6 +49,7 @@ type Repository interface {
 	CountActive(userID int64) int                  // 활성(provisioning|running) 세션 수
 	UserLeasedNode(userID int64, node string) bool // 사용자가 그 물리노드를 대여한 적 있는지(로컬 Home 접근 검증)
 	SetUserSSHKey(userID int64, key string) error
+	UserSSHKey(userID int64) string // 등록된 SSH 공개키(미등록=""). 컨테이너 SSH authorized_keys 주입용
 	Username(userID int64) string
 	GetByInstance(instanceID string) (*Session, error)
 
@@ -219,6 +220,14 @@ func (r *gormRepo) SetUserSSHKey(userID int64, key string) error {
 		return nil
 	}
 	return r.db.Exec(`UPDATE users SET ssh_public_key = ? WHERE id = ?`, key, userID).Error
+}
+
+// UserSSHKey는 사용자가 등록한 SSH 공개키(OpenSSH 1줄)를 반환한다. 미등록이면 빈 문자열.
+// 컨테이너 세션 sshd 사이드카가 신뢰할 authorized_keys Secret 을 채우는 데 쓴다.
+func (r *gormRepo) UserSSHKey(userID int64) string {
+	var key string
+	r.db.Raw(`SELECT ssh_public_key FROM users WHERE id = ?`, userID).Scan(&key)
+	return key
 }
 
 func (r *gormRepo) Username(userID int64) string {

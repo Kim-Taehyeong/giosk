@@ -60,7 +60,12 @@ export default function Topbar({ variant, ns }) {
       getAdminDashboard()
         .then((d) => {
           const k = d.kpis || {};
-          setSummary((s) => ({ ...s, adminBadge: t('topbar.nodeBadge', { up: k.nodesUp ?? 0, total: k.nodesTotal ?? 0, gpu: k.gpuUtil ?? 0, defaultValue: 'Nodes {{up}}/{{total}} · GPU {{gpu}}%' }) }));
+          // 모니터링(DCGM) 이 없으면 GPU 사용률은 0% 가 아니라 미측정 — 0% 로 보이면 "GPU 가 논다"고 오해된다.
+          const nt = { up: k.nodesUp ?? 0, total: k.nodesTotal ?? 0 };
+          const badge = d.metrics?.dcgm
+            ? t('topbar.nodeBadge', { ...nt, gpu: k.gpuUtil ?? 0, defaultValue: 'Nodes {{up}}/{{total}} · GPU {{gpu}}%' })
+            : t('topbar.nodeBadgeNoGpu', { ...nt, defaultValue: 'Nodes {{up}}/{{total}} · GPU —' });
+          setSummary((s) => ({ ...s, adminBadge: badge }));
         })
         .catch(() => {});
       return;

@@ -229,7 +229,7 @@
     "connByImage": "연결 방식은 이미지가 결정합니다",
     "reviewStart": "검토 후 시작",
     "sessionName": "세션 이름",
-    "sshKey": "SSH 공개키 (비우면 비밀번호 접속)",
+    "sshKey": "SSH 공개키 (등록하면 세션에 SSH로 바로 접속)",
     "type": "유형",
     "offering": "오퍼링",
     "image": "이미지",
@@ -310,7 +310,8 @@
     "runtimeLeft": "이 단가로 사용 가능",
     "hoursApprox": "약 {{n}}시간",
     "notEnough": "크레딧 부족 — 최소 1시간치 필요",
-    "tsSlotN": "슬롯 1개 / {{n}}"
+    "tsSlotN": "슬롯 1개 / {{n}}",
+    "sshKeyChange": "변경"
   },
   "session": {
     "title": "세션",
@@ -413,7 +414,9 @@
     "sshDirect": "직접 접속 (사내망)",
     "sshDirectInHint": "사무실 네트워크(사내망) 안에서 노드에 바로 접속합니다. 게이트웨이를 거치지 않습니다.",
     "regenerate": "재생성",
-    "regenerated": "새 접속 링크를 발급했습니다."
+    "regenerated": "새 접속 링크를 발급했습니다.",
+    "sshNeedKey": "SSH 공개키가 등록되어 있지 않습니다",
+    "sshNeedKeyHint": "아래에서 등록하거나 키를 생성하세요. 실행 중인 세션에도 바로 반영됩니다."
   },
   "account": {
     "title": "내 정보·설정",
@@ -430,7 +433,7 @@
     "noGroup": "소속 그룹 없음",
     "memberRole": "그룹 역할",
     "ssh": "SSH 공개키",
-    "sshHint": "세션 생성 시 컨테이너에 자동 주입됩니다.",
+    "sshHint": "세션 컨테이너·물리노드에 자동 주입됩니다. 실행 중인 세션에도 바로 반영됩니다.",
     "save": "저장",
     "sshSaved": "SSH 공개키 저장됨",
     "pwTitle": "비밀번호 변경",
@@ -449,7 +452,13 @@
     "dark": "다크",
     "homeTitle": "SSH home 용량",
     "homeHint": "하이브리드(SSH) 모드에서 물리 노드의 home 디렉토리 사용량입니다.",
-    "localAcctNote": "각 물리 노드에는 본인 계정이 로컬 계정으로 생성되어 있습니다."
+    "localAcctNote": "각 물리 노드에는 본인 계정이 로컬 계정으로 생성되어 있습니다.",
+    "sshBad": "공개키 형식이 올바르지 않습니다. \"ssh-ed25519 AAAA...\" 한 줄을 붙여넣으세요.",
+    "sshFail": "SSH 공개키 저장에 실패했습니다.",
+    "sshGenerate": "키 생성 & 다운로드",
+    "sshGenerated": "키를 생성했습니다. 내려받은 개인키 파일을 안전하게 보관하세요(다시 받을 수 없습니다).",
+    "sshGenFail": "SSH 키 생성에 실패했습니다.",
+    "sshGenerateHint": "키가 없으면 \"키 생성 & 다운로드\"를 누르세요. 개인키 파일(.pem)이 한 번만 내려받아지고 공개키는 자동 등록됩니다. 접속: ssh -i 내려받은키.pem ..."
   },
   "notify": {
     "title": "알림 센터",
