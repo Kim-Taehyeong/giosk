@@ -225,6 +225,7 @@ func main() {
 	go notify.NewEngine(notifyRepo, met, nodesDown, mailer).
 		WithRecorder(alertStore).
 		WithUserAlerts(inboxStore, userMetric).
+		WithSessionMetric(sessionSvc.SessionMetric). // 세션 단위 알림(session_gpu/cpu/vram)
 		Run(context.Background(), time.Minute)
 
 	// 데이터셋 — 정규 NFS 경로(<base>/dataset/<name>) 적재 + 리컨실러(다운로드 완료 시 PVC 바인딩).

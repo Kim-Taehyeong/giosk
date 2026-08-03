@@ -16,6 +16,7 @@ import { getAlerts, createAlert, deleteAlert, toggleAlert } from '../../../api/c
 import { getSshNodes } from '../../../api/console/sshNodes';
 import { getUserNotify, saveUserNotify, getInbox, markInboxRead, markInboxAllRead } from '../../../api/console/notify';
 import { getAvailability, getOfferings } from '../../../api/console/resources';
+import { getMySessions } from '../../../api/console/sessions';
 
 export default function NotificationCenter() {
   const { t } = useTranslation('consoleUser');
@@ -36,6 +37,9 @@ export default function NotificationCenter() {
 
   // 가용 알림 대상이 될 수 있는 GPU 자원(실시간: 전용 타입 + 공유 오퍼링).
   const [gpuTargets, setGpuTargets] = useState([]);
+  // 세션 단위 알림 대상 — 내 세션 목록(활성 팀 기준). rule.target = 세션 instance_id.
+  const [mySessions, setMySessions] = useState([]);
+  useEffect(() => { getMySessions().then(setMySessions).catch(() => {}); }, []);
 
   // 가용성 알림(이전 '워크로드 알림') — GPU 자원/노드가 비면 알림.
   const [avail, setAvail] = useState([]);
@@ -109,29 +113,37 @@ export default function NotificationCenter() {
     ? <Pill variant="primary"><Server size={12} /> {t('alerts.typeNode')}</Pill>
     : <Pill variant="gpu"><Cpu size={12} /> {t('alerts.typeGpu')}</Pill>);
 
+  // 실제로 발화하는 지표만 노출한다(서버 미평가 지표는 규칙을 추가해도 안 울려 혼란을 준다).
+  //  전역: credit_balance(크레딧 잔액). 세션 단위: session_gpu/cpu/vram(대상 세션에서 평가).
   const METRICS = [
-    ...(creditMode ? [
-      { key: 'credit_balance', label: t('notify.mCredit'), unit: 'C' },
-      { key: 'budget_pct', label: t('notify.mBudget'), unit: '%' },
-    ] : []),
-    { key: 'session_idle', label: t('notify.mIdle'), unit: '분' },
-    { key: 'queue_len', label: t('notify.mQueue'), unit: '건' },
-    { key: 'gpu_util', label: t('notify.mGpu'), unit: '%' },
+    ...(creditMode ? [{ key: 'credit_balance', label: t('notify.mCredit'), unit: 'C' }] : []),
+    { key: 'session_gpu', label: t('notify.mSessGpu', { defaultValue: '세션 GPU 사용률' }), unit: '%', session: true },
+    { key: 'session_cpu', label: t('notify.mSessCpu', { defaultValue: '세션 CPU 사용률' }), unit: '%', session: true },
+    { key: 'session_vram', label: t('notify.mSessVram', { defaultValue: '세션 VRAM 사용률' }), unit: '%', session: true },
   ];
+  const isSessionMetric = (m) => !!METRICS.find((x) => x.key === m)?.session;
   const OPS = [{ key: 'lte', label: t('notify.opLte') }, { key: 'gte', label: t('notify.opGte') }];
   const CHANNELS = [{ key: 'email', label: t('notify.chEmail') }, { key: 'webhook', label: t('notify.chWebhook') }];
 
   const metricUnit = (m) => METRICS.find((x) => x.key === m)?.unit || '';
-  const addRule = () => setRules([...rules, { id: Date.now(), metric: 'gpu_util', op: 'lte', value: 5, channel: 'webhook', on: true }]);
-  const updateRule = (id, patch) => setRules(rules.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+  // 세션 instance_id → 표시 이름(현재 내 세션 목록 기준). 없으면 id 그대로.
+  const sessName = (id) => mySessions.find((s) => s.id === id)?.name || id;
+  // 신규 규칙 기본값: 세션 GPU 유휴(≤10%) 알림 — 첫 세션 대상(있으면). 크레딧 모드 무관하게 세션 지표는 항상 가능.
+  const addRule = () => setRules([...rules, { id: Date.now(), metric: 'session_gpu', op: 'lte', value: 10, channel: 'email', on: true, target: mySessions[0]?.id || '' }]);
+  // 지표를 세션↔전역으로 바꾸면 target 을 맞춰 초기화(세션 지표인데 target 없으면 첫 세션).
+  const updateRule = (id, patch) => setRules(rules.map((r) => {
+    if (r.id !== id) return r;
+    const next = { ...r, ...patch };
+    if (patch.metric !== undefined) next.target = isSessionMetric(patch.metric) ? (r.target || mySessions[0]?.id || '') : '';
+    return next;
+  }));
   const removeRule = (id) => setRules(rules.filter((r) => r.id !== id));
   const addEmail = () => { if (newEmail.trim()) { setEmails([...emails, newEmail.trim()]); setNewEmail(''); } };
   const addWebhook = () => { if (newWebhook.trim()) { setWebhooks([...webhooks, newWebhook.trim()]); setNewWebhook(''); } };
 
   return (
     <div>
-      <PageHead title={t('notify.title')} subtitle={t('notify.subtitle')}
-        actions={<button className="btn primary" onClick={addRule}><Plus size={15} /> {t('notify.addRule')}</button>} />
+      <PageHead title={t('notify.title')} subtitle={t('notify.subtitle')} />
 
       {/* 받은 알림(인앱 수신함) */}
       <div className="card mb">
@@ -152,8 +164,12 @@ export default function NotificationCenter() {
                   cursor: n.read ? 'default' : 'pointer', opacity: n.read ? 0.6 : 1 }}>
                 {!n.read && <span style={{ marginTop: 6, flex: '0 0 auto', width: 8, height: 8, borderRadius: 4, background: 'var(--danger)' }} />}
                 <div style={{ minWidth: 0, flex: 1 }}>
-                  <div className="flex" style={{ gap: 8, alignItems: 'center', marginBottom: 3 }}>
+                  <div className="flex" style={{ gap: 8, alignItems: 'center', marginBottom: 3, flexWrap: 'wrap' }}>
                     <Pill variant={sevVariant[n.severity] || 'primary'}>{t(`notify.sev_${n.severity}`, { defaultValue: n.severity })}</Pill>
+                    {/* 대상 구분: 세션 알림은 어느 세션인지, 그 외는 계정 전체 */}
+                    {n.target
+                      ? <Pill variant="gpu"><Server size={11} /> {sessName(n.target)}</Pill>
+                      : <Pill variant="primary">{t('notify.scopeAccount', { defaultValue: '계정 전체' })}</Pill>}
                     <span style={{ fontWeight: 700, fontSize: 13.5 }}>{txt.title}</span>
                   </div>
                   <div className="muted" style={{ fontSize: 12.5 }}>{txt.body}</div>
@@ -196,7 +212,11 @@ export default function NotificationCenter() {
       )}
 
       <div className="card mb">
-        <h3><BellRing size={16} /> {t('notify.rules')}</h3>
+        <h3 className="flex" style={{ justifyContent: 'space-between' }}>
+          <span className="flex gap"><BellRing size={16} /> {t('notify.rules')}</span>
+          <button className="btn sm primary" onClick={addRule}><Plus size={14} /> {t('notify.addRule')}</button>
+        </h3>
+        <div className="legend mb">{t('notify.rulesHint', { defaultValue: '알림 규칙과 받은 알림은 계정 단위입니다(모든 팀 공통). 세션 지표는 대상 세션에서 평가됩니다.' })}</div>
         {rules.length === 0 && <div className="muted" style={{ padding: '12px 0' }}>{t('notify.noRules')}</div>}
         {rules.map((r) => (
           <div key={r.id} className="flex gap wrap" style={{ padding: '14px 0', borderBottom: '1px solid var(--border)' }}>
@@ -204,6 +224,13 @@ export default function NotificationCenter() {
             <span className="muted">{t('notify.cond')}</span>
             <Select size="sm" value={r.metric} onChange={(v) => updateRule(r.id, { metric: v })}
               options={METRICS.map((m) => ({ value: m.key, label: m.label }))} />
+            {/* 세션 지표면 대상 세션 선택 */}
+            {isSessionMetric(r.metric) && (
+              mySessions.length > 0
+                ? <Select size="sm" width={180} value={r.target} onChange={(v) => updateRule(r.id, { target: v })}
+                    options={mySessions.map((s) => ({ value: s.id, label: s.name || s.id }))} placeholder={t('notify.selectSession', { defaultValue: '세션 선택' })} />
+                : <span className="muted" style={{ fontSize: 12.5 }}>{t('notify.noSession', { defaultValue: '실행 중 세션 없음' })}</span>
+            )}
             <Select size="sm" width={110} value={r.op} onChange={(v) => updateRule(r.id, { op: v })}
               options={OPS.map((o) => ({ value: o.key, label: o.label }))} />
             <input type="number" style={{ width: 90 }} value={r.value} onChange={(e) => updateRule(r.id, { value: Number(e.target.value) })} />

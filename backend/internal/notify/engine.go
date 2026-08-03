@@ -23,12 +23,15 @@ type Mailer interface {
 // 노드 비가용 수는 주입된 함수로 평가한다. 같은 규칙은 cooldown 동안 재발송하지 않는다(스팸 방지).
 // Inbox는 사용자 인앱 알림 수신함(usernotify.Store)의 최소 계약 — 결합을 줄이려 인터페이스로 받는다.
 type Inbox interface {
-	Record(userID int64, severity, metric string, value float64, threshold int) error
+	Record(userID int64, severity, metric string, value float64, threshold int, target string) error
 }
 
 // UserMetricFn은 사용자 규칙 지표 1개를 userID→값 맵으로 평가한다(미지원이면 ok=false).
 // credit_balance(잔액)·budget_pct(소모%)는 DB 로, volume_usage 등은 Prometheus 로 채운다.
 type UserMetricFn func(ctx context.Context, metric string) (map[int64]float64, bool)
+
+// SessionMetricFn은 세션 단위 지표(session_gpu/cpu/vram, %)를 특정 세션에서 평가한다(미가용이면 ok=false).
+type SessionMetricFn func(ctx context.Context, metric, instanceID string) (float64, bool)
 
 // Engine은 관리자(전역) 알림 규칙을 주기적으로 평가해, 위반 시 채널(웹훅/이메일)로 발송한다.
 // 규칙/채널은 notify_rules·notify_channels(관리자 설정)에서 읽는다. 메트릭은 Prometheus(DCGM),
@@ -46,7 +49,11 @@ type Engine struct {
 	recorder   *alertlog.Store // 발화 이벤트 이력 적재(감시월 통합 피드). nil 허용.
 	inbox      Inbox           // 사용자 인앱 수신함. nil 이면 사용자 규칙 평가를 건너뛴다.
 	userMetric UserMetricFn    // 사용자 지표 평가기. nil 이면 사용자 규칙 평가를 건너뛴다.
+	sessMetric SessionMetricFn // 세션 단위 지표 평가기(session_* 규칙용). nil 이면 세션 규칙 건너뜀.
 }
+
+// WithSessionMetric은 세션 단위 지표 평가기를 주입한다(session_gpu/cpu/vram 규칙 활성화).
+func (e *Engine) WithSessionMetric(fn SessionMetricFn) *Engine { e.sessMetric = fn; return e }
 
 // WithRecorder는 발화 경고를 alert_events 에 이력으로 남기게 한다.
 func (e *Engine) WithRecorder(r *alertlog.Store) *Engine { e.recorder = r; return e }
@@ -123,17 +130,32 @@ func (e *Engine) userTick(ctx context.Context) {
 	cache := map[string]map[int64]float64{}
 	ok := map[string]bool{}
 	for _, r := range rules {
-		vals, seen := cache[r.Metric]
-		if !seen {
-			vals, ok[r.Metric] = e.userMetric(ctx, r.Metric)
-			cache[r.Metric] = vals
-		}
-		if !ok[r.Metric] {
-			continue // 미지원/미가용 지표
-		}
-		val, has := vals[r.OwnerID]
-		if !has {
-			continue // 이 사용자의 표본 없음(세션 없음 등)
+		var val float64
+		if r.Target != "" {
+			// 세션 단위 규칙(session_gpu/cpu/vram) — 대상 세션에서 직접 평가.
+			if e.sessMetric == nil {
+				continue
+			}
+			v, good := e.sessMetric(ctx, r.Metric, r.Target)
+			if !good {
+				continue // 세션 없음/정지/측정불가 → 발화 안 함
+			}
+			val = v
+		} else {
+			// 사용자 전역 규칙(credit_balance 등) — 지표별 1회 평가 캐시.
+			vals, seen := cache[r.Metric]
+			if !seen {
+				vals, ok[r.Metric] = e.userMetric(ctx, r.Metric)
+				cache[r.Metric] = vals
+			}
+			if !ok[r.Metric] {
+				continue
+			}
+			v, has := vals[r.OwnerID]
+			if !has {
+				continue
+			}
+			val = v
 		}
 		if !breached(r.Op, val, float64(r.Value)) {
 			continue
@@ -142,10 +164,17 @@ func (e *Engine) userTick(ctx context.Context) {
 			continue
 		}
 		e.lastFired[r.ID] = time.Now()
-		// 표시 문자열 대신 metric+파라미터만 적재 → 프론트가 언어별로 렌더(i18n).
-		_ = e.inbox.Record(r.OwnerID, userSeverity(r.Metric), r.Metric, val, r.Value)
-		log.Printf("[alert-engine] USER FIRE uid=%d %s %s %d (현재 %.0f)", r.OwnerID, r.Metric, opSymbol(r.Op), r.Value, val)
+		// 표시 문자열 대신 metric+파라미터만 적재 → 프론트가 언어별로 렌더(i18n). target=대상 세션.
+		_ = e.inbox.Record(r.OwnerID, userSeverity(r.Metric), r.Metric, val, r.Value, r.Target)
+		log.Printf("[alert-engine] USER FIRE uid=%d %s%s %s %d (현재 %.0f)", r.OwnerID, r.Metric, targetLog(r.Target), opSymbol(r.Op), r.Value, val)
 	}
+}
+
+func targetLog(t string) string {
+	if t == "" {
+		return ""
+	}
+	return "@" + t
 }
 
 // userMsg는 사용자 알림의 제목·본문을 만든다(한국어).

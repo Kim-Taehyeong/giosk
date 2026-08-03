@@ -25,7 +25,8 @@ type Note struct {
 	// 구 알림은 title/body(한국어)가 남아 있어 프론트가 그대로 폴백 표시한다.
 	Value     float64    `gorm:"column:value" json:"value"`
 	Threshold int        `gorm:"column:threshold" json:"threshold"`
-	Title     string     `gorm:"column:title" json:"title"` // legacy(구 알림)
+	Target    string     `gorm:"column:target" json:"target"` // 세션 알림의 대상 세션(instance_id). 빈값=전역.
+	Title     string     `gorm:"column:title" json:"title"`   // legacy(구 알림)
 	Body      string     `gorm:"column:body" json:"body"`   // legacy(구 알림)
 	ReadAt    *time.Time `gorm:"column:read_at" json:"-"`
 	CreatedAt time.Time  `gorm:"column:created_at" json:"createdAt"`
@@ -41,11 +42,11 @@ func New(db *gorm.DB) *Store { return &Store{db: db} }
 
 // Record는 사용자 알림 한 건을 적재한다(엔진 발화 시). metric+value+threshold 만 저장하고
 // 표시 문자열은 프론트가 현지화 렌더한다(i18n). title/body 는 저장하지 않는다(구 알림 폴백 전용).
-func (s *Store) Record(userID int64, severity, metric string, value float64, threshold int) error {
+func (s *Store) Record(userID int64, severity, metric string, value float64, threshold int, target string) error {
 	if s == nil {
 		return nil
 	}
-	return s.db.Create(&Note{UserID: userID, Severity: severity, Metric: metric, Value: value, Threshold: threshold}).Error
+	return s.db.Create(&Note{UserID: userID, Severity: severity, Metric: metric, Value: value, Threshold: threshold, Target: target}).Error
 }
 
 // ListByUser는 사용자의 최근 알림(최신순, 최대 100)을 반환한다.
