@@ -968,7 +968,7 @@ function SSHWizard({ t, navigate, toast, nodes, vols, labels }) {
               <div className="grid" style={{ gap: 12 }}>
                 {nodes.map((n) => {
                   const on = sel === n.node;
-                  const dsTotal = n.cached.reduce((a, d) => a + d.sizeGb, 0);
+                  const dsBytes = (n.cached || []).reduce((a, d) => a + (d.sizeBytes || 0), 0);
                   return (
                     <div key={n.node} className={`selbox${on ? ' on' : ''}`} onClick={() => setSel(n.node)}
                       style={{ padding: 14, borderRadius: 12, cursor: 'pointer',
@@ -985,7 +985,7 @@ function SSHWizard({ t, navigate, toast, nodes, vols, labels }) {
                       {config.features.datasets && (
                         <>
                           <div className="flex" style={{ gap: 8, flexWrap: 'wrap' }}>
-                            <Pill variant="gpu">{t('newSession.sshCachedN', { n: n.cached.length, gb: dsTotal })}</Pill>
+                            <Pill variant="gpu">{t('newSession.sshCacheCount', { n: (n.cached || []).length, defaultValue: `캐시 ${(n.cached || []).length}개` })}{dsBytes ? ` · ${formatBytes(dsBytes)}` : ''}</Pill>
                             <button className="btn sm" onClick={(e) => { e.stopPropagation(); setDetail(detail === n.node ? null : n.node); }}>{t('newSession.sshCacheDetail')}</button>
                           </div>
                           {detail === n.node && (

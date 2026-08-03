@@ -30,12 +30,23 @@ export default function DatasetDetail() {
   const load = () => getDatasets().then((d) => { const f = (d.global || []).find((x) => x.id === did); if (!f) setNotFound(true); else setDs(f); });
   useEffect(() => { load(); getAdminNodes().then(setNodes).catch(() => {}); /* eslint-disable-next-line */ }, [did]);
   // 캐시 진행상황 3초 폴링.
-  useEffect(() => { const t = setInterval(load, 3000); return () => clearInterval(t); /* eslint-disable-next-line */ }, [did]);
+  // 진행 중(로딩/캐싱)이면 촘촘히(1.2s), 아니면 느슨히(4s) 폴링 — 진행률이 부드럽게 갱신되게.
+  const busy = ds && (ds.loadStatus === 'loading' || (ds.caches || []).some((c) => c.status === 'caching'));
+  useEffect(() => { const t = setInterval(load, busy ? 1200 : 4000); return () => clearInterval(t); /* eslint-disable-next-line */ }, [did, busy]);
 
   if (notFound) return <div className="card">{t('datasets.notFound', { defaultValue: '데이터셋을 찾을 수 없습니다.' })}</div>;
   if (!ds) return <Spinner pad label={t('datasets.loading', { defaultValue: '…' })} />;
 
-  const toggleNode = async (node) => { await toggleDatasetCache(did, node); load(); };
+  // 낙관적 토글 — 클릭 즉시 UI 반영(caching pill/해제) 후 백그라운드로 요청. job 생성 대기로 클릭이 굼떠 보이지 않게.
+  const toggleNode = (node) => {
+    const already = cacheObjOf(node);
+    setDs((d) => {
+      const caches = (d.caches || []).filter((c) => c.node !== node);
+      if (!already) caches.push({ node, status: 'caching', progress: 0, phase: 'copy' });
+      return { ...d, caches };
+    });
+    toggleDatasetCache(did, node).then(load).catch(() => { toast(t('datasets.cacheFail', { defaultValue: '캐시 요청 실패' })); load(); });
+  };
   const saveDesc = async () => { try { await updateDatasetDescription(did, descDraft ?? ''); setDescDraft(null); load(); toast(t('datasets.descSaved', { defaultValue: '설명을 저장했습니다.' })); } catch { toast(t('datasets.descFail', { defaultValue: '설명 저장 실패' })); } };
   const cacheObjOf = (node) => (ds.caches || []).find((c) => c.node === node);
   const cacheOf = (node) => cacheObjOf(node)?.status || ((ds.nodes || []).includes(node) ? 'cached' : undefined);

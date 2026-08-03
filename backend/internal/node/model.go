@@ -111,6 +111,8 @@ type CachedDataset struct {
 	Name      string `json:"name"`
 	SizeClass string `json:"sizeClass"`
 	SizeGb    int    `json:"sizeGb"`
+	SizeBytes int64  `json:"sizeBytes"` // 정확 크기(sub-GB 도 표시). 프론트는 formatBytes.
+	Hash      string `json:"hash"`
 	Format    string `json:"format"`
 	Files     string `json:"files"`
 	UpdatedAt string `json:"updatedAt"`

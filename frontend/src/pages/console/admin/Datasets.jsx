@@ -36,7 +36,10 @@ export default function Datasets() {
 
   const load = () => getDatasets().then((d) => { setData({ global: d.global.map((x) => ({ ...x })), requests: [...d.requests] }); });
   // 5초 폴링 — 적재 상태(다운로드중→완료) 라이브 갱신.
-  useEffect(() => { load(); const id = setInterval(load, 5000); return () => clearInterval(id); }, []);
+  // 진행 중(로딩/캐싱)이면 촘촘히(1.2s), 아니면 느슨히(5s) 폴링.
+  const anyBusy = (data?.global || []).some((x) => x.loadStatus === 'loading' || (x.caches || []).some((c) => c.status === 'caching'));
+  useEffect(() => { load(); }, []); // 최초
+  useEffect(() => { const id = setInterval(load, anyBusy ? 1200 : 5000); return () => clearInterval(id); }, [anyBusy]);
   // 캐시 배치 대상 노드 목록(클러스터 노드). GPU 노드 우선 정렬.
   useEffect(() => { getAdminNodes().then(setAllNodes).catch(() => {}); }, []);
 
@@ -45,7 +48,17 @@ export default function Datasets() {
     await deleteDataset(id); setData((d) => ({ ...d, global: d.global.filter((x) => x.id !== id) })); toast(t('datasets.removed'));
   };
   // 노드 로컬 캐시 토글 — 백엔드가 NFS→노드 로컬 복사 Job 기동/해제. 이후 폴링으로 상태 갱신.
-  const toggleNode = async (dsId, node) => { await toggleDatasetCache(dsId, node); load(); };
+  // 낙관적 토글 — 클릭 즉시 caching/해제 반영 후 백그라운드 요청(job 생성 대기 딜레이 제거).
+  const toggleNode = (dsId, node) => {
+    setData((d) => ({ ...d, global: d.global.map((x) => {
+      if (x.id !== dsId) return x;
+      const has = (x.caches || []).some((c) => c.node === node);
+      const caches = (x.caches || []).filter((c) => c.node !== node);
+      if (!has) caches.push({ node, status: 'caching', progress: 0, phase: 'copy' });
+      return { ...x, caches };
+    }) }));
+    toggleDatasetCache(dsId, node).then(load).catch(load);
+  };
   const approve = async (req) => {
     await approveDatasetRequest(req.id);
     setData((d) => ({
