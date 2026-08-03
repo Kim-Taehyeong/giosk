@@ -54,6 +54,18 @@ type NodeAvail struct {
 	FracCoresTotal  int  `json:"fracCoresTotal"`
 	FracSlotsFree   int  `json:"fracSlotsFree"`
 	FracSlotsTotal  int  `json:"fracSlotsTotal"`
+	// 이 노드에 로컬 캐시된 데이터셋(세션 생성 시 노드 선호 표시용).
+	Cached []CachedDS `json:"cached"`
+}
+
+// CachedDS — 노드 로컬 캐시 데이터셋(세션 생성 노드 picker 표시).
+type CachedDS struct {
+	Name      string `json:"name"`
+	SizeClass string `json:"sizeClass"`
+	SizeGb    int    `json:"sizeGb"`
+	SizeBytes int64  `json:"sizeBytes"` // 정확 크기(sub-GB 도 표시되게). 프론트는 formatBytes 로.
+	Hash      string `json:"hash"`
+	Owner     string `json:"owner"`
 }
 
 // ShareUse — 한 노드에서 실행 중인 공유(HAMi) 세션들의 자원 점유 합.
@@ -82,6 +94,10 @@ func (s *Service) Availability(ctx context.Context) Availability {
 		return out
 	}
 	usedNode := s.counter.RunningByNode()
+	var cachedDS map[string][]CachedDS
+	if s.cachedByNode != nil {
+		cachedDS = s.cachedByNode()
+	}
 	physNodes := s.counter.RunningPhysicalNodes() // 물리 임대 노드 → 통째 점유
 	hamiNodes := s.counter.HamiNodes()            // 분할 가능(share_mode='hami') 노드
 	splitByNode := s.counter.NodeSplitCount()     // 노드별 deviceSplitCount
@@ -112,6 +128,10 @@ func (s *Service) Availability(ctx context.Context) Availability {
 		na := NodeAvail{
 			Node: n.Name, Gpu: gpuLabel(n.GpuType, capN), GpuType: n.GpuType,
 			GpuTotal: capN, GpuFree: capN - used, Physical: n.Physical,
+			Cached: cachedDS[n.Name],
+		}
+		if na.Cached == nil {
+			na.Cached = []CachedDS{}
 		}
 		if hamiNodes[n.Name] && !physNodes[n.Name] { // 분할(HAMi) 노드 = 분할 전용(전용 가용에서 제외)
 			t.FractionalTotal += capN

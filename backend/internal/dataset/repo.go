@@ -27,7 +27,9 @@ type Repository interface {
 	SetPVC(id int64, name, ns string) error      // RWX NFS 실체 PVC 좌표 기록
 	SetLoadStatus(id int64, status string) error // loading|ready|failed
 	SetHash(id int64, hash string) error         // 해제 잡이 계산한 아카이브 해시 저장
+	SetSize(id int64, bytes int64) error         // 해제 완료 후 실제 콘텐츠 크기로 교정
 	SetDescription(id int64, desc string) error
+	SetSizeClass(id int64, sizeClass string) error
 	ListLoading() []Dataset                      // 적재중 데이터셋(리컨실러)
 
 	CacheStatus(datasetID int64, node string) (status string, exists bool)
@@ -36,6 +38,7 @@ type Repository interface {
 	ListCaching() []DatasetCacheRow      // 복사중 캐시 행(리컨실러)
 	CachedNodesOf(datasetID int64) []string // 캐시 완료(cached) 노드(세션 마운트 판정)
 	CacheDeleteAll(datasetID int64) error   // 데이터셋 삭제 시 그 데이터셋의 모든 캐시 행 정리
+	CachedDatasetsByNode() []NodeCachedDataset // 노드별 캐시 완료 데이터셋(세션 생성 노드 선호 UI)
 	NameTaken(name string) bool             // 동일 이름의 데이터셋/대기 신청 존재 여부(정규경로 충돌 방지)
 }
 
@@ -134,8 +137,19 @@ func (r *gormRepo) SetHash(id int64, hash string) error {
 	return r.db.Exec(`UPDATE datasets SET hash = ? WHERE id = ?`, hash, id).Error
 }
 
+func (r *gormRepo) SetSize(id int64, bytes int64) error {
+	if bytes <= 0 {
+		return nil
+	}
+	return r.db.Exec(`UPDATE datasets SET size_bytes = ? WHERE id = ?`, bytes, id).Error
+}
+
 func (r *gormRepo) SetLoadStatus(id int64, status string) error {
 	return r.db.Model(&Dataset{}).Where("id = ?", id).Update("load_status", status).Error
+}
+
+func (r *gormRepo) SetSizeClass(id int64, sizeClass string) error {
+	return r.db.Exec(`UPDATE datasets SET size_class = ? WHERE id = ?`, sizeClass, id).Error
 }
 
 func (r *gormRepo) SetDescription(id int64, desc string) error {
@@ -166,6 +180,27 @@ func (r *gormRepo) CacheUpsert(datasetID int64, node, status string) error {
 }
 
 // CacheDelete는 (dataset,node) 캐시 행을 제거한다.
+// NodeCachedDataset — 특정 노드에 캐시 완료된 데이터셋 메타(세션 생성 UI 노드 선호 표시용).
+type NodeCachedDataset struct {
+	Node      string
+	Name      string
+	SizeClass string
+	SizeGB    int
+	SizeBytes int64
+	Hash      string
+	Owner     string
+	Desc      string
+}
+
+// CachedDatasetsByNode는 노드 로컬 캐시 완료(cached) 데이터셋을 메타와 함께 반환한다.
+func (r *gormRepo) CachedDatasetsByNode() []NodeCachedDataset {
+	var out []NodeCachedDataset
+	r.db.Raw(`SELECT c.node, d.name, d.size_class AS size_class, d.size_gb AS size_gb, d.size_bytes AS size_bytes, d.hash, d.owner, d.description AS ` + "`desc`" + `
+		FROM dataset_node_cache c JOIN datasets d ON d.id=c.dataset_id
+		WHERE c.status='cached' ORDER BY c.node, d.name`).Scan(&out)
+	return out
+}
+
 func (r *gormRepo) CacheDeleteAll(datasetID int64) error {
 	return r.db.Exec(`DELETE FROM dataset_node_cache WHERE dataset_id=?`, datasetID).Error
 }

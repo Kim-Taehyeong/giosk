@@ -364,6 +364,9 @@ func (s *Service) Create(ctx context.Context, userID int64, username string, req
 	// 로컬 Home 선택 시 그 물리노드 디스크(hostPath, 노드핀). 개인 영속 저장소는 ~/nfs(NFS PVC)로 별도 마운트.
 	// → 어디서나 일관: home=로컬(임시), ~/nfs=영속. (컨테이너·물리 SSH 동일 규칙)
 	var requireNode string
+	if req.Node != "" {
+		requireNode = req.Node // 사용자가 데이터셋 노드 picker 에서 고른 실행 노드 = 하드 핀(자동 배치 대신)
+	}
 	if req.LocalHomeNode != "" {
 		lh, err := s.resolveLocalHome(ctx, userID, username, req.LocalHomeNode)
 		if err != nil {

@@ -98,7 +98,8 @@ func main() {
 		WithUIDBase(cfg.PhysicalNodes.UIDBase).                                              // 전역 안정 UID 베이스(재사용 방지)
 		WithLocalHomeHost(cfg.Storage.PhysicalHomeHost).                                     // 물리 SSH 로컬 home 루트(/home/giosk)
 		WithFreeMode(cfg.IsFree()).                                                          // 자유 모드: 임대 영속·계정 재사용·동시접속
-		WithDevicePluginConfig(cfg.K8s.DevicePluginConfigNS, cfg.K8s.DevicePluginConfigName) // 타임셰어링 웹 설정 → device plugin 즉시 반영
+		WithDevicePluginConfig(cfg.K8s.DevicePluginConfigNS, cfg.K8s.DevicePluginConfigName). // 타임셰어링 웹 설정 → device plugin 즉시 반영
+		WithPhysicalLabel(cfg.PhysicalNodes.Label)                                           // 물리 임대 토글이 이 라벨을 k8s 노드에 적용
 	cfgStore := systemconfig.NewStore(db) // 런타임 설정(유휴·기능 토글·전역 상한) 저장소
 	platIntervalFn := func() int { return cfgStore.IntOr(systemconfig.KeyRechargeIntervalDays, 30) }
 	orgSvc.WithPlatformInterval(platIntervalFn)    // 조직 리필 주기 캡(플랫폼 기본)
@@ -262,6 +263,24 @@ func main() {
 		WithMetrics(met) // 다운로드 진행률(%)
 	go datasetSvc.RunReconciler(context.Background(), 10*time.Second)
 	sessionSvc.WithDatasetCache(datasetSvc) // 세션이 캐시된 노드선 데이터셋을 hostPath 로 마운트
+	// 세션 생성 UI: 노드별 "캐시된 데이터셋" 표시(dataset_node_cache). 노드-선호 선택용.
+	// node.Cached(물리노드 뷰) + resource.byNode.cached(세션 가용노드 = 컨테이너 GPU 노드) 둘 다 채운다.
+	nodeSvc.WithCachedDatasets(func() map[string][]node.CachedDataset {
+		out := map[string][]node.CachedDataset{}
+		for _, c := range datasetSvc.CachedByNode() {
+			out[c.Node] = append(out[c.Node], node.CachedDataset{
+				Name: c.Name, SizeClass: c.SizeClass, SizeGb: c.SizeGB, Owner: c.Owner, Desc: c.Desc,
+			})
+		}
+		return out
+	})
+	resourceSvc.WithCachedDatasets(func() map[string][]resource.CachedDS {
+		out := map[string][]resource.CachedDS{}
+		for _, c := range datasetSvc.CachedByNode() {
+			out[c.Node] = append(out[c.Node], resource.CachedDS{Name: c.Name, SizeClass: c.SizeClass, SizeGb: c.SizeGB, SizeBytes: c.SizeBytes, Hash: c.Hash, Owner: c.Owner})
+		}
+		return out
+	})
 
 	// 사용자 360 상세 — 각 도메인의 기존 userID-키 서비스를 클로저로 모아 한 응답으로.
 	usersRepo := users.NewRepository(db)

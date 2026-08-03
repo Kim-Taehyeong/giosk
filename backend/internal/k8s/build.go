@@ -175,9 +175,11 @@ func extractWithProgress(dir string) string {
 	return `base=$(stat -c %s "$a")
 case "$a" in
   *.zip) total=$(unzip -l "$a" 2>/dev/null | tail -1 | awk '{print $1}') ;;
-  *) total=0 ;;
+  *.tar.gz|*.tgz) total=$(gzip -l "$a" 2>/dev/null | awk 'NR==2{print $2}') ;;  # 해제 크기(gzip 푸터, <4GB 정확)
+  *) total=$(stat -c %s "$a") ;;   # .tar 등: 아카이브 크기 ≈ 해제 크기
 esac
-{ [ -z "$total" ] || [ "$total" -le 0 ] 2>/dev/null; } && total=$(( base * 3 ))
+case "$total" in ''|*[!0-9]*) total=0 ;; esac
+[ "$total" -lt "$base" ] && total=$(( base * 3 ))   # gzip -l 4GB wrap·비정상 → 3배 추정
 echo "EXTOTAL $total"
 echo "EXTRACT"
 ( case "$a" in
@@ -193,6 +195,8 @@ while kill -0 "$pid" 2>/dev/null; do
   sleep 2
 done
 wait "$pid" || echo "extract failed(아카이브만 보관)"
+fin=$(( $(du -sb "` + dir + `" 2>/dev/null | awk '{print $1}') - base )); [ "$fin" -lt 0 ] && fin=0
+echo "EXTRACTED $fin"
 echo "HASH $(sha256sum "$a" 2>/dev/null | cut -c1-16)"
 echo "EXTRACT DONE"`
 }
