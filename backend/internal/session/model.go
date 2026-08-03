@@ -88,6 +88,17 @@ type CreateReq struct {
 	LocalHomeNode string     `json:"localHomeNode"` // 선택 시 그 물리노드 로컬 디스크 home 을 /home/work 로 hostPath 마운트 + 노드 핀(기본은 emptyDir 로컬 home)
 }
 
+// ReconfigureReq — 중단된 컨테이너 세션의 계산자원 재구성 요청("데이터 준비는 CPU로, 학습은 GPU로").
+// 홈(/home/work)·볼륨·데이터셋은 그대로 두고 GPU 사양만 바꾼다.
+type ReconfigureReq struct {
+	GpuMode    string `json:"gpuMode"`    // shared|exclusive|cpu
+	OfferingID *int64 `json:"offeringId"` // 공유(분할) 전환 시 오퍼링
+	GpuType    string `json:"gpuType"`
+	GpuCount   int    `json:"gpuCount"`
+	ImageID    *int64 `json:"imageId"` // 선택: 모드에 맞춰 이미지 교체(CPU 이미지 → CUDA 이미지 등)
+	Start      bool   `json:"start"`   // true = 적용 후 바로 재개
+}
+
 // Connection — 연결정보(게이트웨이 URL/토큰).
 type Connection struct {
 	VSCode  map[string]string `json:"vscode,omitempty"`

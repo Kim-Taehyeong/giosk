@@ -389,7 +389,8 @@
     "reclaimKept": "Disimpan",
     "reclaimHint": "Sesi yang dihentikan masih menggunakan cakera home. Selepas {{n}} hari terhenti, ia boleh dituntut semula, dan yang paling lama tidak digunakan mungkin dipadam apabila cakera sesebuah nod semakin berkurangan.",
     "reclaimKeptHint": "Sesi terhenti terbaharu anda tidak pernah dituntut semula.",
-    "reclaimResumeHint": "Memulakan semula akan menetapkan semula kiraan. Padamkan sesi yang tidak perlu anda simpan lagi."
+    "reclaimResumeHint": "Memulakan semula akan menetapkan semula kiraan. Padamkan sesi yang tidak perlu anda simpan lagi.",
+    "actionFailed": "Permintaan tidak dapat diselesaikan"
   },
   "conn": {
     "loading": "Memuatkan maklumat sambungan…",

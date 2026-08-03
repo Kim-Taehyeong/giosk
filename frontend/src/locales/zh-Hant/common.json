@@ -561,5 +561,12 @@
       "teamTitle": "{{target}} 團隊積分不足"
     }
   },
-  "close": "關閉"
+  "close": "關閉",
+  "rowMenu": {
+    "more": "更多的"
+  },
+  "nav": {
+    "openMenu": "開啟選單",
+    "label": "控制台選單"
+  }
 }

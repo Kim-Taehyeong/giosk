@@ -389,7 +389,8 @@
     "reclaimKept": "Beholdes",
     "reclaimHint": "Stoppede økter bruker fortsatt hjemmedisk. Etter {{n}} dager som stoppet kan de gjenvinnes, og de lengst inaktive kan bli slettet når en node går tom for diskplass.",
     "reclaimKeptHint": "Din sist stoppede økt blir aldri gjenvunnet.",
-    "reclaimResumeHint": "Omstart nullstiller telleren. Slett økter du ikke lenger trenger å beholde."
+    "reclaimResumeHint": "Omstart nullstiller telleren. Slett økter du ikke lenger trenger å beholde.",
+    "actionFailed": "Forespørselen kunne ikke fullføres"
   },
   "conn": {
     "openVscode": "Åpne VSCode",

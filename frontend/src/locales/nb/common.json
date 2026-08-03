@@ -561,5 +561,12 @@
       "teamBody": "{{target}}-lagkreditter er på {{value}}, under {{threshold}}-terskelen. Økter i dette teamet kan stoppe snart."
     }
   },
-  "close": "Lukke"
+  "close": "Lukke",
+  "rowMenu": {
+    "more": "Flere"
+  },
+  "nav": {
+    "openMenu": "Åpne menyen",
+    "label": "Konsollmeny"
+  }
 }

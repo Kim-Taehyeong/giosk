@@ -561,5 +561,12 @@
       "teamBody": "Die Team-Credits von {{target}} liegen bei {{value}}, also unter dem Schwellenwert von {{threshold}}. Die Sitzungen in diesem Team werden möglicherweise bald beendet."
     }
   },
-  "close": "Schließen"
+  "close": "Schließen",
+  "rowMenu": {
+    "more": "Mehr"
+  },
+  "nav": {
+    "openMenu": "Menü öffnen",
+    "label": "Konsolenmenü"
+  }
 }

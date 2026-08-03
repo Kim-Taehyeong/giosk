@@ -561,5 +561,12 @@
       "teamBody": "Kredit tim {{target}} berada pada {{value}}, di bawah ambang batas {{threshold}}. Sesi di tim ini mungkin akan segera berhenti."
     }
   },
-  "close": "Menutup"
+  "close": "Menutup",
+  "rowMenu": {
+    "more": "Lagi"
+  },
+  "nav": {
+    "openMenu": "Buka menunya",
+    "label": "Menu konsol"
+  }
 }

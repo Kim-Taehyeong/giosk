@@ -142,5 +142,6 @@
   "e141": "Errore nel salvataggio delle preimpostazioni",
   "e143": "Campo obbligatorio mancante",
   "e142": "Ricerca preimpostata non riuscita",
-  "e144": "Oggetto della notifica non consentito"
+  "e144": "Oggetto della notifica non consentito",
+  "e145": "Nessuna GPU è disponibile al momento. Riprova più tardi o scegli un'offerta diversa."
 }

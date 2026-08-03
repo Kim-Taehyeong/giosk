@@ -389,7 +389,8 @@
     "reclaimKept": "Megőrizve",
     "reclaimHint": "A leállított munkamenetek továbbra is használják a home-lemezt. {{n}} nap leállított állapot után visszanyerhetővé válnak, és a legrégebb óta tétlenek törlődhetnek, ha egy csomóponton kevés a lemezterület.",
     "reclaimKeptHint": "A legutóbb leállított munkamenete soha nem kerül visszanyerésre.",
-    "reclaimResumeHint": "Az újraindítás nullázza a számlálót. Törölje azokat a munkameneteket, amelyeket már nem kell megőriznie."
+    "reclaimResumeHint": "Az újraindítás nullázza a számlálót. Törölje azokat a munkameneteket, amelyeket már nem kell megőriznie.",
+    "actionFailed": "A kérést nem sikerült teljesíteni"
   },
   "conn": {
     "loading": "Csatlakozási adatok betöltése…",

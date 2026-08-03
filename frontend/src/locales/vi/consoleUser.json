@@ -389,7 +389,8 @@
     "reclaimKept": "Được giữ",
     "reclaimHint": "Phiên đã dừng vẫn dùng đĩa home. Sau {{n}} ngày ở trạng thái dừng, phiên có thể bị thu hồi, và những phiên nhàn rỗi lâu nhất có thể bị xóa khi một nút sắp hết dung lượng đĩa.",
     "reclaimKeptHint": "Phiên bạn dừng gần đây nhất không bao giờ bị thu hồi.",
-    "reclaimResumeHint": "Khởi động lại sẽ đặt lại bộ đếm. Hãy xóa những phiên bạn không cần giữ nữa."
+    "reclaimResumeHint": "Khởi động lại sẽ đặt lại bộ đếm. Hãy xóa những phiên bạn không cần giữ nữa.",
+    "actionFailed": "Yêu cầu không thể hoàn thành"
   },
   "conn": {
     "webConnectHint": "Mở một thiết bị đầu cuối ngay trong trình duyệt của bạn (không cần khóa SSH hoặc lệnh).",

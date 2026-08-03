@@ -561,5 +561,12 @@
       "teamBody": "Los créditos del equipo {{target}} están en {{value}}, por debajo del umbral de {{threshold}}. Es posible que las sesiones en este equipo finalicen pronto."
     }
   },
-  "close": "Cerca"
+  "close": "Cerca",
+  "rowMenu": {
+    "more": "Más"
+  },
+  "nav": {
+    "openMenu": "abrir menú",
+    "label": "Menú de consola"
+  }
 }

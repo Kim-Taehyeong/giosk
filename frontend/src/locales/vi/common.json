@@ -561,5 +561,12 @@
       "teamBody": "Tín dụng của nhóm {{target}} ở mức {{value}}, dưới ngưỡng {{threshold}}. Các phiên trong nhóm này có thể sớm dừng lại."
     }
   },
-  "close": "Đóng"
+  "close": "Đóng",
+  "rowMenu": {
+    "more": "Hơn"
+  },
+  "nav": {
+    "openMenu": "Mở trình đơn",
+    "label": "Trình đơn bảng điều khiển"
+  }
 }

@@ -142,5 +142,6 @@
   "e142": "Förinställd sökning misslyckades",
   "e143": "Obligatoriskt fält saknas",
   "e141": "Förinställt lagringsfel",
-  "e144": "Ej tillåtet meddelandeämne"
+  "e144": "Ej tillåtet meddelandeämne",
+  "e145": "Ingen GPU är tillgänglig just nu. Försök igen snart eller välj ett annat erbjudande."
 }

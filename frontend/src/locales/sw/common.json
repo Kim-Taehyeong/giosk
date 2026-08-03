@@ -561,5 +561,12 @@
       "teamBody": "Salio za timu ya {{target}} ziko {{value}}, chini ya kiwango cha {{threshold}}. Vipindi katika timu hii vinaweza kusimamishwa hivi karibuni."
     }
   },
-  "close": "Funga"
+  "close": "Funga",
+  "rowMenu": {
+    "more": "Zaidi"
+  },
+  "nav": {
+    "openMenu": "Fungua menyu",
+    "label": "Menyu ya Console"
+  }
 }

@@ -17,7 +17,7 @@ export default function StatCard({ label, value, unit, sub, bar, icon: Icon, ton
     <div className="card stat">
       <div className="flex" style={{ gap: 10, alignItems: 'center' }}>
         {Icon && (
-          <span style={{ width: 32, height: 32, flex: '0 0 auto', borderRadius: 9, display: 'grid', placeItems: 'center', background: c.bg, color: c.fg }}>
+          <span style={{ width: 32, height: 32, flex: '0 0 auto', borderRadius: 'var(--r-inset)', display: 'grid', placeItems: 'center', background: c.bg, color: c.fg }}>
             <Icon size={17} strokeWidth={2.2} />
           </span>
         )}

@@ -131,7 +131,7 @@ export default function Select({ value, onChange, options = [], placeholder, wid
         style={{
           width: '100%', textAlign: 'left', padding: pad, fontSize: fs, fontWeight: 500,
           cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1,
-          border: '1px solid ' + (open ? 'var(--primary)' : 'var(--border)'), borderRadius: 9,
+          border: '1px solid ' + (open ? 'var(--primary)' : 'var(--border)'), borderRadius: 'var(--r-control)',
           background: 'var(--surface-2)', color: sel ? 'var(--text)' : 'var(--muted)',
           boxShadow: open ? '0 0 0 3px var(--primary-soft)' : 'none', transition: 'border-color .15s, box-shadow .15s',
           position: 'relative', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
@@ -151,7 +151,7 @@ export default function Select({ value, onChange, options = [], placeholder, wid
           return (
             <div ref={menuRef} style={{
               position: 'fixed', ...pos, left: rect.left, minWidth: Math.max(rect.width, 180), zIndex: 2000,
-              background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 11,
+              background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-container)',
               boxShadow: '0 12px 32px rgba(10,15,28,.22)', padding: 7, maxHeight: Math.min(320, openUp ? rect.top - 12 : vh - rect.bottom - 12), overflowY: 'auto',
             }}>
           {searchable && (
@@ -162,7 +162,7 @@ export default function Select({ value, onChange, options = [], placeholder, wid
               aria-activedescendant={active >= 0 ? `${domId}-opt-${active}` : undefined}
               onKeyDown={onKeyNav}
               style={{ width: '100%', boxSizing: 'border-box', padding: '8px 10px', marginBottom: 6, fontSize: fs,
-                color: 'var(--text)', background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 8, outline: 'none' }} />
+                color: 'var(--text)', background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 'var(--r-control)', outline: 'none' }} />
           )}
           {/* 목록: 검색형이 아니면 목록 자체가 포커스를 받아 방향키를 처리한다. */}
           <div ref={listRef} id={`${domId}-list`} role="listbox" aria-label={ariaLabel} aria-labelledby={ariaLabelledBy}
@@ -178,7 +178,7 @@ export default function Select({ value, onChange, options = [], placeholder, wid
                   onClick={() => pick(o)}
                   onMouseMove={() => setActive(oi)}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: 9, padding: '10px 12px', borderRadius: 8, cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', gap: 9, padding: '10px 12px', borderRadius: 'var(--r-control)', cursor: 'pointer',
                     fontSize: fs, fontWeight: on ? 700 : 500,
                     // 선택됨(체크)과 커서 위치(호버/방향키)는 다른 상태다 — 커서는 배경만 바뀐다.
                     background: on ? 'var(--primary-soft)' : cursor ? 'var(--surface-2)' : 'transparent',

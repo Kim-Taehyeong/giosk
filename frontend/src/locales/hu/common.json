@@ -561,5 +561,12 @@
       "teamTitle": "A {{target}} csapatnak kevés a kreditje"
     }
   },
-  "close": "Közeli"
+  "close": "Közeli",
+  "rowMenu": {
+    "more": "Több"
+  },
+  "nav": {
+    "openMenu": "Menü megnyitása",
+    "label": "Konzol menü"
+  }
 }

@@ -142,5 +142,6 @@
   "e142": "Esiasetettu haku epäonnistui",
   "e138": "Luoton myöntäminen epäonnistui",
   "e140": "Esiasetuksen poistaminen epäonnistui",
-  "e141": "Esiasetettu tallennus epäonnistui"
+  "e141": "Esiasetettu tallennus epäonnistui",
+  "e145": "GPU:ta ei ole tällä hetkellä saatavilla. Yritä hetken kuluttua uudelleen tai valitse toinen tarjous."
 }

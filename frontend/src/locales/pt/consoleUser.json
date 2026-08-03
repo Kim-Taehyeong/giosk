@@ -389,7 +389,8 @@
     "reclaimKept": "Mantida",
     "reclaimHint": "As sessões paradas continuam a usar disco pessoal. Após {{n}} dias paradas tornam-se recuperáveis e as há mais tempo inativas podem ser eliminadas quando um nó ficar com pouco espaço em disco.",
     "reclaimKeptHint": "A sua sessão parada mais recente nunca é recuperada.",
-    "reclaimResumeHint": "Reiniciar repõe a contagem. Elimine as sessões que já não precisa de manter."
+    "reclaimResumeHint": "Reiniciar repõe a contagem. Elimine as sessões que já não precisa de manter.",
+    "actionFailed": "Não foi possível concluir a solicitação"
   },
   "conn": {
     "title": "Conectar – {{name}}",

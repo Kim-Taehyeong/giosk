@@ -142,5 +142,6 @@
   "e139": "Nastavení doplnění týmu se nezdařilo",
   "e144": "Nepovolený předmět oznámení",
   "e140": "Smazání předvolby se nezdařilo",
-  "e141": "Selhání přednastaveného uložení"
+  "e141": "Selhání přednastaveného uložení",
+  "e145": "Momentálně není k dispozici žádný GPU. Zkuste to za chvíli znovu nebo vyberte jinou nabídku."
 }

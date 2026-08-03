@@ -389,7 +389,8 @@
     "reclaimKept": "Conservada",
     "reclaimHint": "Las sesiones detenidas siguen usando disco personal. Tras {{n}} días detenidas pasan a ser recuperables, y las más antiguas pueden eliminarse cuando a un nodo le falte espacio en disco.",
     "reclaimKeptHint": "Su sesión detenida más reciente nunca se recupera.",
-    "reclaimResumeHint": "Reiniciarla pone el contador a cero. Elimine las sesiones que ya no necesite conservar."
+    "reclaimResumeHint": "Reiniciarla pone el contador a cero. Elimine las sesiones que ya no necesite conservar.",
+    "actionFailed": "La solicitud no se pudo completar."
   },
   "conn": {
     "loading": "Cargando información de conexión…",

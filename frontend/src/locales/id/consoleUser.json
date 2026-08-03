@@ -389,7 +389,8 @@
     "reclaimKept": "Disimpan",
     "reclaimHint": "Sesi yang dihentikan tetap memakai disk home. Setelah {{n}} hari terhenti, sesi dapat ditarik kembali, dan yang paling lama menganggur dapat dihapus ketika disk sebuah node menipis.",
     "reclaimKeptHint": "Sesi terhenti terbaru Anda tidak pernah ditarik.",
-    "reclaimResumeHint": "Memulai ulang akan mengatur ulang hitungan. Hapus sesi yang tidak perlu Anda simpan lagi."
+    "reclaimResumeHint": "Memulai ulang akan mengatur ulang hitungan. Hapus sesi yang tidak perlu Anda simpan lagi.",
+    "actionFailed": "Permintaan tersebut tidak dapat diselesaikan"
   },
   "conn": {
     "loading": "Memuat info koneksi…",

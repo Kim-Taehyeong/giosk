@@ -142,5 +142,6 @@
   "e142": "Forudindstillet opslag mislykkedes",
   "e138": "Kunne ikke give kredit",
   "e143": "Påkrævet felt mangler",
-  "e144": "Emne for ikke tilladt underretning"
+  "e144": "Emne for ikke tilladt underretning",
+  "e145": "Ingen GPU er tilgængelig lige nu. Prøv igen om lidt, eller vælg et andet tilbud."
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Code2, NotebookPen, TerminalSquare, Square, RotateCcw, Trash2, Clock, Activity, Power, ScrollText, Server, Coins } from 'lucide-react';
+import { ArrowLeft, Code2, NotebookPen, TerminalSquare, Square, RotateCcw, Trash2, Clock, Activity, Power, ScrollText, Server, Coins, Cpu } from 'lucide-react';
 import PageHead from '../../../components/console/PageHead';
 import StatCard from '../../../components/console/StatCard';
 import Pill from '../../../components/console/Pill';
@@ -9,6 +9,7 @@ import Bar from '../../../components/console/Bar';
 import Spinner from '../../../components/console/Spinner';
 import PagedTable from '../../../components/console/PagedTable';
 import ConnectionModal from '../../../components/console/ConnectionModal';
+import ReconfigureModal from '../../../components/console/ReconfigureModal';
 import SessionHistoryChart from '../../../components/console/SessionHistoryChart';
 import { useToast } from '../../../components/console/Toast';
 import { useConfirm } from '../../../components/console/Confirm';
@@ -34,6 +35,8 @@ export default function UserSessionDetail() {
   const [r, setR] = useState(null);
   const [notFound, setNotFound] = useState(false);
   const [conn, setConn] = useState(false);
+  const [reconf, setReconf] = useState(false); // 자원 변경(GPU 붙이기/떼기) 모달 — 중단 상태에서만
+  const [busy, setBusy] = useState(false); // 정지/재시작 진행 중(연타 방지)
   const [activity, setActivity] = useState([]);
 
   const load = () => getMySessionsWithUsage().then((list) => {
@@ -53,7 +56,20 @@ export default function UserSessionDetail() {
   if (notFound) return <div className="card">{t('sdetail.notFound', { defaultValue: '세션을 찾을 수 없습니다.' })}</div>;
   if (!r) return <Spinner pad label={t('sdetail.loading', { defaultValue: '…' })} />;
 
-  const act = async (fn, msg) => { await fn(id); toast(msg); load(); };
+  // 정지/재시작 — 실패를 반드시 말해준다. 재시작은 관문에서 거절될 수 있고(자리 없음·노드 고정),
+  // 조용히 삼키면 사용자에겐 "버튼이 안 먹는다"로 보인다. 연타는 서버 CAS 전에 여기서 먼저 막는다.
+  const act = async (fn, msg) => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await fn(id);
+      toast(msg);
+    } catch (e) {
+      toast(e?.message || t('session.actionFailed', { defaultValue: '요청을 처리하지 못했습니다' }));
+    }
+    setBusy(false);
+    load();
+  };
   const doDelete = async () => {
     if (!await confirm({ title: t('session.delete'), message: t('confirmDelete'), confirmText: t('session.delete') })) return;
     await deleteSession(id);
@@ -88,8 +104,9 @@ export default function UserSessionDetail() {
           <span className="flex" style={{ gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
             {canConnect && <button className="btn primary" onClick={() => setConn(true)}><TerminalSquare size={14} /> {t('session.conn')}</button>}
             {canExtend && <button className="btn" onClick={doExtend}><Clock size={14} /> {t('session.extend')} ({r.extensionsUsed || 0}/{lease.maxExtensions})</button>}
-            {r.status === 'running' && <button className="btn" onClick={() => act(stopSession, t('session.stopped'))}><Square size={14} /> {t('session.stop')}</button>}
-            {r.status === 'stopped' && <button className="btn" onClick={() => act(startSession, t('session.restarted'))}><RotateCcw size={14} /> {t('session.restart')}</button>}
+            {r.status === 'running' && <button className="btn" onClick={() => act(stopSession, t('session.stopped'))} disabled={busy}><Square size={14} /> {t('session.stop')}</button>}
+            {r.status === 'stopped' && r.mode !== 'ssh' && <button className="btn" onClick={() => setReconf(true)}><Cpu size={14} /> {t('reconf.menu')}</button>}
+            {r.status === 'stopped' && <button className="btn" onClick={() => act(startSession, t('session.restarted'))} disabled={busy}><RotateCcw size={14} /> {t('session.restart')}</button>}
             {r.status !== 'running' && <button className="btn danger" onClick={doDelete}><Trash2 size={14} /> {t('session.delete')}</button>}
           </span>
         } />
@@ -172,6 +189,7 @@ export default function UserSessionDetail() {
       </div>
 
       <ConnectionModal session={conn ? r : null} onClose={() => setConn(false)} />
+      {reconf && <ReconfigureModal session={r} onClose={() => setReconf(false)} onDone={load} />}
     </div>
   );
 }

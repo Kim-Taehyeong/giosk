@@ -389,7 +389,8 @@
     "reclaimKept": "保留中",
     "reclaimHint": "已停止的会话仍在占用主目录磁盘。停止超过 {{n}} 天后即可被回收；当节点磁盘不足时，闲置最久的可能被删除。",
     "reclaimKeptHint": "您最近停止的一个会话永不回收。",
-    "reclaimResumeHint": "重新启动会重置计时。不再需要保留的会话请删除。"
+    "reclaimResumeHint": "重新启动会重置计时。不再需要保留的会话请删除。",
+    "actionFailed": "请求无法完成"
   },
   "conn": {
     "webConnectHint": "直接在浏览器中打开终端（无需 SSH 密钥或命令）。",

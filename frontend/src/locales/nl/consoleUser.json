@@ -389,7 +389,8 @@
     "reclaimKept": "Behouden",
     "reclaimHint": "Gestopte sessies gebruiken nog steeds home-schijfruimte. Na {{n}} dagen gestopt worden ze terugvorderbaar, en de langst inactieve kunnen worden verwijderd wanneer een node weinig schijfruimte overhoudt.",
     "reclaimKeptHint": "Je meest recent gestopte sessie wordt nooit teruggevorderd.",
-    "reclaimResumeHint": "Opnieuw starten zet de teller terug. Verwijder sessies die je niet meer hoeft te bewaren."
+    "reclaimResumeHint": "Opnieuw starten zet de teller terug. Verwijder sessies die je niet meer hoeft te bewaren.",
+    "actionFailed": "Het verzoek kon niet worden voltooid"
   },
   "conn": {
     "title": "Verbinden — {{name}}",

@@ -142,5 +142,6 @@
   "e138": "Kunne ikke gi kreditt",
   "e139": "Oppsett av teampåfyll mislyktes",
   "e141": "Forhåndsinnstilt lagringsfeil",
-  "e144": "Emne for ikke tillatt varsling"
+  "e144": "Emne for ikke tillatt varsling",
+  "e145": "Ingen GPU er tilgjengelig akkurat nå. Prøv igjen snart, eller velg et annet tilbud."
 }

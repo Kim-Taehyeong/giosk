@@ -142,5 +142,6 @@
   "e138": "Falha ao conceder crédito",
   "e140": "Falha na exclusão da predefinição",
   "e142": "Falha na pesquisa predefinida",
-  "e143": "Campo obrigatório ausente"
+  "e143": "Campo obrigatório ausente",
+  "e145": "Nenhuma GPU está disponível no momento. Tente novamente em breve ou escolha uma oferta diferente."
 }

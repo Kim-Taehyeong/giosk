@@ -561,5 +561,12 @@
       "teamBody": "Creditele echipei {{target}} sunt la {{value}}, sub pragul {{threshold}}. Sesiunile din această echipă se pot opri în curând."
     }
   },
-  "close": "Aproape"
+  "close": "Aproape",
+  "rowMenu": {
+    "more": "Mai mult"
+  },
+  "nav": {
+    "openMenu": "Deschide meniul",
+    "label": "Meniul consolei"
+  }
 }

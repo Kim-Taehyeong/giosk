@@ -142,5 +142,6 @@
   "e139": "A csapat utántöltés beállítása nem sikerült",
   "e130": "A szervezet keresése nem sikerült",
   "e143": "A kötelező mező hiányzik",
-  "e144": "Nem engedélyezett értesítés tárgya"
+  "e144": "Nem engedélyezett értesítés tárgya",
+  "e145": "Jelenleg nem érhető el GPU. Próbálja újra rövidesen, vagy válasszon másik ajánlatot."
 }

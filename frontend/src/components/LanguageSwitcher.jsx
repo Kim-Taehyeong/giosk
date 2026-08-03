@@ -74,7 +74,7 @@ export default function LanguageSwitcher({ align = 'right' }) {
         aria-expanded={open}
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 7, padding: '7px 11px', fontSize: 13,
-          border: '1px solid var(--border)', borderRadius: 8, background: 'var(--surface)',
+          border: '1px solid var(--border)', borderRadius: 'var(--r-control)', background: 'var(--surface)',
           color: 'var(--text)', cursor: 'pointer',
         }}
       >
@@ -88,7 +88,7 @@ export default function LanguageSwitcher({ align = 'right' }) {
           position: 'absolute', [align === 'left' ? 'left' : 'right']: 0,
           [dropUp ? 'bottom' : 'top']: 'calc(100% + 6px)',
           width: 264, zIndex: 70, background: 'var(--surface)', border: '1px solid var(--border)',
-          borderRadius: 12, boxShadow: '0 16px 40px rgba(10,15,28,.22)', overflow: 'hidden',
+          borderRadius: 'var(--r-container)', boxShadow: '0 16px 40px rgba(10,15,28,.22)', overflow: 'hidden',
         }}>
           <div style={{ padding: 8, borderBottom: '1px solid var(--border)' }}>
             <div style={{ position: 'relative' }}>
@@ -100,7 +100,7 @@ export default function LanguageSwitcher({ align = 'right' }) {
                 placeholder="Search language…"
                 style={{
                   width: '100%', padding: '8px 10px 8px 30px', fontSize: 13, color: 'var(--text)',
-                  background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 8, outline: 'none',
+                  background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 'var(--r-control)', outline: 'none',
                 }}
               />
             </div>

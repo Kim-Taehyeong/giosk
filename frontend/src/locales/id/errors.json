@@ -142,5 +142,6 @@
   "e136": "Pelepasan cache gagal",
   "e141": "Kegagalan penyimpanan preset",
   "e143": "Bidang yang wajib diisi tidak ada",
-  "e144": "Subjek pemberitahuan tidak diizinkan"
+  "e144": "Subjek pemberitahuan tidak diizinkan",
+  "e145": "Tidak ada GPU yang tersedia saat ini. Coba lagi sebentar lagi atau pilih penawaran lain."
 }

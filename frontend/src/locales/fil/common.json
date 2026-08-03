@@ -561,5 +561,12 @@
       "teamBody": "Ang mga kredito ng koponan ng {{target}} ay nasa {{value}}, sa ibaba ng threshold ng {{threshold}}. Maaaring huminto sa lalong madaling panahon ang mga session sa team na ito."
     }
   },
-  "close": "Isara"
+  "close": "Isara",
+  "rowMenu": {
+    "more": "Higit pa"
+  },
+  "nav": {
+    "openMenu": "Buksan ang menu",
+    "label": "Menu ng console"
+  }
 }

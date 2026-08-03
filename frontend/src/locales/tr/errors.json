@@ -142,5 +142,6 @@
   "e137": "Bağlam araması başarısız oldu",
   "e140": "Ön ayar silinemedi",
   "e142": "Ön ayar araması başarısız oldu",
-  "e141": "Ön ayar kaydetme hatası"
+  "e141": "Ön ayar kaydetme hatası",
+  "e145": "Şu anda GPU mevcut değil. Kısa süre sonra tekrar deneyin veya farklı bir teklif seçin."
 }

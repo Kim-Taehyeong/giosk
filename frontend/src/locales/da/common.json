@@ -561,5 +561,12 @@
       "teamBody": "{{target}}-holdkreditter er på {{value}}, under {{threshold}}-tærsklen. Sessioner i dette team stopper muligvis snart."
     }
   },
-  "close": "Tæt"
+  "close": "Tæt",
+  "rowMenu": {
+    "more": "Mere"
+  },
+  "nav": {
+    "openMenu": "Åbn menuen",
+    "label": "Konsol menu"
+  }
 }

@@ -389,7 +389,8 @@
     "reclaimKept": "Zachováno",
     "reclaimHint": "Zastavené relace stále používají domovský disk. Po {{n}} dnech zastavení se stanou uvolnitelnými a nejdéle nečinné mohou být smazány, když uzlu dojde místo na disku.",
     "reclaimKeptHint": "Vaše naposledy zastavená relace se nikdy neuvolňuje.",
-    "reclaimResumeHint": "Restart vynuluje počítadlo. Smažte relace, které už nepotřebujete uchovávat."
+    "reclaimResumeHint": "Restart vynuluje počítadlo. Smažte relace, které už nepotřebujete uchovávat.",
+    "actionFailed": "Požadavek nebylo možné dokončit"
   },
   "conn": {
     "webConnect": "Připojte se přes web",

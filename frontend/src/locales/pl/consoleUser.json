@@ -389,7 +389,8 @@
     "reclaimKept": "Zachowana",
     "reclaimHint": "Zatrzymane sesje nadal korzystają z dysku domowego. Po {{n}} dniach zatrzymania stają się możliwe do odzyskania, a najdłużej bezczynne mogą zostać usunięte, gdy węzłowi zabraknie miejsca na dysku.",
     "reclaimKeptHint": "Twoja ostatnio zatrzymana sesja nigdy nie jest odzyskiwana.",
-    "reclaimResumeHint": "Ponowne uruchomienie zeruje licznik. Usuń sesje, których nie musisz już przechowywać."
+    "reclaimResumeHint": "Ponowne uruchomienie zeruje licznik. Usuń sesje, których nie musisz już przechowywać.",
+    "actionFailed": "Nie można zrealizować żądania"
   },
   "conn": {
     "webConnect": "Połącz się przez internet",

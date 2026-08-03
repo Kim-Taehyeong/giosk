@@ -142,5 +142,6 @@
   "e141": "Falha ao salvar predefinição",
   "e142": "Falha na pesquisa predefinida",
   "e143": "Campo obrigatório ausente",
-  "e144": "Assunto de notificação não permitido"
+  "e144": "Assunto de notificação não permitido",
+  "e145": "Nenhuma GPU está disponível no momento. Tente novamente em breve ou escolha uma oferta diferente."
 }

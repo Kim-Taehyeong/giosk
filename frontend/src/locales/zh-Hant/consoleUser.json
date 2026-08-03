@@ -389,7 +389,8 @@
     "reclaimKept": "保留中",
     "reclaimHint": "已停止的工作階段仍在占用家目錄磁碟。停止超過 {{n}} 天後即可被回收；當節點磁碟不足時，閒置最久的可能會被刪除。",
     "reclaimKeptHint": "您最近停止的一個工作階段永不回收。",
-    "reclaimResumeHint": "重新啟動會重設計時。不再需要保留的工作階段請刪除。"
+    "reclaimResumeHint": "重新啟動會重設計時。不再需要保留的工作階段請刪除。",
+    "actionFailed": "請求無法完成"
   },
   "conn": {
     "webConnect": "透過網路連線",

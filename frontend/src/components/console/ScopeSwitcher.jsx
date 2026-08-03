@@ -60,7 +60,7 @@ export default function ScopeSwitcher({ ns }) {
       {open && (
         <div className="scope-menu" role="menu" style={{
           position: 'absolute', top: '100%', left: 0, marginTop: 6, minWidth: 220, zIndex: 50,
-          background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8,
+          background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-container)',
           boxShadow: '0 8px 24px rgba(0,0,0,.12)', padding: 6,
         }}>
           <div className="muted" style={{ fontSize: 11, padding: '4px 8px' }}>{t('topbar.switchScope')}</div>
@@ -71,7 +71,7 @@ export default function ScopeSwitcher({ ns }) {
                 onClick={(e) => { e.stopPropagation(); pick(s); }}
                 style={{
                   width: '100%', textAlign: 'left', alignItems: 'center', gap: 8, padding: '7px 8px',
-                  border: 0, borderRadius: 6, background: active ? 'var(--surface-2)' : 'transparent', cursor: 'pointer',
+                  border: 0, borderRadius: 'var(--r-control)', background: active ? 'var(--surface-2)' : 'transparent', cursor: 'pointer',
                 }}>
                 {s.level === 'org' ? <Building2 size={14} /> : <FolderKanban size={14} />}
                 <span style={{ flex: 1 }}>

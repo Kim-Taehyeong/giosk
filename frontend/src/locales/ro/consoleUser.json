@@ -389,7 +389,8 @@
     "reclaimKept": "Păstrată",
     "reclaimHint": "Sesiunile oprite folosesc în continuare discul home. După {{n}} zile de oprire devin recuperabile, iar cele inactive de cel mai mult timp pot fi șterse când un nod rămâne fără spațiu pe disc.",
     "reclaimKeptHint": "Cea mai recentă sesiune oprită a dvs. nu este niciodată recuperată.",
-    "reclaimResumeHint": "Repornirea resetează contorul. Ștergeți sesiunile pe care nu mai trebuie să le păstrați."
+    "reclaimResumeHint": "Repornirea resetează contorul. Ștergeți sesiunile pe care nu mai trebuie să le păstrați.",
+    "actionFailed": "Solicitarea nu a putut fi finalizată"
   },
   "conn": {
     "title": "Conectare — {{name}}",

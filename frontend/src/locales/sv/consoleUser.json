@@ -389,7 +389,8 @@
     "reclaimKept": "Behålls",
     "reclaimHint": "Stoppade sessioner använder fortfarande hemdisk. Efter {{n}} dagar som stoppade blir de återtagbara, och de längst inaktiva kan raderas när en nod får ont om diskutrymme.",
     "reclaimKeptHint": "Din senast stoppade session återtas aldrig.",
-    "reclaimResumeHint": "Att starta om nollställer räknaren. Radera sessioner du inte längre behöver spara."
+    "reclaimResumeHint": "Att starta om nollställer räknaren. Radera sessioner du inte längre behöver spara.",
+    "actionFailed": "Begäran kunde inte slutföras"
   },
   "conn": {
     "loading": "Laddar anslutningsinformation...",
