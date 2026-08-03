@@ -22,6 +22,10 @@ const idleCPUThreshold = 0.05
 // GPU 대여 세션은 GPU 점유가 목적이므로 CPU 가 아니라 GPU util(DCGM)로만 유휴를 판정한다.
 const idleGPUThreshold = 5.0
 
+// idleGPUPowerW는 전용/물리 GPU 세션의 "연산 중" 판정 전력(W). DCGM util 이 오보고(0)돼도 이 이상
+// 전력을 쓰면 실제 연산 중으로 보고 유휴로 죽이지 않는다. 유휴 4090 ~25W, 실부하 130W+ → 60W 로 넉넉히.
+const idleGPUPowerW = 60.0
+
 // AuditReader는 세션 대상 감사 로그 조회/기록(audit.Repository 가 구현).
 type AuditReader interface {
 	ListByTarget(target string, limit int) ([]audit.Log, error)
@@ -417,7 +421,7 @@ func (s *Service) Create(ctx context.Context, userID int64, username string, req
 	req.Datasets = s.repo.MountableDatasetIDs()
 	dsTarget, dsCached, dsHostPath := requireNode, map[int64][]string(nil), map[int64]string(nil)
 	if requireNode == "" {
-		dsTarget, dsCached, dsHostPath = s.pickDatasetNode(ctx, req.Datasets, sess.GpuType, sess.GpuMode)
+		dsTarget, dsCached, dsHostPath = s.pickDatasetNode(ctx, req.Datasets, sess.GpuType, sess.GpuMode, sess.GpuCount)
 		requireNode = dsTarget
 	} else if s.datasetCache != nil {
 		dsCached, dsHostPath = s.datasetCache.DatasetCachePlacement(req.Datasets)
@@ -617,7 +621,7 @@ func (s *Service) mountFor(ctx context.Context, ns string, userID, volID int64, 
 // pickDatasetNode는 요청 데이터셋들의 로컬 캐시 배치를 보고, 가장 많이 캐시된(GPU타입 일치) 노드를 고른다.
 // 반환 node!="" 이면 그 노드에 핀하고, 그 노드에 캐시된 데이터셋은 hostPath 로 마운트한다(나머지는 NFS).
 // 캐시 비활성/후보 없음이면 node="" (전부 NFS).
-func (s *Service) pickDatasetNode(ctx context.Context, ids []int64, gpuType, gpuMode string) (string, map[int64][]string, map[int64]string) {
+func (s *Service) pickDatasetNode(ctx context.Context, ids []int64, gpuType, gpuMode string, gpuCount int) (string, map[int64][]string, map[int64]string) {
 	if s.datasetCache == nil || len(ids) == 0 {
 		return "", nil, nil
 	}
@@ -626,12 +630,23 @@ func (s *Service) pickDatasetNode(ctx context.Context, ids []int64, gpuType, gpu
 		return "", nil, nil
 	}
 	typeNodes := s.nodesOfType(ctx, gpuType, gpuMode) // 후보를 GPU 타입 일치 노드로 제한
+	// 사용자가 노드를 직접 고르지 않은 경우, 데이터셋 캐시 노드로 "하드핀"하면 그 노드가 만석일 때
+	// 다른 빈 노드가 있어도 영구 Pending 이 된다. 그러니 GPU 여유가 있는 캐시 노드만 후보로 삼고,
+	// 여유 있는 캐시 노드가 없으면 핀하지 않는다("" → 데이터셋은 NFS, 스케줄러가 빈 노드로 배치).
+	freeGpu := s.freeGpuByNode(ctx)
+	need := 1
+	if gpuMode == "exclusive" {
+		need = max1(gpuCount)
+	}
 	best, bestN := "", 0
 	score := map[string]int{}
 	for _, nodes := range cached {
 		for _, n := range nodes {
 			if typeNodes != nil && !typeNodes[n] {
 				continue
+			}
+			if freeGpu != nil && freeGpu[n] < need {
+				continue // 캐시돼 있어도 GPU 여유 없음 → 핀 후보 제외(만석 노드에 핀 금지)
 			}
 			score[n]++
 			if score[n] > bestN {
@@ -640,9 +655,34 @@ func (s *Service) pickDatasetNode(ctx context.Context, ids []int64, gpuType, gpu
 		}
 	}
 	if bestN == 0 {
-		return "", nil, nil // 캐시된 노드 중 타입 일치 없음 → 전부 NFS
+		return "", nil, nil // 여유 있는 캐시 노드 없음 → 핀 없이 NFS(빈 노드로 스케줄)
 	}
 	return best, cached, hostPaths
+}
+
+// freeGpuByNode는 노드별 남은 GPU 수를 근사한다(데이터셋 캐시 핀의 여유 판정용).
+// 전용 세션은 GPU 개수만큼 점유로 계산, 분할/타임셰어는 한 장을 나눠 쓰므로 여유를 깎지 않는다(패킹 가능).
+func (s *Service) freeGpuByNode(ctx context.Context) map[string]int {
+	live, err := s.prov.ListNodes(ctx)
+	if err != nil || len(live) == 0 {
+		return nil
+	}
+	free := map[string]int{}
+	for _, n := range live {
+		free[n.Name] = atoiCap(n.GpuCapacity)
+	}
+	running, err := s.repo.ListRunning()
+	if err != nil {
+		return free
+	}
+	for i := range running {
+		r := running[i]
+		if r.Node == "" || r.Env == "ssh" || r.GpuMode != "exclusive" {
+			continue
+		}
+		free[r.Node] -= max1(r.GpuCount)
+	}
+	return free
 }
 
 // nodesOfType는 GPU 타입이 일치하는(또는 CPU면 전체) Ready 노드 집합을 반환한다(미가용 시 nil=제한없음).
@@ -1490,7 +1530,7 @@ func (s *Service) Start(ctx context.Context, instanceID string, userID int64) er
 		mounts = append(mounts, k8s.VolMountSpec{PVCName: persistPVC, MountPath: homeMount + "/nfs"})
 	}
 	dsIDs := s.repo.SessionDatasetIDs(sess.ID)
-	dsNode, dsCached, dsHostPath := s.pickDatasetNode(ctx, dsIDs, sess.GpuType, sess.GpuMode)
+	dsNode, dsCached, dsHostPath := s.pickDatasetNode(ctx, dsIDs, sess.GpuType, sess.GpuMode, sess.GpuCount)
 	mounts = append(mounts, s.resolveDatasets(ctx, ns, dsIDs, dsNode, dsCached, dsHostPath)...) // 데이터셋 RO 복원
 	var preferNodes []string
 	if sess.ImageID != nil {
@@ -1802,7 +1842,17 @@ func (s *Service) isIdle(ctx context.Context, sess *Session, windowMin int) (idl
 	if !got {
 		return false, false // GPU 메트릭 미가용 → 정지하지 않음(보수적)
 	}
-	return v < idleGPUThreshold, true
+	if v >= idleGPUThreshold {
+		return false, true // 사용 중
+	}
+	// util 이 낮게 나와도 유휴로 단정하지 않는다. 컨슈머 GeForce+최신 드라이버에선 DCGM 이 util(%)을
+	// 종종 0 으로 오보고하지만(전력·클럭은 정상), 이를 그대로 믿으면 100% 학습 중인 세션이 유휴로 죽는다.
+	// 전력을 보조 신호로: GPU 가 유의미한 전력을 쓰면 실제 연산 중 → 유휴 아님. (유휴 4090 ~25W, 부하 >130W)
+	pq := fmt.Sprintf(`avg(avg_over_time(DCGM_FI_DEV_POWER_USAGE[%dm]) * on(pod,namespace) group_left(node) kube_pod_info{node=%q})`, windowMin, sess.Node)
+	if p, ok := s.met.Scalar(ctx, pq); ok && p >= idleGPUPowerW {
+		return false, true // 전력 사용 중 → util 오보고 방어(유휴 아님)
+	}
+	return true, true
 }
 
 // RunPhaseReconciler는 컨테이너 세션의 라이브 Pod 상태를 주기적으로 DB 에 반영한다.
