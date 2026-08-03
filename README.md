@@ -6,6 +6,8 @@ Giosk turns a Kubernetes cluster into a self-service GPU cloud — users launch 
 
 > Sessions run as **real Kubernetes Pods** — native scheduling, RBAC, PVC storage, and the GPU stack (device-plugin, GFD, HAMi, DCGM). No VMs, no external scheduler.
 
+[한국어 README](README.ko.md) · [한국어 문서](docs/ko/) (more detailed)
+
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-native-326CE5?logo=kubernetes&logoColor=white)
 
@@ -56,6 +58,9 @@ The chart refuses to install with an unsafe config (missing NFS class, missing M
 - [Installation](docs/installation.md) (incl. k3s notes)
 - [Configuration](docs/configuration.md)
 - [Development](docs/development.md)
+
+The Korean docs under [`docs/ko/`](docs/ko/) go further — API reference, operations,
+troubleshooting, and architecture decision records.
 
 ## Repository layout
 
