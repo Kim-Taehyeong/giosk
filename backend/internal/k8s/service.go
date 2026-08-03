@@ -9,11 +9,10 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-// 세션 노출 모드.
+// 세션 노출 모드. nodeport(기본) 또는 loadbalancer(MetalLB) 둘 뿐이다.
 const (
 	ExposeLoadBalancer = "loadbalancer"
 	ExposeNodePort     = "nodeport"
-	ExposePortForward  = "portforward"
 )
 
 // SvcSpec은 세션 웹 노출 Service 입력.
@@ -21,8 +20,8 @@ type SvcSpec struct {
 	Namespace string
 	Name      string    // = instance_id (pod 와 동일; selector giosk.io/session)
 	Ports     []SvcPort // 노출 포트(웹 채널 + sshd 22). 첫 항목이 primary(외부 노출 좌표).
-	Mode      string    // loadbalancer | nodeport | portforward
-	Internal  bool      // 게이트웨이 라우팅용: portforward 모드여도 ClusterIP Service 를 항상 생성.
+	Mode      string    // loadbalancer | nodeport
+	Internal  bool      // 게이트웨이 라우팅용: 외부 노출 대신 ClusterIP Service 를 만들어 인클러스터 DNS 로 도달.
 }
 
 // SvcPort는 세션 Service 가 노출하는 포트 1개.
@@ -42,27 +41,20 @@ type SvcAccess struct {
 }
 
 func svcType(mode string) corev1.ServiceType {
-	switch mode {
-	case ExposeLoadBalancer:
+	if mode == ExposeLoadBalancer {
 		return corev1.ServiceTypeLoadBalancer
-	case ExposeNodePort:
-		return corev1.ServiceTypeNodePort
-	default:
-		return corev1.ServiceTypeClusterIP
 	}
+	return corev1.ServiceTypeNodePort // 기본 nodeport
 }
 
-// EnsureSessionService는 세션 Service 를 멱등 생성한다. portforward 모드면 생략하되,
-// Internal(게이트웨이 라우팅)이면 ClusterIP Service 를 항상 만들어 모든 채널 포트(+sshd 22)를 노출한다.
+// EnsureSessionService는 세션 Service 를 멱등 생성한다.
+// Internal(게이트웨이 라우팅)이면 외부 노출 대신 ClusterIP Service 를 만들어 인클러스터 DNS 로 도달한다.
 func (c *Client) EnsureSessionService(ctx context.Context, s SvcSpec) error {
 	if !c.Available() || len(s.Ports) == 0 {
 		return nil
 	}
 	svcTy := svcType(s.Mode)
-	if s.Mode == ExposePortForward {
-		if !s.Internal {
-			return nil // 외부 노출도 게이트웨이도 없음 → Service 불요(port-forward)
-		}
+	if s.Internal {
 		svcTy = corev1.ServiceTypeClusterIP // 게이트웨이가 인클러스터 DNS 로 도달
 	}
 	ports := make([]corev1.ServicePort, 0, len(s.Ports))
@@ -104,7 +96,7 @@ func (c *Client) DeleteSessionService(ctx context.Context, ns, name string) erro
 // SessionServiceAccess는 Service 의 외부 접속 좌표(LB IP / NodePort)를 읽는다.
 func (c *Client) SessionServiceAccess(ctx context.Context, ns, name, mode string) (SvcAccess, error) {
 	out := SvcAccess{Mode: mode}
-	if !c.Available() || mode == ExposePortForward {
+	if !c.Available() {
 		return out, nil
 	}
 	svc, err := c.cs.CoreV1().Services(ns).Get(ctx, name, v1.GetOptions{})

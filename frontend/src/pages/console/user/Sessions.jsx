@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Code2, NotebookPen, TerminalSquare, ChevronDown, ChevronRight, Power, ScrollText, Clock, Activity } from 'lucide-react';
@@ -16,6 +16,12 @@ import { measureRows, gpuUnmeasurable } from '../../../utils/sessionUsage';
 
 const CONN_ICON = { vscode: Code2, jupyter: NotebookPen, ssh: TerminalSquare, terminal: TerminalSquare };
 const CONN_LABEL = { vscode: 'VSCode', jupyter: 'Jupyter', ssh: 'SSH', terminal: 'SSH' };
+
+// connChips는 세션 채널 목록을 버튼용으로 정규화한다 — 웹터미널(terminal)과 SSH(ssh)는 접속 모달의
+// 통합 SSH 탭 하나로 다루므로 terminal→ssh 로 접고 중복을 없앤다(SSH 칩이 두 개로 뜨는 것 방지).
+function connChips(conn) {
+  return [...new Set((conn || []).map((c) => { const k = c.toLowerCase(); return k === 'terminal' ? 'ssh' : k; }))];
+}
 
 export default function Sessions() {
   const { t } = useTranslation('consoleUser');
@@ -38,13 +44,19 @@ export default function Sessions() {
   const [extendFor, setExtendFor] = useState(null);
   const [extHours, setExtHours] = useState(1);
   const hourOpts = Array.from({ length: Math.max(1, lease.extensionHours) }, (_, i) => ({ value: i + 1, label: t('session.hoursN', { h: i + 1 }) }));
-  const load = () => getMySessionsWithUsage().then(setRows);
+  // 4초 폴링 — 데이터가 실제로 바뀐 경우에만 setRows 한다. 매 틱마다 새 배열로 갱신하면
+  // 테이블 전체가 리렌더되며 "폴링처럼 깜박"인다(usePoll 과 같은 시그니처 비교로 방지).
+  const lastSig = useRef('');
+  const load = () => getMySessionsWithUsage().then((d) => {
+    const sig = (() => { try { return JSON.stringify(d); } catch { return null; } })();
+    if (sig === null || sig !== lastSig.current) { lastSig.current = sig; setRows(d); }
+  });
   // 마운트 시 1회 + 4초마다 폴링(프로비저닝→실행 등 상태 자동 갱신).
   useEffect(() => {
     load();
     const id = setInterval(load, 4000);
     return () => clearInterval(id);
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const act = async (fn, id, msg) => { await fn(id); toast(msg); load(); };
   // 임대 연장 — 백엔드가 정책(maxExtensions) 내에서 연장 횟수를 +1(영속). 성공 시 재조회.
   const doExtend = async () => {
@@ -146,7 +158,7 @@ export default function Sessions() {
                 {dynamicMode && <td>{r.mode === 'cpu' ? '—' : leaseLeftText(r)}</td>}
                 <td className="flex">
                   {r.status === 'running' && r.conn.length
-                    ? r.conn.map((c) => { const k = c.toLowerCase(); const Icon = CONN_ICON[k] || TerminalSquare; return <button key={c} className="btn sm" onClick={() => { setConnTab(k); setConn(r); }} title={c}><Icon size={13} /> {CONN_LABEL[k] || c}</button>; })
+                    ? connChips(r.conn).map((k) => { const Icon = CONN_ICON[k] || TerminalSquare; return <button key={k} className="btn sm" onClick={() => { setConnTab(k); setConn(r); }} title={CONN_LABEL[k] || k}><Icon size={13} /> {CONN_LABEL[k] || k}</button>; })
                     : <span className="muted">—</span>}
                 </td>
                 <td><ChevronRight size={15} style={{ color: 'var(--muted)' }} /></td>

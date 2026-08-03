@@ -3,6 +3,7 @@ package session
 import (
 	"context"
 	"errors"
+	"log"
 	"strconv"
 
 	"giosk/internal/auth"
@@ -164,6 +165,9 @@ func (h *Handler) writeErr(c *gin.Context, err error, msg string) {
 	case errors.Is(err, k8s.ErrNoCluster):
 		httpx.Err(c, 503, "k8s_unavailable", "클러스터를 사용할 수 없습니다")
 	default:
+		// 알려지지 않은 에러(주로 프로비저닝: PVC/네임스페이스/스케줄)는 500 으로 나가되,
+		// 원시 에러를 반드시 서버 로그에 남긴다 — 안 그러면 클라이언트엔 "실패"만 뜨고 원인이 사라진다.
+		log.Printf("[session] %s: %v", msg, err)
 		httpx.Internal(c, msg)
 	}
 }

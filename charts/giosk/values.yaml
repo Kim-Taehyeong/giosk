@@ -205,11 +205,10 @@ features:
 
 # ── 세션 웹(VSCode/code-server) 노출 ────────────────────────────────
 # loadbalancer = 세션마다 LoadBalancer Service(MetalLB 가 IP 할당) → http://<IP>:8080
-# nodeport     = 워커 NodeIP:NodePort
-# portforward  = 외부 노출 없음, kubectl port-forward 안내(기본/로컬)
+# nodeport     = 워커 NodeIP:NodePort (기본 — 인그레스/게이트웨이 없이 바로 접속)
 # 인증은 Giosk 가 세션마다 생성하는 랜덤 비밀번호(code-server)로 강제 — 인그레스/DNS 불필요.
 session:
-  expose: portforward
+  expose: nodeport
   # 컨테이너 세션 SSH — 기본 경로다. 켜면 sshd 사이드카(image.sshd)가 항상 붙고 세션 Service 에
   # 22 포트가 열려, 사용자가 콘솔에 등록한 공개키로 바로 SSH 할 수 있다(게이트웨이 불요).
   # 노출 주소는 expose 를 따른다: loadbalancer(MetalLB 우선) > nodeport. 키 미등록 사용자는

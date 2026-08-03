@@ -66,7 +66,7 @@ const sizeTierOf = (corePercent) => {
   return 'large';
 };
 const SIZE_VARIANT = { small: 'free', medium: 'gpu', large: 'primary' };
-// CPU·메모리 최소 보장 = 최소 후보 노드 사양 × GPU 지분. 지분은 "노드 GPU 총수 대비 내 몫".
+// CPU·메모리 최소 보장 = 최소 후보 노드 사양 × GPU 지분 × requestFactor. 지분은 "노드 GPU 총수 대비 내 몫".
 //   전용 N개 → N/G · 분할(코어 c%) → (c/100)/G. (타임셰어링은 제거됨)
 // 서버(applyGuarantee)와 동일한 식이며, Pod 에는 request 로만 걸려 여유 시 초과 사용 가능(상한 아님).
 const shareOf = (mode, { gpuCount = 1, corePercent = 0, nodeGpus = 1 }) => {
@@ -75,12 +75,19 @@ const shareOf = (mode, { gpuCount = 1, corePercent = 0, nodeGpus = 1 }) => {
   if (mode === 'shared') return (corePercent / 100) / g;
   return 0;
 };
+// 서버 applyGuarantee 와 동일한 requestFactor(0.5): 한 노드의 지분 합 ≤ 1 이므로 request 총합을 노드의
+// 50% 이하로 눌러 CPU/Mem 부족으로 스케줄 실패하는 일을 원천 차단한다. 표기도 실제 예약값과 맞춰야
+// "보장 32 vCPU" 처럼 실제(16)의 2배로 보이는 오표기가 안 생긴다. 서버 상수와 반드시 동일하게 유지.
+const REQUEST_FACTOR = 0.5;
 // gt=선택된 GPU 타입 정보(nodeCpu/nodeMemGb/nodeGpus). 정보가 없으면 null → 표기 생략.
 const guaranteeOf = (gt, mode, opts) => {
   if (!gt || !gt.nodeCpu) return null;
-  const sh = shareOf(mode, { ...opts, nodeGpus: gt.nodeGpus });
+  const sh = Math.min(1, shareOf(mode, { ...opts, nodeGpus: gt.nodeGpus })); // share 상한 1.0(서버와 동일)
   if (sh <= 0) return null;
-  return { cpu: Math.max(1, Math.round(gt.nodeCpu * sh)), memGb: Math.max(1, Math.round(gt.nodeMemGb * sh)) };
+  return {
+    cpu: Math.max(1, Math.round(gt.nodeCpu * sh * REQUEST_FACTOR)),
+    memGb: Math.max(1, Math.round(gt.nodeMemGb * sh * REQUEST_FACTOR)),
+  };
 };
 
 function SelBox({ on, onClick, disabled, children }) {
@@ -448,8 +455,10 @@ export default function NewSession() {
         gpuMode: wtype,
         gpuType: selGpuType || undefined,
         gpuCount: wtype === 'exclusive' ? gpuCount : 1,
-        vramMb: vram,
-        corePercent: cores,
+        // VRAM·코어% 는 공유(HAMi 분할) 전용 값이다. 전용/CPU 모드에선 백엔드가 무시하므로
+        // 이전 단계의 기본값(8192·50%)이 그대로 실려 나가지 않게 0 으로 보낸다(요청 정합성).
+        vramMb: wtype === 'shared' ? vram : 0,
+        corePercent: wtype === 'shared' ? cores : 0,
         cpuCores: dc.cpu,
         memGb: dc.memGb,
         volumes: selVols.map((v) => ({ id: v.id, mountPath: v.mountPath })),

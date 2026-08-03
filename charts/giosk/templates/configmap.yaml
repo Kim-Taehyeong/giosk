@@ -66,7 +66,7 @@ data:
   GIOSK_QUOTA_MAX_VRAM_GB: {{ .Values.quota.maxVramGb | quote }}
   GIOSK_QUOTA_MAX_SESSIONS: {{ .Values.quota.maxConcurrentSessions | quote }}
   GIOSK_VOLUME_QUOTA_GB: {{ .Values.quota.volumeQuotaGb | quote }}
-  # 세션 웹(VSCode) 노출 모드: loadbalancer(MetalLB) | nodeport | portforward
+  # 세션 웹(VSCode) 노출 모드: nodeport(기본) | loadbalancer(MetalLB)
   GIOSK_SESSION_EXPOSE: {{ .Values.session.expose | quote }}
   # Prometheus(메트릭) — monitoring.enabled 면 in-cluster 서비스, 아니면 외부 URL.
   GIOSK_PROMETHEUS_URL: {{ .Values.monitoring.prometheusURL | default (ternary (printf "http://kps-kube-prometheus-stack-prometheus.%s:9090" .Release.Namespace) "" .Values.monitoring.install) | quote }}
@@ -80,6 +80,10 @@ data:
   GIOSK_REGISTRY: {{ $registry | quote }}
   # cosign 서명키 Secret(빌드 ns). registry.cosign.enabled 면 빌드 후 서명(키 없으면 자동 생성).
   GIOSK_COSIGN_KEY_SECRET: {{ if .Values.registry.cosign.enabled }}{{ .Values.registry.cosign.keySecret | quote }}{{ else }}""{{ end }}
+  # 컨테이너 세션 sshd 사이드카 이미지. session.ssh.enabled(기본 on)면 image.sshd 를 쓴다 —
+  # 게이트웨이와 무관하게 "사용자 공개키로 직접 SSH"가 기본 경로이므로 gateway.enabled 블록 밖에 둔다.
+  # gateway.sshdImage 는 예전 게이트웨이 전용 설정과의 하위호환 폴백.
+  GIOSK_SESSION_SSHD_IMAGE: {{ if .Values.session.ssh.enabled }}{{ printf "%s:%s" .Values.image.sshd.repository .Values.image.sshd.tag | quote }}{{ else }}{{ .Values.gateway.sshdImage | default "" | quote }}{{ end }}
   {{- if .Values.gateway.enabled }}
   # ── 접속 게이트웨이 ──
   # API 는 이 값들로 세션 접속 URL/SSH 명령을 만든다. 비밀(GIOSK_GATEWAY_SECRET)은 Secret 에서 주입.
@@ -91,11 +95,6 @@ data:
   GIOSK_GATEWAY_SSH_PORT: {{ .Values.gateway.sshPort | default 2222 | quote }}
   # 외부(VPN 밖) 접속용 SSH 점프 호스트. 지정 시 콘솔이 -J 붙은 명령도 함께 보여준다. 빈값=내부 명령만.
   GIOSK_GATEWAY_SSH_PROXY_JUMP: {{ .Values.gateway.sshProxyJump | default "" | quote }}
-  # 컨테이너 세션 SSH 사이드카(빈값=컨테이너 SSH 비활성 → SSH 탭 미표시, 물리 세션만 SSH).
-  # 컨테이너 세션 sshd 사이드카 이미지. session.ssh.enabled(기본 on)면 image.sshd 를 쓴다 —
-  # 게이트웨이와 무관하게 "사용자 공개키로 직접 SSH"가 기본 경로이기 때문. gateway.sshdImage 는
-  # 예전 게이트웨이 전용 설정과의 하위호환 폴백.
-  GIOSK_SESSION_SSHD_IMAGE: {{ if .Values.session.ssh.enabled }}{{ printf "%s:%s" .Values.image.sshd.repository .Values.image.sshd.tag | quote }}{{ else }}{{ .Values.gateway.sshdImage | default "" | quote }}{{ end }}
   # sshd 사이드카·물리 계정이 신뢰할 게이트웨이 공개키(공개값이라 ConfigMap 가능).
   GIOSK_GATEWAY_SSH_PUBKEY: {{ .Values.gateway.sshPublicKey | default "" | quote }}
   {{- end }}

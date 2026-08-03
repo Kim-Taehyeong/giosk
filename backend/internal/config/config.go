@@ -83,7 +83,7 @@ type K8s struct {
 	GatewayJump       string // 외부(VPN 밖) 접속용 SSH 점프 호스트(user@host). 빈값=내부 명령만 표시.
 	SessionSSHDImage  string // 컨테이너 세션 sshd 사이드카 이미지. 빈값=컨테이너 SSH 비활성.
 	SessionSSHDPubKey string // sshd 사이드카가 신뢰할 게이트웨이 공개키(authorized_keys)
-	SessionExpose     string // 세션 웹 노출: loadbalancer | nodeport | portforward
+	SessionExpose     string // 세션 웹 노출: nodeport(기본) | loadbalancer(MetalLB)
 	// NVIDIA device plugin 설정 ConfigMap(GPU Operator). 지정 시 관리자가 웹에서 타임셰어링을 켜면
 	// 프로파일 upsert + 노드 라벨 부여로 즉시 반영된다. 빈값이면 자동 적용 생략(수동 운영).
 	DevicePluginConfigNS   string
@@ -261,7 +261,7 @@ func Load(lookup func(string) (string, bool)) (*Config, error) {
 			GatewayJump:            g.str("GIOSK_GATEWAY_SSH_PROXY_JUMP", ""),
 			SessionSSHDImage:       g.str("GIOSK_SESSION_SSHD_IMAGE", ""),
 			SessionSSHDPubKey:      g.str("GIOSK_GATEWAY_SSH_PUBKEY", ""),
-			SessionExpose:          g.str("GIOSK_SESSION_EXPOSE", "portforward"),
+			SessionExpose:          g.str("GIOSK_SESSION_EXPOSE", "nodeport"),
 			DevicePluginConfigNS:   g.str("GIOSK_DEVICE_PLUGIN_CONFIG_NS", ""),
 			DevicePluginConfigName: g.str("GIOSK_DEVICE_PLUGIN_CONFIG_NAME", ""),
 			Registry:               g.str("GIOSK_REGISTRY", ""),

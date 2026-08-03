@@ -45,7 +45,19 @@ export default function TerminalPane({ session, fill = false }) {
 
     const ws = new WebSocket(wsURL(`/instances/${session.id}/terminal`));
     ws.binaryType = 'arraybuffer';
-    const sendResize = () => { if (ws.readyState === 1) ws.send(`1${term.cols},${term.rows}`); };
+    // 서버(x/net/websocket)는 프레임을 []byte 로 받으므로 반드시 "바이너리" 프레임으로 보내야 한다.
+    // ws.send(string) 은 텍스트 프레임이라 서버 Receive 가 거부→연결이 즉시 끊긴다(context canceled).
+    // 프레임 = [프리픽스 1바이트('0'입력/'1'리사이즈)] + [UTF-8 payload].
+    const enc = new TextEncoder();
+    const sendFrame = (prefix, payload) => {
+      if (ws.readyState !== 1) return;
+      const body = enc.encode(payload);
+      const frame = new Uint8Array(body.length + 1);
+      frame[0] = prefix.charCodeAt(0);
+      frame.set(body, 1);
+      ws.send(frame);
+    };
+    const sendResize = () => sendFrame('1', `${term.cols},${term.rows}`);
     // 연결이 "CONNECTING"에서 멈춰 검은 화면만 나오는 것을 막는다 — 일정 시간 내 안 열리면 실패로 안내.
     const connectTimer = setTimeout(() => {
       if (alive && !opened) {
@@ -61,6 +73,7 @@ export default function TerminalPane({ session, fill = false }) {
       clearTimeout(connectTimer);
       if (!alive) return;
       setStatus('open');
+      term.reset(); // "연결 중…" 안내를 지우고 셸 프롬프트만 깨끗이 받는다.
       safeFit();
       sendResize();
     };
@@ -82,7 +95,7 @@ export default function TerminalPane({ session, fill = false }) {
       term.writeln('\r\n\x1b[31m[연결 오류] 웹소켓 연결에 실패했습니다.\x1b[0m');
     };
 
-    const dData = term.onData((d) => { if (ws.readyState === 1) ws.send(`0${d}`); });
+    const dData = term.onData((d) => sendFrame('0', d));
     const dResize = term.onResize(() => sendResize());
     const ro = new ResizeObserver(() => safeFit());
     ro.observe(host);
