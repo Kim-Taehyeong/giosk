@@ -36,15 +36,25 @@ export default function Wallet() {
   const [amount, setAmount] = useState(100);
   const [reason, setReason] = useState('');
   const [page, setPage] = useState(0); // 내역 페이지네이션
+  const [q, setQ] = useState('');       // 내역 검색(세션 ref/유형/내용)
+  const [grouped, setGrouped] = useState(false); // 세션별 묶기 토글
   const { toast } = useToast();
 
   useEffect(() => { getWallet().then(setW); }, []);
   if (!w) return <div className="muted">{t('common.loading')}</div>;
 
   const PAGE_SIZE = 12;
-  const pageCount = Math.max(1, Math.ceil(w.history.length / PAGE_SIZE));
+  // 검색 — 유형/내용/세션 ref 를 소문자 부분일치.
+  const ql = q.trim().toLowerCase();
+  const matchTx = (r) => !ql || `${r.type} ${r.desc || ''} ${txDesc(r, t)}`.toLowerCase().includes(ql);
+  const filteredHistory = w.history.filter(matchTx);
+  const pageCount = Math.max(1, Math.ceil(filteredHistory.length / PAGE_SIZE));
   const curPage = Math.min(page, pageCount - 1);
-  const pagedHistory = w.history.slice(curPage * PAGE_SIZE, curPage * PAGE_SIZE + PAGE_SIZE);
+  const pagedHistory = filteredHistory.slice(curPage * PAGE_SIZE, curPage * PAGE_SIZE + PAGE_SIZE);
+  // 세션별 묶기 — bySession(세션 단위 소비 합계)을 검색 필터해 표로.
+  const groupedRows = [...w.bySession]
+    .filter((s) => !ql || `${s.name || ''} ${s.ref || ''}`.toLowerCase().includes(ql))
+    .sort((a, b) => b.credit - a.credit);
 
   const submit = async () => {
     await requestTopup({ amount: Number(amount), reason });
@@ -87,7 +97,28 @@ export default function Wallet() {
 
       <div className="grid cols-2">
         <div className="card">
-          <h3><ReceiptText size={16} /> {t('wallet.history')}</h3>
+          <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 14 }}>
+            <h3 style={{ margin: 0 }}><ReceiptText size={16} /> {t('wallet.history')}</h3>
+            <div className="flex" style={{ gap: 8, alignItems: 'center' }}>
+              <input type="text" value={q} onChange={(e) => { setQ(e.target.value); setPage(0); }}
+                placeholder={t('wallet.searchPh', { defaultValue: '검색(세션·유형·내용)' })}
+                style={{ width: 200, fontSize: 12.5, padding: '5px 9px' }} />
+              <button className="btn sm" onClick={() => setGrouped((g) => !g)}>
+                {grouped ? t('wallet.viewAll', { defaultValue: '전체 내역' }) : t('wallet.viewBySession', { defaultValue: '세션별 묶기' })}
+              </button>
+            </div>
+          </div>
+          {grouped ? (
+            <DataTable
+              rows={groupedRows}
+              rowKey={(r, i) => r.ref || i}
+              columns={[
+                { key: 'name', header: t('wallet.session', { defaultValue: '세션' }), render: (r) => <span style={{ fontWeight: 600 }}>{r.name}</span> },
+                { key: 'ref', header: 'ID', className: 'mono', render: (r) => <span className="muted" style={{ fontSize: 11.5 }}>{r.ref}</span> },
+                { key: 'credit', header: t('wallet.consumedCol', { defaultValue: '소모' }), render: (r) => (r.credit ? cU(r.credit) : t('wallet.free')) },
+              ]}
+            />
+          ) : (<>
           <DataTable
             rows={pagedHistory}
             columns={[
@@ -104,6 +135,7 @@ export default function Wallet() {
               <button className="btn sm" disabled={curPage >= pageCount - 1} onClick={() => setPage(curPage + 1)}>{t('wallet.next')}</button>
             </div>
           )}
+          </>)}
         </div>
         <div className="card">
           <h3><PieChart size={16} /> {t('wallet.bySession')}</h3>

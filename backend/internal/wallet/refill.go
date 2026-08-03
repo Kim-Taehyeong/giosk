@@ -1,10 +1,60 @@
 package wallet
 
 import (
+	"errors"
 	"time"
 
 	"gorm.io/gorm"
 )
+
+// ErrNoRecurring은 즉시 리필 대상 지갑에 정기 리필 금액(recurring_credit)이 설정돼 있지 않을 때.
+var ErrNoRecurring = errors.New("no recurring refill configured")
+
+// RefillNowUser는 (user,group) 멤버십 지갑을 즉시 리필한다(정기 주기를 기다리지 않고 지금 적용).
+// 이월이면 잔액에 더하고, 아니면 recurring 으로 세팅. cycle_started_at 을 now 로 리셋해 다음 주기가 여기서 다시 센다.
+func (r *gormRepo) RefillNowUser(userID, groupID int64) (int, error) {
+	var w struct {
+		Recurring int
+		Balance   int
+		Carryover bool
+	}
+	r.db.Raw("SELECT recurring_credit AS recurring, balance, carryover FROM user_wallets WHERE user_id=? AND group_id=?", userID, groupID).Scan(&w)
+	if w.Recurring <= 0 {
+		return 0, ErrNoRecurring
+	}
+	bal := w.Recurring
+	if w.Carryover {
+		bal = w.Balance + w.Recurring
+	}
+	now := time.Now()
+	if err := r.db.Exec("UPDATE user_wallets SET balance=?, cycle_started_at=? WHERE user_id=? AND group_id=?", bal, now, userID, groupID).Error; err != nil {
+		return 0, err
+	}
+	err := r.db.Exec(`INSERT INTO credit_transactions (user_id, group_id, type, amount, balance_after, description, created_at)
+		VALUES (?, ?, 'recharge', ?, ?, '즉시 리필', NOW())`, userID, groupID, w.Recurring, bal).Error
+	return w.Recurring, err
+}
+
+// RefillNowGroup은 팀(그룹) 지갑을 즉시 리필한다.
+func (r *gormRepo) RefillNowGroup(groupID int64) (int, error) {
+	var w struct {
+		Recurring int
+		Balance   int
+		Carryover bool
+	}
+	r.db.Raw("SELECT recurring_credit AS recurring, balance, carryover FROM group_wallets WHERE group_id=?", groupID).Scan(&w)
+	if w.Recurring <= 0 {
+		return 0, ErrNoRecurring
+	}
+	bal := w.Recurring
+	if w.Carryover {
+		bal = w.Balance + w.Recurring
+	}
+	if err := r.db.Exec("UPDATE group_wallets SET balance=?, cycle_started_at=? WHERE group_id=?", bal, time.Now(), groupID).Error; err != nil {
+		return 0, err
+	}
+	return w.Recurring, nil
+}
 
 // 계층형 정기 크레딧 리필 엔진.
 //

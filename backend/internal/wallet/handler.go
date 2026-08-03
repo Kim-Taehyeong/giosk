@@ -156,6 +156,71 @@ func (h *Handler) SetUserRefill(c *gin.Context) {
 	httpx.OK(c, gin.H{"ok": true})
 }
 
+// RefillUserNow는 (member, 스코프 팀) 지갑을 즉시 리필한다(설정된 정기 금액을 지금 지급).
+func (h *Handler) RefillUserNow(c *gin.Context) {
+	amt, err := h.svc.RefillNowUser(gid(c), scopeGroup(c))
+	if err != nil {
+		if errors.Is(err, ErrNoRecurring) {
+			httpx.Err(c, 400, "no_recurring", "정기 리필 금액이 설정되어 있지 않습니다")
+			return
+		}
+		httpx.Internal(c, "즉시 리필 실패")
+		return
+	}
+	httpx.OK(c, gin.H{"ok": true, "amount": amt})
+}
+
+// RefillGroupNow는 팀 지갑을 즉시 리필한다.
+func (h *Handler) RefillGroupNow(c *gin.Context) {
+	amt, err := h.svc.RefillNowGroup(gid(c))
+	if err != nil {
+		if errors.Is(err, ErrNoRecurring) {
+			httpx.Err(c, 400, "no_recurring", "정기 리필 금액이 설정되어 있지 않습니다")
+			return
+		}
+		httpx.Internal(c, "즉시 리필 실패")
+		return
+	}
+	httpx.OK(c, gin.H{"ok": true, "amount": amt})
+}
+
+// SetMemberRefill은 그룹 관리자가 팀(:id) 멤버(:userId)의 정기 리필 금액을 개별 설정한다.
+func (h *Handler) SetMemberRefill(c *gin.Context) {
+	var req RefillSpec
+	if err := c.ShouldBindJSON(&req); err != nil {
+		httpx.BadRequest(c, "recurring/interval/carryover 필요")
+		return
+	}
+	uid, gID := memberIDs(c)
+	if err := h.svc.SetUserRefill(uid, gID, req); err != nil {
+		httpx.Internal(c, "멤버 리필 설정 실패")
+		return
+	}
+	httpx.OK(c, gin.H{"ok": true})
+}
+
+// RefillMemberNow는 팀(:id) 멤버(:userId) 지갑을 즉시 리필한다.
+func (h *Handler) RefillMemberNow(c *gin.Context) {
+	uid, gID := memberIDs(c)
+	amt, err := h.svc.RefillNowUser(uid, gID)
+	if err != nil {
+		if errors.Is(err, ErrNoRecurring) {
+			httpx.Err(c, 400, "no_recurring", "정기 리필 금액이 설정되어 있지 않습니다")
+			return
+		}
+		httpx.Internal(c, "즉시 리필 실패")
+		return
+	}
+	httpx.OK(c, gin.H{"ok": true, "amount": amt})
+}
+
+// memberIDs는 /groups/:id/members/:userId 경로에서 (userID, groupID)를 뽑는다.
+func memberIDs(c *gin.Context) (userID, groupID int64) {
+	groupID, _ = strconv.ParseInt(c.Param("id"), 10, 64)
+	userID, _ = strconv.ParseInt(c.Param("userId"), 10, 64)
+	return
+}
+
 func gid(c *gin.Context) int64 { id, _ := strconv.ParseInt(c.Param("id"), 10, 64); return id }
 
 // scopeGroup은 X-Console-Scope 헤더가 group:N 이면 N 을, 아니면 0(대표 팀 폴백)을 반환한다.

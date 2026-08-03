@@ -94,7 +94,14 @@ func (h *Handler) Update(c *gin.Context) {
 // Delete는 그룹을 소프트 삭제(archived)한다(플랫폼 관리자).
 func (h *Handler) Delete(c *gin.Context) {
 	if err := h.svc.ArchiveGroup(gid(c)); err != nil {
-		httpx.Internal(c, "그룹 삭제 실패")
+		switch {
+		case errors.Is(err, ErrDefaultGroup):
+			httpx.Err(c, 409, "default_group", "'일반' 팀은 삭제할 수 없습니다(다른 팀 삭제 시 멤버 이전 대상).")
+		case errors.Is(err, ErrGroupHasMembers):
+			httpx.Err(c, 409, "group_has_members", "팀에 멤버가 있어 삭제할 수 없습니다. 멤버를 다른 팀으로 옮기거나 제거한 뒤 삭제하세요.")
+		default:
+			httpx.Internal(c, "그룹 삭제 실패")
+		}
 		return
 	}
 	httpx.OK(c, gin.H{"ok": true})

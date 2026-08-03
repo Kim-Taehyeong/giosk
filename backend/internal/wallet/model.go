@@ -23,21 +23,24 @@ type UserWallet struct {
 	RecurringCredit    int        `gorm:"column:recurring_credit" json:"recurringCredit"`
 	RefillIntervalDays int        `gorm:"column:refill_interval_days" json:"refillIntervalDays"`
 	Carryover          bool       `gorm:"column:carryover" json:"carryover"`
+	NextRefillAt       *time.Time `gorm:"-" json:"nextRefillAt,omitempty"` // 다음 정기 리필 예정 시각(계산값; recurring>0일 때만)
 }
 
 func (UserWallet) TableName() string { return "user_wallets" }
 
 // GroupWallet은 group_wallets 테이블 매핑.
 type GroupWallet struct {
-	GroupID             int64 `gorm:"primaryKey;column:group_id" json:"-"`
-	Balance             int   `gorm:"column:balance" json:"balance"`
-	Reserved            int   `gorm:"column:reserved" json:"reserved"`
-	BudgetCap           int   `gorm:"column:budget_cap" json:"budgetCap"`
-	AlertThresholdPct   int   `gorm:"column:alert_threshold_pct" json:"alertPct"`
-	DefaultMemberBudget int   `gorm:"column:default_member_budget" json:"defaultBudget"`
-	RecurringCredit     int   `gorm:"column:recurring_credit" json:"recurringCredit"`
-	RefillIntervalDays  int   `gorm:"column:refill_interval_days" json:"refillIntervalDays"`
-	Carryover           bool  `gorm:"column:carryover" json:"carryover"`
+	GroupID             int64      `gorm:"primaryKey;column:group_id" json:"-"`
+	Balance             int        `gorm:"column:balance" json:"balance"`
+	Reserved            int        `gorm:"column:reserved" json:"reserved"`
+	BudgetCap           int        `gorm:"column:budget_cap" json:"budgetCap"`
+	AlertThresholdPct   int        `gorm:"column:alert_threshold_pct" json:"alertPct"`
+	DefaultMemberBudget int        `gorm:"column:default_member_budget" json:"defaultBudget"`
+	RecurringCredit     int        `gorm:"column:recurring_credit" json:"recurringCredit"`
+	RefillIntervalDays  int        `gorm:"column:refill_interval_days" json:"refillIntervalDays"`
+	Carryover           bool       `gorm:"column:carryover" json:"carryover"`
+	CycleStartedAt      *time.Time `gorm:"column:cycle_started_at" json:"cycleStartedAt,omitempty"`
+	NextRefillAt        *time.Time `gorm:"-" json:"nextRefillAt,omitempty"` // 다음 정기 리필 예정 시각(계산값)
 }
 
 func (GroupWallet) TableName() string { return "group_wallets" }

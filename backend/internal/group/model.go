@@ -31,29 +31,30 @@ const (
 // Summary — 관리자 그룹 목록(집계 + 지갑 포함).
 type Summary struct {
 	Group
-	OrgName     string `json:"orgName"`
-	MemberCount int    `json:"memberCount"`
-	Balance            int  `json:"balance"`            // group_wallets.balance
-	BudgetCap          int  `json:"budgetCap"`          // group_wallets.budget_cap
-	AlertPct           int  `json:"alertPct"`           // group_wallets.alert_threshold_pct
-	RecurringCredit    int  `json:"recurringCredit"`    // 정기 리필 양
-	RefillIntervalDays int  `json:"refillIntervalDays"` // 리필 주기(일)
-	Carryover          bool `json:"carryover"`          // 이월 여부
-	Consumed           int  `json:"consumed"`           // 멤버 누적 사용량 합(showback)
+	OrgName            string `json:"orgName"`
+	MemberCount        int    `json:"memberCount"`
+	Balance            int    `json:"balance"`            // group_wallets.balance
+	BudgetCap          int    `json:"budgetCap"`          // group_wallets.budget_cap
+	AlertPct           int    `json:"alertPct"`           // group_wallets.alert_threshold_pct
+	RecurringCredit    int    `json:"recurringCredit"`    // 정기 리필 양
+	RefillIntervalDays int    `json:"refillIntervalDays"` // 리필 주기(일)
+	Carryover          bool   `json:"carryover"`          // 이월 여부
+	Consumed           int    `json:"consumed"`           // 멤버 누적 사용량 합(showback)
 }
 
 // Member — 그룹 멤버(memberships ⨝ users).
 type Member struct {
-	UserID   int64       `json:"userId"`
-	Username string      `json:"username"`
-	Name     string      `json:"name"`
-	Email    string      `json:"email"`
-	Role     string      `json:"role"`
-	Status   string      `json:"status"`
-	Budget   int         `json:"budget"`
-	Balance  int         `json:"balance"` // user_wallets.balance(배분된 잔여 크레딧)
-	Consumed int         `json:"consumed"`
-	Roles    []RoleBadge `json:"roles" gorm:"-"` // 이 사용자가 가진 전체 관리 역할(멀티롤 배지). gorm:"-" — 서비스에서 별도 채움(스캔 제외)
+	UserID          int64       `json:"userId"`
+	Username        string      `json:"username"`
+	Name            string      `json:"name"`
+	Email           string      `json:"email"`
+	Role            string      `json:"role"`
+	Status          string      `json:"status"`
+	Budget          int         `json:"budget"`
+	Balance         int         `json:"balance"`         // user_wallets.balance(배분된 잔여 크레딧)
+	RecurringCredit int         `json:"recurringCredit"` // 이 멤버의 정기 리필 금액(user_wallets.recurring_credit)
+	Consumed        int         `json:"consumed"`
+	Roles           []RoleBadge `json:"roles" gorm:"-"` // 이 사용자가 가진 전체 관리 역할(멀티롤 배지). gorm:"-" — 서비스에서 별도 채움(스캔 제외)
 }
 
 // RoleBadge — 사용자가 가진 관리 역할 하나(어느 조직/그룹의 무슨 관리자인지). 멀티롤 표시용.

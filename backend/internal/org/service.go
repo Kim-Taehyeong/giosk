@@ -8,6 +8,9 @@ import (
 // ErrDuplicateName은 같은 이름의 조직이 이미 있을 때(unique 충돌).
 var ErrDuplicateName = errors.New("duplicate org name")
 
+// ErrOrgHasUsers는 조직 산하에 아직 사용자가 있어 삭제할 수 없을 때(고아 방지) — 전원 이전/삭제 후 가능.
+var ErrOrgHasUsers = errors.New("organization still has users")
+
 func isDuplicate(err error) bool {
 	return err != nil && strings.Contains(err.Error(), "Duplicate entry")
 }
@@ -72,7 +75,14 @@ func (s *Service) Update(id int64, req UpdateReq) error {
 	return s.repo.Update(id, fields)
 }
 
-func (s *Service) Archive(id int64) error { return s.repo.Archive(id) }
+// Archive는 조직을 삭제한다. 데이터 무결성 가드: 산하에 활성 사용자가 하나라도 있으면 삭제 불가
+// (모든 사용자를 다른 조직으로 이전하거나 삭제한 뒤에야 삭제 가능) → 고아 사용자 방지.
+func (s *Service) Archive(id int64) error {
+	if s.repo.ActiveUserCount(id) > 0 {
+		return ErrOrgHasUsers
+	}
+	return s.repo.Archive(id)
+}
 
 // Grant는 조직 크레딧 풀에 가산한다(크레딧 모드 전용 — 게이팅은 라우트/상위에서).
 // PlatformInterval은 플랫폼 기본 리필 주기(일)를 반환한다(조직 주기 캡). nil 이면 캡 없음.

@@ -1,7 +1,11 @@
 import { apiGet, apiPost, apiPut } from '../client';
 
 // 빌링 showback — /console 은 호출자 스코프로 필터(platform=전체, org=자기 조직, group=자기 그룹).
-export const getBilling = () => apiGet('/console/billing');
+export const getBilling = (period) => {
+  const qs = period && (period.from || period.to)
+    ? `?${new URLSearchParams({ ...(period.from ? { from: period.from } : {}), ...(period.to ? { to: period.to } : {}) })}` : '';
+  return apiGet(`/console/billing${qs}`);
+};
 
 // 감사 로그 — /console 은 actor 가 스코프 소속인 로그만(platform=전체).
 export const getAudit = () => apiGet('/console/audit').then((d) => ({ items: d.items || [] }));

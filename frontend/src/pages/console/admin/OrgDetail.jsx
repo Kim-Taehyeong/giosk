@@ -98,7 +98,13 @@ export default function OrgDetail() {
   };
   const removeGroup = async (g) => {
     if (!(await confirm({ title: t('groups.deleteTitle'), message: t('groups.deleteConfirm', { name: g.displayName }), confirmText: t('common.delete') }))) return;
-    await deleteGroup(g.id); toast(t('groups.deleted', { name: g.displayName })); load();
+    try { await deleteGroup(g.id); } catch (e) {
+      toast(e?.code === 'default_group' ? t('groups.cantDeleteDefault', { defaultValue: "'일반' 팀은 삭제할 수 없습니다." })
+        : e?.code === 'group_has_members' ? t('groups.hasMembers', { defaultValue: '팀에 멤버가 있어 삭제할 수 없습니다. 멤버를 옮기거나 제거하세요.' })
+          : (e?.message || t('groups.deleteFail', { defaultValue: '삭제 실패' })));
+      return;
+    }
+    toast(t('groups.deleted', { name: g.displayName })); load();
   };
   const saveEdit = async () => {
     await updateOrg(oid, { displayName: edit.displayName, defaultGroupBudget: Number(edit.defaultGroupBudget) || 0 });
@@ -107,7 +113,12 @@ export default function OrgDetail() {
   // 조직 삭제 — 리스트가 아니라 여기서만(실수 방지). 성공 시 조직 목록으로.
   const removeOrg = async () => {
     if (!(await confirm({ title: t('orgs.deleteTitle'), message: t('orgs.deleteConfirm', { name: org?.displayName }), confirmText: t('common.delete') }))) return;
-    await deleteOrg(oid); toast(t('orgs.deleted', { name: org?.displayName })); navigate('/console/admin/orgs');
+    try { await deleteOrg(oid); } catch (e) {
+      toast(e?.code === 'org_has_users' ? t('orgs.hasUsers', { defaultValue: '조직에 사용자가 있어 삭제할 수 없습니다. 모든 사용자를 다른 조직으로 옮기거나 삭제하세요.' })
+        : (e?.message || t('orgs.deleteFail', { defaultValue: '삭제 실패' })));
+      return;
+    }
+    toast(t('orgs.deleted', { name: org?.displayName })); navigate('/console/admin/orgs');
   };
 
   return (

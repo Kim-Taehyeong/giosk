@@ -13,9 +13,10 @@ type Repository interface {
 	ListAll() ([]Summary, error)
 	Create(g *Group) error
 	Update(id int64, fields map[string]any) error // 표시명·가입수락 등 수정
-	Archive(id int64) error                        // 소프트 삭제(status='archived')
-	CancelJoinRequest(userID, reqID int64) error   // 본인 대기중 가입신청 취소
+	Archive(id int64) error                       // 소프트 삭제(status='archived')
+	CancelJoinRequest(userID, reqID int64) error  // 본인 대기중 가입신청 취소
 	Find(id int64) (*Group, error)
+	ActiveMemberCount(groupID int64) int // 활성 멤버 수(삭제 가드용)
 	RoleInGroup(userID, groupID int64) (string, bool)
 
 	ListMembers(groupID int64) ([]Member, error)

@@ -27,4 +27,8 @@ export const moveMember = (groupId, userId, body) => apiPut(`/console/groups/${g
 
 export const updateBudget = (groupId, body) => apiPut(`/console/groups/${groupId}/wallet/budget`, body);
 export const grantGroupCredit = (groupId, body) => apiPost(`/console/groups/${groupId}/wallet/grant`, body);
-export const setGroupRefill = (groupId, body) => apiPut(`/admin/groups/${groupId}/wallet/refill`, body); // 팀 정기 리필
+export const setGroupRefill = (groupId, body) => apiPut(`/console/groups/${groupId}/wallet/refill`, body); // 팀 정기 리필(스코프)
+export const refillGroupNow = (groupId) => apiPost(`/console/groups/${groupId}/wallet/refill/now`); // 팀 즉시 리필
+export const getGroupWallet = (groupId) => apiGet(`/console/groups/${groupId}/wallet`); // 팀 지갑(다음 리필일 포함)
+export const setMemberRefill = (groupId, userId, body) => apiPut(`/console/groups/${groupId}/members/${userId}/refill`, body); // 멤버별 정기 리필 금액
+export const refillMemberNow = (groupId, userId) => apiPost(`/console/groups/${groupId}/members/${userId}/refill/now`); // 멤버 즉시 리필

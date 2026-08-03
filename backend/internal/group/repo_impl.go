@@ -38,6 +38,13 @@ func (r *gormRepo) Archive(id int64) error {
 	return r.db.Table("`groups`").Where("id = ?", id).Update("status", "archived").Error
 }
 
+// ActiveMemberCount는 그룹의 활성 멤버 수(삭제 가드용 — 멤버 있는 팀은 삭제 불가).
+func (r *gormRepo) ActiveMemberCount(groupID int64) int {
+	var n int64
+	r.db.Raw(`SELECT COUNT(*) FROM memberships WHERE group_id = ? AND status = 'active'`, groupID).Scan(&n)
+	return int(n)
+}
+
 // CancelJoinRequest는 본인의 대기중(pending) 가입신청을 취소(삭제)한다(타인 신청은 영향 없음).
 func (r *gormRepo) CancelJoinRequest(userID, reqID int64) error {
 	return r.db.Exec(`DELETE FROM group_join_requests WHERE id = ? AND user_id = ? AND status = 'pending'`, reqID, userID).Error
@@ -68,7 +75,7 @@ func (r *gormRepo) ListMembers(groupID int64) ([]Member, error) {
 	err := r.db.Raw(`
 		SELECT m.user_id, u.username, TRIM(CONCAT(COALESCE(u.last_name,''), COALESCE(u.first_name,''))) AS name,
 		       u.email, m.role, m.status, m.budget, m.consumed,
-		       COALESCE(uw.balance, 0) AS balance
+		       COALESCE(uw.balance, 0) AS balance, COALESCE(uw.recurring_credit, 0) AS recurring_credit
 		FROM memberships m JOIN users u ON u.id = m.user_id
 		LEFT JOIN user_wallets uw ON uw.user_id = m.user_id AND uw.group_id = m.group_id
 		WHERE m.group_id = ? AND m.status <> 'removed' ORDER BY m.id`, groupID).Scan(&out).Error
