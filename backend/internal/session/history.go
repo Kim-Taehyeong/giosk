@@ -85,7 +85,7 @@ func (s *Service) History(ctx context.Context, sess *Session, hours int) ([]Hist
 
 	end := time.Now()
 	start := end.Add(-time.Duration(hours) * time.Hour)
-	// ⚠️ 조회 구간을 "이 세션이 실제로 살아 있던 구간"으로 자른다.
+	// 조회 구간을 "이 세션이 실제로 살아 있던 구간"으로 자른다.
 	// 전용(DCGM) 이력은 pod 이 아니라 노드에 귀속해 뽑는다(아래 참조). 그래서 창을 그대로 두면
 	// 같은 노드에서 돌던 앞 세션의 사용률이 이 세션 이력에 섞여 나온다(뒤 세션이 뜨면 반대로도 샌다).
 	// CPU/RAM 은 pod 라벨이라 원래 안 새지만, 창을 맞춰야 축이 서로 어긋나지 않는다.

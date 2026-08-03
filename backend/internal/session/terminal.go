@@ -125,7 +125,7 @@ func (s *Service) RunTerminal(ctx context.Context, instanceID string, userID int
 	}
 	// 컨테이너 세션: 홈으로 이동 후 대화형(-i) 로그인(-l) 셸. -i 라야 프롬프트가 뜨고 job control 이 붙어
 	// Ctrl+C 가 터미널 전체가 아니라 포그라운드 명령만 끊는다. TERM 지정으로 컬러/편집키 동작.
-	// ⚠️ exec 셸에 2>/dev/null 을 붙이면 안 된다 — bash 는 프롬프트(PS1)와 readline 에코를 stderr 로
+	// exec 셸에 2>/dev/null 을 붙이면 안 된다 — bash 는 프롬프트(PS1)와 readline 에코를 stderr 로
 	// 내보내므로, stderr 를 버리면 명령 출력(stdout)만 보이고 프롬프트·타자 에코가 사라진다.
 	cmd := []string{"/bin/sh", "-c", `cd "${HOME:-/home/work}" 2>/dev/null; export TERM=xterm-256color; exec bash -il || exec bash -i || exec sh -i`}
 	return s.prov.ExecTerminal(ctx, s.namespaceOf(sess), sess.InstanceID, "session", cmd, k8s.ExecIO{

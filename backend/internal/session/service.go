@@ -881,7 +881,7 @@ func (s *Service) applyGuarantee(ctx context.Context, sess *Session) {
 	//   노드 위 CPU/Mem request 총합 = 0.5 × 노드 × Σ(share) ≤ 노드의 50%.
 	//   → 항상 ≥50% 헤드룸이 남아 "CPU/Mem 부족으로 스케줄 실패(영구 Pending)"가 원천 차단된다.
 	//   전용(share=1)도 노드의 50%만 요청 → 반드시 배치되고, limit 이 없어 노드 전체까지 버스트한다.
-	// ⚠️ "limit만" 방식은 금물: request 없이 limit 만 주면 k8s 가 request=limit 으로 자동 설정해 다시 100% 요청이 된다.
+	// "limit만" 방식은 금물: request 없이 limit 만 주면 k8s 가 request=limit 으로 자동 설정해 다시 100% 요청이 된다.
 	const requestFactor = 0.5
 	// share 상한 1.0 — 요청 GPU 수가 노드 GPU 수를 초과해 share>1 이 되어도(그런 세션은 어차피
 	// "한 노드에 그만큼의 GPU가 없어" GPU 부족으로 스케줄 불가) CPU/Mem request 가 노드 용량을
@@ -1531,7 +1531,7 @@ func (s *Service) webAccess(ctx context.Context, sess *Session, ch k8s.WebChanne
 
 // sshAccess는 SSH 접속(복붙 한 줄) 정보를 만든다. 게이트웨이 활성 시 username=1회 토큰,
 // 아니면 물리 노드로의 직접 SSH 로 폴백한다.
-// ⚠️ 토큰은 jti 단일사용(게이트웨이 nonce) — ssh/sftp 각각에 별도 토큰을 발급한다(같은 토큰이면 두 번째가 거부됨).
+// 토큰은 jti 단일사용(게이트웨이 nonce) — ssh/sftp 각각에 별도 토큰을 발급한다(같은 토큰이면 두 번째가 거부됨).
 func (s *Service) sshAccess(instanceID string, userID int64, ns, node, tgt, user string) map[string]string {
 	if !s.gatewayOn() {
 		if tgt == gateway.TgtPhysical {

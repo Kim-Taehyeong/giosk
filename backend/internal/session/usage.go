@@ -190,7 +190,7 @@ func (s *Service) usageOf(ctx context.Context, rows []Session) map[string]*Usage
 // DCGM 의 pod-resources 기반 GPU→pod 매핑이 HAMi vGPU device ID 와 안 맞아 워크로드 pod 라벨이
 // 안 붙는다(exported_pod 없음). 전용 세션은 노드 GPU 를 통째로 쓰므로 노드 GPU 지표 = 세션 지표다.
 // dcgm-exporter pod→node 는 kube_pod_info 로 매핑(노드 대시보드와 동일 방식).
-// ⚠️ 노드에 GPU 가 여러 장이면 노드 평균/합이라 같은 노드의 전용 세션들엔 동일 값이 간다
+// 노드에 GPU 가 여러 장이면 노드 평균/합이라 같은 노드의 전용 세션들엔 동일 값이 간다
 //    (노드당 1 GPU 전용 배치에서 정확 — 세션별 카드 귀속은 DCGM pod 매핑이 필요한데 HAMi 가 막음).
 func (s *Service) fillDCGM(ctx context.Context, out map[string]*Usage, nodes map[string]string) {
 	if len(nodes) == 0 {
