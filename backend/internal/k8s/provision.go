@@ -119,6 +119,10 @@ type PodStatus struct {
 	Phase string
 	Node  string
 	IP    string
+	// Unschedulable = 스케줄러가 "지금 넣을 노드가 없다"고 표시한 상태(PodScheduled=False, Reason=Unschedulable).
+	// 이 제품은 대기열을 두지 않으므로, 이 상태로 오래 매달린 세션은 조용히 줄 세우지 않고 정리한다.
+	Unschedulable bool
+	Reason        string // 스케줄 실패 사유(0/2 nodes are available: ... 등)
 }
 
 // EnsureNamespace는 세션 네임스페이스를 멱등 생성한다(managed-by 라벨).
@@ -172,7 +176,14 @@ func (c *Client) PodStatus(ctx context.Context, ns, name string) (*PodStatus, er
 	if err != nil {
 		return nil, err
 	}
-	return &PodStatus{Phase: string(p.Status.Phase), Node: p.Spec.NodeName, IP: p.Status.PodIP}, nil
+	st := &PodStatus{Phase: string(p.Status.Phase), Node: p.Spec.NodeName, IP: p.Status.PodIP}
+	for _, cond := range p.Status.Conditions {
+		if cond.Type == corev1.PodScheduled && cond.Status == corev1.ConditionFalse && cond.Reason == corev1.PodReasonUnschedulable {
+			st.Unschedulable, st.Reason = true, cond.Message
+			break
+		}
+	}
+	return st, nil
 }
 
 // PodDescribe는 kubectl describe 에 해당하는 요약(파드/컨테이너 상태·조건·이벤트)을 반환한다.

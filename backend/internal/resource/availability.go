@@ -32,7 +32,7 @@ type TypeAvail struct {
 	// 프론트가 "이 오퍼링(예: 4GB) 이 몇 개 더 들어가는지"를 노드별로 계산해 합산한다.
 	FracVramFreeMB  int `json:"fracVramFreeMb"`
 	FracVramTotalMB int `json:"fracVramTotalMb"`
-	FracCoresFree   int `json:"fracCoresFree"`  // 여유 코어 합(각 GPU 100% 기준)
+	FracCoresFree   int `json:"fracCoresFree"` // 여유 코어 합(각 GPU 100% 기준)
 	FracCoresTotal  int `json:"fracCoresTotal"`
 	FracSlotsFree   int `json:"fracSlotsFree"` // 여유 태스크 슬롯(deviceSplitCount×GPU수 − 실행중 공유세션)
 	FracSlotsTotal  int `json:"fracSlotsTotal"`
@@ -75,14 +75,30 @@ type ShareUse struct {
 	Count  int
 }
 
-// SessionCounter는 running 세션 수(타입/노드별)를 센다.
+// Reservation — 아직 노드가 정해지지 않은(스케줄 대기) 세션들의 자원 예약분(GPU 타입별).
+// 가용성 표시(Availability)에는 반영하지 않는다: 화면은 "실제로 놓인 것"을 보여주고,
+// 관문(CanPlace)만 이 예약분을 빼고 판정한다 — 표시는 정확하게, 승인은 보수적으로.
+type Reservation struct {
+	GpuByType    map[string]int      // 전용 예약 GPU 수
+	SharedByType map[string]ShareUse // 분할 예약(VRAM·코어·슬롯)
+}
+
+// SessionCounter는 자리를 차지한 세션(=관문을 통과해 admit 된 것)을 센다.
+//
+// "실행 중(running)"만 세면 안 된다 — 방금 만들어져 아직 스케줄 중(provisioning)인 세션도
+// 이미 그 GPU 를 예약한 상태다. running 만 세던 시절에는 동시에 들어온 요청들이 모두 같은
+// 여유를 보고 통과해(TOCTOU) 뒤에 온 세션이 Pending 으로 매달렸다 — 이 제품이 두지 않기로 한
+// "보이지 않는 대기열"이 정확히 그렇게 생겼다.
 type SessionCounter interface {
 	RunningByGpuType() map[string]int
 	RunningByNode() map[string]int
-	RunningPhysicalNodes() map[string]bool     // 물리(SSH) 임대 중인 노드 = 노드 통째 점유
-	HamiNodes() map[string]bool                // share_mode='hami' 노드(분할 가능) 집합
-	NodeSplitCount() map[string]int            // 노드별 deviceSplitCount(nodes.split_count)
-	SharedUsageByNode() map[string]ShareUse    // 노드별 실행중 공유세션 VRAM/코어/개수 합
+	// Reserved는 admit 됐지만 아직 노드가 정해지지 않은 세션(phase=provisioning, node='')의 예약분이다.
+	// 노드에 귀속시킬 수 없으므로 후보 노드 어디든 들어올 수 있다고 보고 보수적으로 차감한다.
+	Reserved() Reservation
+	RunningPhysicalNodes() map[string]bool  // 물리(SSH) 임대 중인 노드 = 노드 통째 점유
+	HamiNodes() map[string]bool             // share_mode='hami' 노드(분할 가능) 집합
+	NodeSplitCount() map[string]int         // 노드별 deviceSplitCount(nodes.split_count)
+	SharedUsageByNode() map[string]ShareUse // 노드별 실행중 공유세션 VRAM/코어/개수 합
 }
 
 // Availability는 라이브 노드 capacity 에서 running 세션을 빼 가용을 계산한다.
@@ -240,12 +256,43 @@ func NewSessionCounter(db *gorm.DB) SessionCounter { return &sessionCounter{db: 
 // (분할 세션의 실제 동거 배치는 추적하지 않으므로 보수적으로 1개로 본다)
 const usedGpuExpr = `SUM(CASE WHEN gpu_mode='exclusive' THEN GREATEST(gpu_count,1) WHEN gpu_mode='cpu' THEN 0 ELSE 1 END)`
 
+// admitted = 이미 자리를 차지한 세션. 스케줄 중(provisioning)도 포함한다 — Pod 가 이미 그 GPU 를
+// 요청한 상태라, 여유로 세면 같은 자리를 두 번 내주게 된다.
+const admittedPhases = `phase IN ('provisioning','running')`
+
 func (c *sessionCounter) RunningByGpuType() map[string]int {
-	return c.group(`SELECT gpu_type AS k, ` + usedGpuExpr + ` AS n FROM sessions WHERE phase='running' GROUP BY gpu_type`)
+	return c.group(`SELECT gpu_type AS k, ` + usedGpuExpr + ` AS n FROM sessions WHERE ` + admittedPhases + ` GROUP BY gpu_type`)
 }
 
 func (c *sessionCounter) RunningByNode() map[string]int {
-	return c.group(`SELECT node AS k, ` + usedGpuExpr + ` AS n FROM sessions WHERE phase='running' AND node<>'' GROUP BY node`)
+	return c.group(`SELECT node AS k, ` + usedGpuExpr + ` AS n FROM sessions WHERE ` + admittedPhases + ` AND node<>'' GROUP BY node`)
+}
+
+// Reserved는 아직 노드가 안 붙은(스케줄 대기) 세션의 예약분을 GPU 타입별로 모은다.
+func (c *sessionCounter) Reserved() Reservation {
+	res := Reservation{GpuByType: map[string]int{}, SharedByType: map[string]ShareUse{}}
+	var rows []struct {
+		GpuType string
+		Mode    string
+		Gpus    int
+		Vram    int
+		Core    int
+		Cnt     int
+	}
+	c.db.Raw(`SELECT gpu_type, gpu_mode AS mode,
+			COALESCE(SUM(GREATEST(gpu_count,1)),0) AS gpus,
+			COALESCE(SUM(vram_mb),0) AS vram, COALESCE(SUM(core_percent),0) AS core, COUNT(*) AS cnt
+		FROM sessions
+		WHERE phase='provisioning' AND node='' AND gpu_mode<>'cpu' AND gpu_type<>''
+		GROUP BY gpu_type, gpu_mode`).Scan(&rows)
+	for _, r := range rows {
+		if r.Mode == "shared" {
+			res.SharedByType[r.GpuType] = ShareUse{VramMB: r.Vram, Cores: r.Core, Count: r.Cnt}
+			continue
+		}
+		res.GpuByType[r.GpuType] += r.Gpus
+	}
+	return res
 }
 
 // RunningPhysicalNodes는 물리(SSH) 세션이 활성인 노드 집합을 반환한다(노드 통째 점유 판정).
@@ -295,7 +342,7 @@ func (c *sessionCounter) SharedUsageByNode() map[string]ShareUse {
 		Cnt  int
 	}
 	c.db.Raw(`SELECT node, COALESCE(SUM(vram_mb),0) AS vram, COALESCE(SUM(core_percent),0) AS core, COUNT(*) AS cnt
-		FROM sessions WHERE phase='running' AND gpu_mode='shared' AND node<>'' GROUP BY node`).Scan(&rows)
+		FROM sessions WHERE ` + admittedPhases + ` AND gpu_mode='shared' AND node<>'' GROUP BY node`).Scan(&rows)
 	out := map[string]ShareUse{}
 	for _, r := range rows {
 		out[r.Node] = ShareUse{VramMB: r.Vram, Cores: r.Core, Count: r.Cnt}
@@ -321,4 +368,128 @@ func (c *sessionCounter) group(q string) map[string]int {
 		out[r.K] = r.N
 	}
 	return out
+}
+
+// PlaceReq — 세션 하나를 지금 배치할 수 있는지 묻는 요청(가용성 게이트).
+type PlaceReq struct {
+	GpuMode     string // shared|exclusive|cpu|timeslice
+	GpuType     string
+	GpuCount    int
+	VramMB      int // shared 전용
+	CorePercent int // shared 전용
+	// Node 가 있으면 그 노드 안에서만 판정한다. 중단 세션의 사양 변경(GPU 붙이기)처럼
+	// 홈 PVC 가 이미 특정 노드에 묶인 경우, 클러스터 전체에 자리가 있어도 그 노드에
+	// 자리가 없으면 재개가 영구 Pending 이 되므로 노드 단위로 물어야 한다.
+	Node string
+}
+
+// CanPlace는 "지금 이 세션이 들어갈 자리가 있는가"를 답한다.
+//
+// 대기열을 두지 않기로 한 제품 결정에 따라, 생성과 재시작 모두 이 관문을 통과해야 한다.
+// 판정 소스는 세션 마법사·대시보드가 쓰는 Availability 와 같다 — 화면이 "가용 없음"이라고
+// 말하는데 API 는 받아주는(또는 그 반대의) 불일치가 생기지 않게 하기 위해서다.
+//
+// 모드별 기준:
+//   - cpu       : GPU 를 쓰지 않으므로 항상 통과(CPU 부족은 스케줄러가 판단).
+//   - exclusive : 그 타입의 여유 GPU 수 ≥ 요청 개수.
+//   - shared    : 한 노드 안에서 VRAM·코어·슬롯이 모두 남는 노드가 하나라도 있어야 한다.
+//     (합계로 보면 여러 노드에 흩어진 잔여가 합쳐져 "있다"고 나오지만 실제로는 못 들어간다.)
+//   - timeslice : 그 타입에 여유 슬롯이 하나라도 있어야 한다.
+//
+// 클러스터 정보를 못 얻으면(빈 결과) 막지 않는다 — 조회 실패로 사용자를 잠그는 것보다
+// 스케줄러가 판단하게 두는 편이 낫다.
+func (s *Service) CanPlace(ctx context.Context, r PlaceReq) bool {
+	if r.GpuMode == "cpu" || r.GpuType == "" {
+		return true
+	}
+	av := s.Availability(ctx)
+	if len(av.ByType) == 0 && len(av.ByNode) == 0 {
+		return true // 가용성 조회 실패 → 게이트 미적용
+	}
+	// 스케줄 대기 중인(노드 미정) 세션의 예약분을 먼저 뺀다 — 같은 자리를 두 번 내주지 않기 위해.
+	res := s.counter.Reserved()
+	if r.Node != "" {
+		return canPlaceOnNode(av, r, res)
+	}
+
+	switch r.GpuMode {
+	case "exclusive":
+		need := r.GpuCount
+		if need < 1 {
+			need = 1
+		}
+		for _, t := range av.ByType {
+			if t.GpuType == r.GpuType {
+				return t.Free-res.GpuByType[r.GpuType] >= need
+			}
+		}
+		return false // 그런 타입이 클러스터에 없음
+
+	case "shared":
+		for _, n := range av.ByNode {
+			if !n.Fractional || n.GpuType != r.GpuType {
+				continue
+			}
+			if fitsShared(n, r, res.SharedByType[r.GpuType]) {
+				return true // 이 노드 하나에 통째로 들어간다
+			}
+		}
+		return false
+
+	case "timeslice":
+		for _, t := range av.ByType {
+			if t.GpuType == r.GpuType {
+				return t.FracSlotsFree >= 1
+			}
+		}
+		return false
+	}
+	return true
+}
+
+// fitsShared는 분할 요청이 이 노드에 들어가는지 본다(예약분 hold 를 뺀 잔여 기준).
+// hold 는 노드가 정해지지 않은 분할 세션의 예약분이다 — 어느 노드로 갈지 모르므로 후보 노드마다
+// 빼고 본다(보수적). 그 결과 잠깐 실제보다 빡빡하게 판정될 수 있지만, 반대 방향의 실수(Pending)
+// 보다 낫다: 여기서 거절당한 사용자는 즉시 알고 다시 시도하면 되지만, Pending 은 알 길이 없다.
+func fitsShared(n NodeAvail, r PlaceReq, hold ShareUse) bool {
+	if n.FracSlotsFree-hold.Count < 1 {
+		return false
+	}
+	if r.VramMB > 0 && n.FracVramFreeMB-hold.VramMB < r.VramMB {
+		return false
+	}
+	if r.CorePercent > 0 && n.FracCoresFree-hold.Cores < r.CorePercent {
+		return false
+	}
+	return true
+}
+
+// canPlaceOnNode는 지정 노드 한 대 안에서만 자리를 판정한다(노드 고정 세션용).
+// 그 노드가 인벤토리에 없으면(이름 오타·노드 제거·NotReady) 막지 않는다 — 조회 공백으로
+// 사용자를 잠그기보다 스케줄러 판단에 맡기는 CanPlace 의 기존 원칙을 따른다.
+func canPlaceOnNode(av Availability, r PlaceReq, res Reservation) bool {
+	for _, n := range av.ByNode {
+		if n.Node != r.Node {
+			continue
+		}
+		if n.GpuType != r.GpuType {
+			return false // 이 노드엔 그 GPU 모델이 없다 → 그 사양으로는 여기서 못 뜬다
+		}
+		switch r.GpuMode {
+		case "exclusive":
+			need := r.GpuCount
+			if need < 1 {
+				need = 1
+			}
+			return n.GpuFree-res.GpuByType[r.GpuType] >= need
+		case "shared":
+			// 분할은 HAMi 노드에서만 뜬다 — 같은 모델이어도 분할 노드가 아니면 스케줄 불가.
+			if !n.Fractional {
+				return false
+			}
+			return fitsShared(n, r, res.SharedByType[r.GpuType])
+		}
+		return true
+	}
+	return true
 }
