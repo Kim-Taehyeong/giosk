@@ -16,9 +16,23 @@ import { getInfraDashboard } from '../../../api/console/dashboard';
 const hhmm = (ts) => { const d = new Date(ts); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
 
 // 인프라 대시보드(클러스터 하드웨어) — 최고관리자 전용. 감시월: 폴링 주기 선택 + 전체화면.
+// downsample은 시계열을 최대 target 포인트로 버킷 평균한다(촘촘한 원시 샘플 → 부드러운 선).
+const avg = (xs) => (xs.length ? Math.round(xs.reduce((a, b) => a + (b || 0), 0) / xs.length) : 0);
+function downsample(arr, target) {
+  if (arr.length <= target) return arr;
+  const bucket = Math.ceil(arr.length / target);
+  const out = [];
+  for (let i = 0; i < arr.length; i += bucket) {
+    const chunk = arr.slice(i, i + bucket);
+    out.push({ ts: chunk[chunk.length - 1].ts, gpuUtil: avg(chunk.map((c) => c.gpuUtil)), vramUsedPct: avg(chunk.map((c) => c.vramUsedPct)) });
+  }
+  return out;
+}
+
 export default function InfraDashboard() {
   const { t } = useTranslation('consoleAdmin');
   const [intervalMs, setIntervalMs] = useState(15000);
+  const [rangeH, setRangeH] = useState(24); // 추이 시간 범위(시간)
   const wrap = useRef(null);
   const d = usePoll(getInfraDashboard, intervalMs);
   if (!d) return <div className="muted">{t('common.loading')}</div>;
@@ -27,10 +41,14 @@ export default function InfraDashboard() {
   const active = Math.max(0, ss.running - ss.idle);
   const users = d.activeUsers || [];
 
-  const snaps = d.snapshots || [];
+  const allSnaps = d.snapshots || [];
+  // 선택 범위로 자르고(최근 rangeH 시간) 최대 60포인트로 버킷 평균 → 촘촘함 완화.
+  const nowMs = Date.now();
+  const snaps = downsample(allSnaps.filter((s) => nowMs - new Date(s.ts).getTime() <= rangeH * 3600e3), 60);
   const trendLabels = snaps.length ? snaps.map((s) => hhmm(s.ts)) : (d.gpuTrend7d || []).map((x) => x.date);
   const utilVals = snaps.length ? snaps.map((s) => s.gpuUtil) : (d.gpuTrend7d || []).map((x) => x.util);
   const vramVals = snaps.length ? snaps.map((s) => s.vramUsedPct) : [];
+  const RANGES = [6, 12, 24];
   const byType = Object.entries(ss.byGpuType || {}).map(([label, value]) => ({ label: label.replace(/^NVIDIA-/, ''), value }));
   // 지표 스택이 없으면 GPU 사용률·VRAM·온도는 "0" 이 아니라 "—" 로 두고 안내를 띄운다
   // (0% 를 그대로 보여주면 GPU 가 놀고 있는 것으로 오해된다).
@@ -63,7 +81,18 @@ export default function InfraDashboard() {
       {/* 추이 + 세션 상태 도넛 */}
       <div className="grid cols-2 mb">
         <div className="card">
-          <h3><TrendingUp size={16} /> {snaps.length ? t('dash.snapshotTrend') : t('dash.gpuTrend')}</h3>
+          <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+            <h3 style={{ margin: 0 }}><TrendingUp size={16} /> {snaps.length ? t('dash.snapshotTrend') : t('dash.gpuTrend')}</h3>
+            {allSnaps.length > 0 && (
+              <span className="flex" style={{ gap: 2, background: 'var(--surface-2)', borderRadius: 8, padding: 3 }}>
+                {RANGES.map((h) => (
+                  <button key={h} className="btn sm" onClick={() => setRangeH(h)}
+                    style={{ background: rangeH === h ? 'var(--primary)' : 'transparent', color: rangeH === h ? '#fff' : 'var(--text)', border: 0, padding: '3px 10px' }}>
+                    {h}h</button>
+                ))}
+              </span>
+            )}
+          </div>
           {gpuMetricsOn || utilVals.some((v) => v > 0)
             ? <UtilLineChart labels={trendLabels} values={utilVals} label={t('dash.gpuUtil')} extra={vramVals.length ? { label: t('dash.vramAlloc'), values: vramVals } : undefined} />
             : <div className="muted" style={{ padding: '48px 0', textAlign: 'center' }}>{t('dash.metricsOffTitle')}</div>}
