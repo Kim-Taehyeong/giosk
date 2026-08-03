@@ -26,6 +26,7 @@ export default function LimitsFields({ value, onChange }) {
       {field('maxVramGb', 'GB')}
       {field('maxVolumeGib', 'GiB')}
       {field('maxConcurrentSessions', t('limits.sessionsUnit'))}
+      {field('maxEphemeralGib', 'GiB')}
     </div>
   );
 }

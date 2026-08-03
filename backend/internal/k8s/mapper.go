@@ -285,7 +285,7 @@ func nodeAffinity(prefer []string, require string, reqs []corev1.NodeSelectorReq
 	return &corev1.Affinity{NodeAffinity: na}
 }
 
-// gpuLimits는 모드별 GPU 확장 리소스 limit 을 구성한다.
+// gpuLimits는 모드별 GPU 확장 리소스 limit + (정책이 지정한 경우에만) ephemeral-storage 상한을 구성한다.
 func gpuLimits(s SessionSpec) corev1.ResourceList {
 	limits := corev1.ResourceList{}
 	switch s.GpuMode {
@@ -302,6 +302,12 @@ func gpuLimits(s SessionSpec) corev1.ResourceList {
 		if s.CorePercent > 0 {
 			limits[resGPUCores] = *resource.NewQuantity(int64(s.CorePercent), resource.DecimalSI)
 		}
+	}
+	// ephemeral-storage 상한 — ⚠️ 이 limit 의 강제 수단은 kubelet 의 "eviction"(초과 시 세션 파드 강제 종료)이다.
+	// 기본으로 걸면 임시 디스크를 넘긴 사용자의 세션이 갑자기 죽는 위험이 있어, 정책(MaxEphemeralGiB)이
+	// 명시로 값을 준 경우(>0)에만 건다. 0(무제한)=미설정이면 걸지 않는다(다른 하드리밋과 동일: 0=무제한).
+	if s.EphemeralGiB > 0 {
+		limits[corev1.ResourceEphemeralStorage] = resource.MustParse(fmt.Sprintf("%dGi", s.EphemeralGiB))
 	}
 	if len(limits) == 0 {
 		return nil

@@ -19,10 +19,11 @@ type limitRow struct {
 	MaxVramGB             *int `gorm:"column:max_vram_gb"`
 	MaxVolumeGiB          *int `gorm:"column:max_volume_gib"`
 	MaxConcurrentSessions *int `gorm:"column:max_concurrent_sessions"`
+	MaxEphemeralGiB       *int `gorm:"column:max_ephemeral_gib"`
 }
 
 func (l limitRow) toLimits() Limits {
-	return Limits{MaxGpu: l.MaxGpu, MaxVramGB: l.MaxVramGB, MaxVolumeGiB: l.MaxVolumeGiB, MaxConcurrentSessions: l.MaxConcurrentSessions}
+	return Limits{MaxGpu: l.MaxGpu, MaxVramGB: l.MaxVramGB, MaxVolumeGiB: l.MaxVolumeGiB, MaxConcurrentSessions: l.MaxConcurrentSessions, MaxEphemeralGiB: l.MaxEphemeralGiB}
 }
 
 func (r *gormRepo) UserLimits(userID int64) (Limits, error) {
@@ -40,7 +41,7 @@ func (r *gormRepo) OrgLimits(orgID int64) (Limits, error) {
 func (r *gormRepo) fetch(table, idCol string, id int64) (Limits, error) {
 	var row limitRow
 	err := r.db.Raw(
-		"SELECT max_gpu, max_vram_gb, max_volume_gib, max_concurrent_sessions FROM "+table+" WHERE "+idCol+"=?",
+		"SELECT max_gpu, max_vram_gb, max_volume_gib, max_concurrent_sessions, max_ephemeral_gib FROM "+table+" WHERE "+idCol+"=?",
 		id,
 	).Scan(&row).Error
 	return row.toLimits(), err
@@ -53,16 +54,16 @@ func (r *gormRepo) SetLimits(level Level, id int64, l Limits) error {
 		return errUnknownLevel
 	}
 	return r.db.Exec(
-		"UPDATE "+table+" SET max_gpu=?, max_vram_gb=?, max_volume_gib=?, max_concurrent_sessions=? WHERE id=?",
-		l.MaxGpu, l.MaxVramGB, l.MaxVolumeGiB, l.MaxConcurrentSessions, id,
+		"UPDATE "+table+" SET max_gpu=?, max_vram_gb=?, max_volume_gib=?, max_concurrent_sessions=?, max_ephemeral_gib=? WHERE id=?",
+		l.MaxGpu, l.MaxVramGB, l.MaxVolumeGiB, l.MaxConcurrentSessions, l.MaxEphemeralGiB, id,
 	).Error
 }
 
 // ListPolicies는 상한이 하나라도 설정된 모든 범위(개인/그룹/조직)를 한 목록으로 반환한다.
 // "정책" 화면이 범위별로 흩어보지 않고 한눈에 보게 하는 것이 목적.
 func (r *gormRepo) ListPolicies() ([]PolicyRow, error) {
-	const cols = "max_gpu, max_vram_gb, max_volume_gib, max_concurrent_sessions"
-	const anySet = "(max_gpu IS NOT NULL OR max_vram_gb IS NOT NULL OR max_volume_gib IS NOT NULL OR max_concurrent_sessions IS NOT NULL)"
+	const cols = "max_gpu, max_vram_gb, max_volume_gib, max_concurrent_sessions, max_ephemeral_gib"
+	const anySet = "(max_gpu IS NOT NULL OR max_vram_gb IS NOT NULL OR max_volume_gib IS NOT NULL OR max_concurrent_sessions IS NOT NULL OR max_ephemeral_gib IS NOT NULL)"
 	q := `
 		SELECT 'org' AS scope, id, display_name AS name, ` + cols + ` FROM organizations WHERE ` + anySet + `
 		UNION ALL
@@ -80,8 +81,8 @@ func (r *gormRepo) ListPolicies() ([]PolicyRow, error) {
 // ListPoliciesScoped는 호출자 스코프의 상한 목록만 반환한다.
 // org: 자기 조직 + 산하 그룹 + 조직 소속 사용자. group: 자기 그룹 + 멤버.
 func (r *gormRepo) ListPoliciesScoped(orgID, groupID int64) ([]PolicyRow, error) {
-	const cols = "max_gpu, max_vram_gb, max_volume_gib, max_concurrent_sessions"
-	const anySet = "(max_gpu IS NOT NULL OR max_vram_gb IS NOT NULL OR max_volume_gib IS NOT NULL OR max_concurrent_sessions IS NOT NULL)"
+	const cols = "max_gpu, max_vram_gb, max_volume_gib, max_concurrent_sessions, max_ephemeral_gib"
+	const anySet = "(max_gpu IS NOT NULL OR max_vram_gb IS NOT NULL OR max_volume_gib IS NOT NULL OR max_concurrent_sessions IS NOT NULL OR max_ephemeral_gib IS NOT NULL)"
 	const uname = "COALESCE(NULLIF(TRIM(CONCAT(COALESCE(last_name,''),COALESCE(first_name,''))),''), username)"
 	var parts []string
 	var args []any

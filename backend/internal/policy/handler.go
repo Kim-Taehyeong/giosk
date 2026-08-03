@@ -34,10 +34,11 @@ type limitsBody struct {
 	MaxVramGB             *int `json:"maxVramGb"`
 	MaxVolumeGiB          *int `json:"maxVolumeGib"`
 	MaxConcurrentSessions *int `json:"maxConcurrentSessions"`
+	MaxEphemeralGiB       *int `json:"maxEphemeralGib"`
 }
 
 func (b limitsBody) toLimits() Limits {
-	return Limits{MaxGpu: b.MaxGpu, MaxVramGB: b.MaxVramGB, MaxVolumeGiB: b.MaxVolumeGiB, MaxConcurrentSessions: b.MaxConcurrentSessions}
+	return Limits{MaxGpu: b.MaxGpu, MaxVramGB: b.MaxVramGB, MaxVolumeGiB: b.MaxVolumeGiB, MaxConcurrentSessions: b.MaxConcurrentSessions, MaxEphemeralGiB: b.MaxEphemeralGiB}
 }
 
 // Set은 지정 계층(user/group/org)의 하드 제한을 설정한다.
@@ -110,6 +111,7 @@ func (h *Handler) ParentLimit(level Level) gin.HandlerFunc {
 		httpx.OK(c, gin.H{
 			"maxGpu": parent.MaxGpu, "maxVramGb": parent.MaxVramGB,
 			"maxVolumeGib": parent.MaxVolumeGiB, "maxConcurrentSessions": parent.MaxConcurrentSessions,
+			"maxEphemeralGib": parent.MaxEphemeralGiB,
 		})
 	}
 }
@@ -173,6 +175,9 @@ func exceedsParent(b limitsBody, p Resolved) string {
 	if b.MaxConcurrentSessions != nil && p.MaxConcurrentSessions > 0 && *b.MaxConcurrentSessions > p.MaxConcurrentSessions {
 		return "Sessions"
 	}
+	if b.MaxEphemeralGiB != nil && p.MaxEphemeralGiB > 0 && *b.MaxEphemeralGiB > p.MaxEphemeralGiB {
+		return "EphemeralDisk"
+	}
 	return ""
 }
 
@@ -193,6 +198,7 @@ func (h *Handler) List(c *gin.Context) {
 		"global": gin.H{
 			"maxGpu": g.MaxGpu, "maxVramGb": g.MaxVramGB,
 			"maxVolumeGib": g.MaxVolumeGiB, "maxConcurrentSessions": g.MaxConcurrentSessions,
+			"maxEphemeralGib": g.MaxEphemeralGiB,
 		},
 	})
 }
@@ -221,6 +227,7 @@ func (h *Handler) ListScoped(c *gin.Context) {
 		"global": gin.H{
 			"maxGpu": g.MaxGpu, "maxVramGb": g.MaxVramGB,
 			"maxVolumeGib": g.MaxVolumeGiB, "maxConcurrentSessions": g.MaxConcurrentSessions,
+			"maxEphemeralGib": g.MaxEphemeralGiB,
 		},
 	})
 }

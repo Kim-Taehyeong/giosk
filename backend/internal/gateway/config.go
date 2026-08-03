@@ -17,6 +17,7 @@ type Config struct {
 	HTTPAddr     string // HTTP 리스닝(기본 :80)
 	HTTPSAddr    string // HTTPS 리스닝(기본 :443)
 	CookieTTL    int    // 웹 세션 쿠키 수명(초, 기본 8h)
+	ConsoleURL   string // 콘솔 URL(접근 거부 페이지의 "콘솔로 가기" 버튼용). 빈값이면 버튼 생략.
 }
 
 // Load는 환경변수에서 게이트웨이 설정을 읽는다.
@@ -32,6 +33,7 @@ func Load() Config {
 		HTTPAddr:     env("GIOSK_GATEWAY_HTTP_ADDR", ":80"),
 		HTTPSAddr:    env("GIOSK_GATEWAY_HTTPS_ADDR", ":443"),
 		CookieTTL:    envInt("GIOSK_GATEWAY_COOKIE_TTL", 8*3600),
+		ConsoleURL:   os.Getenv("GIOSK_GATEWAY_CONSOLE_URL"),
 	}
 	return c
 }
