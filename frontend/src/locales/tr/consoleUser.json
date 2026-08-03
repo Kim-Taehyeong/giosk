@@ -156,7 +156,11 @@
     "kpiFree": "Ücretsiz (sınırsız)",
     "nodeAvail": "Düğüm başına kullanılabilirlik",
     "mySessions": "Seanslarım",
-    "kpiNodes": "Kullanılabilir düğümler"
+    "kpiNodes": "Kullanılabilir düğümler",
+    "slots": "Yuvalar",
+    "hamiFractional": "Kesirli (VRAM ve çekirdeklere göre)",
+    "exclusiveWhole": "Adanmış (tüm kart)",
+    "hamiShared": "HAMi kesirli"
   },
   "newSession": {
     "crumb": "Oturumlar",
@@ -310,7 +314,8 @@
     "hoursApprox": "~{{n}} saat",
     "grpSlotDesc": "Birkaç kişi sırayla bir GPU'yu kullanır. Bellek garanti edilmez; eğer başka bir oturum VRAM'i tüketirse sizinki de başarısız olabilir.",
     "notEnough": "Yeterli kredi yok — minimum 1 saat gerekli",
-    "sshKeyChange": "Değiştir"
+    "sshKeyChange": "Değiştir",
+    "sshCacheCount": "{{n}} önbelleğe alındı"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "regenerated": "Yeni bir erişim bağlantısı yayınladı.",
     "sshDirect": "Doğrudan (intranet)",
     "sshNeedKey": "Kayıtlı SSH açık anahtarı yok",
-    "sshNeedKeyHint": "Aşağıdan kaydedin veya oluşturun — çalışan oturumlar anında alır."
+    "sshNeedKeyHint": "Aşağıdan kaydedin veya oluşturun — çalışan oturumlar anında alır.",
+    "webConnectNewWindow": "Tarayıcı terminalini yeni bir pencerede açar; SSH anahtarına veya komutuna gerek yoktur."
   },
   "account": {
     "title": "Ayarlarım",
@@ -464,7 +470,8 @@
     "sshGenerate": "Anahtar oluştur ve indir",
     "sshGenerated": "Anahtar oluşturuldu. İndirilen özel anahtarı güvende tutun — tekrar indirilemez.",
     "sshGenFail": "SSH anahtarı oluşturulamadı.",
-    "sshGenerateHint": "Henüz anahtarınız yok mu? “Anahtar oluştur ve indir”e tıklayın. Özel anahtar (.pem) bir kez indirilir, açık anahtar otomatik kaydedilir. Bağlantı: ssh -i indirilen-anahtar.pem …"
+    "sshGenerateHint": "Henüz anahtarınız yok mu? “Anahtar oluştur ve indir”e tıklayın. Özel anahtar (.pem) bir kez indirilir, açık anahtar otomatik kaydedilir. Bağlantı: ssh -i indirilen-anahtar.pem …",
+    "activeScope": "Aktif"
   },
   "notify": {
     "title": "Bildirimler",
@@ -493,7 +500,19 @@
     "subtitle": "Uyarı almak için kendi koşullarınızı tanımlayın",
     "sev_info": "Bilgi",
     "sev_warn": "Uyarı",
-    "sev_err": "Hata"
+    "sev_err": "Hata",
+    "inboxTitle": "Gelen kutusu",
+    "readAll": "Tümünü okundu olarak işaretle",
+    "prev": "Öncesi",
+    "next": "Sonraki",
+    "mSessVram": "Oturum VRAM kullanımı",
+    "mSessCpu": "Oturum CPU kullanımı",
+    "scopeAccount": "Tüm hesap",
+    "inboxEmpty": "Henüz bildirim yok.",
+    "mSessGpu": "Oturum GPU kullanımı",
+    "rulesHint": "Uyarı kuralları ve bildirimler hesap başınadır ve tüm ekipler arasında paylaşılır. Oturum metrikleri seçilen oturumda değerlendirilir.",
+    "noSession": "Çalışan oturum yok",
+    "selectSession": "Bir oturum seçin"
   },
   "wallet": {
     "title": "Cüzdan / Kredi",
@@ -535,7 +554,15 @@
     "bySession": "Oturuma göre",
     "noSpend": "Henüz tüketim yok",
     "desc_gpu": "GPU kullanımı ({{ref}})",
-    "desc_storage": "Depolama ({{ref}})"
+    "desc_storage": "Depolama ({{ref}})",
+    "nextRecharge": "Sonraki dolum",
+    "rechargeSoon": "Yakında",
+    "session": "Oturum",
+    "rechargeEvery": "Her {{n}} günde bir",
+    "consumedCol": "Tüketilen",
+    "viewAll": "Tüm girişler",
+    "viewBySession": "Oturuma göre grupla",
+    "searchPh": "Arama oturumları, türleri, ayrıntıları"
   },
   "volume": {
     "title": "Veri / Birimler",
@@ -596,7 +623,16 @@
     "afterUse": "Şu tarihten sonra kullanılır:",
     "thisVol": "Bu cilt",
     "afterRemain": "Sonra kaldı",
-    "overQuota": "Kalan kotayı aşıyor ({{remain}} GB)"
+    "overQuota": "Kalan kotayı aşıyor ({{remain}} GB)",
+    "teamFail": "Takım değiştirilemedi",
+    "personal": "Kişisel",
+    "teamQuota": "Hedef ekibin hacim kotasını aşıyor",
+    "changeTeam": "Ekibi değiştir",
+    "teamChanged": "Takım değişti",
+    "teamHint": "Bu birimin kapasite kotası ve depolama kredileri seçilen ekipten gelir. Sen sahibi olarak kal.",
+    "teamHome": "Takıma fatura edildi",
+    "sharedBy": "Tarafından paylaşıldı",
+    "changeTeamTitle": "Ekibi değiştir — {{name}}"
   },
   "gmembers": {
     "title": "Üyeler",

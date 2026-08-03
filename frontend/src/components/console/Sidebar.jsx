@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 export default function Sidebar({ navGroups, basePath, ns }) {
   const { t } = useTranslation(ns);
   return (
-    <nav className="nav">
+    <nav className="nav" id="console-nav" aria-label={t('nav.label', { defaultValue: '콘솔 메뉴' })}>
       {navGroups.map((group, gi) => (
         <div key={gi}>
           {group.title && <div className="group">{t(`nav.${group.title}`)}</div>}

@@ -67,7 +67,9 @@
       "subtitle": "Isi formulir di bawah ini. Anda akan dapat masuk setelah administrator menyetujui permintaan Anda.",
       "errorGeneric": "Pendaftaran gagal.",
       "errorGroup": "Anda harus memilih organisasi dan grup.",
-      "errorPasswordMismatch": "Kata sandi tidak cocok."
+      "errorPasswordMismatch": "Kata sandi tidak cocok.",
+      "pwMismatch": "Kata sandi tidak cocok",
+      "pwMatch": "Kata sandi cocok"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Node {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "Node {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "Node {{up}}/{{total}} · GPU —",
+    "rolePlatformSub": "Admin super",
+    "alerts": "Peringatan",
+    "noAlerts": "Belum ada peringatan.",
+    "clusterStatus": "Status klaster",
+    "creditBalance": "Saldo kredit",
+    "viewAll": "Lihat semuanya di Pusat Pemberitahuan",
+    "unreadN": "{{n}} belum dibaca",
+    "rolePlatform": "Seluruh platform",
+    "orgWhole": "Seluruh organisasi"
+  },
+  "table": {
+    "empty": "Tidak ada data"
+  },
+  "refill": {
+    "carryover": "Bawaan",
+    "carryOff": "Berakhir",
+    "title": "Isi ulang berulang",
+    "carryOn": "Lanjutkan",
+    "note": "Isi ulang sebanyak ini setiap siklus (0 menonaktifkannya). Siklusnya tidak boleh lebih lama dari siklus induknya dan dibatasi secara otomatis.",
+    "maxHint": "Batas siklus induk: {{n}} hari atau kurang",
+    "interval": "Siklus isi ulang (hari)",
+    "amount": "Kredit per siklus"
+  },
+  "select": {
+    "placeholder": "Memilih",
+    "search": "Mencari…",
+    "noMatch": "Tidak ada kecocokan"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "Tim {{target}} kekurangan kredit",
+      "teamBody": "Kredit tim {{target}} berada pada {{value}}, di bawah ambang batas {{threshold}}. Sesi di tim ini mungkin akan segera berhenti."
+    }
+  },
+  "close": "Menutup"
 }

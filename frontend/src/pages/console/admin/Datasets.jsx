@@ -13,6 +13,7 @@ import { useToast } from '../../../components/console/Toast';
 import { useConfirm } from '../../../components/console/Confirm';
 import { getDatasets, deleteDataset, approveDatasetRequest, rejectDatasetRequest, toggleDatasetCache, getDatasetInbox, registerDatasetNFS, registerDatasetURL } from '../../../api/console/datasets';
 import { getAdminNodes } from '../../../api/console/nodes';
+import { tabbable } from '../../../utils/a11y';
 
 // 사이즈 클래스 → Pill 변형.
 export const sizeVariant = { Large: 'primary', Medium: 'gpu', Small: 'free' };
@@ -113,8 +114,8 @@ export default function Datasets() {
       </div>
 
       <div className="subtabs">
-        <span className={`st${tab === 'registry' ? ' active' : ''}`} onClick={() => setTab('registry')}>{t('datasets.tabRegistry')}</span>
-        <span className={`st${tab === 'requests' ? ' active' : ''}`} onClick={() => setTab('requests')}>{t('datasets.tabRequests')} {requests.length > 0 && <Pill variant="warn">{requests.length}</Pill>}</span>
+        <span className={`st${tab === 'registry' ? ' active' : ''}`} {...tabbable(() => setTab('registry'), tab === 'registry')}>{t('datasets.tabRegistry')}</span>
+        <span className={`st${tab === 'requests' ? ' active' : ''}`} {...tabbable(() => setTab('requests'), tab === 'requests')}>{t('datasets.tabRequests')} {requests.length > 0 && <Pill variant="warn">{requests.length}</Pill>}</span>
       </div>
 
       <div className="card">
@@ -145,7 +146,7 @@ export default function Datasets() {
                             <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{r.progress || 0}%</span>
                           </div>
                           <div style={{ height: 7, borderRadius: 4, background: 'var(--surface-2)', overflow: 'hidden' }}>
-                            <div style={{ height: '100%', width: `${r.progress || 0}%`, background: 'var(--primary)', transition: 'width .5s' }} />
+                            <div className="progress-fill" style={{ '--p': (r.progress || 0) / 100 }} />
                           </div>
                         </div>
                       )}
@@ -160,7 +161,7 @@ export default function Datasets() {
                   {openId === r.id && (
                     <tr>
                       <td colSpan={7} style={{ background: 'var(--surface)' }}>
-                        <div style={{ padding: '10px 0 12px 18px', marginLeft: 8, borderLeft: '3px solid var(--primary)' }}>
+                        <div style={{ padding: '10px 0 12px 18px', marginLeft: 8, borderInlineStart: '1px solid var(--border)' }}>
                           {/* 다운로드 중: NFS 적재 진행률(%) — 완료 후 노드 배치 UI 로 전환 */}
                           {r.loadStatus === 'loading' ? (
                             <div>
@@ -171,7 +172,7 @@ export default function Datasets() {
                                 <span style={{ fontWeight: 700 }}>{r.progress || 0}%</span>
                               </div>
                               <div style={{ height: 10, borderRadius: 6, background: 'var(--surface-2)', overflow: 'hidden' }}>
-                                <div style={{ height: '100%', width: `${r.progress || 0}%`, background: 'var(--primary)', transition: 'width .5s' }} />
+                                <div className="progress-fill" style={{ '--p': (r.progress || 0) / 100 }} />
                               </div>
                               <div className="legend mt">{t('datasets.dlHint')}</div>
                             </div>
@@ -196,7 +197,7 @@ export default function Datasets() {
                                       <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{cache.progress || 0}%</span>
                                     </div>
                                     <div style={{ height: 6, borderRadius: 4, background: 'var(--surface-2)', overflow: 'hidden' }}>
-                                      <div style={{ height: '100%', width: `${cache.progress || 0}%`, background: 'var(--primary)', transition: 'width .5s' }} />
+                                      <div className="progress-fill" style={{ '--p': (cache.progress || 0) / 100 }} />
                                     </div>
                                   </div>
                                 ) : st === 'failed' ? <Pill variant="err">{t('datasets.cacheFailed')}</Pill>
@@ -275,8 +276,8 @@ export default function Datasets() {
           ))}
         </div>
 
-        <label className="fld">{t('datasets.name')}<Req /></label>
-        <input type="text" value={reg.name} onChange={(e) => setReg({ ...reg, name: e.target.value })} placeholder="imagenet-mini" />
+        <label className="fld" htmlFor="admin-datasets-fld-0">{t('datasets.name')}<Req /></label>
+        <input id="admin-datasets-fld-0" type="text" value={reg.name} onChange={(e) => setReg({ ...reg, name: e.target.value })} placeholder="imagenet-mini" />
 
         {regTab === 'nfs' ? (
           <>
@@ -288,12 +289,12 @@ export default function Datasets() {
               </code>
               <button className="btn sm" onClick={loadInbox} title={t('datasets.regRefresh', { defaultValue: '새로고침' })}><RefreshCw size={13} /></button>
             </div>
-            <label className="fld">{t('datasets.regInboxFile', { defaultValue: '인박스 파일' })}<Req /></label>
+            <label className="fld" htmlFor="admin-datasets-fld-1">{t('datasets.regInboxFile', { defaultValue: '인박스 파일' })}<Req /></label>
             <div style={{ maxHeight: 220, overflowY: 'auto', border: '1px solid var(--border)', borderRadius: 10 }}>
               {inbox.files.length === 0 && <div className="muted" style={{ padding: '16px', fontSize: 13, textAlign: 'center' }}>{t('datasets.regInboxEmpty', { defaultValue: '인박스가 비어 있습니다. 위 경로로 복사 후 새로고침하세요.' })}</div>}
               {inbox.files.map((f) => (
                 <label key={f.name} className="flex" style={{ gap: 10, alignItems: 'center', padding: '10px 12px', borderTop: '1px solid var(--border)', cursor: 'pointer', background: reg.filename === f.name ? 'var(--primary-soft)' : 'transparent' }}>
-                  <input type="radio" name="inboxfile" checked={reg.filename === f.name} onChange={() => pickInboxFile(f.name)} style={{ accentColor: 'var(--primary)' }} />
+                  <input id="admin-datasets-fld-1" type="radio" name="inboxfile" checked={reg.filename === f.name} onChange={() => pickInboxFile(f.name)} style={{ accentColor: 'var(--primary)' }} />
                   <span style={{ flex: 1, fontWeight: 600, fontSize: 13, wordBreak: 'break-all' }}>{f.name}</span>
                   <span className="muted" style={{ fontSize: 12.5 }}>{formatBytes(f.bytes)}</span>
                 </label>
@@ -302,23 +303,23 @@ export default function Datasets() {
           </>
         ) : (
           <>
-            <label className="fld">{t('datasets.regUrlField', { defaultValue: '다운로드 URL' })}<Req /></label>
-            <input type="text" value={reg.url} onChange={(e) => setReg({ ...reg, url: e.target.value })} placeholder="https://example.com/dataset.tar.gz" />
+            <label className="fld" htmlFor="admin-datasets-fld-2">{t('datasets.regUrlField', { defaultValue: '다운로드 URL' })}<Req /></label>
+            <input id="admin-datasets-fld-2" type="text" value={reg.url} onChange={(e) => setReg({ ...reg, url: e.target.value })} placeholder="https://example.com/dataset.tar.gz" />
             <div className="legend" style={{ marginTop: 8 }}>{t('datasets.regUrlHint', { defaultValue: '서버가 이 URL 을 직접 다운로드해 등록합니다(브라우저 업로드 없음). 진행률은 목록에서 확인하세요.' })}</div>
           </>
         )}
 
         <div className="grid cols-2" style={{ gap: 14 }}>
           <div>
-            <label className="fld">{t('datasets.upScope', { defaultValue: '공개 범위' })}</label>
-            <select value={reg.scope} onChange={(e) => setReg({ ...reg, scope: e.target.value })}>
+            <label className="fld" htmlFor="admin-datasets-fld-3">{t('datasets.upScope', { defaultValue: '공개 범위' })}</label>
+            <select id="admin-datasets-fld-3" value={reg.scope} onChange={(e) => setReg({ ...reg, scope: e.target.value })}>
               <option value="global">{t('datasets.scopeGlobal', { defaultValue: '전역(모든 사용자)' })}</option>
               <option value="personal">{t('datasets.scopePersonal', { defaultValue: '개인(나만)' })}</option>
             </select>
           </div>
           <div>
-            <label className="fld">{t('datasets.regSizeClass', { defaultValue: '크기 클래스' })}</label>
-            <select value={reg.sizeClass} onChange={(e) => setReg({ ...reg, sizeClass: e.target.value })}>
+            <label className="fld" htmlFor="admin-datasets-fld-4">{t('datasets.regSizeClass', { defaultValue: '크기 클래스' })}</label>
+            <select id="admin-datasets-fld-4" value={reg.sizeClass} onChange={(e) => setReg({ ...reg, sizeClass: e.target.value })}>
               <option value="Small">Small</option>
               <option value="Medium">Medium</option>
               <option value="Large">Large</option>

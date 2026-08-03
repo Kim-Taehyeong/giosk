@@ -242,8 +242,8 @@ export default function UserDetail() {
         </>}>
         {move && (
           <>
-            <label className="fld" style={{ marginTop: 0 }}>{t('userDetail.moveTo')}</label>
-            <Select value={move.toGroupId} placeholder={t('userDetail.pickGroup')}
+            <label className="fld" id="admin-userdetail-fld-0-lbl" style={{ marginTop: 0 }}>{t('userDetail.moveTo')}</label>
+            <Select ariaLabelledBy="admin-userdetail-fld-0-lbl" value={move.toGroupId} placeholder={t('userDetail.pickGroup')}
               onChange={(v) => setMove({ ...move, toGroupId: Number(v) })}
               options={allGroups.filter((g) => g.id !== move.fromGroupId).map((g) => ({ value: g.id, label: `${g.displayName} (${g.orgName})` }))} />
           </>
@@ -258,16 +258,16 @@ export default function UserDetail() {
         </>}>
         {addMem && (
           <>
-            <label className="fld" style={{ marginTop: 0 }}>{t('userDetail.org', { defaultValue: '조직' })}</label>
-            <Select value={addMem.orgId} placeholder={t('userDetail.pickOrg', { defaultValue: '조직 선택' })}
+            <label className="fld" id="admin-userdetail-fld-1-lbl" style={{ marginTop: 0 }}>{t('userDetail.org', { defaultValue: '조직' })}</label>
+            <Select ariaLabelledBy="admin-userdetail-fld-1-lbl" value={addMem.orgId} placeholder={t('userDetail.pickOrg', { defaultValue: '조직 선택' })}
               onChange={(v) => setAddMem({ ...addMem, orgId: Number(v), groupId: 0 })}
               options={orgs.map((o) => ({ value: o.id, label: o.displayName || o.name }))} />
-            <label className="fld">{t('userDetail.group', { defaultValue: '팀' })}</label>
-            <Select value={addMem.groupId} placeholder={t('userDetail.pickGroup', { defaultValue: '팀 선택' })}
+            <label className="fld" id="admin-userdetail-fld-2-lbl">{t('userDetail.group', { defaultValue: '팀' })}</label>
+            <Select ariaLabelledBy="admin-userdetail-fld-2-lbl" value={addMem.groupId} placeholder={t('userDetail.pickGroup', { defaultValue: '팀 선택' })}
               onChange={(v) => setAddMem({ ...addMem, groupId: Number(v) })}
               options={allGroups.filter((g) => g.orgId === addMem.orgId).map((g) => ({ value: g.id, label: g.displayName }))} />
-            <label className="fld">{t('userDetail.role')}</label>
-            <Select value={addMem.role} onChange={(v) => setAddMem({ ...addMem, role: v })}
+            <label className="fld" id="admin-userdetail-fld-3-lbl">{t('userDetail.role')}</label>
+            <Select ariaLabelledBy="admin-userdetail-fld-3-lbl" value={addMem.role} onChange={(v) => setAddMem({ ...addMem, role: v })}
               options={MROLES.map((x) => ({ value: x, label: t(`roles.${x}`, { defaultValue: x }) }))} />
             {allGroups.filter((g) => g.orgId === addMem.orgId).length === 0 && <div className="legend mt">{t('userDetail.noTeamsInOrg', { defaultValue: '이 조직에 팀이 없습니다.' })}</div>}
           </>
@@ -281,8 +281,8 @@ export default function UserDetail() {
         </>}>
         {grant && (
           <>
-            <label className="fld" style={{ marginTop: 0 }}>{t('userDetail.grantAmount', { defaultValue: '부여 크레딧 (C, 음수 차감)' })}</label>
-            <input type="number" value={grant.amount} onChange={(e) => setGrant({ amount: e.target.value })} />
+            <label className="fld" htmlFor="admin-userdetail-fld-4" style={{ marginTop: 0 }}>{t('userDetail.grantAmount', { defaultValue: '부여 크레딧 (C, 음수 차감)' })}</label>
+            <input id="admin-userdetail-fld-4" type="number" value={grant.amount} onChange={(e) => setGrant({ amount: e.target.value })} />
             <div className="legend mt">{t('userDetail.grantHint', { defaultValue: '개인 크레딧 잔액에 즉시 반영되며 감사 로그에 기록됩니다(일회성 조정).' })}</div>
           </>
         )}

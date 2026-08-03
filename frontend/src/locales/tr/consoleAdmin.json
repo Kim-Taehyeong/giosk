@@ -53,7 +53,8 @@
     "edit": "Düzenlemek",
     "advanced": "Daha fazla ayar",
     "optional": "(isteğe bağlı)",
-    "empty": "Veri yok"
+    "empty": "Veri yok",
+    "prev": "Öncesi"
   },
   "dash": {
     "title": "Kontrol Paneli",
@@ -197,7 +198,10 @@
     "colMemberRole": "Kuruluş/ekip rolü",
     "groupPh": "Grup seç",
     "totalN": "{{n}} kullanıcıları",
-    "bulkDone": "Toplu eklenen {{n}} kullanıcıları"
+    "bulkDone": "Toplu eklenen {{n}} kullanıcıları",
+    "colRefill": "Tekrarlanan dolum",
+    "refillDefault": "Varsayılan",
+    "colBalance": "Mevcut bakiye"
   },
   "groups": {
     "title": "Gruplar",
@@ -248,7 +252,18 @@
     "grantHintSuper": "Platform yöneticisi istisna izni. Bütünlük açısından aynı miktar ana kuruluş havuzuna otomatik olarak eklenir.",
     "grantHintOrg": "Kuruluş havuzunuzdan düşülerek bu grubun havuzuna eklendi. Kuruluş havuzu bakiyesi aşılamaz.",
     "adminHintOpt": "Grup yöneticisi olmadan grup oluşturmak için boş bırakın. Grup ayrıntılarından bir üye ekleyin ve rolünü Grup yöneticisi olarak ayarlayın.",
-    "insufficientOrgPool": "Yetersiz kuruluş kredi havuzu bakiyesi."
+    "insufficientOrgPool": "Yetersiz kuruluş kredi havuzu bakiyesi.",
+    "colRefill": "Tekrarlanan dolum",
+    "refillDefault": "Varsayılan",
+    "refillInterval": "Yeniden doldurma döngüsü (gün)",
+    "refillAmt": "Tekrarlanan dolum (döngü başına)",
+    "cantDeleteDefault": "Varsayılan takım silinemez.",
+    "carryover": "Kullanılmayan kredilerin devredilmesi",
+    "hasMembers": "Bu ekibin hala üyeleri var. Silmeden önce bunları taşıyın veya kaldırın.",
+    "initCredit": "İlk krediler ve yinelenen yeniden doldurma",
+    "initCreditHint": "İsteğe bağlı olarak organizasyon havuzundan tahsis edin ve ekibi oluştururken bir yeniden doldurma ayarlayın. Bunu daha sonra ekip ayrıntıları sayfasında da yapabilirsiniz.",
+    "deleteFail": "Silinemedi",
+    "initCreditAmt": "Başlangıç ​​kredileri"
   },
   "orgs": {
     "title": "Organizasyonlar",
@@ -292,7 +307,11 @@
     "adminUnknown": "Kuruluş yöneticisi hesabı bulunamadı",
     "adminHintOpt": "Yalnızca 'Genel' grubu oluşturmak ve daha sonra Kuruluş ayrıntısı → Genel → Kuruluş yöneticisi rolüne sahip üye ekle bölümünden bir yönetici atamak için boş bırakın.",
     "adminOpt": "Kuruluş yöneticisi (isteğe bağlı)",
-    "bulkDone": "Toplu eklenen {{n}} kuruluşları"
+    "bulkDone": "Toplu eklenen {{n}} kuruluşları",
+    "colRefill": "Tekrarlanan dolum",
+    "refillDefault": "Varsayılan",
+    "hasUsers": "Bu kuruluşun hâlâ kullanıcıları var. Silmeden önce bunları taşıyın veya kaldırın.",
+    "deleteFail": "Silinemedi"
   },
   "billing": {
     "title": "Faturalandırma",
@@ -318,7 +337,12 @@
     "budget": "Bütçe",
     "vsAlloc": "vs tahsis",
     "byUser": "Kullanıcıya göre tüketim",
-    "byGroup": "Gruba göre tüketim (gösteri)"
+    "byGroup": "Gruba göre tüketim (gösteri)",
+    "periodLastMonth": "Geçen ay",
+    "periodAll": "Tüm zamanlar",
+    "periodMonth": "Bu ay",
+    "period7d": "Son 7 gün",
+    "periodNote": "Gösterilen tüketim ve GPU saatleri, deftere göre seçilen dönemde gerçekleşen değerlerdir. Bütçeler ve havuzlar dönem kapsamlı değildir."
   },
   "audit": {
     "title": "Denetim Günlüğü",
@@ -476,7 +500,10 @@
     "impDone": "{{name}}'den {{user}}'ye içe aktarılan hacim.",
     "impOwnerHint": "İçe aktarmak için listeden bir hesap seçin.",
     "impOwnerPicked": "Seçildi: {{name}} ({{id}})",
-    "metricsOffNotice": "İzleme (DCGM/Prometheus) kurulu değil, bu yüzden GPU kullanımı ve VRAM gösterilemiyor. Canlı metrikleri görmek için izlemeyi etkinleştirin."
+    "metricsOffNotice": "İzleme (DCGM/Prometheus) kurulu değil, bu yüzden GPU kullanımı ve VRAM gösterilemiyor. Canlı metrikleri görmek için izlemeyi etkinleştirin.",
+    "cordon": "Kordon",
+    "noMetrics": "Metrik yok",
+    "uncordon": "Kordonu çöz"
   },
   "mset": {
     "title": "Ayarlar",
@@ -599,7 +626,21 @@
     "pickGroup": "Bir grup seçin",
     "removeTitle": "Gruptan kaldır",
     "removed": "Gruptan kaldırıldı",
-    "moveFail": "Taşıma işlemi başarısız oldu"
+    "moveFail": "Taşıma işlemi başarısız oldu",
+    "granted": "{{n}} C verildi",
+    "grant": "Kredi ver",
+    "grantFail": "Hibe başarısız oldu",
+    "memberAdded": "Üyelik eklendi.",
+    "addFail": "Eklenemedi",
+    "restore": "Eski haline getirmek",
+    "suspend": "Askıya almak",
+    "noTeamsInOrg": "Bu organizasyonun ekibi yok.",
+    "statusConfirm": "Bu kullanıcının durumunu değiştirir.",
+    "grantHint": "Kişisel kredi bakiyesine anında uygulanır ve denetim günlüğüne bir defaya mahsus düzeltme olarak kaydedilir.",
+    "grantTitle": "Kredi verme — {{name}}",
+    "pickOrg": "Bir kuruluş seçin",
+    "addMembership": "Üyelik ekle",
+    "grantAmount": "Verilecek krediler (C; negatif kesintiler)"
   },
   "clusters": {
     "title": "Kümeler",
@@ -699,7 +740,12 @@
     "imgRefHint": "Docker Hub'ı / harici kayıt defteri görüntüsünü olduğu gibi çekin ve kullanın (derleme yok). örneğin codercom/kod sunucusu:en son",
     "needRef": "Bir resim referansı girin",
     "extRegistered": "Harici resim kaydedildi",
-    "extFail": "Harici görüntü kaydedilemedi"
+    "extFail": "Harici görüntü kaydedilemedi",
+    "loading": "…",
+    "notFound": "Resim bulunamadı.",
+    "notCached": "Önbelleğe alınmadı",
+    "info": "Resim bilgisi",
+    "logsHint": "Derleme ve tarama günlüklerini yükler."
   },
   "anotify": {
     "title": "Bildirimler",
@@ -886,7 +932,23 @@
     "lockedHelmNote": "Bunları değiştirmek için Helm değerlerini düzenleyin ve yeniden konuşlandırın.",
     "lockDatasetsSub": "NFS/merkezi depolamaya bağlıdır — kurulum sırasında sabitlenir",
     "brandingNote": "Kuruluşunuz için hizmet adını ve logo rengini özelleştirin. Oturum açma ve konsol başlığına anında uygulanır.",
-    "brandAccentHint": "Tema rengini kullanmak için boş bırakın."
+    "brandAccentHint": "Tema rengini kullanmak için boş bırakın.",
+    "rechargeSaved": "Yeniden doldurma ayarları kaydedildi.",
+    "carryoverOn": "Kullanılmayan kredilerin devredilmesi",
+    "brandSubtitle": "Altyazı",
+    "brandIconUpload": "Bir simge yükleyin (isteğe bağlı)",
+    "rechargeAmountHint": "Ayrıntı sayfalarında kuruluş başına, ekip başına ve kullanıcı başına yeniden doldurma miktarlarını, döngüleri ve aktarımları ayarlayın. Bir döngü asla ebeveynininkinden daha uzun olamaz.",
+    "rechargeInterval": "Varsayılan yeniden doldurma döngüsü (gün) · daha düşük seviyeler için limit",
+    "carryoverOff": "Her döngünün süresinin dolması",
+    "brandIcon": "Simge",
+    "rechargeCarryover": "Aktarmaya izin ver",
+    "brandSubtitleHint": "Logonun yanında küçük metin. Gizlemek için boş bırakın.",
+    "rechargeEnabled": "Tekrarlanan dolumu etkinleştir",
+    "brandIconClear": "Kaldırmak",
+    "brandIconTooBig": "Simgenin boyutu 120 KB veya daha küçük olmalıdır.",
+    "rechargeTitle": "Yinelenen kredi doldurma (varsayılan ve limit)",
+    "rechargeNote": "Platformun varsayılan yeniden doldurma döngüsü ve aktarma politikası. Kuruluşlar, ekipler ve bireyler daha kısa bir döngüyü seçebilir ancak asla daha uzun bir döngüyü tercih edemezler ve bir ebeveyn devir işlemine izin vermediğinde, bunun altındaki kullanılmamış kredilerin süresi o sınırda dolar.",
+    "brandIconUploadHint": "Yüklenen bir simge, yukarıdaki Lucide simgesine göre önceliklidir. 120 KB'nin altındaki PNG veya SVG önerilir."
   },
   "datasets": {
     "title": "Veri kümeleri",
@@ -932,7 +994,40 @@
     "rejected": "İstek reddedildi",
     "assign": "Düğümleri ata",
     "dlTitle": "NFS indirme ilerlemesi",
-    "measuring": "Ölçme…"
+    "measuring": "Ölçme…",
+    "phaseDownload": "İndiriliyor",
+    "phaseExtract": "Çıkarma",
+    "cacheFail": "Önbellek isteği başarısız oldu",
+    "descSaved": "Açıklama kaydedildi.",
+    "info": "Veri kümesi bilgisi",
+    "phaseCopy": "Kopyalanıyor",
+    "notFound": "Veri kümesi bulunamadı.",
+    "description": "Tanım",
+    "descFail": "Açıklama kaydedilemedi",
+    "regFail": "Kayıt başarısız oldu",
+    "regNeedFile": "Gelen kutusundan bir dosya seçin.",
+    "upTaken": "Bu ada sahip bir veri kümesi zaten mevcut.",
+    "regNeedName": "Bir veri kümesi adı girin.",
+    "registering": "Kaydediliyor",
+    "descPh": "Bu veri kümesini açıklayın",
+    "sizeClassSaved": "Boyut sınıfı kaydedildi.",
+    "cache": "Düğüm önbelleği",
+    "regNeedUrl": "Bir URL girin.",
+    "sizeClass": "Boyut sınıfı",
+    "regStarted": "Kayıt başladı — ilerlemeyi listeden takip edin.",
+    "regInboxFile": "Gelen kutusu dosyası",
+    "regNfs": "NFS kopyası (SCP)",
+    "regBusy": "Kaydediliyor…",
+    "regSizeClass": "Boyut sınıfı",
+    "regTitle": "Veri kümesini kaydedin",
+    "extracting": "Çıkarılıyor…",
+    "regUrl": "URL (wget)",
+    "upScope": "Görünürlük",
+    "regRefresh": "Yenile",
+    "regUrlField": "İndirme URL'si",
+    "regInboxEmpty": "Gelen kutusu boş. Bir dosyayı yukarıdaki yola kopyalayın ve yenileyin.",
+    "regNfsHint": "Bir arşivi (zip, tar, tar.gz) aşağıdaki yola kopyalayın, ardından kaydetmek için dosyayı seçin. Kaydolmak onu gelen kutusundan çıkarır ve otomatik olarak çıkarır.",
+    "regUrlHint": "Sunucu bu URL'yi doğrudan indirir; tarayıcınızdan hiçbir şey yüklenmez. Listedeki ilerlemeyi izleyin."
   },
   "announce": {
     "title": "Duyurular",
@@ -1054,7 +1149,8 @@
     "globalHint": "Global herkes için geri dönüştür; boş olamaz ve en az 1 olmalıdır. Kuruluş/grup/kullanıcı kapsamları bunu geçersiz kılabilir.",
     "globalNeedsValue": "Dört genel sınırın tümü en az 1 olmalıdır",
     "removed": "'{{name}}' politikası silindi",
-    "searchUser": "Kullanıcı ara"
+    "searchUser": "Kullanıcı ara",
+    "capHint": "İzin verilen maksimum — GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · hacim ≤ {{vol}}GiB · eşzamanlı oturumlar ≤ {{sess}}"
   },
   "roles": {
     "org_admin": "Kuruluş yöneticisi",
@@ -1070,7 +1166,16 @@
     "subtitle": "Tanımlayıcı {{name}} · gruplarını, kullanıcılarını ve kredilerini buradan yönetin",
     "usersHint": "Rol, kullanıcının kendi grubu içindeki rolüdür. Bunu o grubun üye yönetiminden değiştirin.",
     "usersCapped": "{{total}}'nin ilk {{shown}}'si gösteriliyor",
-    "inGroup": "Grupta yönet"
+    "inGroup": "Grupta yönet",
+    "recurringAmount": "Döngü başına kredi",
+    "recurringInterval": "Yeniden doldurma döngüsü (gün)",
+    "recurringCarryover": "Devralma",
+    "carryOn": "devretmek",
+    "carryOff": "Süresi dolmuş",
+    "maxIntervalHint": "Platform sınırı: {{n}} gün veya daha az",
+    "recurringSaved": "Yinelenen krediler kaydedildi.",
+    "recurringTitle": "Tekrarlanan krediler",
+    "recurringNote": "Organizasyon havuzunu her döngüde bu miktarda yeniden doldurur (0 bunu devre dışı bırakır)."
   },
   "gdetail": {
     "title": "Grup",
@@ -1098,7 +1203,25 @@
     "moveHint": "Rol devam ediyor. Bu gruba tahsis edilen kredi geçerli değildir ve kullanım geçmişi bu grupta kalır.",
     "needTarget": "Bir hedef grup seçin",
     "moved": "{{name}}, {{group}}'ye taşındı",
-    "moveTo": "Şuraya taşı:"
+    "moveTo": "Şuraya taşı:",
+    "refillCol": "Tekrarlanan dolum",
+    "noRecurring": "Yinelenen yeniden doldurma miktarı ayarlanmadı",
+    "memberRefillSaved": "Tekrarlanan dolum kaydedildi",
+    "refillFail": "Yeniden doldurma başarısız oldu",
+    "memberRefillSet": "Yinelenen dolumu ayarla",
+    "refillSaved": "Tekrarlanan dolum kaydedildi.",
+    "noRecurringShort": "Tekrarlanan dolum yok",
+    "refillCarryover": "Kullanılmayan kredilerin devredilmesi",
+    "refillTitle": "Takım yinelenen dolum",
+    "refillNow": "Şimdi yeniden doldur",
+    "nextRefill": "Sonraki dolum",
+    "refilledNow": "Şimdi yeniden dolduruldu: +{{n}} C",
+    "refillAmount": "Tekrarlanan dolum miktarı (C)",
+    "refillInterval": "Döngü (günler) — takımın varsayılan durumu için boş bırakın",
+    "refillMenu": "Yeniden doldurma",
+    "refillInheritPh": "Devralınan",
+    "memberRefillTitle": "Tekrarlanan dolum — {{name}}",
+    "memberRefillHint": "Bu tutar her döngüde üyenin cüzdanına ödenir. Hemen ödemek için \"Şimdi doldur\" seçeneğini kullanın."
   },
   "picker": {
     "allOrgs": "Tüm kuruluşlar",
@@ -1125,5 +1248,8 @@
   "brand": "Giosk Konsolu",
   "confirmDelete": "Bu silinsin mi? Bu geri alınamaz.",
   "confirmTerminate": "Bu oturum zorla sonlandırılsın mı? Yürüyen iş anında durur.",
-  "confirmRemoveMember": "Bu üye gruptan çıkarılsın mı?"
+  "confirmRemoveMember": "Bu üye gruptan çıkarılsın mı?",
+  "paged": {
+    "range": "{{total}}'nin {{from}}–{{to}}'si"
+  }
 }

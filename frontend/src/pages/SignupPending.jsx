@@ -28,32 +28,37 @@ const SignupPending = () => {
   useEffect(() => () => clearPendingMessage(), [clearPendingMessage]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white px-4">
-      <div className="max-w-md w-full text-center">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-yellow-100 text-yellow-600 mb-5">
-          <Clock size={32} />
+    <div className="auth-root">
+      <div className="auth-card" style={{ textAlign: 'center' }}>
+        {/* 대기 상태 = 앰버. 색만으로 알리지 않도록 아이콘과 문구가 함께 말한다. */}
+        <div style={{
+          display: 'inline-grid', placeItems: 'center', width: 62, height: 62, borderRadius: '50%',
+          background: 'var(--warn-soft)', color: 'var(--warn)', marginBottom: 18,
+        }}>
+          <Clock size={30} />
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-3">{t('auth.signupPending.title')}</h1>
-        <p className="text-gray-600 mb-6 leading-relaxed">{t('auth.signupPending.body')}</p>
+        <h1 className="auth-title" style={{ fontSize: 22 }}>{t('auth.signupPending.title')}</h1>
+        <p className="auth-sub">{t('auth.signupPending.body')}</p>
 
         {createdAt && (
-          <div className="inline-flex items-center gap-2 mb-8 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700">
-            <CalendarDays size={16} className="text-gray-400" />
-            <span className="text-gray-500">{t('auth.signupPending.submittedAt')}:</span>
-            <span className="font-medium text-gray-900">{formatDate(createdAt, i18n.language)}</span>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 26,
+            padding: '9px 14px', background: 'var(--surface-2)', border: '1px solid var(--border)',
+            borderRadius: 10, fontSize: 13,
+          }}>
+            <CalendarDays size={15} style={{ color: 'var(--muted)', flex: '0 0 auto' }} />
+            <span className="muted" style={{ color: 'var(--muted)' }}>{t('auth.signupPending.submittedAt')}</span>
+            <span style={{ fontWeight: 700 }}>{formatDate(createdAt, i18n.language)}</span>
           </div>
         )}
 
         <div>
-          <Link
-            to="/login"
-            className="inline-block px-6 py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700"
-          >
+          <Link to="/login" className="auth-submit" style={{ display: 'inline-block', width: 'auto', textDecoration: 'none' }}>
             {t('auth.signupPending.backToLogin')}
           </Link>
         </div>
 
-        <div className="mt-8 flex justify-center">
+        <div className="auth-foot">
           <LanguageSwitcher />
         </div>
       </div>

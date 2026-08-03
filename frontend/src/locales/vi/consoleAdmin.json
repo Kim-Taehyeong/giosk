@@ -53,7 +53,8 @@
     "create": "Tạo nên",
     "edit": "Biên tập",
     "advanced": "Thêm cài đặt",
-    "optional": "(không bắt buộc)"
+    "optional": "(không bắt buộc)",
+    "prev": "Trước"
   },
   "dash": {
     "title": "Trang tổng quan",
@@ -197,7 +198,10 @@
     "bulkEmpty": "Không có hàng để thêm (kiểm tra mẫu)",
     "advBelong": "Tư cách thành viên · vai trò · mật khẩu",
     "totalN": "Người dùng {{n}}",
-    "colMemberRole": "Vai trò của tổ chức/nhóm"
+    "colMemberRole": "Vai trò của tổ chức/nhóm",
+    "colRefill": "Nạp tiền định kỳ",
+    "colBalance": "Số dư hiện tại",
+    "refillDefault": "Mặc định"
   },
   "groups": {
     "title": "Nhóm",
@@ -248,7 +252,18 @@
     "adminOpt": "Quản trị nhóm (tùy chọn)",
     "grantFail": "Không thể cấp tín dụng.",
     "grantHintOrg": "Được khấu trừ từ nhóm tổ chức của bạn và được thêm vào nhóm của nhóm này. Không thể vượt quá số dư nhóm tổ chức.",
-    "adminHintOpt": "Để trống để tạo nhóm mà không cần quản trị viên nhóm. Thêm thành viên từ chi tiết nhóm và đặt vai trò của họ thành Quản trị viên nhóm."
+    "adminHintOpt": "Để trống để tạo nhóm mà không cần quản trị viên nhóm. Thêm thành viên từ chi tiết nhóm và đặt vai trò của họ thành Quản trị viên nhóm.",
+    "colRefill": "Nạp tiền định kỳ",
+    "deleteFail": "Xóa không thành công",
+    "refillInterval": "Chu kỳ nạp tiền (ngày)",
+    "refillDefault": "Mặc định",
+    "hasMembers": "Đội này vẫn còn thành viên. Di chuyển hoặc loại bỏ chúng trước khi xóa nó.",
+    "carryover": "Chuyển tiếp các khoản tín dụng chưa sử dụng",
+    "cantDeleteDefault": "Nhóm mặc định không thể bị xóa.",
+    "initCredit": "Tín dụng ban đầu và nạp tiền định kỳ",
+    "refillAmt": "Nạp tiền định kỳ (mỗi chu kỳ)",
+    "initCreditHint": "Tùy chọn phân bổ từ nhóm tổ chức và thiết lập mức nạp lại khi tạo nhóm. Bạn cũng có thể thực hiện việc này sau trong trang chi tiết về nhóm.",
+    "initCreditAmt": "Tín dụng ban đầu"
   },
   "orgs": {
     "title": "Tổ chức",
@@ -292,7 +307,11 @@
     "bulkDone": "Các tổ chức {{n}} được thêm hàng loạt",
     "grantAmount": "Số tiền (C)",
     "grantHint": "Áp dụng cho nhóm tổ chức ngay lập tức và được ghi vào nhật ký kiểm tra.",
-    "adminHintOpt": "Để trống để chỉ tạo nhóm 'Chung' và chỉ định quản trị viên sau, từ Chi tiết tổ chức → Chung → Thêm thành viên với vai trò Quản trị viên tổ chức."
+    "adminHintOpt": "Để trống để chỉ tạo nhóm 'Chung' và chỉ định quản trị viên sau, từ Chi tiết tổ chức → Chung → Thêm thành viên với vai trò Quản trị viên tổ chức.",
+    "deleteFail": "Xóa không thành công",
+    "colRefill": "Nạp tiền định kỳ",
+    "refillDefault": "Mặc định",
+    "hasUsers": "Tổ chức này vẫn có người dùng. Di chuyển hoặc loại bỏ chúng trước khi xóa nó."
   },
   "billing": {
     "title": "Thanh toán",
@@ -318,7 +337,12 @@
     "subtitle": "Mức sử dụng và số liệu thống kê theo tổ chức/nhóm/người dùng (tín dụng nội bộ)",
     "tabGroup": "Theo nhóm",
     "byGroup": "Mức tiêu thụ theo nhóm (showback)",
-    "vsAlloc": "vs phân bổ"
+    "vsAlloc": "vs phân bổ",
+    "periodMonth": "Tháng này",
+    "periodAll": "Mọi lúc",
+    "period7d": "7 ngày qua",
+    "periodLastMonth": "Tháng trước",
+    "periodNote": "Mức tiêu thụ và số giờ GPU được hiển thị là những gì đã xảy ra trong khoảng thời gian đã chọn, trên mỗi sổ cái. Ngân sách và nhóm không có phạm vi theo thời gian."
   },
   "audit": {
     "title": "Nhật ký kiểm tra",
@@ -476,7 +500,10 @@
     "impSize": "Kích thước hiển thị (GiB)",
     "impOwnerHint": "Chọn một tài khoản trong danh sách để nhập.",
     "impOwnerPicked": "Đã chọn: {{name}} ({{id}})",
-    "metricsOffNotice": "Chưa cài giám sát (DCGM/Prometheus) nên không thể hiển thị mức dùng GPU và VRAM. Bật giám sát để xem số liệu trực tiếp."
+    "metricsOffNotice": "Chưa cài giám sát (DCGM/Prometheus) nên không thể hiển thị mức dùng GPU và VRAM. Bật giám sát để xem số liệu trực tiếp.",
+    "cordon": "dây thừng",
+    "uncordon": "cởi trói",
+    "noMetrics": "Không có số liệu"
   },
   "mset": {
     "title": "Cài đặt",
@@ -599,7 +626,21 @@
     "noMembership": "Không phải là thành viên của bất kỳ nhóm nào.",
     "removed": "Đã xóa khỏi nhóm",
     "removeConfirm": "Xóa người dùng này khỏi {{group}}.",
-    "moved": "Đã chuyển đến {{group}}"
+    "moved": "Đã chuyển đến {{group}}",
+    "suspend": "Đình chỉ",
+    "restore": "Khôi phục",
+    "memberAdded": "Đã thêm thành viên.",
+    "grant": "Cấp tín dụng",
+    "statusConfirm": "Điều này thay đổi trạng thái của người dùng.",
+    "pickOrg": "Chọn một tổ chức",
+    "granted": "Được cấp {{n}} C",
+    "grantFail": "Cấp không thành công",
+    "addFail": "Không thể thêm",
+    "grantAmount": "Tín dụng để cấp (C; khấu trừ âm)",
+    "addMembership": "Thêm thành viên",
+    "grantTitle": "Cấp tín dụng — {{name}}",
+    "noTeamsInOrg": "Tổ chức này không có đội.",
+    "grantHint": "Áp dụng ngay vào số dư tín dụng cá nhân và được ghi vào nhật ký kiểm toán dưới dạng điều chỉnh một lần."
   },
   "clusters": {
     "title": "Cụm",
@@ -699,7 +740,12 @@
     "addExternal": "Thêm hình ảnh bên ngoài",
     "needRef": "Nhập một hình ảnh giới thiệu",
     "extRegistered": "Đã đăng ký hình ảnh bên ngoài",
-    "extFail": "Không thể đăng ký hình ảnh bên ngoài"
+    "extFail": "Không thể đăng ký hình ảnh bên ngoài",
+    "notCached": "Không được lưu vào bộ nhớ đệm",
+    "notFound": "Không tìm thấy hình ảnh.",
+    "loading": "…",
+    "info": "Thông tin hình ảnh",
+    "logsHint": "Tải nhật ký xây dựng và quét."
   },
   "anotify": {
     "title": "Thông báo",
@@ -886,7 +932,23 @@
     "featuresHead": "Tính năng người dùng",
     "brandingNote": "Tùy chỉnh tên dịch vụ và màu logo cho tổ chức của bạn. Áp dụng ngay lập tức cho tiêu đề đăng nhập và bảng điều khiển.",
     "brandAccent": "Màu logo",
-    "brandAccentHint": "Để trống để sử dụng màu chủ đề."
+    "brandAccentHint": "Để trống để sử dụng màu chủ đề.",
+    "carryoverOn": "Chuyển tiếp các khoản tín dụng chưa sử dụng",
+    "rechargeTitle": "Nạp tiền tín dụng định kỳ (mặc định và giới hạn)",
+    "rechargeCarryover": "Cho phép chuyển tiếp",
+    "carryoverOff": "Hết hạn mỗi chu kỳ",
+    "rechargeSaved": "Đã lưu cài đặt nạp tiền.",
+    "rechargeInterval": "Chu kỳ nạp tiền mặc định (ngày) · giới hạn cho mức thấp hơn",
+    "brandSubtitle": "Phụ đề",
+    "brandIcon": "Biểu tượng",
+    "brandIconClear": "Di dời",
+    "brandIconUpload": "Tải lên một biểu tượng (tùy chọn)",
+    "rechargeEnabled": "Cho phép nạp tiền định kỳ",
+    "rechargeNote": "Chu kỳ nạp tiền mặc định của nền tảng và chính sách chuyển tiếp. Các tổ chức, nhóm và cá nhân có thể chọn chu kỳ ngắn hơn nhưng không bao giờ chọn chu kỳ dài hơn và khi phụ huynh không cho phép chuyển tiếp, các khoản tín dụng chưa sử dụng dưới chu kỳ đó sẽ hết hạn ở ranh giới đó.",
+    "rechargeAmountHint": "Đặt số tiền nạp, chu kỳ và chuyển tiếp cho mỗi tổ chức, mỗi nhóm và mỗi người dùng trên trang chi tiết của họ. Một chu kỳ không bao giờ có thể dài hơn chu kỳ cha của nó.",
+    "brandIconUploadHint": "Biểu tượng đã tải lên được ưu tiên hơn biểu tượng Lucide ở trên. Khuyến nghị PNG hoặc SVG dưới 120KB.",
+    "brandIconTooBig": "Biểu tượng phải có kích thước 120KB hoặc nhỏ hơn.",
+    "brandSubtitleHint": "Dòng chữ nhỏ bên cạnh logo. Để trống để ẩn nó."
   },
   "datasets": {
     "title": "Bộ dữ liệu",
@@ -932,7 +994,40 @@
     "notCached": "Không được lưu vào bộ nhớ đệm",
     "assignTitle": "Gán nút bộ đệm",
     "dlInto": "Đang tải vào/dataset/{{name}}",
-    "assignHint": "Chọn nút nào lưu trữ tập dữ liệu này. Nó được trích xuất từ ​​NFS sang nút cục bộ để sử dụng ngay."
+    "assignHint": "Chọn nút nào lưu trữ tập dữ liệu này. Nó được trích xuất từ ​​NFS sang nút cục bộ để sử dụng ngay.",
+    "phaseExtract": "Giải nén",
+    "phaseCopy": "Sao chép",
+    "phaseDownload": "Đang tải xuống",
+    "descFail": "Không thể lưu mô tả",
+    "cacheFail": "Yêu cầu bộ đệm không thành công",
+    "description": "Sự miêu tả",
+    "descPh": "Mô tả tập dữ liệu này",
+    "sizeClassSaved": "Đã lưu lớp kích thước.",
+    "regNeedName": "Nhập tên tập dữ liệu.",
+    "notFound": "Không tìm thấy tập dữ liệu.",
+    "descSaved": "Đã lưu mô tả.",
+    "cache": "Bộ đệm nút",
+    "registering": "Đăng ký",
+    "regBusy": "Đang đăng ký…",
+    "regNeedUrl": "Nhập một URL.",
+    "extracting": "Đang trích xuất…",
+    "regFail": "Đăng ký không thành công",
+    "regTitle": "Đăng ký tập dữ liệu",
+    "regRefresh": "Làm cho khỏe lại",
+    "upTaken": "Tập dữ liệu có tên đó đã tồn tại.",
+    "sizeClass": "Lớp kích thước",
+    "info": "Thông tin tập dữ liệu",
+    "regNeedFile": "Chọn một tập tin từ hộp thư đến.",
+    "regSizeClass": "Lớp kích thước",
+    "upScope": "Khả năng hiển thị",
+    "regUrl": "URL (wget)",
+    "regInboxFile": "Tệp hộp thư đến",
+    "regNfs": "Bản sao NFS (SCP)",
+    "regUrlField": "URL tải xuống",
+    "regInboxEmpty": "Hộp thư đến trống. Sao chép một tập tin vào đường dẫn trên, sau đó làm mới.",
+    "regStarted": "Đã bắt đầu đăng ký - theo dõi tiến trình trong danh sách.",
+    "regNfsHint": "Sao chép một kho lưu trữ (zip, tar, tar.gz) vào đường dẫn bên dưới, sau đó chọn tệp để đăng ký. Việc đăng ký sẽ di chuyển nó ra khỏi hộp thư đến và tự động trích xuất nó.",
+    "regUrlHint": "Máy chủ tải xuống URL này trực tiếp - không có gì được tải lên từ trình duyệt của bạn. Theo dõi tiến độ trong danh sách."
   },
   "announce": {
     "title": "Thông báo",
@@ -1054,7 +1149,8 @@
     "addTitle": "Thêm chính sách",
     "searchUser": "Tìm kiếm người dùng",
     "removeConfirm": "Việc xóa chính sách '{{name}}' sẽ khiến chính sách này kế thừa từ phạm vi ở trên. Tiếp tục?",
-    "globalHint": "Toàn cầu là dự phòng cho tất cả mọi người — nó không được để trống và phải có ít nhất 1. Phạm vi tổ chức/nhóm/người dùng có thể ghi đè nó."
+    "globalHint": "Toàn cầu là dự phòng cho tất cả mọi người — nó không được để trống và phải có ít nhất 1. Phạm vi tổ chức/nhóm/người dùng có thể ghi đè nó.",
+    "capHint": "Mức tối đa được phép — GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · âm lượng ≤ {{vol}}GiB · phiên đồng thời ≤ {{sess}}"
   },
   "roles": {
     "org_admin": "Quản trị viên tổ chức",
@@ -1070,7 +1166,16 @@
     "subtitle": "Mã định danh {{name}} · quản lý nhóm, người dùng và tín dụng của mình tại đây",
     "usersHint": "Vai trò là vai trò của người dùng trong nhóm của họ. Thay đổi nó từ quản lý thành viên của nhóm đó.",
     "usersCapped": "hiển thị {{shown}} đầu tiên của {{total}}",
-    "inGroup": "Quản lý theo nhóm"
+    "inGroup": "Quản lý theo nhóm",
+    "recurringAmount": "Tín dụng mỗi chu kỳ",
+    "recurringInterval": "Chu kỳ nạp tiền (ngày)",
+    "recurringCarryover": "Chuyển tiếp",
+    "carryOn": "Chuyển tiếp",
+    "carryOff": "Hết hạn",
+    "recurringTitle": "Tín dụng định kỳ",
+    "recurringSaved": "Các khoản tín dụng định kỳ được lưu.",
+    "maxIntervalHint": "Giới hạn nền tảng: {{n}} ngày trở xuống",
+    "recurringNote": "Nạp lại nhóm tổ chức theo số tiền này mỗi chu kỳ (0 vô hiệu hóa nó)."
   },
   "gdetail": {
     "title": "Nhóm",
@@ -1098,7 +1203,25 @@
     "roleHint": "Quyền quản trị viên tổ chức và quản trị viên nhóm đến từ vai trò này (tách biệt với vai trò nền tảng).",
     "moveTitle": "Di chuyển nhóm - {{name}}",
     "moveFail": "Không thể di chuyển",
-    "moveHint": "Vai trò tiếp tục. Tín dụng được phân bổ trong nhóm này thì không và lịch sử sử dụng vẫn thuộc về nhóm này."
+    "moveHint": "Vai trò tiếp tục. Tín dụng được phân bổ trong nhóm này thì không và lịch sử sử dụng vẫn thuộc về nhóm này.",
+    "refillCol": "Nạp tiền định kỳ",
+    "noRecurringShort": "Không nạp tiền định kỳ",
+    "refillSaved": "Đã lưu nạp tiền định kỳ.",
+    "refillTitle": "Đội nạp tiền định kỳ",
+    "refilledNow": "Nạp lại ngay bây giờ: +{{n}} C",
+    "refillMenu": "Nạp tiền",
+    "nextRefill": "Lần nạp tiếp theo",
+    "refillCarryover": "Chuyển tiếp các khoản tín dụng chưa sử dụng",
+    "memberRefillSet": "Đặt nạp tiền định kỳ",
+    "memberRefillSaved": "Đã lưu nạp tiền định kỳ",
+    "refillFail": "Nạp tiền không thành công",
+    "refillInheritPh": "Kế thừa",
+    "noRecurring": "Không có số tiền nạp định kỳ nào được đặt",
+    "refillAmount": "Lượng nạp lại định kỳ (C)",
+    "refillInterval": "Chu kỳ (ngày) - để trống cho mặc định của nhóm",
+    "refillNow": "Nạp tiền ngay bây giờ",
+    "memberRefillHint": "Số tiền này được trả vào ví của thành viên mỗi chu kỳ. Sử dụng \"Nạp ngay\" để thanh toán ngay.",
+    "memberRefillTitle": "Nạp tiền định kỳ - {{name}}"
   },
   "picker": {
     "allOrgs": "Tất cả tổ chức",
@@ -1125,5 +1248,8 @@
   "brand": "Bảng điều khiển Giosk",
   "confirmDelete": "Xóa cái này? Điều này không thể hoàn tác được.",
   "confirmTerminate": "Buộc chấm dứt phiên này? Công việc đang chạy dừng lại ngay lập tức.",
-  "confirmRemoveMember": "Xóa thành viên này khỏi nhóm?"
+  "confirmRemoveMember": "Xóa thành viên này khỏi nhóm?",
+  "paged": {
+    "range": "{{from}}–{{to}} của {{total}}"
+  }
 }

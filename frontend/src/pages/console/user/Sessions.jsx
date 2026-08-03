@@ -1,16 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Code2, NotebookPen, TerminalSquare, ChevronDown, ChevronRight, Power, ScrollText, Clock, Activity } from 'lucide-react';
+import { Code2, NotebookPen, TerminalSquare, ChevronRight, Power, RotateCcw, Trash2, Clock } from 'lucide-react';
 import PageHead from '../../../components/console/PageHead';
 import Pill from '../../../components/console/Pill';
 import Bar from '../../../components/console/Bar';
 import ConnectionModal from '../../../components/console/ConnectionModal';
-import Modal from '../../../components/console/Modal';
-import Select from '../../../components/console/Select';
 import { useToast } from '../../../components/console/Toast';
 import { useConfirm } from '../../../components/console/Confirm';
-import { getMySessionsWithUsage, stopSession, startSession, deleteSession, extendSession, getSessionAudit } from '../../../api/console/sessions';
+import { getMySessionsWithUsage, stopSession, startSession, deleteSession, extendSession } from '../../../api/console/sessions';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { measureRows, gpuUnmeasurable } from '../../../utils/sessionUsage';
 import { reclaimInfo, RECLAIM_VARIANT } from '../../../utils/reclaim';
@@ -30,26 +28,24 @@ export default function Sessions() {
   const { config } = useSystemConfig();
   const creditMode = config.billing.mode === 'credit';
   const dynamicMode = config.billing.mode === 'dynamic';
-  // 기본 9열(상태·이름·종류·오퍼링·노드·사용률·실행시간·접속·작업) + 모드별 1열
+  // 기본 10열(상태·이름·종류·오퍼링·노드·사용률·실행시간·접속·작업·상세화살표) + 모드별 1열
   // (credit=크레딧 / dynamic=남은시간 / free=없음).
-  const colCount = 9 + ((creditMode || dynamicMode) ? 1 : 0);
+  const colCount = 10 + ((creditMode || dynamicMode) ? 1 : 0);
   const [rows, setRows] = useState(null);
   const [conn, setConn] = useState(null);
   const [connTab, setConnTab] = useState(null); // 클릭한 채널(모달 초기 탭) — 안 넘기면 항상 VSCode 로 열린다
-  const [openId, setOpenId] = useState(null);
   const navigate = useNavigate();
   const { toast } = useToast();
   const confirm = useConfirm();
 
   // 임대/연장은 선착순(Dynamic) 모드 전용 개념 — 크레딧 모드에선 노출하지 않음.
   const lease = config.lease || { extensionHours: 0, maxExtensions: 0 };
-  const [extendFor, setExtendFor] = useState(null);
-  const [extHours, setExtHours] = useState(1);
-  const hourOpts = Array.from({ length: Math.max(1, lease.extensionHours) }, (_, i) => ({ value: i + 1, label: t('session.hoursN', { h: i + 1 }) }));
   // 4초 폴링 — 데이터가 실제로 바뀐 경우에만 setRows 한다. 매 틱마다 새 배열로 갱신하면
   // 테이블 전체가 리렌더되며 "폴링처럼 깜박"인다(usePoll 과 같은 시그니처 비교로 방지).
   const lastSig = useRef('');
+  const [now, setNow] = useState(() => Date.now());
   const load = () => getMySessionsWithUsage().then((d) => {
+    setNow(Date.now()); // 남은 임대시간 기준시각 — 렌더 중 Date.now() 를 부르면 순수하지 않다
     const sig = (() => { try { return JSON.stringify(d); } catch { return null; } })();
     if (sig === null || sig !== lastSig.current) { lastSig.current = sig; setRows(d); }
   });
@@ -58,18 +54,19 @@ export default function Sessions() {
     load();
     const id = setInterval(load, 4000);
     return () => clearInterval(id);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
   const act = async (fn, id, msg) => { await fn(id); toast(msg); load(); };
   // 임대 연장 — 백엔드가 정책(maxExtensions) 내에서 연장 횟수를 +1(영속). 성공 시 재조회.
-  const doExtend = async () => {
-    const r = extendFor;
+  // 연장 시간은 사용자가 고르는 값이 아니라 정책값(lease.extensionHours)이다 — 백엔드 Extend 는
+  // 시간 인자를 받지 않고 "maxLeaseHours + 연장횟수 × extensionHours" 로 만료를 계산한다.
+  // (예전엔 시간 선택 모달이 있었지만 고른 값이 어디에도 쓰이지 않아 사용자를 오해시켰다.)
+  const doExtend = async (r) => {
     try {
       await extendSession(r.id);
-      toast(t('session.extended', { h: extHours }));
+      toast(t('session.extended', { h: lease.extensionHours || 1 }));
     } catch {
       toast(t('session.extendFailed'));
     }
-    setExtendFor(null);
     load();
   };
 
@@ -77,7 +74,7 @@ export default function Sessions() {
   const leaseLeftText = (r) => {
     if (r.status !== 'running' || !r.startedAt) return '—';
     const totalH = config.billing.dynamic.maxLeaseHours + (r.extensionsUsed || 0) * (lease.extensionHours || 0);
-    const leftH = totalH - (Date.now() - new Date(r.startedAt).getTime()) / 3600000;
+    const leftH = totalH - (now - new Date(r.startedAt).getTime()) / 3600000;
     if (leftH <= 0) return t('session.leaseExpired');
     const h = Math.floor(leftH);
     const m = Math.floor((leftH - h) * 60);
@@ -106,6 +103,33 @@ export default function Sessions() {
         <Pill variant={RECLAIM_VARIANT[state]}>{label}</Pill>
       </div>
     );
+  };
+
+  // 행 작업 — 실행 중이면 중지, 중단이면 재시작/삭제. 예전엔 이 열에 접속 칩만 있어서
+  // 중단된 세션은 목록에서 아무것도 할 수 없었다(상세로 들어가야만 재시작·삭제 가능).
+  // 중단 세션은 홈 디스크를 계속 물고 있으므로, 정리하는 길이 목록에 바로 있어야 한다.
+  const rowActions = (r) => {
+    const stop = () => act(stopSession, r.id, t('session.stopped'));
+    const start = () => act(startSession, r.id, t('session.restarted'));
+    const del = async () => {
+      // 상세 페이지와 같은 문구·같은 확인 절차 — 삭제는 홈 데이터까지 지운다(중단은 보존).
+      if (!(await confirm({ title: t('session.delete'), message: t('confirmDelete'), confirmText: t('session.delete') }))) return;
+      act(deleteSession, r.id, t('session.deleted'));
+    };
+    if (r.status === 'running') {
+      const canExtend = dynamicMode && r.mode !== 'cpu' && (r.extensionsUsed || 0) < lease.maxExtensions;
+      return (<>
+        {canExtend && <button className="btn sm" onClick={() => doExtend(r)} title={t('session.extend')}><Clock size={13} /> {t('session.extend')}</button>}
+        <button className="btn sm" onClick={stop} title={t('session.stop')}><Power size={13} /> {t('session.stop')}</button>
+      </>);
+    }
+    if (r.status === 'stopped') {
+      return (<>
+        <button className="btn sm" onClick={start} title={t('session.restart')}><RotateCcw size={13} /> {t('session.restart')}</button>
+        <button className="btn sm danger" onClick={del} title={t('session.delete')}><Trash2 size={13} /></button>
+      </>);
+    }
+    return null; // provisioning/queued 등 전이 중에는 조작을 막는다(중복 요청 방지)
   };
 
   const modePill = (m) => {
@@ -156,7 +180,7 @@ export default function Sessions() {
               <th>{t('session.offering')}</th><th>{t('session.detNode')}</th><th>{t('session.usage')}</th><th>{t('session.runtime')}</th>
               {creditMode && <th>{t('session.credit')}</th>}
               {dynamicMode && <th>{t('session.leaseLeftCol')}</th>}
-              <th>{t('session.conn')}</th><th>{t('session.action')}</th>
+              <th>{t('session.conn')}</th><th>{t('session.action')}</th><th />
             </tr>
           </thead>
           <tbody>
@@ -178,6 +202,7 @@ export default function Sessions() {
                     ? connChips(r.conn).map((k) => { const Icon = CONN_ICON[k] || TerminalSquare; return <button key={k} className="btn sm" onClick={() => { setConnTab(k); setConn(r); }} title={CONN_LABEL[k] || k}><Icon size={13} /> {CONN_LABEL[k] || k}</button>; })
                     : <span className="muted">—</span>}
                 </td>
+                <td className="flex">{rowActions(r) || <span className="muted">—</span>}</td>
                 <td><ChevronRight size={15} style={{ color: 'var(--muted)' }} /></td>
               </tr>
             ))}

@@ -25,10 +25,18 @@ export default function Heatmap({ data, unit = 'C', rows = 7, cell = 16 }) {
   const max = Math.max(1, ...data.map((d) => d.value));
   const level = (v) => (v <= 0 ? 0 : Math.min(4, Math.ceil((v / max) * 4)));
 
-  // 마지막 데이터 = 오늘. 각 칸의 실제 날짜를 역산.
+  // 각 칸의 실제 날짜. label('YYYY-MM-DD')이 오면 그걸 쓰고, 없을 때만 "마지막 칸=오늘"로 역산한다.
+  // 역산은 데이터가 하루도 빠짐없이 연속일 때만 맞다 — 하루라도 비면 이후 칸의 날짜와 요일 정렬이
+  // 통째로 밀린다(값이 0인 날을 빼고 내려주던 시절의 버그). label 우선이면 그 함정이 사라진다.
+  // 문자열은 직접 분해해 만든다 — new Date('YYYY-MM-DD')는 UTC 자정으로 파싱돼 시간대에 따라 하루 밀린다.
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const N = data.length;
-  const dateOf = (i) => { const d = new Date(today); d.setDate(d.getDate() - (N - 1 - i)); return d; };
+  const parseDay = (s) => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s || ''));
+    return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null;
+  };
+  const dateOf = (i) => parseDay(data[i]?.label)
+    || (() => { const d = new Date(today); d.setDate(d.getDate() - (N - 1 - i)); return d; })();
   const lead = dateOf(0).getDay(); // 첫 칸의 요일만큼 앞을 비워 요일 정렬
   const cells = [...Array(lead).fill(null), ...data.map((d, i) => ({ v: d.value, i }))];
   const cols = Math.ceil(cells.length / rows);

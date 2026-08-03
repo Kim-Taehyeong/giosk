@@ -67,7 +67,9 @@
       "errorGroup": "עליך לבחור ארגון וקבוצה.",
       "errorTerms": "עליך לאשר את התנאים כדי להירשם.",
       "errorAdvisor": "סטודנטים לתואר ראשון ושני חייבים לספק יועץ.",
-      "errorPasswordMismatch": "הסיסמאות אינן תואמות."
+      "errorPasswordMismatch": "הסיסמאות אינן תואמות.",
+      "pwMismatch": "הסיסמאות אינן תואמות",
+      "pwMatch": "סיסמאות תואמות"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "צמתים {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "צמתים {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "צמתים {{up}}/{{total}} · GPU —",
+    "clusterStatus": "מצב אשכול",
+    "rolePlatform": "פלטפורמה שלמה",
+    "unreadN": "{{n}} לא נקרא",
+    "noAlerts": "עדיין אין התראות.",
+    "orgWhole": "ארגון שלם",
+    "alerts": "התראות",
+    "creditBalance": "יתרת אשראי",
+    "rolePlatformSub": "סופר אדמין",
+    "viewAll": "ראה הכל במרכז ההודעות"
+  },
+  "table": {
+    "empty": "אין נתונים"
+  },
+  "refill": {
+    "carryOff": "לָפוּג",
+    "amount": "זיכויים לכל מחזור",
+    "carryover": "העברה",
+    "title": "מילוי חוזר",
+    "carryOn": "להעביר",
+    "note": "ממלא בכמות זו בכל מחזור (0 משבית אותו). המחזור לא יכול להיות ארוך יותר מזה של ההורה והוא מוגבל אוטומטית.",
+    "interval": "מחזור מילוי (ימים)",
+    "maxHint": "מגבלת מחזור ההורה: {{n}} ימים או פחות"
+  },
+  "select": {
+    "placeholder": "לִבחוֹר",
+    "search": "לְחַפֵּשׂ…",
+    "noMatch": "אין התאמה"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "לצוות {{target}} יש מעט קרדיטים",
+      "teamBody": "הזיכויים לצוות {{target}} הם ב-{{value}}, מתחת לסף {{threshold}}. הפעלות בצוות זה עשויות להפסיק בקרוב."
+    }
+  },
+  "close": "לִסְגוֹר"
 }

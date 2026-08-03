@@ -53,7 +53,8 @@
     "optional": "（选修的）",
     "comingSoon": "即将推出",
     "edit": "编辑",
-    "advanced": "更多设置"
+    "advanced": "更多设置",
+    "prev": "以前的"
   },
   "dash": {
     "title": "仪表板",
@@ -197,7 +198,10 @@
     "duplicate": "用户名或电子邮件已存在",
     "bulkEmpty": "没有要添加的行（检查模板）",
     "advBelong": "会员·角色·密码",
-    "groupPickOrgFirst": "首先选择一个组织"
+    "groupPickOrgFirst": "首先选择一个组织",
+    "colRefill": "定期补充",
+    "colBalance": "当前余额",
+    "refillDefault": "默认"
   },
   "groups": {
     "title": "团体",
@@ -248,7 +252,18 @@
     "adminHintOpt": "留空以创建没有组管理员的组。从组详细信息中添加成员并将其角色设置为组管理员。",
     "grantHintOrg": "从您的组织池中扣除并添加到该组的池中。不能超过组织池余额。",
     "adminRequired": "输入团队管理员帐号",
-    "grantFail": "未能授予信用。"
+    "grantFail": "未能授予信用。",
+    "colRefill": "定期补充",
+    "deleteFail": "删除失败",
+    "refillInterval": "补充周期（天）",
+    "initCreditAmt": "初始学分",
+    "refillDefault": "默认",
+    "initCreditHint": "可以选择从组织池中分配并在创建团队时设置补充。您也可以稍后在团队详细信息页面中执行此操作。",
+    "hasMembers": "这个团队还有成员。在删除之前移动或删除它们。",
+    "initCredit": "初始积分和定期充值",
+    "cantDeleteDefault": "默认团队无法删除。",
+    "carryover": "结转未使用的积分",
+    "refillAmt": "定期补充（每个周期）"
   },
   "orgs": {
     "title": "组织机构",
@@ -292,7 +307,11 @@
     "grantHint": "立即应用于组织池并记录在审核日志中。",
     "adminOpt": "组织管理员（可选）",
     "bulkDone": "批量添加 {{n}} 组织",
-    "adminHintOpt": "留空以仅创建“常规”组，并稍​​后从组织详细信息 → 常规 → 添加具有组织管理员角色的成员分配管理员。"
+    "adminHintOpt": "留空以仅创建“常规”组，并稍​​后从组织详细信息 → 常规 → 添加具有组织管理员角色的成员分配管理员。",
+    "deleteFail": "删除失败",
+    "colRefill": "定期补充",
+    "refillDefault": "默认",
+    "hasUsers": "这个组织仍然有用户。在删除之前移动或删除它们。"
   },
   "billing": {
     "title": "计费",
@@ -318,7 +337,12 @@
     "vsAlloc": "与分配",
     "byUser": "用户消费",
     "byOrg": "按组织划分的消耗",
-    "byGroup": "团体消费（展示）"
+    "byGroup": "团体消费（展示）",
+    "periodAll": "所有时间",
+    "periodMonth": "本月",
+    "periodLastMonth": "上个月",
+    "period7d": "过去 7 天",
+    "periodNote": "显示的消耗和 GPU 小时数是根据分类帐在选定时间段内发生的情况。预算和资金池没有时间范围。"
   },
   "audit": {
     "title": "审核日志",
@@ -476,7 +500,10 @@
     "impMissing": "输入名称、所有者、NFS 服务器和路径。",
     "impOwnerHint": "请从列表中选择一个账号以导入。",
     "impOwnerPicked": "已选择：{{name}}（{{id}}）",
-    "metricsOffNotice": "未安装监控（DCGM/Prometheus），因此无法显示 GPU 利用率和显存。启用监控后即可看到实时指标。"
+    "metricsOffNotice": "未安装监控（DCGM/Prometheus），因此无法显示 GPU 利用率和显存。启用监控后即可看到实时指标。",
+    "cordon": "警戒线",
+    "uncordon": "解除警戒线",
+    "noMetrics": "没有指标"
   },
   "mset": {
     "title": "设置",
@@ -599,7 +626,21 @@
     "removeConfirm": "从 {{group}} 中删除该用户。",
     "noMembership": "不是任何团体的成员。",
     "removeTitle": "从组中删除",
-    "removed": "已从群组中删除"
+    "removed": "已从群组中删除",
+    "memberAdded": "已添加会员。",
+    "addFail": "无法添加",
+    "granted": "授予 {{n}} C",
+    "grantFail": "授予失败",
+    "suspend": "暂停",
+    "restore": "恢复",
+    "addMembership": "添加会员资格",
+    "grant": "授予学分",
+    "statusConfirm": "这会更改用户的状态。",
+    "grantTitle": "授予学分 — {{name}}",
+    "pickOrg": "选择一个组织",
+    "noTeamsInOrg": "这个组织没有团队。",
+    "grantAmount": "授予学分（C；负扣除）",
+    "grantHint": "立即应用于个人信用余额并记录在审计日志中作为一次性调整。"
   },
   "clusters": {
     "title": "集群",
@@ -699,7 +740,12 @@
     "needRef": "输入图像参考",
     "webName": "频道名称（可选）",
     "extRegistered": "已注册外部图像",
-    "extFail": "注册外部图片失败"
+    "extFail": "注册外部图片失败",
+    "loading": "……",
+    "notCached": "未缓存",
+    "notFound": "未找到图像。",
+    "info": "图片信息",
+    "logsHint": "加载构建和扫描日志。"
   },
   "anotify": {
     "title": "通知",
@@ -886,7 +932,23 @@
     "brandAccentHint": "留空以使用主题颜色。",
     "brandAccent": "标志颜色",
     "leaseHead": "会议延期（先到先得）",
-    "brandingNote": "为您的组织自定义服务名称和徽标颜色。立即应用于登录和控制台标头。"
+    "brandingNote": "为您的组织自定义服务名称和徽标颜色。立即应用于登录和控制台标头。",
+    "carryoverOn": "结转未使用的积分",
+    "rechargeCarryover": "允许结转",
+    "rechargeSaved": "已保存补充设置。",
+    "carryoverOff": "每个周期到期",
+    "rechargeEnabled": "启用定期补充",
+    "brandSubtitle": "字幕",
+    "brandIcon": "图标",
+    "rechargeTitle": "定期信用充值（默认和限额）",
+    "rechargeInterval": "默认补充周期（天） · 较低级别的限制",
+    "brandIconClear": "消除",
+    "rechargeAmountHint": "在其详细信息页面上设置每个组织、每个团队和每个用户的补充金额、周期和结转。一个周期永远不会比它的父周期长。",
+    "brandIconTooBig": "图标必须为 120KB 或更小。",
+    "rechargeNote": "平台默认的充值周期和结转政策。组织、团队和个人可以选择较短的周期，但决不能选择较长的周期，当父母不允许结转时，低于其的未使用积分将在该边界到期。",
+    "brandSubtitleHint": "徽标旁边的小文字。留空以隐藏它。",
+    "brandIconUpload": "上传图标（可选）",
+    "brandIconUploadHint": "上传的图标优先于上面的 Lucide 图标。建议使用 120KB 以下的 PNG 或 SVG。"
   },
   "datasets": {
     "title": "数据集",
@@ -932,7 +994,40 @@
     "assignHint": "选择哪些节点缓存此数据集。它从 NFS 提取到节点本地以供立即使用。",
     "assignTitle": "缓存节点分配",
     "notCached": "未缓存",
-    "dlHint": "完成后，您可以在下面分配节点本地缓存。"
+    "dlHint": "完成后，您可以在下面分配节点本地缓存。",
+    "phaseCopy": "复印",
+    "descSaved": "说明已保存。",
+    "phaseExtract": "提取",
+    "notFound": "未找到数据集。",
+    "cacheFail": "缓存请求失败",
+    "info": "数据集信息",
+    "description": "描述",
+    "phaseDownload": "正在下载",
+    "sizeClass": "尺码等级",
+    "regNeedName": "输入数据集名称。",
+    "sizeClassSaved": "尺码类别已保存。",
+    "cache": "节点缓存",
+    "descPh": "描述这个数据集",
+    "regBusy": "注册…",
+    "regFail": "注册失败",
+    "registering": "注册",
+    "descFail": "无法保存描述",
+    "regRefresh": "刷新",
+    "regStarted": "注册开始 — 跟踪列表中的进度。",
+    "regNeedUrl": "输入 URL。",
+    "upTaken": "具有该名称的数据集已存在。",
+    "regNeedFile": "从收件箱中选择一个文件。",
+    "regNfsHint": "将存档（zip、tar、tar.gz）复制到以下路径，然后选择该文件进行注册。注册会将其移出收件箱并自动提取。",
+    "regSizeClass": "尺码等级",
+    "regUrlField": "下载地址",
+    "extracting": "正在提取...",
+    "regTitle": "注册数据集",
+    "upScope": "能见度",
+    "regUrl": "网址（wget）",
+    "regNfs": "NFS 副本 (SCP)",
+    "regInboxFile": "收件箱文件",
+    "regUrlHint": "服务器直接下载此 URL — 不会从您的浏览器上传任何内容。跟踪列表中的进度。",
+    "regInboxEmpty": "收件箱是空的。将文件复制到上面的路径，然后刷新。"
   },
   "announce": {
     "title": "公告",
@@ -1054,7 +1149,8 @@
     "globalNeedsValue": "所有四个全局限制必须至少为 1",
     "removeConfirm": "删除“{{name}}”策略会使其继承上述范围。继续？",
     "needTarget": "选择范围和目标",
-    "removed": "已删除“{{name}}”的政策"
+    "removed": "已删除“{{name}}”的政策",
+    "capHint": "允许的最大值 — GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · 卷 ≤ {{vol}}GiB · 并发会话 ≤ {{sess}}"
   },
   "roles": {
     "org_admin": "组织管理员",
@@ -1070,7 +1166,16 @@
     "inGroup": "分组管理",
     "subtitle": "标识符 {{name}} · 在此管理其组、用户和积分",
     "usersCapped": "显示 {{total}} 中的第一个 {{shown}}",
-    "usersHint": "角色是用户在其组中的角色。从该组的成员管理中更改它。"
+    "usersHint": "角色是用户在其组中的角色。从该组的成员管理中更改它。",
+    "recurringAmount": "每个周期学分",
+    "recurringInterval": "补充周期（天）",
+    "recurringCarryover": "结转",
+    "carryOn": "结转",
+    "carryOff": "到期",
+    "recurringTitle": "经常性学分",
+    "recurringSaved": "已保存经常性积分。",
+    "recurringNote": "每个周期按此数量重新填充组织池（0 禁用它）。",
+    "maxIntervalHint": "平台限制：{{n}}天或更短"
   },
   "gdetail": {
     "title": "团体",
@@ -1098,7 +1203,25 @@
     "moveFail": "移动失败",
     "moved": "将 {{name}} 移动到 {{group}}",
     "needTarget": "选择目标群体",
-    "moveHint": "这个角色继续存在。在此组中分配的信用不会，并且使用历史记录保留在该组中。"
+    "moveHint": "这个角色继续存在。在此组中分配的信用不会，并且使用历史记录保留在该组中。",
+    "refillCol": "定期补充",
+    "refillSaved": "已保存定期补充。",
+    "memberRefillSaved": "已保存定期补充",
+    "refillFail": "充值失败",
+    "refilledNow": "立即补充：+{{n}} C",
+    "refillNow": "立即补充",
+    "refillMenu": "补充装",
+    "refillCarryover": "结转未使用的积分",
+    "refillInheritPh": "遗传",
+    "refillTitle": "团队定期补充",
+    "noRecurring": "未设置重复充值金额",
+    "nextRefill": "下次补充",
+    "noRecurringShort": "无重复补充",
+    "memberRefillSet": "设置定期补充",
+    "memberRefillTitle": "定期补充 — {{name}}",
+    "refillAmount": "经常性补充量 (C)",
+    "refillInterval": "周期（天）——团队默认留空",
+    "memberRefillHint": "这笔金额每个周期都会存入会员的钱包中。使用“立即充值”立即付款。"
   },
   "picker": {
     "allOrgs": "所有组织",
@@ -1125,5 +1248,8 @@
   "brand": "Giosk 控制台",
   "confirmTerminate": "强制终止此会话？正在运行的工作立即停止。",
   "confirmDelete": "删除这个？此操作无法撤消。",
-  "confirmRemoveMember": "将此成员从群组中删除吗？"
+  "confirmRemoveMember": "将此成员从群组中删除吗？",
+  "paged": {
+    "range": "{{total}} 的 {{from}}–{{to}}"
+  }
 }

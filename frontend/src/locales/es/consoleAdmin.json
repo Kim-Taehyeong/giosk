@@ -53,7 +53,8 @@
     "create": "Crear",
     "advanced": "Más configuraciones",
     "search": "Buscar",
-    "optional": "(opcional)"
+    "optional": "(opcional)",
+    "prev": "Anterior"
   },
   "dash": {
     "title": "Panel",
@@ -197,7 +198,10 @@
     "advBelong": "Membresía · rol · contraseña",
     "groupPh": "Seleccionar grupo",
     "totalN": "Usuarios de {{n}}",
-    "colMemberRole": "Rol de organización/equipo"
+    "colMemberRole": "Rol de organización/equipo",
+    "colRefill": "Recarga recurrente",
+    "colBalance": "Saldo actual",
+    "refillDefault": "Por defecto"
   },
   "groups": {
     "title": "Grupos",
@@ -248,7 +252,18 @@
     "grantHintOrg": "Deducido del grupo de su organización y agregado al grupo de este grupo. No se puede exceder el saldo del grupo de organización.",
     "adminUnknown": "Cuenta de administrador del equipo no encontrada",
     "adminRequired": "Ingrese a la cuenta de administrador del equipo",
-    "insufficientOrgPool": "Saldo insuficiente del fondo de crédito de la organización."
+    "insufficientOrgPool": "Saldo insuficiente del fondo de crédito de la organización.",
+    "colRefill": "Recarga recurrente",
+    "deleteFail": "Error al eliminar",
+    "refillInterval": "Ciclo de recarga (días)",
+    "refillDefault": "Por defecto",
+    "initCredit": "Créditos iniciales y recarga recurrente",
+    "carryover": "Transferir créditos no utilizados",
+    "hasMembers": "Este equipo todavía tiene miembros. Muévelos o elimínalos antes de eliminarlo.",
+    "initCreditAmt": "Créditos iniciales",
+    "cantDeleteDefault": "El equipo predeterminado no se puede eliminar.",
+    "refillAmt": "Recarga recurrente (por ciclo)",
+    "initCreditHint": "Opcionalmente, asigne desde el grupo de organizaciones y establezca una recarga al crear el equipo. También puedes hacer esto más adelante en la página de detalles del equipo."
   },
   "orgs": {
     "title": "Organizaciones",
@@ -292,7 +307,11 @@
     "adminOpt": "Administrador de organización (opcional)",
     "bulkDone": "Organizaciones {{n}} agregadas de forma masiva",
     "adminUnknown": "No se encontró la cuenta de administrador de la organización",
-    "adminHintOpt": "Déjelo vacío para crear solo el grupo 'General' y asignar un administrador más tarde, desde Detalles de la organización → General → Agregar miembro con la función de administrador de la organización."
+    "adminHintOpt": "Déjelo vacío para crear solo el grupo 'General' y asignar un administrador más tarde, desde Detalles de la organización → General → Agregar miembro con la función de administrador de la organización.",
+    "deleteFail": "Error al eliminar",
+    "colRefill": "Recarga recurrente",
+    "refillDefault": "Por defecto",
+    "hasUsers": "Esta organización todavía tiene usuarios. Muévelos o elimínalos antes de eliminarlo."
   },
   "billing": {
     "title": "Facturación",
@@ -318,7 +337,12 @@
     "tabGroup": "Por grupo",
     "tabOrg": "Por organización",
     "byGroup": "Consumo por grupo (showback)",
-    "vsAlloc": "vs asignación"
+    "vsAlloc": "vs asignación",
+    "periodMonth": "este mes",
+    "periodLastMonth": "Mes pasado",
+    "period7d": "últimos 7 días",
+    "periodAll": "Todo el tiempo",
+    "periodNote": "El consumo y las horas de GPU que se muestran son lo que ocurrió en el período seleccionado, según el libro mayor. Los presupuestos y los grupos no tienen un alcance de período."
   },
   "audit": {
     "title": "Registro de auditoría",
@@ -476,7 +500,10 @@
     "impDone": "Volumen importado {{name}} a {{user}}.",
     "impOwnerHint": "Elija una cuenta de la lista para importar.",
     "impOwnerPicked": "Seleccionado: {{name}} ({{id}})",
-    "metricsOffNotice": "La monitorización (DCGM/Prometheus) no está instalada, por lo que no se pueden mostrar el uso de GPU ni la VRAM. Active la monitorización para ver métricas en vivo."
+    "metricsOffNotice": "La monitorización (DCGM/Prometheus) no está instalada, por lo que no se pueden mostrar el uso de GPU ni la VRAM. Active la monitorización para ver métricas en vivo.",
+    "cordon": "Cordón",
+    "uncordon": "sincordón",
+    "noMetrics": "Sin métricas"
   },
   "mset": {
     "title": "Ajustes",
@@ -599,7 +626,21 @@
     "pickGroup": "Elige un grupo",
     "removeConfirm": "Eliminar este usuario de {{group}}.",
     "noMembership": "No es miembro de ningún grupo.",
-    "removeTitle": "Eliminar del grupo"
+    "removeTitle": "Eliminar del grupo",
+    "addFail": "No se pudo agregar",
+    "memberAdded": "Membresía agregada.",
+    "granted": "Concedido {{n}} C",
+    "grantFail": "La subvención falló",
+    "restore": "Restaurar",
+    "suspend": "Suspender",
+    "statusConfirm": "Esto cambia el estado del usuario.",
+    "grantHint": "Se aplica al saldo de crédito personal de forma inmediata y se registra en el registro de auditoría como un ajuste único.",
+    "addMembership": "Agregar membresía",
+    "pickOrg": "Seleccione una organización",
+    "grantAmount": "Créditos a conceder (C; deducciones negativas)",
+    "noTeamsInOrg": "Esta organización no tiene equipos.",
+    "grant": "Conceder créditos",
+    "grantTitle": "Conceder créditos — {{name}}"
   },
   "clusters": {
     "title": "Clústeres",
@@ -699,7 +740,12 @@
     "webName": "Nombre del canal (opcional)",
     "extSshOnly": "Sin VSCode/Jupyter/puerto personalizado, las sesiones en esta imagen son solo SSH.",
     "extFail": "No se pudo registrar la imagen externa",
-    "extRegistered": "Imagen externa registrada"
+    "extRegistered": "Imagen externa registrada",
+    "loading": "…",
+    "notFound": "Imagen no encontrada.",
+    "notCached": "No almacenado en caché",
+    "logsHint": "Carga registros de compilación y escaneo.",
+    "info": "Información de la imagen"
   },
   "anotify": {
     "title": "Notificaciones",
@@ -886,7 +932,23 @@
     "leaseHead": "Extensión de sesión (por orden de llegada)",
     "brandAccentHint": "Déjelo vacío para usar el color del tema.",
     "lockConcurrency": "Sesiones simultáneas",
-    "brandingNote": "Personalice el nombre del servicio y el color del logotipo de su organización. Se aplica instantáneamente al inicio de sesión y al encabezado de la consola."
+    "brandingNote": "Personalice el nombre del servicio y el color del logotipo de su organización. Se aplica instantáneamente al inicio de sesión y al encabezado de la consola.",
+    "rechargeEnabled": "Habilitar recarga recurrente",
+    "carryoverOn": "Transferir créditos no utilizados",
+    "rechargeTitle": "Recarga de crédito recurrente (predeterminado y límite)",
+    "brandSubtitle": "Subtitular",
+    "rechargeCarryover": "Permitir transferencia",
+    "rechargeSaved": "Configuración de recarga guardada.",
+    "carryoverOff": "Caducar cada ciclo",
+    "brandIcon": "Icono",
+    "brandIconClear": "Eliminar",
+    "rechargeInterval": "Ciclo de recarga predeterminado (días) · límite para niveles inferiores",
+    "brandIconUpload": "Sube un ícono (opcional)",
+    "rechargeNote": "El ciclo de recarga predeterminado y la política de transferencia de la plataforma. Las organizaciones, equipos e individuos pueden elegir un ciclo más corto pero nunca uno más largo, y cuando un padre no permite el traspaso, los créditos no utilizados por debajo de él caducan en ese límite.",
+    "rechargeAmountHint": "Establezca cantidades de recarga, ciclos y remanentes por organización, por equipo y por usuario en sus páginas de detalles. Un ciclo nunca puede ser más largo que el de sus padres.",
+    "brandIconTooBig": "El icono debe tener 120 KB o menos.",
+    "brandIconUploadHint": "Un ícono cargado tiene prioridad sobre el ícono de Lucide arriba. Se recomienda PNG o SVG de menos de 120 KB.",
+    "brandSubtitleHint": "Pequeño texto al lado del logo. Déjelo vacío para ocultarlo."
   },
   "datasets": {
     "title": "Conjuntos de datos",
@@ -932,7 +994,40 @@
     "notCached": "No almacenado en caché",
     "dlInto": "Cargando en /dataset/{{name}}",
     "dlHint": "Una vez completado, puede asignar cachés locales de nodo a continuación.",
-    "assignHint": "Elija qué nodos almacenan en caché este conjunto de datos. Se extrae de NFS al nodo local para su uso inmediato."
+    "assignHint": "Elija qué nodos almacenan en caché este conjunto de datos. Se extrae de NFS al nodo local para su uso inmediato.",
+    "phaseCopy": "Proceso de copiar",
+    "phaseDownload": "Descargando",
+    "descSaved": "Descripción guardada.",
+    "notFound": "Conjunto de datos no encontrado.",
+    "description": "Descripción",
+    "descFail": "No se pudo guardar la descripción",
+    "info": "Información del conjunto de datos",
+    "phaseExtract": "Extrayendo",
+    "cacheFail": "Error en la solicitud de caché",
+    "regFail": "Registro fallido",
+    "regNeedFile": "Seleccione un archivo de la bandeja de entrada.",
+    "regNeedName": "Introduzca un nombre de conjunto de datos.",
+    "sizeClassSaved": "Clase de talla guardada.",
+    "regBusy": "Registrándose…",
+    "regNeedUrl": "Introduzca una URL.",
+    "regStarted": "Registro iniciado: realice un seguimiento del progreso en la lista.",
+    "regUrl": "URL (wget)",
+    "regNfs": "Copia NFS (SCP)",
+    "regTitle": "Registrar conjunto de datos",
+    "extracting": "Extrayendo…",
+    "regRefresh": "Refrescar",
+    "upTaken": "Ya existe un conjunto de datos con ese nombre.",
+    "sizeClass": "Clase de tamaño",
+    "regSizeClass": "Clase de tamaño",
+    "cache": "Caché de nodo",
+    "descPh": "Describe este conjunto de datos",
+    "registering": "Registrarse",
+    "upScope": "Visibilidad",
+    "regUrlField": "Descargar URL",
+    "regNfsHint": "Copie un archivo (zip, tar, tar.gz) en la ruta siguiente, luego elija el archivo para registrarlo. El registro lo saca de la bandeja de entrada y lo extrae automáticamente.",
+    "regInboxEmpty": "La bandeja de entrada está vacía. Copie un archivo en la ruta anterior y luego actualice.",
+    "regInboxFile": "archivo de bandeja de entrada",
+    "regUrlHint": "El servidor descarga esta URL directamente; no se carga nada desde su navegador. Realice un seguimiento del progreso en la lista."
   },
   "announce": {
     "title": "Anuncios",
@@ -1054,7 +1149,8 @@
     "searchUser": "Buscar usuario",
     "globalNeedsValue": "Los cuatro límites globales deben ser al menos 1",
     "needTarget": "Elija un alcance y un objetivo",
-    "removed": "Política eliminada para '{{name}}'"
+    "removed": "Política eliminada para '{{name}}'",
+    "capHint": "Máximo permitido: GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · volumen ≤ {{vol}}GiB · sesiones simultáneas ≤ {{sess}}"
   },
   "roles": {
     "org_admin": "Administrador de organización",
@@ -1070,7 +1166,16 @@
     "usersCapped": "mostrando el primer {{shown}} de {{total}}",
     "inGroup": "Administrar en grupo",
     "subtitle": "Identificador {{name}} · gestiona aquí sus grupos, usuarios y créditos",
-    "usersHint": "Rol es el rol del usuario dentro de su grupo. Cámbielo desde la administración de miembros de ese grupo."
+    "usersHint": "Rol es el rol del usuario dentro de su grupo. Cámbielo desde la administración de miembros de ese grupo.",
+    "recurringAmount": "Créditos por ciclo",
+    "recurringInterval": "Ciclo de recarga (días)",
+    "recurringCarryover": "Continuar",
+    "carryOn": "Continuar",
+    "carryOff": "Expirar",
+    "maxIntervalHint": "Límite de plataforma: {{n}} días o menos",
+    "recurringNote": "Recarga el fondo de la organización con esta cantidad en cada ciclo (0 lo desactiva).",
+    "recurringSaved": "Créditos recurrentes guardados.",
+    "recurringTitle": "Créditos recurrentes"
   },
   "gdetail": {
     "title": "Grupo",
@@ -1098,7 +1203,25 @@
     "moved": "Se movió {{name}} a {{group}}",
     "removed": "Eliminado {{name}}",
     "moveTitle": "Mover grupo — {{name}}",
-    "moveHint": "El papel se traslada. El crédito asignado en este grupo no lo hace y el historial de uso permanece en este grupo."
+    "moveHint": "El papel se traslada. El crédito asignado en este grupo no lo hace y el historial de uso permanece en este grupo.",
+    "refillCol": "Recarga recurrente",
+    "noRecurring": "No se establece ningún monto de recarga recurrente",
+    "refillMenu": "Rellenar",
+    "memberRefillSaved": "Recarga recurrente guardada",
+    "refillFail": "Error de recarga",
+    "refilledNow": "Recargado ahora: +{{n}} C",
+    "refillSaved": "Recarga recurrente guardada.",
+    "refillCarryover": "Transferir créditos no utilizados",
+    "refillNow": "Recarga ahora",
+    "noRecurringShort": "Sin recarga recurrente",
+    "refillTitle": "Recarga recurrente del equipo",
+    "nextRefill": "Próxima recarga",
+    "memberRefillSet": "Establecer recarga recurrente",
+    "memberRefillTitle": "Recarga recurrente — {{name}}",
+    "refillInheritPh": "Heredado",
+    "refillInterval": "Ciclo (días): déjelo vacío para el valor predeterminado del equipo.",
+    "refillAmount": "Monto de recarga recurrente (C)",
+    "memberRefillHint": "Este monto se paga en la billetera del miembro en cada ciclo. Utilice \"Recargar ahora\" para pagarlo inmediatamente."
   },
   "picker": {
     "allOrgs": "Todas las organizaciones",
@@ -1125,5 +1248,8 @@
   "brand": "Consola Giosk",
   "confirmTerminate": "¿Forzar la finalización de esta sesión? El trabajo en marcha se detiene inmediatamente.",
   "confirmDelete": "¿Eliminar esto? Esto no se puede deshacer.",
-  "confirmRemoveMember": "¿Quitar a este miembro del grupo?"
+  "confirmRemoveMember": "¿Quitar a este miembro del grupo?",
+  "paged": {
+    "range": "{{from}}–{{to}} de {{total}}"
+  }
 }

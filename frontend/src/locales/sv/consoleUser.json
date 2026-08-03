@@ -156,7 +156,11 @@
     "kpiMaxLease": "Max hyra",
     "kpiEta": "Tar slut",
     "gpuAvail": "GPU tillgänglig",
-    "kpiNodes": "Tillgängliga noder"
+    "kpiNodes": "Tillgängliga noder",
+    "slots": "Slots",
+    "hamiShared": "HAMi fraktionerad",
+    "hamiFractional": "Bråkdel (med VRAM och kärnor)",
+    "exclusiveWhole": "Dedikerad (helt kort)"
   },
   "newSession": {
     "crumb": "Sessioner",
@@ -310,7 +314,8 @@
     "guaranteed": "Garanterade resurser",
     "tsSlotN": "1 av {{n}}-platser",
     "runtimeLeft": "Körtid i denna takt",
-    "sshKeyChange": "Ändra"
+    "sshKeyChange": "Ändra",
+    "sshCacheCount": "{{n}} cachad"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "sshProxy": "Proxy (gateway)",
     "regenerated": "Utfärdat en ny åtkomstlänk.",
     "sshNeedKey": "Ingen offentlig SSH-nyckel registrerad",
-    "sshNeedKeyHint": "Registrera eller generera en nedan – körande sessioner tar den direkt."
+    "sshNeedKeyHint": "Registrera eller generera en nedan – körande sessioner tar den direkt.",
+    "webConnectNewWindow": "Öppnar en webbläsarterminal i ett nytt fönster — ingen SSH-nyckel eller kommando behövs."
   },
   "account": {
     "title": "Mina inställningar",
@@ -464,7 +470,8 @@
     "sshGenerate": "Generera och ladda ner nyckel",
     "sshGenerated": "Nyckel genererad. Förvara den nedladdade privata nyckeln säkert – den kan inte laddas ner igen.",
     "sshGenFail": "Det gick inte att generera en SSH-nyckel.",
-    "sshGenerateHint": "Ingen nyckel än? Klicka på ”Generera och ladda ner nyckel”. Den privata nyckeln (.pem) laddas ner en gång och den offentliga registreras automatiskt. Anslut med: ssh -i nedladdad-nyckel.pem …"
+    "sshGenerateHint": "Ingen nyckel än? Klicka på ”Generera och ladda ner nyckel”. Den privata nyckeln (.pem) laddas ner en gång och den offentliga registreras automatiskt. Anslut med: ssh -i nedladdad-nyckel.pem …",
+    "activeScope": "Aktiv"
   },
   "notify": {
     "title": "Aviseringar",
@@ -493,7 +500,19 @@
     "mIdle": "Session inaktiv tid",
     "sev_info": "Info",
     "sev_err": "Fel",
-    "sev_warn": "Varning"
+    "sev_warn": "Varning",
+    "inboxTitle": "Inkorg",
+    "mSessCpu": "Session CPU-användning",
+    "readAll": "Markera allt som läst",
+    "prev": "Tidigare",
+    "next": "Nästa",
+    "mSessGpu": "Session GPU-användning",
+    "mSessVram": "Session VRAM-användning",
+    "rulesHint": "Varningsregler och aviseringar är per konto och delas mellan alla team. Sessionsmätvärden utvärderas på den valda sessionen.",
+    "selectSession": "Välj en session",
+    "scopeAccount": "Hela kontot",
+    "noSession": "Inga löppass",
+    "inboxEmpty": "Inga aviseringar än."
   },
   "wallet": {
     "title": "Plånbok / Krediter",
@@ -535,7 +554,15 @@
     "topupTitle": "Begär kreditpåfyllning",
     "topupSend": "Skicka förfrågan",
     "desc_storage": "Lagring ({{ref}})",
-    "desc_gpu": "GPU-användning ({{ref}})"
+    "desc_gpu": "GPU-användning ({{ref}})",
+    "nextRecharge": "Nästa påfyllning",
+    "rechargeSoon": "Snart",
+    "session": "Session",
+    "consumedCol": "Förbrukad",
+    "rechargeEvery": "Varje {{n}}-dag",
+    "viewAll": "Alla poster",
+    "viewBySession": "Grupp för session",
+    "searchPh": "Sök sessioner, typer, detaljer"
   },
   "volume": {
     "title": "Data / Volymer",
@@ -596,7 +623,16 @@
     "afterUse": "Används efter",
     "afterRemain": "Lämnade efter",
     "remain": "{{n}} GB kvar",
-    "overQuota": "Överskrider återstående kvot ({{remain}} GB)"
+    "overQuota": "Överskrider återstående kvot ({{remain}} GB)",
+    "teamFail": "Kunde inte byta lag",
+    "personal": "Personlig",
+    "teamQuota": "Överskrider mållagets volymkvot",
+    "sharedBy": "Delas av",
+    "teamHome": "Faktureras till teamet",
+    "changeTeam": "Byt lag",
+    "teamHint": "Denna volyms kapacitetskvot och lagringskrediter kommer från det valda teamet. Du förblir ägare.",
+    "teamChanged": "Laget bytte",
+    "changeTeamTitle": "Byt team — {{name}}"
   },
   "gmembers": {
     "title": "Medlemmar",

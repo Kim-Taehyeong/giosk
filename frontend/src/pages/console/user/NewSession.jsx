@@ -18,6 +18,7 @@ import { c } from '../../../lib/credit';
 import { useAuth } from '../../../context/AuthContext';
 import { useConsole } from '../../../context/ConsoleContext';
 import { apiPut } from '../../../api/client';
+import { clickable } from '../../../utils/a11y';
 
 // SshKeyField는 위저드의 SSH 공개키 입력. 계정에 이미 등록돼 있으면 긴 키를 다시 보여주지 않고
 // 한 줄 요약 + "변경"만 노출한다(매번 빈 칸처럼 보이는 큰 상자가 뜨지 않게).
@@ -40,8 +41,8 @@ function SshKeyField({ t, registered, value, onChange }) {
   }
   return (
     <>
-      <label className="fld">{t('newSession.sshKey')}</label>
-      <textarea value={value} onChange={(e) => onChange(e.target.value)} placeholder="ssh-ed25519 AAAA..." style={{ minHeight: 70 }} />
+      <label className="fld" htmlFor="user-newsession-fld-0">{t('newSession.sshKey')}</label>
+      <textarea id="user-newsession-fld-0" value={value} onChange={(e) => onChange(e.target.value)} placeholder="ssh-ed25519 AAAA..." style={{ minHeight: 70 }} />
     </>
   );
 }
@@ -95,7 +96,7 @@ const guaranteeOf = (gt, mode, opts) => {
 
 function SelBox({ on, onClick, disabled, children }) {
   return (
-    <div className={`selbox${on ? ' on' : ''}`} onClick={disabled ? undefined : onClick}
+    <div className={`selbox${on ? ' on' : ''}`} {...clickable(disabled ? undefined : onClick)}
       style={{ padding: 18, borderRadius: 12, cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.55 : 1,
         border: '2px solid ' + (on ? 'var(--primary)' : 'var(--border)'),
         background: on ? 'var(--primary-soft)' : 'var(--surface)' }}>
@@ -122,7 +123,7 @@ function DatasetRow({ t, d, selectable, on, onClick }) {
   const sizeText = d.sizeBytes ? formatBytes(d.sizeBytes) : `${d.sizeGb || 0} GB`;
   const meta = [sizeText, d.sizeClass, d.hash && `#${d.hash}`, d.owner, d.format, d.files, d.updatedAt && t('newSession.dsUpdatedAt', { d: d.updatedAt })].filter(Boolean);
   return (
-    <div onClick={onClick}
+    <div {...clickable(onClick)}
       style={{ display: 'flex', gap: 11, alignItems: 'flex-start', padding: '10px 12px', borderRadius: 10,
         cursor: selectable ? 'pointer' : 'default', background: 'var(--surface-2)',
         border: '1.5px solid ' + (on ? 'var(--primary)' : 'var(--border)'),
@@ -155,7 +156,7 @@ function StepSidebar({ steps, step, maxReached, summary, onGoto, labels }) {
       {steps.map((s, i) => {
         const reachable = i <= maxReached;
         return (
-          <div key={i} onClick={() => reachable && onGoto(i)} className="selbox"
+          <div key={i} {...clickable(reachable ? () => onGoto(i) : undefined)} className="selbox"
             style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: 16, borderRadius: 12,
               border: '2px solid ' + (i === step ? 'var(--primary)' : 'var(--border)'),
               background: i === step ? 'var(--primary-soft)' : 'var(--surface)',
@@ -510,7 +511,7 @@ export default function NewSession() {
               const on = env === b.key;
               const BIcon = b.icon;
               return (
-                <div key={b.key} className={`selbox${on ? ' on' : ''}`} onClick={() => setEnv(b.key)}
+                <div key={b.key} className={`selbox${on ? ' on' : ''}`} {...clickable(() => setEnv(b.key))}
                   style={{ padding: 14, borderRadius: 12, cursor: 'pointer',
                     border: '2px solid ' + (on ? 'var(--primary)' : 'var(--border)'),
                     background: on ? 'var(--primary-soft)' : 'var(--surface)' }}>
@@ -655,7 +656,7 @@ export default function NewSession() {
                             const on = offeringId === o.id;
                             const cuda = cudaOfType(o.gpuType);
                             return (
-                              <div key={o.id} onClick={un ? undefined : () => pickShared(o)}
+                              <div key={o.id} {...clickable(un ? undefined : () => pickShared(o))} aria-pressed={on}
                                 style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 14px', borderRadius: 10,
                                   cursor: un ? 'not-allowed' : 'pointer', opacity: un ? 0.55 : 1,
                                   border: '1.5px solid ' + (on ? 'var(--primary)' : 'var(--border)'),
@@ -731,8 +732,8 @@ export default function NewSession() {
             {step === 4 && (
               <div>
                 <h3>{t('newSession.reviewStart')}</h3>
-                <label className="fld" style={{ marginTop: 0 }}>{t('newSession.sessionName')}</label>
-                <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="my-train" />
+                <label className="fld" htmlFor="user-newsession-fld-1" style={{ marginTop: 0 }}>{t('newSession.sessionName')}</label>
+                <input id="user-newsession-fld-1" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="my-train" />
                 <SshKeyField t={t} registered={user?.sshPublicKey} value={sshKey} onChange={setSshKey} />
 
                 {wtype !== 'cpu' && config.features.datasets && (
@@ -833,8 +834,8 @@ function VolumePicker({ t, vols, selVols, toggleVol, setMount, localHomeNode, se
                   </div>
                   {sel && (
                     <div className="mt" onClick={(e) => e.stopPropagation()}>
-                      <label className="fld" style={{ marginTop: 0, display: 'flex', alignItems: 'center', gap: 6 }}><FolderInput size={13} /> {t('newSession.mountPath')}</label>
-                      <input type="text" value={sel.mountPath} onChange={(e) => setMount(v.id, e.target.value)} placeholder="/data/dataset" />
+                      <label className="fld" htmlFor="user-newsession-fld-2" style={{ marginTop: 0, display: 'flex', alignItems: 'center', gap: 6 }}><FolderInput size={13} /> {t('newSession.mountPath')}</label>
+                      <input id="user-newsession-fld-2" type="text" value={sel.mountPath} onChange={(e) => setMount(v.id, e.target.value)} placeholder="/data/dataset" />
                     </div>
                   )}
                 </SelBox>
@@ -865,7 +866,7 @@ function DatasetNodePicker({ t, nodes, selGpuType, selNode, setSelNode }) {
         <div className="mt">
           <div className="legend mb">{t('newSession.dsAdvHint')}</div>
           <div className="grid" style={{ gap: 10 }}>
-            <div className={`selbox${selNode === 'auto' ? ' on' : ''}`} onClick={() => pickNode('auto')}
+            <div className={`selbox${selNode === 'auto' ? ' on' : ''}`} {...clickable(() => pickNode('auto'))}
               style={{ padding: 12, borderRadius: 10, cursor: 'pointer',
                 border: '2px solid ' + (selNode === 'auto' ? 'var(--primary)' : 'var(--border)'),
                 background: selNode === 'auto' ? 'var(--primary-soft)' : 'var(--surface)' }}>
@@ -875,7 +876,7 @@ function DatasetNodePicker({ t, nodes, selGpuType, selNode, setSelNode }) {
             {matched.map((n) => {
               const on = selNode === n.node;
               return (
-                <div key={n.node} className={`selbox${on ? ' on' : ''}`} onClick={() => pickNode(n.node)}
+                <div key={n.node} className={`selbox${on ? ' on' : ''}`} {...clickable(() => pickNode(n.node))}
                   style={{ padding: 12, borderRadius: 10, cursor: 'pointer',
                     border: '2px solid ' + (on ? 'var(--primary)' : 'var(--border)'),
                     background: on ? 'var(--primary-soft)' : 'var(--surface)' }}>
@@ -970,7 +971,7 @@ function SSHWizard({ t, navigate, toast, nodes, vols, labels }) {
                   const on = sel === n.node;
                   const dsBytes = (n.cached || []).reduce((a, d) => a + (d.sizeBytes || 0), 0);
                   return (
-                    <div key={n.node} className={`selbox${on ? ' on' : ''}`} onClick={() => setSel(n.node)}
+                    <div key={n.node} className={`selbox${on ? ' on' : ''}`} {...clickable(() => setSel(n.node))}
                       style={{ padding: 14, borderRadius: 12, cursor: 'pointer',
                         border: '2px solid ' + (on ? 'var(--primary)' : 'var(--border)'),
                         background: on ? 'var(--primary-soft)' : 'var(--surface)' }}>
@@ -1013,8 +1014,8 @@ function SSHWizard({ t, navigate, toast, nodes, vols, labels }) {
           {step === 2 && (
             <div>
               <h3>{t('newSession.reviewStart')}</h3>
-              <label className="fld" style={{ marginTop: 0 }}>{t('newSession.sessionName')}</label>
-              <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="ssh-session" />
+              <label className="fld" htmlFor="user-newsession-fld-3" style={{ marginTop: 0 }}>{t('newSession.sessionName')}</label>
+              <input id="user-newsession-fld-3" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="ssh-session" />
               <SshKeyField t={t} registered={user?.sshPublicKey} value={sshKey} onChange={setSshKey} />
               <div className="cost-box mt">
                 <div className="row"><span>{t('newSession.sshNodeLabel')}</span><span>{sel || '—'}</span></div>

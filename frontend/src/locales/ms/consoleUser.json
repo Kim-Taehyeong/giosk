@@ -156,7 +156,11 @@
     "nodeAvail": "Ketersediaan per-nod",
     "kpiMaxLease": "Pajakan maksimum",
     "kpiNodes": "Nod yang tersedia",
-    "kpiFree": "Percuma (tidak terhad)"
+    "kpiFree": "Percuma (tidak terhad)",
+    "slots": "Slot",
+    "hamiShared": "pecahan HAMi",
+    "exclusiveWhole": "Dedicated (seluruh kad)",
+    "hamiFractional": "Pecahan (oleh VRAM dan teras)"
   },
   "newSession": {
     "crumb": "Sesi",
@@ -310,7 +314,8 @@
     "hoursApprox": "~{{n}} jam",
     "runtimeLeft": "Masa tayangan pada kadar ini",
     "guaranteeCpu": "{{n}} vCPU dijamin",
-    "sshKeyChange": "Tukar"
+    "sshKeyChange": "Tukar",
+    "sshCacheCount": "{{n}} dicache"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "sshDirectHint": "Menyambung terus ke nod dengan kunci awam berdaftar anda (rangkaian kampus / VPN diperlukan).",
     "sshUnavailable": "SSH tidak tersedia untuk sesi ini (pentadbir mesti mendayakan bekas SSH).",
     "sshNeedKey": "Tiada kunci awam SSH didaftarkan",
-    "sshNeedKeyHint": "Daftar atau jana satu di bawah — sesi yang sedang berjalan menerimanya serta-merta."
+    "sshNeedKeyHint": "Daftar atau jana satu di bawah — sesi yang sedang berjalan menerimanya serta-merta.",
+    "webConnectNewWindow": "Membuka terminal penyemak imbas dalam tetingkap baharu — tiada kunci atau arahan SSH diperlukan."
   },
   "account": {
     "title": "Tetapan Saya",
@@ -464,7 +470,8 @@
     "sshGenerate": "Jana & muat turun kunci",
     "sshGenerated": "Kunci dijana. Simpan kunci persendirian yang dimuat turun dengan selamat — ia tidak boleh dimuat turun semula.",
     "sshGenFail": "Gagal menjana kunci SSH.",
-    "sshGenerateHint": "Belum ada kunci? Klik “Jana & muat turun kunci”. Kunci persendirian (.pem) dimuat turun sekali sahaja dan kunci awam didaftarkan secara automatik. Sambungan: ssh -i kunci-dimuat-turun.pem …"
+    "sshGenerateHint": "Belum ada kunci? Klik “Jana & muat turun kunci”. Kunci persendirian (.pem) dimuat turun sekali sahaja dan kunci awam didaftarkan secara automatik. Sambungan: ssh -i kunci-dimuat-turun.pem …",
+    "activeScope": "Aktif"
   },
   "notify": {
     "title": "Pemberitahuan",
@@ -493,7 +500,19 @@
     "mIdle": "Masa melahu sesi",
     "sev_info": "info",
     "sev_err": "ralat",
-    "sev_warn": "Amaran"
+    "sev_warn": "Amaran",
+    "inboxTitle": "Peti masuk",
+    "prev": "Sebelumnya",
+    "next": "Seterusnya",
+    "mSessVram": "Penggunaan VRAM sesi",
+    "mSessCpu": "Penggunaan CPU sesi",
+    "mSessGpu": "Penggunaan GPU sesi",
+    "readAll": "Tandakan semua sudah dibaca",
+    "scopeAccount": "Seluruh akaun",
+    "inboxEmpty": "Tiada pemberitahuan lagi.",
+    "selectSession": "Pilih sesi",
+    "noSession": "Tiada sesi berjalan",
+    "rulesHint": "Peraturan dan pemberitahuan makluman adalah untuk setiap akaun dan dikongsi merentas semua pasukan. Metrik sesi dinilai pada sesi yang dipilih."
   },
   "wallet": {
     "title": "Dompet / Kredit",
@@ -535,7 +554,15 @@
     "topupNote": "Dipohon selepas pentadbir kumpulan anda meluluskan (tiada bayaran sebenar)",
     "topupSent": "Permintaan dihantar (menunggu kelulusan pentadbir kumpulan)",
     "desc_storage": "Storan ({{ref}})",
-    "desc_gpu": "Penggunaan GPU ({{ref}})"
+    "desc_gpu": "Penggunaan GPU ({{ref}})",
+    "nextRecharge": "Isi semula seterusnya",
+    "consumedCol": "Dimakan",
+    "session": "Sesi",
+    "searchPh": "Sesi carian, jenis, butiran",
+    "rechargeEvery": "Setiap {{n}} hari",
+    "rechargeSoon": "Tak lama lagi",
+    "viewBySession": "Kumpulan mengikut sesi",
+    "viewAll": "Semua entri"
   },
   "volume": {
     "title": "Data / Jilid",
@@ -596,7 +623,16 @@
     "afterRemain": "Ditinggalkan selepas",
     "quota": "Kuota volum",
     "remain": "{{n}} GB kiri",
-    "quotaHint": "Had storan setiap pengguna untuk volum peribadi anda (bebas daripada kumpulan). Jilid baharu disekat apabila anda melebihinya."
+    "quotaHint": "Had storan setiap pengguna untuk volum peribadi anda (bebas daripada kumpulan). Jilid baharu disekat apabila anda melebihinya.",
+    "personal": "Peribadi",
+    "teamFail": "Tidak dapat menukar pasukan",
+    "teamHome": "Dibilkan kepada pasukan",
+    "teamChanged": "Pasukan bertukar",
+    "teamQuota": "Melebihi kuota volum pasukan sasaran",
+    "sharedBy": "Dikongsi oleh",
+    "changeTeam": "Tukar pasukan",
+    "changeTeamTitle": "Tukar pasukan — {{name}}",
+    "teamHint": "Kuota kapasiti volum ini dan kredit storan datang daripada pasukan yang dipilih. Anda tetap pemiliknya."
   },
   "gmembers": {
     "title": "ahli",

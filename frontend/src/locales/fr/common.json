@@ -67,7 +67,9 @@
       "errorTerms": "Vous devez accepter les conditions pour vous inscrire.",
       "errorGroup": "Vous devez sélectionner une organisation et un groupe.",
       "errorGeneric": "L'inscription a échoué.",
-      "errorPasswordMismatch": "Les mots de passe ne correspondent pas."
+      "errorPasswordMismatch": "Les mots de passe ne correspondent pas.",
+      "pwMismatch": "Les mots de passe ne correspondent pas",
+      "pwMatch": "Les mots de passe correspondent"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Nœuds {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "Nœuds {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "Nœuds {{up}}/{{total}} · GPU —",
+    "rolePlatformSub": "Super administrateur",
+    "rolePlatform": "Plateforme entière",
+    "unreadN": "{{n}} non lu",
+    "alerts": "Alertes",
+    "viewAll": "Tout afficher dans Centre de notifications",
+    "clusterStatus": "État du cluster",
+    "noAlerts": "Aucune alerte pour l'instant.",
+    "orgWhole": "Organisation entière",
+    "creditBalance": "Solde créditeur"
+  },
+  "table": {
+    "empty": "Aucune donnée"
+  },
+  "refill": {
+    "carryover": "Reporter",
+    "carryOn": "Reporter",
+    "carryOff": "Expirer",
+    "note": "Se recharge de ce montant à chaque cycle (0 le désactive). Le cycle ne peut pas être plus long que celui du parent et est automatiquement plafonné.",
+    "amount": "Crédits par cycle",
+    "title": "Recharge récurrente",
+    "interval": "Cycle de recharge (jours)",
+    "maxHint": "Limite du cycle parent : {{n}} jours ou moins"
+  },
+  "select": {
+    "placeholder": "Sélectionner",
+    "search": "Rechercher…",
+    "noMatch": "Aucune correspondance"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "L'équipe {{target}} est à court de crédits",
+      "teamBody": "Les crédits de l'équipe {{target}} sont à {{value}}, en dessous du seuil {{threshold}}. Les sessions dans cette équipe pourraient bientôt s’arrêter."
+    }
+  },
+  "close": "Fermer"
 }

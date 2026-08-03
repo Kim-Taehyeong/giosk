@@ -156,7 +156,11 @@
     "kpiNodes": "Tilgængelige noder",
     "kpiFree": "Gratis (ubegrænset)",
     "kpiCooldown": "Prøv nedkøling igen",
-    "kpiMaxLease": "Max lejemål"
+    "kpiMaxLease": "Max lejemål",
+    "slots": "Slots",
+    "exclusiveWhole": "Dedikeret (helt kort)",
+    "hamiFractional": "Fraktionel (ved VRAM og kerner)",
+    "hamiShared": "HAMi fraktioneret"
   },
   "newSession": {
     "crumb": "Sessioner",
@@ -310,7 +314,8 @@
     "notEnough": "Ikke nok kredit - 1 time minimum påkrævet",
     "hoursApprox": "~{{n}} timer",
     "runtimeLeft": "Kørselstid med denne hastighed",
-    "sshKeyChange": "Skift"
+    "sshKeyChange": "Skift",
+    "sshCacheCount": "{{n}} cachelagret"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "sshDirect": "Direkte (intranet)",
     "regenerated": "Udstedt et nyt adgangslink.",
     "sshNeedKey": "Ingen offentlig SSH-nøgle registreret",
-    "sshNeedKeyHint": "Registrér eller generér en nedenfor – kørende sessioner tager den med det samme."
+    "sshNeedKeyHint": "Registrér eller generér en nedenfor – kørende sessioner tager den med det samme.",
+    "webConnectNewWindow": "Åbner en browserterminal i et nyt vindue - ingen SSH-nøgle eller kommando nødvendig."
   },
   "account": {
     "title": "Mine indstillinger",
@@ -464,7 +470,8 @@
     "sshGenerate": "Generér og hent nøgle",
     "sshGenerated": "Nøgle genereret. Opbevar den hentede private nøgle sikkert – den kan ikke hentes igen.",
     "sshGenFail": "SSH-nøglen kunne ikke genereres.",
-    "sshGenerateHint": "Ingen nøgle endnu? Klik på ”Generér og hent nøgle”. Den private nøgle (.pem) hentes én gang, og den offentlige registreres automatisk. Forbind med: ssh -i hentet-noegle.pem …"
+    "sshGenerateHint": "Ingen nøgle endnu? Klik på ”Generér og hent nøgle”. Den private nøgle (.pem) hentes én gang, og den offentlige registreres automatisk. Forbind med: ssh -i hentet-noegle.pem …",
+    "activeScope": "Aktiv"
   },
   "notify": {
     "title": "Meddelelser",
@@ -493,7 +500,19 @@
     "webhooks": "Registrerede webhooks",
     "sev_info": "Info",
     "sev_warn": "Advarsel",
-    "sev_err": "Fejl"
+    "sev_err": "Fejl",
+    "mSessVram": "Session VRAM udnyttelse",
+    "mSessGpu": "Session GPU-udnyttelse",
+    "prev": "Tidligere",
+    "mSessCpu": "Session CPU-udnyttelse",
+    "inboxTitle": "Indbakke",
+    "next": "Næste",
+    "selectSession": "Vælg en session",
+    "readAll": "Marker alt som læst",
+    "noSession": "Ingen løbesessioner",
+    "scopeAccount": "Hele kontoen",
+    "inboxEmpty": "Ingen meddelelser endnu.",
+    "rulesHint": "Advarselsregler og meddelelser er pr. konto og deles på tværs af alle teams. Sessionsmetrics evalueres på den valgte session."
   },
   "wallet": {
     "title": "Tegnebog / Kreditter",
@@ -535,7 +554,15 @@
     "tx_settle": "Afregne",
     "topupNote": "Anvendt efter din gruppeadministrator har godkendt (ingen reel betaling)",
     "desc_gpu": "GPU-brug ({{ref}})",
-    "desc_storage": "Opbevaring ({{ref}})"
+    "desc_storage": "Opbevaring ({{ref}})",
+    "nextRecharge": "Næste genopfyldning",
+    "rechargeSoon": "Snart",
+    "viewBySession": "Gruppe for session",
+    "rechargeEvery": "Hver {{n}} dag",
+    "session": "Session",
+    "consumedCol": "Forbrugt",
+    "searchPh": "Søg efter sessioner, typer, detaljer",
+    "viewAll": "Alle poster"
   },
   "volume": {
     "title": "Data / mængder",
@@ -596,7 +623,16 @@
     "shareSet": "Del sæt",
     "quota": "Mængdekvote",
     "quotaHint": "Per-bruger lagergrænse for dine personlige mængder (uafhængig af gruppe). Nye mængder blokeres, når du overskrider det.",
-    "overQuota": "Overskrider resterende kvote ({{remain}} GB)"
+    "overQuota": "Overskrider resterende kvote ({{remain}} GB)",
+    "personal": "Personlig",
+    "sharedBy": "Delt af",
+    "teamChanged": "Hold ændret",
+    "teamFail": "Kunne ikke skifte hold",
+    "teamQuota": "Overskrider målholdets volumenkvote",
+    "teamHome": "Faktureret til holdet",
+    "changeTeam": "Skift hold",
+    "changeTeamTitle": "Skift hold — {{name}}",
+    "teamHint": "Denne volumens kapacitetskvote og lagerkreditter kommer fra det valgte team. Du forbliver ejer."
   },
   "gmembers": {
     "title": "Medlemmer",

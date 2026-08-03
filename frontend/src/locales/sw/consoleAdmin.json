@@ -53,7 +53,8 @@
     "search": "Tafuta",
     "optional": "(si lazima)",
     "advanced": "Mipangilio zaidi",
-    "comingSoon": "Inakuja hivi karibuni"
+    "comingSoon": "Inakuja hivi karibuni",
+    "prev": "Iliyotangulia"
   },
   "dash": {
     "title": "Dashibodi",
@@ -197,7 +198,10 @@
     "colMemberRole": "Jukumu la Org/timu",
     "groupPh": "Chagua kikundi",
     "groupPickOrgFirst": "Chagua shirika kwanza",
-    "advBelong": "Uanachama · jukumu · nenosiri"
+    "advBelong": "Uanachama · jukumu · nenosiri",
+    "colRefill": "Kujaza mara kwa mara",
+    "refillDefault": "Chaguomsingi",
+    "colBalance": "Mizani ya sasa"
   },
   "groups": {
     "title": "Vikundi",
@@ -248,7 +252,18 @@
     "adminUnknown": "Akaunti ya msimamizi wa timu haijapatikana",
     "adminHintOpt": "Ondoka tupu ili kuunda kikundi bila msimamizi wa kikundi. Ongeza mshiriki kutoka kwa maelezo ya kikundi na uweke jukumu lake kuwa msimamizi wa Kikundi.",
     "grantFail": "Imeshindwa kutoa mkopo.",
-    "grantHintOrg": "Imetolewa kutoka kwa kikundi chako cha washiriki na kuongezwa kwenye bwawa la kikundi hiki. Haiwezi kuzidi salio la bwawa la shirika."
+    "grantHintOrg": "Imetolewa kutoka kwa kikundi chako cha washiriki na kuongezwa kwenye bwawa la kikundi hiki. Haiwezi kuzidi salio la bwawa la shirika.",
+    "colRefill": "Kujaza mara kwa mara",
+    "deleteFail": "Imeshindwa kufuta",
+    "refillDefault": "Chaguomsingi",
+    "refillInterval": "Mzunguko wa kujaza tena (siku)",
+    "initCreditHint": "Tenga kutoka kwa kundi la shirika kwa hiari na uweke kujaza tena wakati wa kuunda timu. Unaweza pia kufanya hivi baadaye katika ukurasa wa maelezo ya timu.",
+    "initCreditAmt": "Mikopo ya awali",
+    "hasMembers": "Timu hii bado ina wanachama. Hamisha au uondoe kabla ya kuifuta.",
+    "carryover": "Endelea na mikopo ambayo haijatumika",
+    "cantDeleteDefault": "Timu chaguo-msingi haiwezi kufutwa.",
+    "initCredit": "Salio la awali na kujaza mara kwa mara",
+    "refillAmt": "Kujaza mara kwa mara (kwa kila mzunguko)"
   },
   "orgs": {
     "title": "Mashirika",
@@ -292,7 +307,11 @@
     "adminHintOpt": "Ondoka tupu ili kuunda kikundi cha 'Jumla' na kukabidhi msimamizi baadaye, kutoka kwa maelezo ya Org → Jumla → Ongeza mwanachama aliye na jukumu la msimamizi wa Org.",
     "grantHint": "Inatumika kwa kundi la shirika mara moja na kurekodiwa kwenye logi ya ukaguzi.",
     "adminOpt": "Msimamizi wa shirika (si lazima)",
-    "bulkDone": "Vikundi vya {{n}} vilivyoongezwa kwa wingi"
+    "bulkDone": "Vikundi vya {{n}} vilivyoongezwa kwa wingi",
+    "deleteFail": "Imeshindwa kufuta",
+    "colRefill": "Kujaza mara kwa mara",
+    "refillDefault": "Chaguomsingi",
+    "hasUsers": "Shirika hili bado lina watumiaji. Hamisha au uondoe kabla ya kuifuta."
   },
   "billing": {
     "title": "Bili",
@@ -318,7 +337,12 @@
     "vsAlloc": "dhidi ya alloc",
     "byGroup": "Matumizi kwa kikundi (onyesho nyuma)",
     "byOrg": "Matumizi kwa org",
-    "notSet": "Haijawekwa"
+    "notSet": "Haijawekwa",
+    "periodMonth": "Mwezi huu",
+    "periodAll": "Wakati wote",
+    "period7d": "Siku 7 zilizopita",
+    "periodLastMonth": "Mwezi uliopita",
+    "periodNote": "Saa za matumizi na GPU zilizoonyeshwa ndizo zilifanyika katika kipindi kilichochaguliwa, kulingana na leja. Bajeti na bwawa hazijapimwa kwa muda."
   },
   "audit": {
     "title": "Kumbukumbu ya Ukaguzi",
@@ -476,7 +500,10 @@
     "impDone": "Kiasi kilichoingizwa {{name}} hadi {{user}}.",
     "impOwnerHint": "Chagua akaunti kutoka kwenye orodha ili kuingiza.",
     "impOwnerPicked": "Imechaguliwa: {{name}} ({{id}})",
-    "metricsOffNotice": "Ufuatiliaji (DCGM/Prometheus) haujasakinishwa, hivyo matumizi ya GPU na VRAM haviwezi kuonyeshwa. Washa ufuatiliaji ili kuona vipimo vya moja kwa moja."
+    "metricsOffNotice": "Ufuatiliaji (DCGM/Prometheus) haujasakinishwa, hivyo matumizi ya GPU na VRAM haviwezi kuonyeshwa. Washa ufuatiliaji ili kuona vipimo vya moja kwa moja.",
+    "noMetrics": "Hakuna vipimo",
+    "cordon": "Cordon",
+    "uncordon": "Uncordon"
   },
   "mset": {
     "title": "Mipangilio",
@@ -599,7 +626,21 @@
     "removed": "Imeondolewa kwenye kikundi",
     "removeConfirm": "Ondoa mtumiaji huyu kutoka {{group}}.",
     "removeTitle": "Ondoa kwenye kikundi",
-    "move": "Sogeza"
+    "move": "Sogeza",
+    "grantFail": "Grant imeshindwa",
+    "granted": "Iliyotolewa na {{n}} C",
+    "suspend": "Sitisha",
+    "memberAdded": "Uanachama umeongezwa.",
+    "addFail": "Haikuweza kuongeza",
+    "restore": "Rejesha",
+    "statusConfirm": "Hii inabadilisha hali ya mtumiaji.",
+    "grantHint": "Inatumika kwa salio la mkopo wa kibinafsi mara moja na kurekodiwa katika kumbukumbu ya ukaguzi kama marekebisho ya mara moja.",
+    "grant": "Ruzuku mikopo",
+    "addMembership": "Ongeza uanachama",
+    "noTeamsInOrg": "Shirika hili halina timu.",
+    "grantAmount": "Mikopo ya kutoa (C; makato hasi)",
+    "grantTitle": "Mikopo ya ruzuku - {{name}}",
+    "pickOrg": "Chagua shirika"
   },
   "clusters": {
     "title": "Vikundi",
@@ -699,7 +740,12 @@
     "webPort": "Lango la wavuti maalum (si lazima)",
     "extFail": "Imeshindwa kusajili picha ya nje",
     "extSshOnly": "Bila mlango wa VSCode/Jupyter/Custom, vipindi kwenye picha hii ni vya SSH pekee.",
-    "needRef": "Weka rejeleo la picha"
+    "needRef": "Weka rejeleo la picha",
+    "loading": "…",
+    "notCached": "Haijahifadhiwa",
+    "info": "Maelezo ya picha",
+    "notFound": "Picha haijapatikana.",
+    "logsHint": "Mizigo hujenga na kuchambua kumbukumbu."
   },
   "anotify": {
     "title": "Arifa",
@@ -886,7 +932,23 @@
     "brandingTitle": "Kuweka chapa",
     "brandAccent": "Rangi ya nembo",
     "brandPreview": "Hakiki",
-    "brandAccentHint": "Acha tupu ili kutumia rangi ya mandhari."
+    "brandAccentHint": "Acha tupu ili kutumia rangi ya mandhari.",
+    "carryoverOn": "Endelea na mikopo ambayo haijatumika",
+    "brandSubtitle": "Manukuu",
+    "rechargeEnabled": "Washa ujazo unaorudiwa",
+    "carryoverOff": "Inaisha kwa kila mzunguko",
+    "rechargeSaved": "Mipangilio ya kujaza upya imehifadhiwa.",
+    "rechargeTitle": "Kujazwa tena kwa mkopo mara kwa mara (chaguo-msingi na kikomo)",
+    "brandIconClear": "Ondoa",
+    "rechargeAmountHint": "Weka kwa kila shirika, kwa kila timu, na viwango vya kujaza upya kwa kila mtumiaji, mizunguko, na usafirishaji kwenye kurasa zao za maelezo. Mzunguko hauwezi kamwe kuwa mrefu kuliko wa mzazi wake.",
+    "rechargeInterval": "Mzunguko chaguomsingi wa kujaza upya (siku) · kikomo cha viwango vya chini",
+    "rechargeCarryover": "Ruhusu kubeba",
+    "rechargeNote": "Mzunguko chaguomsingi wa mfumo wa kujaza upya na sera ya uendelezaji. Mashirika, timu na watu binafsi wanaweza kuchagua mzunguko mfupi zaidi lakini sio mrefu zaidi, na mzazi anapokataza kubeba, salio lisilotumika lililo chini yake huisha muda katika mpaka huo.",
+    "brandIconUpload": "Pakia ikoni (si lazima)",
+    "brandSubtitleHint": "Maandishi madogo kando ya nembo. Acha tupu ili kuificha.",
+    "brandIcon": "Aikoni",
+    "brandIconTooBig": "Aikoni lazima iwe 120 KB au ndogo zaidi.",
+    "brandIconUploadHint": "Aikoni iliyopakiwa inachukua nafasi ya kwanza kuliko ikoni ya Lucide hapo juu. PNG au SVG chini ya KB 120 inapendekezwa."
   },
   "datasets": {
     "title": "Seti za data",
@@ -932,7 +994,40 @@
     "dlHint": "Mara tu itakapokamilika, unaweza kukabidhi kache za nodi za ndani hapa chini.",
     "assignTitle": "Mgawo wa nodi ya kache",
     "measuring": "Inapima...",
-    "notCached": "Haijahifadhiwa"
+    "notCached": "Haijahifadhiwa",
+    "phaseDownload": "Inapakua",
+    "descSaved": "Maelezo yamehifadhiwa.",
+    "cacheFail": "Ombi la akiba limeshindwa",
+    "description": "Maelezo",
+    "descPh": "Eleza mkusanyiko huu wa data",
+    "info": "Maelezo ya mkusanyiko wa data",
+    "sizeClassSaved": "Darasa la ukubwa limehifadhiwa.",
+    "phaseExtract": "Kuchimba",
+    "phaseCopy": "Kunakili",
+    "notFound": "Seti ya data haijapatikana.",
+    "descFail": "Haikuweza kuhifadhi maelezo",
+    "registering": "Kujiandikisha",
+    "regFail": "Usajili umeshindwa",
+    "regTitle": "Sajili seti ya data",
+    "extracting": "Inachimba...",
+    "sizeClass": "Darasa la ukubwa",
+    "regStarted": "Usajili umeanza - fuatilia maendeleo katika orodha.",
+    "upTaken": "Seti ya data iliyo na jina hilo tayari ipo.",
+    "regNeedFile": "Chagua faili kutoka kwa kisanduku pokezi.",
+    "cache": "Akiba ya nodi",
+    "regRefresh": "Onyesha upya",
+    "regNeedUrl": "Weka URL.",
+    "regNeedName": "Weka jina la seti ya data.",
+    "regSizeClass": "Darasa la ukubwa",
+    "regUrl": "URL (wget)",
+    "regUrlField": "Pakua URL",
+    "regBusy": "Inasajili...",
+    "regInboxFile": "Faili ya kikasha",
+    "regNfs": "Nakala ya NFS (SCP)",
+    "upScope": "Mwonekano",
+    "regNfsHint": "Nakili kumbukumbu (zip, tar, tar.gz) kwenye njia iliyo hapa chini, kisha uchague faili ili kuisajili. Kusajili huihamisha nje ya kikasha na kuitoa kiotomatiki.",
+    "regUrlHint": "Seva hupakua URL hii moja kwa moja - hakuna chochote kinachopakiwa kutoka kwa kivinjari chako. Fuatilia maendeleo katika orodha.",
+    "regInboxEmpty": "Kikasha ni tupu. Nakili faili kwenye njia iliyo hapo juu, kisha uonyeshe upya."
   },
   "announce": {
     "title": "Matangazo",
@@ -1054,7 +1149,8 @@
     "needTarget": "Chagua upeo na lengo",
     "removed": "Sera ya '{{name}}' imefutwa",
     "removeConfirm": "Kufuta sera ya '{{name}}' huifanya kurithi kutoka kwa upeo ulio hapo juu. Ungependa kuendelea?",
-    "globalHint": "Global ni njia mbadala kwa kila mtu - haiwezi kuwa tupu na lazima iwe angalau 1. Org/group/usernages inaweza kuibatilisha."
+    "globalHint": "Global ni njia mbadala kwa kila mtu - haiwezi kuwa tupu na lazima iwe angalau 1. Org/group/usernages inaweza kuibatilisha.",
+    "capHint": "Kiwango cha juu kinachoruhusiwa — GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · kiasi ≤ {{vol}}GiB · vipindi vya wakati mmoja ≤ {{sess}}"
   },
   "roles": {
     "org_admin": "Msimamizi wa shirika",
@@ -1070,7 +1166,16 @@
     "subtitle": "Kitambulisho {{name}} · dhibiti vikundi, watumiaji na mikopo yake hapa",
     "manage": "Dhibiti",
     "inGroup": "Dhibiti katika kikundi",
-    "usersCapped": "kuonyesha kwanza {{shown}} ya {{total}}"
+    "usersCapped": "kuonyesha kwanza {{shown}} ya {{total}}",
+    "recurringAmount": "Mikopo kwa kila mzunguko",
+    "recurringInterval": "Mzunguko wa kujaza tena (siku)",
+    "recurringCarryover": "Usafirishaji",
+    "carryOn": "Endelea",
+    "carryOff": "Muda wake unaisha",
+    "maxIntervalHint": "Kikomo cha jukwaa: siku {{n}} au chache",
+    "recurringNote": "Hujaza tena kundi kwa kiasi hiki kila mzunguko (0 huizima).",
+    "recurringTitle": "Mikopo ya mara kwa mara",
+    "recurringSaved": "Salio la mara kwa mara limehifadhiwa."
   },
   "gdetail": {
     "title": "Kikundi",
@@ -1098,7 +1203,25 @@
     "moveFail": "Imeshindwa kusonga",
     "needTarget": "Chagua kikundi lengwa",
     "moveHint": "Jukumu hubeba. Salio lililotolewa katika kikundi hiki halina, na historia ya utumiaji itasalia kwenye kikundi hiki.",
-    "moveTo": "Hamisha hadi"
+    "moveTo": "Hamisha hadi",
+    "noRecurring": "Hakuna kiasi cha kujaza mara kwa mara kilichowekwa",
+    "refillCol": "Kujaza mara kwa mara",
+    "refillSaved": "Ujazo unaorudiwa umehifadhiwa.",
+    "refilledNow": "Imejazwa tena sasa: +{{n}} C",
+    "nextRefill": "Jaza tena",
+    "memberRefillSaved": "Ujazo unaorudiwa umehifadhiwa",
+    "refillNow": "Jaza tena sasa",
+    "refillCarryover": "Endelea na mikopo ambayo haijatumika",
+    "refillFail": "Imeshindwa kujaza tena",
+    "refillTitle": "Timu ya kujaza mara kwa mara",
+    "memberRefillSet": "Weka kujaza mara kwa mara",
+    "noRecurringShort": "Hakuna kujazwa tena mara kwa mara",
+    "refillInterval": "Mzunguko (siku) - acha tupu kwa chaguo-msingi la timu",
+    "refillMenu": "Jaza tena",
+    "refillInheritPh": "Kurithi",
+    "memberRefillTitle": "Kujaza mara kwa mara - {{name}}",
+    "refillAmount": "Kiasi cha kujaza mara kwa mara (C)",
+    "memberRefillHint": "Kiasi hiki hulipwa kwenye pochi ya mwanachama kila mzunguko. Tumia \"Jaza tena sasa\" ili ulipe mara moja."
   },
   "picker": {
     "allOrgs": "Mashirika yote",
@@ -1125,5 +1248,8 @@
   "brand": "Giosk Console",
   "confirmDelete": "Ungependa kufuta hii? Hili haliwezi kutenduliwa.",
   "confirmTerminate": "Je, ungependa kusitisha kipindi hiki? Kazi ya kukimbia huacha mara moja.",
-  "confirmRemoveMember": "Ungependa kumwondoa mshiriki huyu kwenye kikundi?"
+  "confirmRemoveMember": "Ungependa kumwondoa mshiriki huyu kwenye kikundi?",
+  "paged": {
+    "range": "{{from}}–{{to}} ya {{total}}"
+  }
 }

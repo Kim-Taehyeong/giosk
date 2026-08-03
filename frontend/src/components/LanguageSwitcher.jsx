@@ -1,16 +1,22 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Globe, ChevronDown, Check, Search } from 'lucide-react';
-import 'flag-icons/css/flag-icons.min.css';
 import { LANGUAGES, langMeta, flagCC } from '../i18n/languages';
 
-// SVG 국기(flag-icons) — emoji 와 달리 모든 OS 에서 렌더된다. 대응 국가코드 없으면 지구본으로 폴백.
+// 국기 SVG 를 파일 URL 로만 가져온다.
+// flag-icons 의 통짜 CSS(약 430KB)는 138개국 배경 규칙을 전부 싣는데, 우리가 쓰는 건 언어 목록에
+// 대응하는 40여 개뿐이다. URL 만 뽑아 <img> 로 그리면 CSS 비용이 사라지고, 실제 표시된 국기만 내려받는다.
+const FLAG_URLS = import.meta.glob('/node_modules/flag-icons/flags/4x3/*.svg', { query: '?url', import: 'default', eager: true });
+const flagUrl = (cc) => FLAG_URLS[`/node_modules/flag-icons/flags/4x3/${cc}.svg`];
+
+// SVG 국기 — emoji 와 달리 모든 OS 에서 동일하게 렌더된다. 대응 국가코드가 없으면 지구본으로 폴백.
 function Flag({ flag, size = 20 }) {
   const cc = flagCC(flag);
-  if (!cc) return <Globe size={15} style={{ color: 'var(--muted)' }} />;
+  const url = cc && flagUrl(cc);
+  if (!url) return <Globe size={15} style={{ color: 'var(--muted)' }} />;
   return (
-    <span className={`fi fi-${cc}`}
-      style={{ width: size, height: Math.round(size * 0.75), borderRadius: 2, flexShrink: 0, boxShadow: 'inset 0 0 0 1px rgba(0,0,0,.08)', backgroundSize: 'cover' }} />
+    <img src={url} alt="" aria-hidden="true" width={size} height={Math.round(size * 0.75)}
+      style={{ borderRadius: 2, flexShrink: 0, objectFit: 'cover', boxShadow: 'inset 0 0 0 1px rgba(0,0,0,.08)' }} />
   );
 }
 

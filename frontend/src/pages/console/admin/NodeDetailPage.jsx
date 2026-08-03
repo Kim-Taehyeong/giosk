@@ -212,11 +212,11 @@ export default function NodeDetailPage() {
               </div>
               {shareMode === 'hami' && (
                 <div style={{ marginTop: 14 }}>
-                  <label className="fld" style={{ marginTop: 0, marginBottom: 5 }}>
+                  <label className="fld" htmlFor="admin-nodedetailpage-fld-0" style={{ marginTop: 0, marginBottom: 5 }}>
                     <span className="flex" style={{ gap: 5, alignItems: 'center' }}><Scissors size={12} /> {t('nodes.splitCount')}</span>
                   </label>
                   <span className="flex" style={{ gap: 6, alignItems: 'center' }}>
-                    <input type="number" min={1} max={10} value={splitCount} style={{ width: 90 }}
+                    <input id="admin-nodedetailpage-fld-0" type="number" min={1} max={10} value={splitCount} style={{ width: 90 }}
                       onChange={(e) => save({ splitCount: Math.max(1, Math.min(10, Number(e.target.value))) })} />
                     <span className="muted" style={{ fontSize: 13, fontWeight: 600 }}>{t('nodes.splitCountUnit')}</span>
                   </span>

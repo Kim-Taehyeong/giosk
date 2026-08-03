@@ -67,7 +67,9 @@
       "errorGroup": "您必须选择一个组织和一个组。",
       "errorAdvisor": "本科生和研究生必须提供一名顾问。",
       "submit": "请求注册",
-      "errorPasswordMismatch": "密码不匹配。"
+      "errorPasswordMismatch": "密码不匹配。",
+      "pwMatch": "密码匹配",
+      "pwMismatch": "密码不匹配"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "节点 {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "节点 {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "节点 {{up}}/{{total}} · GPU —",
+    "alerts": "警报",
+    "rolePlatformSub": "超级管理员",
+    "creditBalance": "贷方余额",
+    "clusterStatus": "集群状态",
+    "noAlerts": "还没有警报。",
+    "unreadN": "{{n}} 未读",
+    "orgWhole": "整个组织",
+    "rolePlatform": "整个平台",
+    "viewAll": "在通知中心查看全部内容"
+  },
+  "table": {
+    "empty": "无数据"
+  },
+  "refill": {
+    "amount": "每个周期学分",
+    "title": "定期补充",
+    "carryover": "结转",
+    "carryOff": "到期",
+    "carryOn": "结转",
+    "interval": "补充周期（天）",
+    "note": "每个周期重新填充此数量（0 禁用它）。该周期不能比父代的周期长，并且会自动设置上限。",
+    "maxHint": "母周期限制：{{n}} 天或更少"
+  },
+  "select": {
+    "placeholder": "选择",
+    "search": "搜索…",
+    "noMatch": "没有匹配"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamBody": "{{target}} 团队积分为 {{value}}，低于 {{threshold}} 阈值。该团队的会议可能很快就会停止。",
+      "teamTitle": "{{target}} 团队积分不足"
+    }
+  },
+  "close": "关闭"
 }

@@ -85,8 +85,21 @@ func (s *Service) History(ctx context.Context, sess *Session, hours int) ([]Hist
 
 	end := time.Now()
 	start := end.Add(-time.Duration(hours) * time.Hour)
+	// ⚠️ 조회 구간을 "이 세션이 실제로 살아 있던 구간"으로 자른다.
+	// 전용(DCGM) 이력은 pod 이 아니라 노드에 귀속해 뽑는다(아래 참조). 그래서 창을 그대로 두면
+	// 같은 노드에서 돌던 앞 세션의 사용률이 이 세션 이력에 섞여 나온다(뒤 세션이 뜨면 반대로도 샌다).
+	// CPU/RAM 은 pod 라벨이라 원래 안 새지만, 창을 맞춰야 축이 서로 어긋나지 않는다.
+	if sess.StartedAt != nil && sess.StartedAt.After(start) {
+		start = *sess.StartedAt
+	}
+	if sess.StoppedSince != nil && sess.StoppedSince.Before(end) {
+		end = *sess.StoppedSince // 중단된 세션은 중단 시점에서 끊는다(그 뒤는 다른 세션의 몫)
+	}
+	if !end.After(start) {
+		return []HistPoint{}, ins // 유효 구간 없음(갓 만들어졌거나 시작 전 중단)
+	}
 	// step: 구간을 ~120표본으로. 최소 60초.
-	step := time.Duration(hours) * time.Hour / 120
+	step := end.Sub(start) / 120
 	if step < time.Minute {
 		step = time.Minute
 	}

@@ -99,8 +99,8 @@ export default function VolumesAdmin() {
         {imp && (
           <div className="grid" style={{ gap: 12 }}>
             <div className="legend">{t('nodes.importHint')}</div>
-            <div><label className="fld" style={{ marginTop: 0 }}>{t('nodes.impName')}<Req /></label>
-              <input type="text" value={imp.name} onChange={(e) => setImp({ ...imp, name: e.target.value })} placeholder="team-shared" /></div>
+            <div><label className="fld" htmlFor="admin-volumesadmin-fld-0" style={{ marginTop: 0 }}>{t('nodes.impName')}<Req /></label>
+              <input id="admin-volumesadmin-fld-0" type="text" value={imp.name} onChange={(e) => setImp({ ...imp, name: e.target.value })} placeholder="team-shared" /></div>
             {/* 소유자 — 조직·그룹으로 좁히고 목록에서 계정을 직접 고른다(동명이인 오배정 방지). */}
             <div><label className="fld" style={{ marginTop: 0 }}>{t('nodes.impOwner')}<Req /></label>
               <UserPicker value={imp.owner}
@@ -113,13 +113,13 @@ export default function VolumesAdmin() {
               </div>
             </div>
             <div className="grid cols-2" style={{ gap: 12 }}>
-              <div><label className="fld" style={{ marginTop: 0 }}>{t('nodes.impServer')}<Req /></label>
-                <input type="text" value={imp.nfsServer} onChange={(e) => setImp({ ...imp, nfsServer: e.target.value })} placeholder="192.168.0.10" /></div>
-              <div><label className="fld" style={{ marginTop: 0 }}>{t('nodes.impSize')}</label>
-                <input type="number" min={1} value={imp.sizeGiB} onChange={(e) => setImp({ ...imp, sizeGiB: e.target.value })} /></div>
+              <div><label className="fld" htmlFor="admin-volumesadmin-fld-1" style={{ marginTop: 0 }}>{t('nodes.impServer')}<Req /></label>
+                <input id="admin-volumesadmin-fld-1" type="text" value={imp.nfsServer} onChange={(e) => setImp({ ...imp, nfsServer: e.target.value })} placeholder="192.168.0.10" /></div>
+              <div><label className="fld" htmlFor="admin-volumesadmin-fld-2" style={{ marginTop: 0 }}>{t('nodes.impSize')}</label>
+                <input id="admin-volumesadmin-fld-2" type="number" min={1} value={imp.sizeGiB} onChange={(e) => setImp({ ...imp, sizeGiB: e.target.value })} /></div>
             </div>
-            <div><label className="fld" style={{ marginTop: 0 }}>{t('nodes.impPath')}<Req /></label>
-              <input type="text" value={imp.nfsPath} onChange={(e) => setImp({ ...imp, nfsPath: e.target.value })} placeholder="/srv/nfs/legacy/team-data" /></div>
+            <div><label className="fld" htmlFor="admin-volumesadmin-fld-3" style={{ marginTop: 0 }}>{t('nodes.impPath')}<Req /></label>
+              <input id="admin-volumesadmin-fld-3" type="text" value={imp.nfsPath} onChange={(e) => setImp({ ...imp, nfsPath: e.target.value })} placeholder="/srv/nfs/legacy/team-data" /></div>
           </div>
         )}
       </Modal>

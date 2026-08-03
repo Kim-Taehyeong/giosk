@@ -156,7 +156,11 @@
     "mySessions": "Az én üléseim",
     "kpiFree": "Ingyenes (korlátlan)",
     "gpuAvail": "GPU elérhető",
-    "kpiCooldown": "Próbálja újra a hűtést"
+    "kpiCooldown": "Próbálja újra a hűtést",
+    "slots": "Slots",
+    "hamiShared": "HAMi tört",
+    "exclusiveWhole": "Dedikált (egész kártya)",
+    "hamiFractional": "Tört (VRAM és magok alapján)"
   },
   "newSession": {
     "crumb": "Munkamenetek",
@@ -310,7 +314,8 @@
     "grpGuaranteed": "Particionált GPU · VRAM garantált",
     "notEnough": "Nincs elég kredit – minimum 1 óra szükséges",
     "hoursApprox": "~{{n}} óra",
-    "sshKeyChange": "Módosítás"
+    "sshKeyChange": "Módosítás",
+    "sshCacheCount": "{{n}} gyorsítótárban"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "sshDirect": "Közvetlen (intranet)",
     "regenerated": "Friss hozzáférési hivatkozást adtak ki.",
     "sshNeedKey": "Nincs regisztrált SSH nyilvános kulcs",
-    "sshNeedKeyHint": "Regisztráljon vagy hozzon létre egyet alább — a futó munkamenetek azonnal átveszik."
+    "sshNeedKeyHint": "Regisztráljon vagy hozzon létre egyet alább — a futó munkamenetek azonnal átveszik.",
+    "webConnectNewWindow": "Új ablakban nyit meg egy böngészőterminált – nincs szükség SSH-kulcsra vagy parancsra."
   },
   "account": {
     "title": "Saját beállítások",
@@ -464,7 +470,8 @@
     "sshGenerate": "Kulcs létrehozása és letöltése",
     "sshGenerated": "A kulcs elkészült. Őrizze biztonságos helyen a letöltött privát kulcsot — újra nem tölthető le.",
     "sshGenFail": "Az SSH kulcs létrehozása nem sikerült.",
-    "sshGenerateHint": "Még nincs kulcsa? Kattintson a „Kulcs létrehozása és letöltése” gombra. A privát kulcs (.pem) egyszer töltődik le, a nyilvános automatikusan regisztrálódik. Csatlakozás: ssh -i letoltott-kulcs.pem …"
+    "sshGenerateHint": "Még nincs kulcsa? Kattintson a „Kulcs létrehozása és letöltése” gombra. A privát kulcs (.pem) egyszer töltődik le, a nyilvános automatikusan regisztrálódik. Csatlakozás: ssh -i letoltott-kulcs.pem …",
+    "activeScope": "Aktív"
   },
   "notify": {
     "title": "Értesítések",
@@ -493,7 +500,19 @@
     "mBudget": "Költségvetési felhasználás",
     "sev_info": "Info",
     "sev_err": "Hiba",
-    "sev_warn": "Figyelmeztetés"
+    "sev_warn": "Figyelmeztetés",
+    "mSessGpu": "Munkamenet GPU kihasználtsága",
+    "mSessCpu": "A munkamenet CPU kihasználtsága",
+    "prev": "Előző",
+    "inboxTitle": "Beérkezett üzenetek",
+    "mSessVram": "Munkamenet VRAM kihasználtsága",
+    "readAll": "Jelölje meg az összeset olvasottnak",
+    "next": "Következő",
+    "rulesHint": "A riasztási szabályok és értesítések fiókonként érvényesek, és az összes csapat között meg vannak osztva. A munkamenet-mutatók kiértékelése a kiválasztott munkameneten történik.",
+    "selectSession": "Válasszon egy munkamenetet",
+    "scopeAccount": "Az egész fiók",
+    "noSession": "Nincsenek futó ülések",
+    "inboxEmpty": "Még nincsenek értesítések."
   },
   "wallet": {
     "title": "Pénztárca / kreditek",
@@ -535,7 +554,15 @@
     "bySession": "Munkamenet szerint",
     "topupSent": "Kérés elküldve (várakozik a csoportadminisztrátor jóváhagyására)",
     "desc_storage": "Tárhely ({{ref}})",
-    "desc_gpu": "GPU-használat ({{ref}})"
+    "desc_gpu": "GPU-használat ({{ref}})",
+    "nextRecharge": "Következő utántöltés",
+    "rechargeSoon": "Hamar",
+    "session": "Ülés",
+    "consumedCol": "Elfogyasztott",
+    "viewBySession": "Csoportosítás munkamenet szerint",
+    "rechargeEvery": "Minden {{n}} napon",
+    "viewAll": "Minden bejegyzés",
+    "searchPh": "Keresés munkamenetek, típusok, részletek"
   },
   "volume": {
     "title": "Adatok / kötetek",
@@ -596,7 +623,16 @@
     "afterUse": "Használt után",
     "afterRemain": "Utána maradt",
     "overQuota": "Túllépi a fennmaradó kvótát ({{remain}} GB)",
-    "quotaHint": "Felhasználónkénti tárhelykorlát a személyes kötetei számára (csoporttól függetlenül). Az új kötetek letiltásra kerülnek, ha túllépi azt."
+    "quotaHint": "Felhasználónkénti tárhelykorlát a személyes kötetei számára (csoporttól függetlenül). Az új kötetek letiltásra kerülnek, ha túllépi azt.",
+    "personal": "Személyes",
+    "teamFail": "Nem sikerült csapatot váltani",
+    "teamQuota": "Túllépi a célcsapat mennyiségi kvótáját",
+    "teamHome": "Kiszámlázva a csapatnak",
+    "sharedBy": "Megosztotta",
+    "teamChanged": "Változott a csapat",
+    "changeTeam": "Csapatváltás",
+    "changeTeamTitle": "Csapatváltás — {{name}}",
+    "teamHint": "Ennek a kötetnek a kapacitáskvótája és a tárhely-jóváírások a kiválasztott csapattól származnak. Te maradsz a tulajdonos."
   },
   "gmembers": {
     "title": "tagok",

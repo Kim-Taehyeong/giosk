@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Bell, LogOut, Settings, ChevronDown, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { clickable } from '../../utils/a11y';
 
 function initials(user) {
   const f = user?.firstName || user?.username || '?';
@@ -12,7 +13,7 @@ function initials(user) {
 
 function Item({ icon, label, hint, onClick }) {
   return (
-    <div role="button" onClick={onClick}
+    <div {...clickable(onClick, { role: 'menuitem' })}
       style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 10px', borderRadius: 8, cursor: 'pointer', fontSize: 13 }}
       onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface-2)'; }}
       onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>
@@ -46,13 +47,15 @@ export default function UserMenu({ ns }) {
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
-      <div className="user" onClick={() => setOpen((o) => !o)} title={user?.username || ''}>
+      <div className="user" title={user?.username || ''}
+        aria-expanded={open} aria-haspopup="menu"
+        {...clickable(() => setOpen((o) => !o), { label: user?.username || undefined })}>
         <span className="avatar">{initials(user)}</span>
         <ChevronDown size={14} style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }} />
       </div>
 
       {open && (
-        <div style={{
+        <div role="menu" style={{
           position: 'absolute', top: 'calc(100% + 8px)', right: 0, minWidth: 236, zIndex: 70,
           background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12,
           boxShadow: '0 16px 40px rgba(10,15,28,.22)', padding: 8,

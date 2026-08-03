@@ -67,7 +67,9 @@
       "subtitle": "Preencha o formulário abaixo. Você poderá fazer login assim que um administrador aprovar sua solicitação.",
       "submit": "Solicitar inscrição",
       "errorGeneric": "Falha na inscrição.",
-      "errorPasswordMismatch": "As senhas não coincidem."
+      "errorPasswordMismatch": "As senhas não coincidem.",
+      "pwMismatch": "As senhas não coincidem",
+      "pwMatch": "Correspondência de senhas"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Nós {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "Nós {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "Nós {{up}}/{{total}} · GPU —",
+    "alerts": "Alertas",
+    "rolePlatformSub": "Superadministrador",
+    "viewAll": "Veja tudo na Central de Notificações",
+    "orgWhole": "Organização inteira",
+    "rolePlatform": "Plataforma inteira",
+    "unreadN": "{{n}} não lido",
+    "creditBalance": "Saldo de crédito",
+    "noAlerts": "Ainda não há alertas.",
+    "clusterStatus": "Status do cluster"
+  },
+  "table": {
+    "empty": "Sem dados"
+  },
+  "refill": {
+    "carryOff": "Expirar",
+    "carryover": "Transferir",
+    "carryOn": "Transferir",
+    "maxHint": "Limite do ciclo pai: {{n}} dias ou menos",
+    "note": "Recarrega nessa quantidade a cada ciclo (0 desativa). O ciclo não pode ser maior que o do pai e é limitado automaticamente.",
+    "title": "Recarga recorrente",
+    "interval": "Ciclo de recarga (dias)",
+    "amount": "Créditos por ciclo"
+  },
+  "select": {
+    "placeholder": "Selecione",
+    "search": "Procurar…",
+    "noMatch": "Nenhuma correspondência"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "A equipe {{target}} está com poucos créditos",
+      "teamBody": "Os créditos da equipe {{target}} estão em {{value}}, abaixo do limite {{threshold}}. As sessões nesta equipe podem parar em breve."
+    }
+  },
+  "close": "Fechar"
 }

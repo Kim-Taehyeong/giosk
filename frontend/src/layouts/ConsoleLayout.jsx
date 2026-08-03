@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from '../components/console/Sidebar';
 import Topbar from '../components/console/Topbar';
 import BrandLogo from '../components/BrandLogo';
+import Spinner from '../components/console/Spinner';
 import { userNavGroups } from '../config/userNav';
 import { adminNavGroups } from '../config/adminNav';
 import { useAuth } from '../context/AuthContext';
@@ -59,17 +60,32 @@ export default function ConsoleLayout({ variant = 'user' }) {
 
   navGroups = filterNav(navGroups, { creditMode, approvalsActive, joinOn, datasetsOn, groupReqActive, level, gateByLevel: isAdmin });
 
+  // 모바일(≤768px)에서 사이드바는 서랍이다. 화면을 옮기면 닫고, Escape 로도 닫는다.
+  const [navOpen, setNavOpen] = React.useState(false);
+  React.useEffect(() => { setNavOpen(false); }, [location.pathname]);
+  React.useEffect(() => {
+    if (!navOpen) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') setNavOpen(false); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [navOpen]);
+
   return (
-    <div className="console-root">
+    <div className={`console-root${navOpen ? ' nav-open' : ''}`}>
       <div className="logo">
         <BrandLogo markSize={27} badge={badge} />
       </div>
-      <Topbar variant={variant} ns={ns} />
+      <Topbar variant={variant} ns={ns} navOpen={navOpen} onMenu={() => setNavOpen((o) => !o)} />
       <Sidebar navGroups={navGroups} basePath={basePath} ns={ns} />
+      {/* 서랍이 열렸을 때 뒤 배경을 덮는 막 — 눌러서 닫는다(모바일 전용, CSS 로 표시 제어). */}
+      <div className="nav-scrim" onClick={() => setNavOpen(false)} aria-hidden="true" />
       <main className="main">
         {/* key=경로+활성스코프 → 페이지 전환/스코프 전환 시 리마운트(스코프 바뀌면 데이터 재조회) */}
         <div className="console-page" key={`${location.pathname}::${activeScope || 'default'}`}>
-          <Outlet />
+          {/* 라우트가 지연 로딩이므로 본문만 기다린다 — 셸(로고·상단·네비)은 그대로 남는다. */}
+          <React.Suspense fallback={<div style={{ display: 'grid', placeItems: 'center', padding: '64px 0' }}><Spinner /></div>}>
+            <Outlet />
+          </React.Suspense>
         </div>
       </main>
     </div>

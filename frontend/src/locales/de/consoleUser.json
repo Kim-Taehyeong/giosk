@@ -156,7 +156,11 @@
     "nodeAvail": "Verfügbarkeit pro Knoten",
     "mySessions": "Meine Sitzungen",
     "kpiCooldown": "Abklingzeit erneut versuchen",
-    "gpuAvail": "GPU verfügbar"
+    "gpuAvail": "GPU verfügbar",
+    "hamiFractional": "Bruchteil (nach VRAM und Kernen)",
+    "exclusiveWhole": "Dediziert (ganze Karte)",
+    "slots": "Spielautomaten",
+    "hamiShared": "HAMi Bruchteil"
   },
   "newSession": {
     "crumb": "Sitzungen",
@@ -310,7 +314,8 @@
     "hoursApprox": "~{{n}} Stunden",
     "guaranteed": "Garantierte Ressourcen",
     "grpSlot": "Shared Slot · günstiger, keine Garantie",
-    "sshKeyChange": "Ändern"
+    "sshKeyChange": "Ändern",
+    "sshCacheCount": "{{n}} zwischengespeichert"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "sshDirect": "Direkt (Intranet)",
     "regenerated": "Es wurde ein neuer Zugangslink herausgegeben.",
     "sshNeedKey": "Kein öffentlicher SSH-Schlüssel registriert",
-    "sshNeedKeyHint": "Registrieren oder erzeugen Sie unten einen – laufende Sitzungen übernehmen ihn sofort."
+    "sshNeedKeyHint": "Registrieren oder erzeugen Sie unten einen – laufende Sitzungen übernehmen ihn sofort.",
+    "webConnectNewWindow": "Öffnet ein Browser-Terminal in einem neuen Fenster – kein SSH-Schlüssel oder Befehl erforderlich."
   },
   "account": {
     "title": "Meine Einstellungen",
@@ -464,7 +470,8 @@
     "sshGenerate": "Schlüssel erzeugen & herunterladen",
     "sshGenerated": "Schlüssel erzeugt. Bewahren Sie den heruntergeladenen privaten Schlüssel sicher auf – er kann nicht erneut heruntergeladen werden.",
     "sshGenFail": "Der SSH-Schlüssel konnte nicht erzeugt werden.",
-    "sshGenerateHint": "Noch kein Schlüssel? Klicken Sie auf „Schlüssel erzeugen & herunterladen“. Der private Schlüssel (.pem) wird einmalig heruntergeladen, der öffentliche wird automatisch registriert. Verbinden mit: ssh -i heruntergeladener-schluessel.pem …"
+    "sshGenerateHint": "Noch kein Schlüssel? Klicken Sie auf „Schlüssel erzeugen & herunterladen“. Der private Schlüssel (.pem) wird einmalig heruntergeladen, der öffentliche wird automatisch registriert. Verbinden mit: ssh -i heruntergeladener-schluessel.pem …",
+    "activeScope": "Aktiv"
   },
   "notify": {
     "title": "Benachrichtigungen",
@@ -493,7 +500,19 @@
     "webhooks": "Registrierte Webhooks",
     "sev_info": "Info",
     "sev_warn": "Warnung",
-    "sev_err": "Fehler"
+    "sev_err": "Fehler",
+    "inboxTitle": "Posteingang",
+    "prev": "Vorherige",
+    "mSessGpu": "Sitzungs-GPU-Auslastung",
+    "mSessCpu": "CPU-Auslastung der Sitzung",
+    "mSessVram": "Sitzungs-VRAM-Auslastung",
+    "next": "Nächste",
+    "noSession": "Keine laufenden Sitzungen",
+    "readAll": "Alles als gelesen markieren",
+    "rulesHint": "Warnregeln und Benachrichtigungen gelten pro Konto und werden von allen Teams gemeinsam genutzt. Sitzungsmetriken werden für die ausgewählte Sitzung ausgewertet.",
+    "selectSession": "Wählen Sie eine Sitzung aus",
+    "scopeAccount": "Ganzes Konto",
+    "inboxEmpty": "Noch keine Benachrichtigungen."
   },
   "wallet": {
     "title": "Wallet / Credits",
@@ -535,7 +554,15 @@
     "bySession": "Nach Sitzung",
     "topupNote": "Wird angewendet, nachdem Ihr Gruppenadministrator dies genehmigt hat (keine echte Zahlung).",
     "desc_storage": "Lagerung ({{ref}})",
-    "desc_gpu": "GPU-Nutzung ({{ref}})"
+    "desc_gpu": "GPU-Nutzung ({{ref}})",
+    "nextRecharge": "Nächste Nachfüllung",
+    "rechargeSoon": "Bald",
+    "rechargeEvery": "Alle {{n}} Tage",
+    "consumedCol": "Verbraucht",
+    "session": "Sitzung",
+    "searchPh": "Suchsitzungen, Typen, Details",
+    "viewBySession": "Gruppieren Sie nach Sitzung",
+    "viewAll": "Alle Einträge"
   },
   "volume": {
     "title": "Daten/Volumen",
@@ -596,7 +623,16 @@
     "remain": "{{n}} GB übrig",
     "afterUse": "Danach verwendet",
     "quotaHint": "Speicherlimit pro Benutzer für Ihre persönlichen Volumes (unabhängig von der Gruppe). Neue Volumina werden blockiert, sobald Sie diese überschreiten.",
-    "overQuota": "Übersteigt das verbleibende Kontingent ({{remain}} GB)"
+    "overQuota": "Übersteigt das verbleibende Kontingent ({{remain}} GB)",
+    "personal": "Persönlich",
+    "teamQuota": "Übersteigt das Volumenkontingent des Zielteams",
+    "sharedBy": "Geteilt von",
+    "teamFail": "Team konnte nicht gewechselt werden",
+    "teamHome": "Dem Team in Rechnung gestellt",
+    "teamChanged": "Das Team hat sich geändert",
+    "changeTeam": "Team wechseln",
+    "changeTeamTitle": "Team wechseln – {{name}}",
+    "teamHint": "Das Kapazitätskontingent und die Speichergutschriften dieses Volumes stammen vom ausgewählten Team. Sie bleiben Eigentümer."
   },
   "gmembers": {
     "title": "Mitglieder",

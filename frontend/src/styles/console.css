@@ -7,10 +7,14 @@
 
 :root {
   --bg:#f7f8fa; --surface:#ffffff; --surface-2:#f4f5f7; --border:#e5e7eb;
-  --text:#111827; --muted:#6b7280; --primary:#4f46e5; --primary-soft:#eef2ff;
-  --gpu:#4f46e5; --gpu-soft:#eef2ff; --free:#0f9d6e; --free-soft:#e9f5ef;
-  --warn:#b4730a; --warn-soft:#fbf3e6; --danger:#dc2626; --danger-soft:#fceced;
-  --ok:#0f9d6e; --shadow:0 1px 2px rgba(17,24,39,.04),0 1px 3px rgba(17,24,39,.06);
+  /* --muted 는 라벨·캡션·중단 배지에 쓰인다. #6b7280 은 surface-2 위에서 4.43 으로 아슬하게 미달이라
+     같은 색조를 유지한 채 한 단계만 어둡게(#66707c → 4.61) 잡았다. */
+  --text:#111827; --muted:#66707c; --primary:#4f46e5; --primary-soft:#eef2ff;
+  /* 의미색은 12px 볼드 배지(.pill)로 자기 -soft 위에 올라간다 — WCAG large 가 아니라 4.5:1 이 필요하다.
+     기존 값(#0f9d6e/#b4730a/#dc2626)은 각각 3.09/3.53/4.22 로 미달이라 최소폭만 어둡게 조정했다. */
+  --gpu:#4f46e5; --gpu-soft:#eef2ff; --free:#0b7a56; --free-soft:#e9f5ef;
+  --warn:#8f5a08; --warn-soft:#fbf3e6; --danger:#c81e1e; --danger-soft:#fceced;
+  --ok:#0b7a56; --shadow:0 1px 2px rgba(17,24,39,.04),0 1px 3px rgba(17,24,39,.06);
   --radius:12px;
 }
 html[data-theme="dark"] {
@@ -20,6 +24,51 @@ html[data-theme="dark"] {
   --warn:#d89636; --warn-soft:#2a2210; --danger:#e06666; --danger-soft:#2a1616;
   --ok:#34c08a; --shadow:0 1px 2px rgba(0,0,0,.25),0 6px 18px rgba(0,0,0,.3);
 }
+
+/* ── 인증 화면 (로그인 · 가입 · 승인대기) ──────────────────────────────────
+ * 콘솔 셸 밖에 있지만 같은 시스템에 속한다 — 같은 토큰, 같은 9px 라운드,
+ * 같은 포커스 처리(테두리+3px 글로우), 그리고 라이트/다크 양쪽.
+ * ------------------------------------------------------------------------ */
+.auth-root{
+  min-height:100vh; display:grid; place-items:center; padding:32px 16px;
+  background:var(--bg); color:var(--text);
+  font-family:"Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  font-size:14.5px; line-height:1.55; font-weight:450; -webkit-font-smoothing:antialiased}
+.auth-root *{box-sizing:border-box; font-family:inherit}
+.auth-card{width:100%; max-width:400px}
+.auth-brand{display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:34px}
+.auth-brand .auth-name{display:flex; flex-direction:column; line-height:1.05; min-width:0}
+.auth-brand .auth-name strong{font-size:33px; font-weight:900; letter-spacing:-1.2px}
+.auth-brand .auth-name small{font-size:10.5px; font-weight:700; letter-spacing:.28em; color:var(--muted); margin-top:5px}
+.auth-title{font-size:19px; font-weight:800; letter-spacing:-.3px; margin-bottom:6px}
+.auth-sub{color:var(--muted); font-size:13.5px; margin-bottom:20px}
+.auth-field{position:relative; margin-bottom:11px}
+.auth-field > svg{position:absolute; inset-inline-start:12px; top:50%; transform:translateY(-50%);
+  color:var(--muted); pointer-events:none}
+.auth-root input, .auth-root select{
+  width:100%; padding:11px 13px; border:1px solid var(--border); border-radius:9px;
+  background:var(--surface-2); color:var(--text); font-size:14px; transition:border-color .15s ease}
+.auth-field.has-icon input{padding-inline-start:38px}
+.auth-root input:focus, .auth-root select:focus{
+  outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-soft)}
+.auth-root label{display:block; font-weight:700; font-size:12.5px; margin:14px 0 6px}
+.auth-submit{
+  width:100%; margin-top:6px; padding:11px 16px; border:1px solid var(--primary); border-radius:9px;
+  background:var(--primary); color:#fff; font-weight:700; font-size:14px; cursor:pointer; transition:.15s}
+html[data-theme="dark"] .auth-submit{color:#0f1218}
+.auth-submit:hover:not(:disabled){filter:brightness(.96); transform:translateY(-1px); box-shadow:0 2px 8px rgba(10,15,28,.10)}
+.auth-submit:active:not(:disabled){transform:translateY(0); box-shadow:none}
+.auth-submit:disabled{opacity:.55; cursor:not-allowed}
+.auth-root :is(.auth-submit,.auth-link,input,select):focus-visible{outline:2px solid var(--primary); outline-offset:2px}
+.auth-note{border-radius:9px; padding:10px 13px; font-size:13px; font-weight:600; text-align:center}
+.auth-note.err{background:var(--danger-soft); color:var(--danger)}
+.auth-note.ok{background:var(--free-soft); color:var(--free)}
+.auth-link{color:var(--primary); font-size:13px; font-weight:600; text-decoration:none; background:none; border:none; cursor:pointer}
+.auth-link:hover{text-decoration:underline}
+.auth-foot{margin-top:24px; display:flex; justify-content:center}
+@media (pointer:coarse){ .auth-root input, .auth-submit{padding-top:13px; padding-bottom:13px} }
+@media (prefers-reduced-motion: reduce){ .auth-submit{transition:none} .auth-submit:hover:not(:disabled){transform:none} }
 
 /* Layout shell (root grid) */
 .console-root {
@@ -129,12 +178,28 @@ html[data-theme="dark"] {
 .console-root .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
 .console-root .btn.gpu{background:var(--gpu);border-color:var(--gpu);color:#fff}
 .console-root .btn.free{background:var(--free);border-color:var(--free);color:#fff}
+/* 다크 테마의 강조색은 밝은 계열이라(#7c8aff/#34c08a) 흰 글자를 올리면 3:1 도 못 넘는다.
+   같은 채움 위에 어두운 잉크를 올리면 6~8:1 — 채움의 "눌러라" 신호는 그대로 두고 대비만 회복한다. */
+html[data-theme="dark"] .console-root .btn.primary,
+html[data-theme="dark"] .console-root .btn.gpu,
+html[data-theme="dark"] .console-root .btn.free,
+html[data-theme="dark"] .console-modal-bg .btn.primary{color:#0f1218}
 .console-root .btn.ghost{background:transparent}
 .console-root .btn.sm{padding:5px 10px;font-size:12px}
 .console-root .btn.danger{color:var(--danger);border-color:var(--danger);background:color-mix(in srgb, var(--danger) 9%, transparent)}
 .console-root .btn.danger:hover{background:color-mix(in srgb, var(--danger) 16%, transparent)}
 .console-root .btn.warn{color:var(--warn);border-color:var(--warn);background:var(--warn-soft)}
 .console-root .btn.ok{color:var(--free);border-color:var(--free);background:var(--free-soft)}
+
+/* Focus — 키보드 이동에만 보이게(:focus-visible). 입력류는 아래 폼 섹션에서 테두리+글로우로 따로 처리. */
+.console-root :is(.btn,.icon-btn,.badge-credit,.proj,.st,.t,.dd-item,.opt,.nav a,[tabindex="0"]):focus-visible,
+.console-modal-bg :is(.btn,.icon-btn,.st,.t,.opt,[tabindex="0"]):focus-visible{
+  outline:2px solid var(--primary); outline-offset:2px; border-radius:9px}
+/* 표 행: 바깥으로 밀면 옆 행과 겹치므로 안쪽으로 그리고, 배경도 같이 바꿔 위치를 확실히 알린다. */
+.console-root tr.row-link:focus-visible{outline:2px solid var(--primary); outline-offset:-2px; background:var(--surface-2)}
+.console-root tr.row-link:focus-visible td:first-child{color:var(--primary)}
+/* 모달 패널 자체는 포커스를 받을 수 있지만(트랩 진입점) 테두리를 그릴 필요는 없다. */
+.console-modal-bg .modal:focus, .console-root .modal:focus{outline:none}
 
 /* Start cards */
 .console-root .task-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;cursor:pointer;
@@ -144,7 +209,8 @@ html[data-theme="dark"] {
 .console-root .task-card h4{font-size:16.5px;font-weight:800;letter-spacing:-.2px;margin-bottom:7px}
 .console-root .task-card p{color:var(--muted);font-size:13px;font-weight:500;min-height:34px}
 .console-root .task-card .ribbon{position:absolute;top:14px;right:14px;background:var(--free);color:#fff;
-  font-size:11.5px;font-weight:800;padding:4px 11px;border-radius:20px;box-shadow:0 2px 6px rgba(15,157,110,.35)}
+  font-size:11.5px;font-weight:800;padding:4px 11px;border-radius:20px;
+  box-shadow:0 2px 6px color-mix(in srgb, var(--free) 35%, transparent)}
 
 /* Gauge row */
 .console-root .qrow{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)}
@@ -320,6 +386,15 @@ html[data-theme="dark"] {
 .console-root .console-page .grid > *:nth-child(7){animation-delay:.32s}
 .console-root .console-page .grid > *:nth-child(8){animation-delay:.37s}
 
+/* 실시간 진행 막대(데이터셋 등록·캐시 등) — width 를 애니메이션하면 매 프레임 레이아웃을 다시 계산한다.
+ * 폭은 100% 로 두고 scaleX 만 움직여 합성 단계에서 끝낸다. 채움 비율은 --p (0~1) 로 준다. */
+.console-root .progress-fill{
+  height:100%; width:100%; border-radius:inherit; background:var(--primary);
+  transform-origin:left center; transform:scaleX(var(--p,0));
+  transition:transform .5s cubic-bezier(.22,.61,.36,1)}
+html[dir="rtl"] .console-root .progress-fill{transform-origin:right center}
+@media (prefers-reduced-motion: reduce){ .console-root .progress-fill{transition:none} }
+
 /* 진행 막대 채움이 좌→우로 자라남 */
 .console-root .console-page .bar > i{transform-origin:left center;animation:console-bar-grow .65s .12s cubic-bezier(.22,.61,.36,1) both}
 
@@ -366,3 +441,69 @@ html[data-theme="dark"] {
 /* 고정 컬럼폭 테이블(감사 로그 등) — 페이지마다 컬럼 너비가 출렁이지 않게 */
 .console-root .fixed-cols table{table-layout:fixed;width:100%}
 .console-root .fixed-cols th, .console-root .fixed-cols td{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── 모바일 셸 (≤768px) ─────────────────────────────────────────────────────
+ * 데스크톱에선 248px 사이드바가 늘 떠 있지만, 폰에서는 그게 화면의 2/3를 먹는다.
+ * 로고+네비를 하나의 서랍으로 묶어 화면 밖으로 밀어두고 상단 토글로 꺼낸다.
+ * 서랍은 방향(dir)을 따라 들어오고 나간다 — RTL 에서 반대편에서 나와야 자연스럽다.
+ * ------------------------------------------------------------------------ */
+.console-root .nav-toggle{display:none}
+.console-root .nav-scrim{display:none}
+
+@media (max-width:768px){
+  .console-root{grid-template-columns:1fr; grid-template-rows:64px 1fr; grid-template-areas:"top" "main"}
+  .console-root .main{padding:16px 14px}
+  .console-root .nav-toggle{display:grid; flex:0 0 auto}
+
+  .console-root .logo, .console-root .nav{
+    position:fixed; inset-inline-start:0; width:272px; max-width:84vw; z-index:95;
+    transform:translateX(-100%); transition:transform .22s cubic-bezier(.22,.61,.36,1);
+    border-inline-end:1px solid var(--border)}
+  .console-root .logo{top:0; height:64px}
+  .console-root .nav{top:64px; bottom:0; overflow-y:auto}
+  html[dir="rtl"] .console-root .logo, html[dir="rtl"] .console-root .nav{transform:translateX(100%)}
+  /* 열림 규칙은 RTL 선택자보다 명시도가 높아야 한다 — 아니면 RTL 에서 서랍이 안 열린다. */
+  .console-root.nav-open .logo, .console-root.nav-open .nav,
+  html[dir="rtl"] .console-root.nav-open .logo, html[dir="rtl"] .console-root.nav-open .nav{
+    transform:none; box-shadow:0 24px 64px rgba(0,0,0,.3)}
+
+  .console-root .nav-scrim{display:block; position:fixed; inset:0; z-index:90;
+    background:rgba(10,15,28,.5); backdrop-filter:blur(2px);
+    opacity:0; pointer-events:none; transition:opacity .22s ease}
+  .console-root.nav-open .nav-scrim{opacity:1; pointer-events:auto}
+
+  /* 좁은 폭에서는 모든 카드 그리드가 한 줄씩 */
+  .console-root .cols-5, .console-root .cols-4, .console-root .cols-3, .console-root .cols-2{grid-template-columns:1fr}
+  .console-root .page-head h1{font-size:21px}
+  .console-root .kv{grid-template-columns:96px 1fr}
+  .console-root .qrow{flex-wrap:wrap}
+  .console-root .qrow .qn{width:auto; flex:1 0 auto}
+  .console-root .qrow .qv{width:auto}
+  .console-root .qrow .bar{flex:1 0 100%; order:3}
+  .console-root .choice, .console-modal-bg .choice{grid-template-columns:1fr}
+  .console-modal-bg{padding:12px 10px}
+}
+
+/* 서랍 전환도 모션 최소화 설정을 따른다. */
+@media (prefers-reduced-motion: reduce){
+  .console-root .logo, .console-root .nav, .console-root .nav-scrim{transition:none}
+}
+
+/* ── 입력 방식 적응 ─────────────────────────────────────────────────────────
+ * 화면 크기가 아니라 포인터 종류로 판단한다(터치 노트북·키보드 달린 태블릿 때문에).
+ * ------------------------------------------------------------------------ */
+@media (pointer:coarse){
+  .console-root .btn, .console-modal-bg .btn{padding:11px 16px}
+  .console-root .btn.sm, .console-modal-bg .btn.sm{padding:9px 13px; font-size:12.5px}
+  .console-root .icon-btn, .console-modal-bg .icon-btn{width:44px; height:44px}
+  .console-root .nav a{padding:13px 12px}
+  .console-root .dd-item{padding:12px 11px}
+  .console-root .st, .console-modal-bg .st, .console-root .tabs .t, .console-modal-bg .tabs .t{padding:12px 15px}
+  .console-root td, .console-root th{padding:15px 14px}
+}
+/* 호버가 없는 기기에서 hover 리프트는 "눌린 뒤에도 떠 있는" 잔상만 남긴다. */
+@media (hover:none){
+  .console-root .btn:hover, .console-modal-bg .btn:hover{transform:none; box-shadow:none; filter:none}
+  .console-root .task-card:hover{transform:none}
+  .console-root .selbox:hover{transform:none}
+}

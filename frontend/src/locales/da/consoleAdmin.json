@@ -53,7 +53,8 @@
     "search": "Søge",
     "optional": "(valgfri)",
     "empty": "Ingen data",
-    "advanced": "Flere indstillinger"
+    "advanced": "Flere indstillinger",
+    "prev": "Tidligere"
   },
   "dash": {
     "title": "Dashboard",
@@ -197,7 +198,10 @@
     "advBelong": "Medlemskab · rolle · adgangskode",
     "totalN": "{{n}} brugere",
     "colMemberRole": "Organisations-/teamrolle",
-    "prev": "Prev"
+    "prev": "Prev",
+    "colRefill": "Tilbagevendende genopfyldning",
+    "refillDefault": "Misligholdelse",
+    "colBalance": "Nuværende saldo"
   },
   "groups": {
     "title": "Grupper",
@@ -248,7 +252,18 @@
     "grantHintSuper": "Platform-admin undtagelsesbevilling. For integritets skyld føjes det samme beløb automatisk til den overordnede organisationspulje.",
     "insufficientOrgPool": "Utilstrækkelig org-kreditpuljesaldo.",
     "adminUnknown": "Teamadministratorkontoen blev ikke fundet",
-    "grantHintOrg": "Trækket fra din organisationspulje og føjet til denne gruppes pulje. Kan ikke overskride organisationens puljesaldo."
+    "grantHintOrg": "Trækket fra din organisationspulje og føjet til denne gruppes pulje. Kan ikke overskride organisationens puljesaldo.",
+    "colRefill": "Tilbagevendende genopfyldning",
+    "deleteFail": "Sletning mislykkedes",
+    "refillDefault": "Misligholdelse",
+    "refillInterval": "Genopfyldningscyklus (dage)",
+    "initCreditAmt": "Indledende kreditter",
+    "refillAmt": "Tilbagevendende genopfyldning (pr. cyklus)",
+    "cantDeleteDefault": "Standardteamet kan ikke slettes.",
+    "hasMembers": "Dette hold har stadig medlemmer. Flyt eller fjern dem, før du sletter dem.",
+    "carryover": "Overfør ubrugte kreditter",
+    "initCredit": "Indledende kreditter og tilbagevendende genopfyldning",
+    "initCreditHint": "Tildel eventuelt fra organisationspuljen og sæt en refill ved oprettelse af teamet. Du kan også gøre dette senere på teamets detaljeside."
   },
   "orgs": {
     "title": "Organisationer",
@@ -292,7 +307,11 @@
     "grantReasonPh": "Indtast en årsag",
     "adminOpt": "Organisationsadministrator (valgfrit)",
     "adminHintOpt": "Lad stå tomt for kun at oprette gruppen 'Generelt' og tildele en administrator senere, fra organisationsdetaljer → Generelt → Tilføj medlem med rollen som organisationsadministrator.",
-    "grantHint": "Anvendt på organisationspuljen med det samme og registreret i revisionsloggen."
+    "grantHint": "Anvendt på organisationspuljen med det samme og registreret i revisionsloggen.",
+    "deleteFail": "Sletning mislykkedes",
+    "colRefill": "Tilbagevendende genopfyldning",
+    "refillDefault": "Misligholdelse",
+    "hasUsers": "Denne organisation har stadig brugere. Flyt eller fjern dem, før du sletter dem."
   },
   "billing": {
     "title": "Fakturering",
@@ -318,7 +337,12 @@
     "notSet": "Ikke indstillet",
     "byGroup": "Forbrug efter gruppe (showback)",
     "byUser": "Forbrug pr. bruger",
-    "consumed": "Credits"
+    "consumed": "Credits",
+    "periodMonth": "Denne måned",
+    "periodAll": "Hele tiden",
+    "period7d": "Sidste 7 dage",
+    "periodLastMonth": "Sidste måned",
+    "periodNote": "Det viste forbrug og GPU-timer er, hvad der skete i den valgte periode, ifølge hovedbogen. Budgetter og puljer er ikke periodeafgrænsede."
   },
   "audit": {
     "title": "Revisionslog",
@@ -476,7 +500,10 @@
     "impFail": "Import mislykkedes",
     "impOwnerHint": "Vælg en konto på listen for at importere.",
     "impOwnerPicked": "Valgt: {{name}} ({{id}})",
-    "metricsOffNotice": "Overvågning (DCGM/Prometheus) er ikke installeret, så GPU-forbrug og VRAM kan ikke vises. Aktivér overvågning for at se live-målinger."
+    "metricsOffNotice": "Overvågning (DCGM/Prometheus) er ikke installeret, så GPU-forbrug og VRAM kan ikke vises. Aktivér overvågning for at se live-målinger.",
+    "cordon": "Cordon",
+    "uncordon": "Uncordon",
+    "noMetrics": "Ingen metrics"
   },
   "mset": {
     "title": "Indstillinger",
@@ -599,7 +626,21 @@
     "remove": "Fjerne",
     "removeTitle": "Fjern fra gruppen",
     "removed": "Fjernet fra gruppen",
-    "removeConfirm": "Fjern denne bruger fra {{group}}."
+    "removeConfirm": "Fjern denne bruger fra {{group}}.",
+    "addFail": "Kunne ikke tilføje",
+    "suspend": "Suspendere",
+    "restore": "Gendan",
+    "memberAdded": "Medlemskab tilføjet.",
+    "granted": "Bevilget {{n}} C",
+    "grantFail": "Grant mislykkedes",
+    "statusConfirm": "Dette ændrer brugerens status.",
+    "grant": "Giv kreditter",
+    "addMembership": "Tilføj medlemskab",
+    "grantTitle": "Tilskudskreditter – {{name}}",
+    "pickOrg": "Vælg en organisation",
+    "noTeamsInOrg": "Denne organisation har ingen hold.",
+    "grantHint": "Påført den personlige kreditsaldo med det samme og registreret i revisionsloggen som en engangsregulering.",
+    "grantAmount": "Kreditter, der skal bevilges (C; negative fradrag)"
   },
   "clusters": {
     "title": "Klynger",
@@ -699,7 +740,12 @@
     "imgRefHint": "Træk og brug et Docker Hub / eksternt registreringsdatabasebillede, som det er (ingen build). f.eks. codercom/code-server:nyeste",
     "webPort": "Brugerdefineret webport (valgfrit)",
     "extFail": "Kunne ikke registrere eksternt billede",
-    "extRegistered": "Eksternt billede registreret"
+    "extRegistered": "Eksternt billede registreret",
+    "loading": "…",
+    "info": "Billede info",
+    "notCached": "Ikke cachelagret",
+    "notFound": "Billedet blev ikke fundet.",
+    "logsHint": "Indlæser bygge- og scanningslogfiler."
   },
   "anotify": {
     "title": "Meddelelser",
@@ -886,7 +932,23 @@
     "brandPreview": "Forhåndsvisning",
     "brandingTitle": "Branding",
     "brandAccentHint": "Lad stå tomt for at bruge temafarven.",
-    "brandAccent": "Logo farve"
+    "brandAccent": "Logo farve",
+    "carryoverOn": "Overfør ubrugte kreditter",
+    "brandSubtitle": "Undertekst",
+    "rechargeNote": "Platformens standard genopfyldningscyklus og overførselspolitik. Organisationer, teams og enkeltpersoner kan vælge en kortere cyklus, men aldrig en længere, og når en forælder ikke tillader overførsel, udløber ubrugte kreditter under den ved denne grænse.",
+    "brandIcon": "Ikon",
+    "rechargeEnabled": "Aktiver tilbagevendende genopfyldning",
+    "rechargeCarryover": "Tillad overførsel",
+    "rechargeTitle": "Tilbagevendende kreditpåfyldning (standard og grænse)",
+    "brandSubtitleHint": "Lille tekst ved siden af ​​logoet. Lad stå tomt for at skjule det.",
+    "rechargeSaved": "Genopfyldningsindstillinger gemt.",
+    "carryoverOff": "Udløb hver cyklus",
+    "brandIconClear": "Fjerne",
+    "rechargeAmountHint": "Indstil pr. organisation, pr. team og pr. bruger genopfyldningsmængder, cyklusser og overførsel på deres detaljesider. En cyklus kan aldrig være længere end dens forældres.",
+    "rechargeInterval": "Standard genopfyldningscyklus (dage) · grænse for lavere niveauer",
+    "brandIconTooBig": "Ikonet skal være 120 KB eller mindre.",
+    "brandIconUpload": "Upload et ikon (valgfrit)",
+    "brandIconUploadHint": "Et uploadet ikon har forrang over Lucide-ikonet ovenfor. PNG eller SVG under 120KB anbefales."
   },
   "datasets": {
     "title": "Datasæt",
@@ -932,7 +994,40 @@
     "assign": "Tildel noder",
     "dlInto": "Indlæser i /dataset/{{name}}",
     "assignHint": "Vælg, hvilke noder der cachelagrer dette datasæt. Det uddrages fra NFS til node-lokalt til øjeblikkelig brug.",
-    "notCached": "Ikke cachelagret"
+    "notCached": "Ikke cachelagret",
+    "phaseDownload": "Downloader",
+    "descFail": "Beskrivelsen kunne ikke gemmes",
+    "descSaved": "Beskrivelse gemt.",
+    "info": "Datasæt info",
+    "description": "Beskrivelse",
+    "notFound": "Datasæt ikke fundet.",
+    "phaseCopy": "Kopiering",
+    "cacheFail": "Cache-anmodning mislykkedes",
+    "phaseExtract": "Udvinding",
+    "sizeClassSaved": "Størrelsesklasse gemt.",
+    "sizeClass": "Størrelsesklasse",
+    "cache": "Node cache",
+    "regNeedUrl": "Indtast en URL.",
+    "descPh": "Beskriv dette datasæt",
+    "regFail": "Registreringen mislykkedes",
+    "regStarted": "Registrering startet — spor fremskridt på listen.",
+    "regNeedName": "Indtast et datasætnavn.",
+    "regRefresh": "Opfriske",
+    "upTaken": "Et datasæt med det navn findes allerede.",
+    "regNeedFile": "Vælg en fil fra indbakken.",
+    "regBusy": "Registrerer...",
+    "regUrlField": "Download URL",
+    "registering": "Registrering",
+    "regSizeClass": "Størrelsesklasse",
+    "regUrl": "URL (wget)",
+    "regNfs": "NFS kopi (SCP)",
+    "extracting": "Uddrager...",
+    "regTitle": "Registrer datasæt",
+    "regInboxFile": "Indbakke fil",
+    "upScope": "Sigtbarhed",
+    "regNfsHint": "Kopier et arkiv (zip, tar, tar.gz) til stien nedenfor, og vælg derefter filen for at registrere den. Registrering flytter den ud af indbakken og udtrækker den automatisk.",
+    "regInboxEmpty": "Indbakken er tom. Kopier en fil til stien ovenfor, og opdater derefter.",
+    "regUrlHint": "Serveren downloader denne URL direkte - intet uploades fra din browser. Spor fremskridt på listen."
   },
   "announce": {
     "title": "Meddelelser",
@@ -1054,7 +1149,8 @@
     "pickTarget": "Vælg mål",
     "globalNeedsValue": "Alle fire globale grænser skal være mindst 1",
     "needTarget": "Vælg et omfang og mål",
-    "removed": "Slettet politik for '{{name}}'"
+    "removed": "Slettet politik for '{{name}}'",
+    "capHint": "Maksimalt tilladt — GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · volumen ≤ {{vol}}GiB · samtidige sessioner ≤ {{sess}}"
   },
   "roles": {
     "org_admin": "Organisationsadministrator",
@@ -1070,7 +1166,16 @@
     "manage": "Styre",
     "usersHint": "Rolle er brugerens rolle i deres gruppe. Skift det fra den gruppes medlemsadministration.",
     "usersCapped": "viser den første {{shown}} af {{total}}",
-    "inGroup": "Administrer i gruppe"
+    "inGroup": "Administrer i gruppe",
+    "recurringAmount": "Kreditter pr. cyklus",
+    "recurringInterval": "Genopfyldningscyklus (dage)",
+    "recurringCarryover": "Overførsel",
+    "carryOn": "Bær over",
+    "carryOff": "Udløbe",
+    "recurringSaved": "Tilbagevendende kreditter gemt.",
+    "recurringTitle": "Tilbagevendende kreditter",
+    "recurringNote": "Genfylder organisationspuljen med dette beløb hver cyklus (0 deaktiverer den).",
+    "maxIntervalHint": "Platformgrænse: {{n}} dage eller mindre"
   },
   "gdetail": {
     "title": "Gruppe",
@@ -1098,7 +1203,25 @@
     "moveHint": "Rollen fortsætter. Kredit, der er tildelt i denne gruppe, gør det ikke, og brugshistorikken forbliver hos denne gruppe.",
     "moveTitle": "Flyt gruppe — {{name}}",
     "moved": "Flyttet {{name}} til {{group}}",
-    "needTarget": "Vælg en målgruppe"
+    "needTarget": "Vælg en målgruppe",
+    "refillFail": "Genopfyldning mislykkedes",
+    "noRecurring": "Der er ikke angivet nogen tilbagevendende genopfyldningsmængde",
+    "refillCol": "Tilbagevendende genopfyldning",
+    "refillTitle": "Team tilbagevendende genopfyldning",
+    "refilledNow": "Genopfyldt nu: +{{n}} C",
+    "memberRefillSaved": "Tilbagevendende genopfyldning gemt",
+    "nextRefill": "Næste genopfyldning",
+    "refillSaved": "Tilbagevendende genopfyldning gemt.",
+    "refillCarryover": "Overfør ubrugte kreditter",
+    "refillNow": "Genfyld nu",
+    "refillInheritPh": "Nedarvet",
+    "refillMenu": "Genfyld",
+    "memberRefillSet": "Indstil tilbagevendende refill",
+    "noRecurringShort": "Ingen tilbagevendende genopfyldning",
+    "refillAmount": "Tilbagevendende genopfyldningsmængde (C)",
+    "refillInterval": "Cyklus (dage) — lad stå tomt for teamstandard",
+    "memberRefillHint": "Dette beløb indbetales til medlemmets pung hver cyklus. Brug \"Fyld på nu\" for at betale med det samme.",
+    "memberRefillTitle": "Tilbagevendende genopfyldning — {{name}}"
   },
   "picker": {
     "allOrgs": "Alle organisationer",
@@ -1125,5 +1248,8 @@
   "brand": "Giosk konsol",
   "confirmDelete": "Vil du slette dette? Dette kan ikke fortrydes.",
   "confirmTerminate": "Tvinge afslutte denne session? Løbende arbejde stopper øjeblikkeligt.",
-  "confirmRemoveMember": "Vil du fjerne dette medlem fra gruppen?"
+  "confirmRemoveMember": "Vil du fjerne dette medlem fra gruppen?",
+  "paged": {
+    "range": "{{from}}–{{to}} af {{total}}"
+  }
 }

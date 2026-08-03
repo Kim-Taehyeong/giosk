@@ -13,7 +13,7 @@ function cssVar(name, fb) {
 export default function BarChart({ data = [], height = 200, horizontal = false, color = '--gpu' }) {
   const { chartData, options } = useMemo(() => {
     const c = cssVar(color, '#7c6cf0');
-    const muted = cssVar('--muted', '#6b7280');
+    const muted = cssVar('--muted', '#66707c');
     const grid = cssVar('--border', '#e5e7eb');
     return {
       chartData: {

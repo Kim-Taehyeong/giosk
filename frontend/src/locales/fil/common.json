@@ -67,7 +67,9 @@
       "errorPasswordShort": "Dapat na hindi bababa sa 8 character ang password.",
       "errorTerms": "Dapat mong tanggapin ang mga tuntunin upang mag-sign up.",
       "errorGroup": "Dapat kang pumili ng organisasyon at grupo.",
-      "errorPasswordMismatch": "Hindi tugma ang mga password."
+      "errorPasswordMismatch": "Hindi tugma ang mga password.",
+      "pwMismatch": "Hindi tugma ang mga password",
+      "pwMatch": "Tugma ang mga password"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Mga node {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "Mga node {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "Mga node {{up}}/{{total}} · GPU —",
+    "alerts": "Mga alerto",
+    "creditBalance": "Balanse ng credit",
+    "rolePlatform": "Buong platform",
+    "orgWhole": "Buong organisasyon",
+    "unreadN": "{{n}} hindi pa nababasa",
+    "rolePlatformSub": "Super admin",
+    "clusterStatus": "Katayuan ng cluster",
+    "noAlerts": "Wala pang alerto.",
+    "viewAll": "Tingnan ang lahat sa Notification Center"
+  },
+  "table": {
+    "empty": "Walang data"
+  },
+  "refill": {
+    "carryOff": "Mag-expire",
+    "interval": "Refill cycle (mga araw)",
+    "carryOn": "Dalhin",
+    "amount": "Mga kredito bawat cycle",
+    "maxHint": "Limitasyon sa ikot ng magulang: {{n}} araw o mas kaunti",
+    "note": "Nagre-refill sa halagang ito bawat cycle (0 di-disable ito). Ang cycle ay hindi maaaring mas mahaba kaysa sa magulang at awtomatikong nililimitahan.",
+    "title": "Paulit-ulit na refill",
+    "carryover": "Carryover"
+  },
+  "select": {
+    "placeholder": "Pumili",
+    "search": "Maghanap…",
+    "noMatch": "Walang tugma"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "Ang koponan ng {{target}} ay mababa sa mga kredito",
+      "teamBody": "Ang mga kredito ng koponan ng {{target}} ay nasa {{value}}, sa ibaba ng threshold ng {{threshold}}. Maaaring huminto sa lalong madaling panahon ang mga session sa team na ito."
+    }
+  },
+  "close": "Isara"
 }

@@ -53,7 +53,8 @@
     "edit": "Sunting",
     "create": "Buat",
     "advanced": "Lagi tetapan",
-    "optional": "(pilihan)"
+    "optional": "(pilihan)",
+    "prev": "Sebelumnya"
   },
   "dash": {
     "title": "Papan pemuka",
@@ -197,7 +198,10 @@
     "groupPickOrgFirst": "Pilih organisasi dahulu",
     "totalN": "pengguna {{n}}",
     "colMemberRole": "Peranan org/pasukan",
-    "fAdvisor": "Penaja"
+    "fAdvisor": "Penaja",
+    "colRefill": "Isi semula berulang",
+    "refillDefault": "Lalai",
+    "colBalance": "Baki semasa"
   },
   "groups": {
     "title": "Kumpulan",
@@ -248,7 +252,18 @@
     "grantHintSuper": "Geran pengecualian pentadbir platform. Untuk integriti, jumlah yang sama ditambahkan secara automatik pada kumpulan org induk.",
     "adminHintOpt": "Biarkan kosong untuk membuat kumpulan tanpa pentadbir kumpulan. Tambah ahli daripada butiran kumpulan dan tetapkan peranan mereka kepada pentadbir Kumpulan.",
     "grantHintOrg": "Dipotong daripada kumpulan org anda dan ditambahkan pada kumpulan kumpulan ini. Tidak boleh melebihi baki org pool.",
-    "grantFail": "Gagal memberikan kredit."
+    "grantFail": "Gagal memberikan kredit.",
+    "colRefill": "Isi semula berulang",
+    "deleteFail": "Padam gagal",
+    "refillDefault": "Lalai",
+    "refillInterval": "Kitaran isi semula (hari)",
+    "refillAmt": "Isi semula berulang (setiap kitaran)",
+    "initCredit": "Kredit awal dan pengisian semula berulang",
+    "cantDeleteDefault": "Pasukan lalai tidak boleh dipadamkan.",
+    "carryover": "Bawa kredit yang tidak digunakan",
+    "hasMembers": "Pasukan ini masih mempunyai ahli. Alihkan atau alih keluarnya sebelum memadamkannya.",
+    "initCreditAmt": "Kredit awal",
+    "initCreditHint": "Secara pilihan, peruntukkan daripada kumpulan organisasi dan tetapkan isi semula apabila membuat pasukan. Anda juga boleh melakukan ini kemudian dalam halaman butiran pasukan."
   },
   "orgs": {
     "title": "Organisasi",
@@ -292,7 +307,11 @@
     "deleteConfirm": "Padamkan (arkib) organisasi '{{name}}'?",
     "adminHintOpt": "Biarkan kosong untuk membuat hanya kumpulan 'Umum' dan tetapkan pentadbir kemudian, daripada butiran Org → Umum → Tambah ahli dengan peranan pentadbir Org.",
     "bulkDone": "Org {{n}} yang ditambah pukal",
-    "adminOpt": "Pentadbir org (pilihan)"
+    "adminOpt": "Pentadbir org (pilihan)",
+    "deleteFail": "Padam gagal",
+    "colRefill": "Isi semula berulang",
+    "refillDefault": "Lalai",
+    "hasUsers": "Organisasi ini masih mempunyai pengguna. Alihkan atau alih keluarnya sebelum memadamkannya."
   },
   "billing": {
     "title": "Pengebilan",
@@ -318,7 +337,12 @@
     "consumed": "Kredit",
     "tabUser": "Oleh pengguna",
     "byUser": "Penggunaan oleh pengguna",
-    "notSet": "Tidak ditetapkan"
+    "notSet": "Tidak ditetapkan",
+    "period7d": "7 hari lepas",
+    "periodLastMonth": "bulan lepas",
+    "periodAll": "Sepanjang masa",
+    "periodNote": "Waktu penggunaan dan GPU yang ditunjukkan ialah perkara yang berlaku dalam tempoh yang dipilih, mengikut lejar. Belanjawan dan kumpulan bukan skop tempoh.",
+    "periodMonth": "bulan ini"
   },
   "audit": {
     "title": "Log Audit",
@@ -476,7 +500,10 @@
     "impNoUser": "Akaun tidak ditemui.",
     "impOwnerHint": "Pilih akaun daripada senarai untuk mengimport.",
     "impOwnerPicked": "Dipilih: {{name}} ({{id}})",
-    "metricsOffNotice": "Pemantauan (DCGM/Prometheus) belum dipasang, jadi penggunaan GPU dan VRAM tidak dapat dipaparkan. Aktifkan pemantauan untuk melihat metrik langsung."
+    "metricsOffNotice": "Pemantauan (DCGM/Prometheus) belum dipasang, jadi penggunaan GPU dan VRAM tidak dapat dipaparkan. Aktifkan pemantauan untuk melihat metrik langsung.",
+    "uncordon": "Uncordon",
+    "noMetrics": "Tiada metrik",
+    "cordon": "Cordon"
   },
   "mset": {
     "title": "tetapan",
@@ -599,7 +626,21 @@
     "removed": "Dialih keluar daripada kumpulan",
     "moved": "Beralih ke {{group}}",
     "pickGroup": "Pilih kumpulan",
-    "removeTitle": "Alih keluar daripada kumpulan"
+    "removeTitle": "Alih keluar daripada kumpulan",
+    "statusConfirm": "Ini mengubah status pengguna.",
+    "grantFail": "Grant gagal",
+    "memberAdded": "Keahlian ditambah.",
+    "addFail": "Tidak dapat menambah",
+    "restore": "Pulihkan",
+    "granted": "Diberikan {{n}} C",
+    "grant": "Pemberian kredit",
+    "grantTitle": "Pemberian kredit — {{name}}",
+    "pickOrg": "Pilih organisasi",
+    "addMembership": "Tambah keahlian",
+    "suspend": "tangguh",
+    "grantHint": "Digunakan pada baki kredit peribadi serta-merta dan direkodkan dalam log audit sebagai pelarasan sekali sahaja.",
+    "noTeamsInOrg": "Organisasi ini tidak mempunyai pasukan.",
+    "grantAmount": "Kredit untuk diberikan (C; potongan negatif)"
   },
   "clusters": {
     "title": "Kelompok",
@@ -699,7 +740,12 @@
     "needRef": "Masukkan rujukan imej",
     "extTitle": "Daftar imej luaran",
     "imgRef": "Ruj imej",
-    "webName": "Nama saluran (pilihan)"
+    "webName": "Nama saluran (pilihan)",
+    "notFound": "Imej tidak ditemui.",
+    "loading": "…",
+    "notCached": "Tidak dicache",
+    "info": "Maklumat imej",
+    "logsHint": "Memuatkan binaan dan imbasan log."
   },
   "anotify": {
     "title": "Pemberitahuan",
@@ -886,7 +932,23 @@
     "lockConcurrency": "Sesi serentak",
     "runtimeNote": "Hanya dasar mudah digunakan secara langsung. Model pengebilan, konkurensi dan set data ditetapkan pada masa pemasangan.",
     "lockDatasetsSub": "Bergantung pada NFS/storan pusat — tetap semasa pemasangan",
-    "brandAccentHint": "Biarkan kosong untuk menggunakan warna tema."
+    "brandAccentHint": "Biarkan kosong untuk menggunakan warna tema.",
+    "rechargeInterval": "Kitaran isi semula lalai (hari) · had untuk tahap yang lebih rendah",
+    "carryoverOn": "Bawa kredit yang tidak digunakan",
+    "rechargeEnabled": "Dayakan pengisian semula berulang",
+    "carryoverOff": "Tamat tempoh setiap kitaran",
+    "rechargeSaved": "Tetapan isi semula disimpan.",
+    "rechargeCarryover": "Benarkan pemindahan",
+    "brandIconClear": "Alih keluar",
+    "rechargeTitle": "Isi semula kredit berulang (lalai dan had)",
+    "brandIconUpload": "Muat naik ikon (pilihan)",
+    "brandIconTooBig": "Ikon mestilah berukuran 120KB atau lebih kecil.",
+    "brandIcon": "ikon",
+    "brandSubtitleHint": "Teks kecil di sebelah logo. Biarkan kosong untuk menyembunyikannya.",
+    "rechargeNote": "Kitaran isi semula lalai platform dan dasar pemindahan. Organisasi, pasukan dan individu boleh memilih kitaran yang lebih pendek tetapi jangan sekali-kali memilih kitaran yang lebih panjang, dan apabila ibu bapa tidak membenarkan pemindahan, kredit yang tidak digunakan di bawahnya akan tamat tempoh di sempadan itu.",
+    "brandSubtitle": "Sari kata",
+    "rechargeAmountHint": "Tetapkan amaun, kitaran dan pemindahan setiap organisasi, setiap pasukan dan setiap pengguna pada halaman butiran mereka. Kitaran tidak boleh lebih lama daripada kitaran induknya.",
+    "brandIconUploadHint": "Ikon yang dimuat naik diutamakan berbanding ikon Lucide di atas. PNG atau SVG di bawah 120KB disyorkan."
   },
   "datasets": {
     "title": "Set data",
@@ -932,7 +994,40 @@
     "notCached": "Tidak dicache",
     "assign": "Tetapkan nod",
     "rejected": "Permintaan ditolak",
-    "dlTitle": "Kemajuan muat turun NFS"
+    "dlTitle": "Kemajuan muat turun NFS",
+    "notFound": "Set data tidak ditemui.",
+    "cacheFail": "Permintaan cache gagal",
+    "descFail": "Tidak dapat menyimpan perihalan",
+    "description": "Penerangan",
+    "phaseDownload": "Memuat turun",
+    "descSaved": "Perihalan disimpan.",
+    "info": "Maklumat set data",
+    "phaseCopy": "Menyalin",
+    "sizeClass": "Kelas saiz",
+    "phaseExtract": "Mengeluarkan",
+    "sizeClassSaved": "Kelas saiz disimpan.",
+    "regNeedName": "Masukkan nama set data.",
+    "extracting": "Mengeluarkan…",
+    "descPh": "Terangkan set data ini",
+    "regNeedUrl": "Masukkan URL.",
+    "regNeedFile": "Pilih fail daripada peti masuk.",
+    "upTaken": "Set data dengan nama itu sudah wujud.",
+    "regRefresh": "Segarkan semula",
+    "regFail": "Pendaftaran gagal",
+    "registering": "Mendaftar",
+    "cache": "Cache nod",
+    "regTitle": "Daftar set data",
+    "upScope": "Keterlihatan",
+    "regSizeClass": "Kelas saiz",
+    "regNfs": "Salinan NFS (SCP)",
+    "regUrl": "URL (wget)",
+    "regBusy": "Mendaftar…",
+    "regStarted": "Pendaftaran bermula — jejak kemajuan dalam senarai.",
+    "regNfsHint": "Salin arkib (zip, tar, tar.gz) ke laluan di bawah, kemudian pilih fail untuk mendaftarkannya. Mendaftar akan mengalihkannya keluar dari peti masuk dan mengekstraknya secara automatik.",
+    "regInboxFile": "Fail peti masuk",
+    "regUrlField": "Muat turun URL",
+    "regInboxEmpty": "Peti masuk kosong. Salin fail ke laluan di atas, kemudian muat semula.",
+    "regUrlHint": "Pelayan memuat turun URL ini secara langsung — tiada apa-apa yang dimuat naik dari penyemak imbas anda. Jejaki kemajuan dalam senarai."
   },
   "announce": {
     "title": "Pengumuman",
@@ -1054,7 +1149,8 @@
     "globalNeedsValue": "Keempat-empat had global mestilah sekurang-kurangnya 1",
     "globalHint": "Global ialah sandaran untuk semua orang — ia tidak boleh kosong dan mestilah sekurang-kurangnya 1. Skop organisasi/kumpulan/pengguna boleh mengatasinya.",
     "removeTitle": "Padamkan dasar",
-    "editTitle": "Edit dasar — ​​{{name}}"
+    "editTitle": "Edit dasar — ​​{{name}}",
+    "capHint": "Maksimum dibenarkan — GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · volum ≤ {{vol}}GiB · sesi serentak ≤ ​​{{sess}}"
   },
   "roles": {
     "org_admin": "org admin",
@@ -1070,7 +1166,16 @@
     "manage": "Urus",
     "subtitle": "Pengecam {{name}} · mengurus kumpulan, pengguna dan kreditnya di sini",
     "usersCapped": "menunjukkan {{shown}} pertama daripada {{total}}",
-    "inGroup": "Urus dalam kumpulan"
+    "inGroup": "Urus dalam kumpulan",
+    "recurringAmount": "Kredit setiap kitaran",
+    "recurringInterval": "Kitaran isi semula (hari)",
+    "recurringCarryover": "Pemindahan",
+    "carryOn": "bawa balik",
+    "carryOff": "tamat tempoh",
+    "recurringTitle": "Kredit berulang",
+    "recurringSaved": "Kredit berulang disimpan.",
+    "maxIntervalHint": "Had platform: {{n}} hari atau kurang",
+    "recurringNote": "Mengisi semula kumpulan organisasi dengan jumlah ini setiap kitaran (0 menyahdayakannya)."
   },
   "gdetail": {
     "title": "Kumpulan",
@@ -1098,7 +1203,25 @@
     "roleSet": "Menukar peranan {{name}} kepada {{role}}",
     "moved": "Beralih {{name}} ke {{group}}",
     "roleHint": "Kebenaran org-admin dan group-admin datang daripada peranan ini (berasingan daripada peranan platform).",
-    "moveHint": "Peranan diteruskan. Kredit yang diperuntukkan dalam kumpulan ini tidak, dan sejarah penggunaan kekal bersama kumpulan ini."
+    "moveHint": "Peranan diteruskan. Kredit yang diperuntukkan dalam kumpulan ini tidak, dan sejarah penggunaan kekal bersama kumpulan ini.",
+    "refilledNow": "Diisi semula sekarang: +{{n}} C",
+    "nextRefill": "Isi semula seterusnya",
+    "refillCol": "Isi semula berulang",
+    "refillSaved": "Isi semula berulang disimpan.",
+    "refillFail": "Isi semula gagal",
+    "refillNow": "Isi semula sekarang",
+    "memberRefillSaved": "Isi semula berulang disimpan",
+    "noRecurringShort": "Tiada isi semula berulang",
+    "refillTitle": "Pengisian semula berulang pasukan",
+    "refillCarryover": "Bawa kredit yang tidak digunakan",
+    "refillMenu": "Isi semula",
+    "refillInheritPh": "diwarisi",
+    "noRecurring": "Tiada jumlah isi semula berulang ditetapkan",
+    "memberRefillSet": "Tetapkan pengisian semula berulang",
+    "refillAmount": "Jumlah isi semula berulang (C)",
+    "memberRefillTitle": "Isi semula berulang — {{name}}",
+    "memberRefillHint": "Jumlah ini dibayar ke dalam dompet ahli setiap kitaran. Gunakan \"Isi semula sekarang\" untuk membayarnya dengan segera.",
+    "refillInterval": "Kitaran (hari) — biarkan kosong untuk lalai pasukan"
   },
   "picker": {
     "allOrgs": "Semua org",
@@ -1125,5 +1248,8 @@
   "brand": "Giosk Console",
   "confirmTerminate": "Paksa tamatkan sesi ini? Kerja berjalan terhenti serta-merta.",
   "confirmDelete": "Padamkan ini? Ini tidak boleh dibuat asal.",
-  "confirmRemoveMember": "Alih keluar ahli ini daripada kumpulan?"
+  "confirmRemoveMember": "Alih keluar ahli ini daripada kumpulan?",
+  "paged": {
+    "range": "{{from}}–{{to}} daripada {{total}}"
+  }
 }

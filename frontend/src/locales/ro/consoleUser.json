@@ -156,7 +156,11 @@
     "mySessions": "Sesiunile mele",
     "kpiFree": "Gratuit (nelimitat)",
     "gpuAvail": "GPU disponibil",
-    "kpiCooldown": "Reîncercați răcirea"
+    "kpiCooldown": "Reîncercați răcirea",
+    "slots": "Sloturi",
+    "hamiShared": "HAMi fracţional",
+    "exclusiveWhole": "Dedicat (întreaga carte)",
+    "hamiFractional": "Fracționat (prin VRAM și nuclee)"
   },
   "newSession": {
     "crumb": "Sesiuni",
@@ -310,7 +314,8 @@
     "runtimeLeft": "Timp de rulare la acest ritm",
     "notEnough": "Credit insuficient – ​​este necesară minim 1 oră",
     "tsSlotN": "1 dintre sloturile {{n}}",
-    "sshKeyChange": "Modifică"
+    "sshKeyChange": "Modifică",
+    "sshCacheCount": "{{n}} stocat în cache"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "sshExternalHint": "Din afara rețelei campusului, utilizați această comandă (sare printr-o gazdă proxy la gateway).",
     "sshDirect": "Direct (intranet)",
     "sshNeedKey": "Nicio cheie publică SSH înregistrată",
-    "sshNeedKeyHint": "Înregistrați sau generați una mai jos — sesiunile în execuție o preiau imediat."
+    "sshNeedKeyHint": "Înregistrați sau generați una mai jos — sesiunile în execuție o preiau imediat.",
+    "webConnectNewWindow": "Deschide un terminal de browser într-o fereastră nouă - nu este nevoie de cheie sau comandă SSH."
   },
   "account": {
     "title": "Setările mele",
@@ -464,7 +470,8 @@
     "sshGenerate": "Generează și descarcă cheia",
     "sshGenerated": "Cheie generată. Păstrați în siguranță cheia privată descărcată — nu poate fi descărcată din nou.",
     "sshGenFail": "Generarea cheii SSH a eșuat.",
-    "sshGenerateHint": "Încă nu aveți o cheie? Faceți clic pe „Generează și descarcă cheia”. Cheia privată (.pem) se descarcă o singură dată, iar cea publică se înregistrează automat. Conectare: ssh -i cheie-descarcata.pem …"
+    "sshGenerateHint": "Încă nu aveți o cheie? Faceți clic pe „Generează și descarcă cheia”. Cheia privată (.pem) se descarcă o singură dată, iar cea publică se înregistrează automat. Conectare: ssh -i cheie-descarcata.pem …",
+    "activeScope": "Activ"
   },
   "notify": {
     "title": "Notificări",
@@ -493,7 +500,19 @@
     "saved": "Regulile {{n}} salvate",
     "sev_info": "Info",
     "sev_warn": "Avertizare",
-    "sev_err": "Eroare"
+    "sev_err": "Eroare",
+    "mSessGpu": "Utilizarea GPU al sesiunii",
+    "prev": "Anterior",
+    "inboxTitle": "Inbox",
+    "readAll": "Marcați toate citite",
+    "next": "Următorul",
+    "mSessVram": "Utilizarea VRAM a sesiunii",
+    "mSessCpu": "Utilizarea CPU sesiunii",
+    "rulesHint": "Regulile de alertă și notificările sunt pentru fiecare cont și sunt distribuite tuturor echipelor. Valorile sesiunii sunt evaluate pe sesiunea selectată.",
+    "inboxEmpty": "Nicio notificare încă.",
+    "scopeAccount": "Întregul cont",
+    "selectSession": "Selectați o sesiune",
+    "noSession": "Fără sesiuni de rulare"
   },
   "wallet": {
     "title": "Portofel / Credite",
@@ -535,7 +554,15 @@
     "topupSend": "Trimiteți cererea",
     "topupSent": "Solicitare trimisă (se așteaptă aprobarea administratorului grupului)",
     "desc_storage": "Stocare ({{ref}})",
-    "desc_gpu": "Utilizare GPU ({{ref}})"
+    "desc_gpu": "Utilizare GPU ({{ref}})",
+    "nextRecharge": "Următoarea reumplere",
+    "rechargeSoon": "Curând",
+    "session": "Sesiune",
+    "searchPh": "Căutați sesiuni, tipuri, detalii",
+    "consumedCol": "Consumat",
+    "viewAll": "Toate intrările",
+    "viewBySession": "Grupați după sesiune",
+    "rechargeEvery": "La fiecare {{n}} zile"
   },
   "volume": {
     "title": "Date / Volume",
@@ -596,7 +623,16 @@
     "quotaHint": "Limită de stocare per utilizator pentru volumele dvs. personale (independent de grup). Noile volume sunt blocate odată ce o depășiți.",
     "overQuota": "Depășește cota rămasă ({{remain}} GB)",
     "thisVol": "Acest volum",
-    "afterRemain": "Rămas după"
+    "afterRemain": "Rămas după",
+    "personal": "Personal",
+    "teamHome": "Facturat echipei",
+    "teamFail": "Nu s-a putut schimba echipa",
+    "teamQuota": "Depășește cota de volum a echipei țintă",
+    "sharedBy": "Partajat de",
+    "changeTeam": "Schimba echipa",
+    "changeTeamTitle": "Schimbați echipa — {{name}}",
+    "teamChanged": "Echipa s-a schimbat",
+    "teamHint": "Cota de capacitate și creditele de stocare ale acestui volum provin de la echipa selectată. Tu ramai proprietarul."
   },
   "gmembers": {
     "title": "Membrii",

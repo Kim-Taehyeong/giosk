@@ -55,7 +55,8 @@
     "all": "All",
     "back": "Back",
     "advanced": "More settings",
-    "optional": "(optional)"
+    "optional": "(optional)",
+    "prev": "Previous"
   },
   "dash": {
     "title": "Dashboard",
@@ -199,7 +200,10 @@
     "totalN": "{{n}} users",
     "prev": "Prev",
     "next": "Next",
-    "advBelong": "Membership · role · password"
+    "advBelong": "Membership · role · password",
+    "colBalance": "Current balance",
+    "colRefill": "Recurring refill",
+    "refillDefault": "Default"
   },
   "groups": {
     "title": "Groups",
@@ -250,7 +254,18 @@
     "grantHintSuper": "Platform-admin exception grant. For integrity, the same amount is auto-added to the parent org pool.",
     "grantHintOrg": "Deducted from your org pool and added to this group's pool. Cannot exceed the org pool balance.",
     "insufficientOrgPool": "Insufficient org credit pool balance.",
-    "grantFail": "Failed to grant credit."
+    "grantFail": "Failed to grant credit.",
+    "cantDeleteDefault": "The default team cannot be deleted.",
+    "hasMembers": "This team still has members. Move or remove them before deleting it.",
+    "deleteFail": "Delete failed",
+    "colRefill": "Recurring refill",
+    "refillDefault": "Default",
+    "initCredit": "Initial credits and recurring refill",
+    "initCreditHint": "Optionally allocate from the organization pool and set a refill when creating the team. You can also do this later in the team detail page.",
+    "initCreditAmt": "Initial credits",
+    "refillAmt": "Recurring refill (per cycle)",
+    "refillInterval": "Refill cycle (days)",
+    "carryover": "Carry over unused credits"
   },
   "orgs": {
     "title": "Organizations",
@@ -294,7 +309,11 @@
     "bulkDone": "Bulk-added {{n}} orgs",
     "colConsumed": "Consumed",
     "adminOpt": "Org admin (optional)",
-    "adminHintOpt": "Leave empty to create just the 'General' group and assign an admin later, from Org detail → General → Add member with the Org admin role."
+    "adminHintOpt": "Leave empty to create just the 'General' group and assign an admin later, from Org detail → General → Add member with the Org admin role.",
+    "hasUsers": "This organization still has users. Move or remove them before deleting it.",
+    "deleteFail": "Delete failed",
+    "colRefill": "Recurring refill",
+    "refillDefault": "Default"
   },
   "billing": {
     "title": "Billing",
@@ -320,7 +339,12 @@
     "notSet": "Not set",
     "sessions": "Sessions",
     "vsAlloc": "vs alloc",
-    "vsBudget2": "vs budget"
+    "vsBudget2": "vs budget",
+    "periodAll": "All time",
+    "periodMonth": "This month",
+    "periodLastMonth": "Last month",
+    "period7d": "Last 7 days",
+    "periodNote": "Consumption and GPU hours shown are what occurred in the selected period, per the ledger. Budgets and pools are not period-scoped."
   },
   "audit": {
     "title": "Audit Log",
@@ -478,7 +502,10 @@
     "impFail": "Import failed",
     "impOwnerHint": "Pick an account from the list to import.",
     "impOwnerPicked": "Selected: {{name}} ({{id}})",
-    "metricsOffNotice": "Monitoring (DCGM/Prometheus) is not installed, so GPU utilization and VRAM cannot be shown. Enable monitoring to see live metrics."
+    "metricsOffNotice": "Monitoring (DCGM/Prometheus) is not installed, so GPU utilization and VRAM cannot be shown. Enable monitoring to see live metrics.",
+    "uncordon": "Uncordon",
+    "cordon": "Cordon",
+    "noMetrics": "No metrics"
   },
   "mset": {
     "title": "Settings",
@@ -601,7 +628,21 @@
     "removeTitle": "Remove from group",
     "removeConfirm": "Remove this user from {{group}}.",
     "removed": "Removed from group",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "memberAdded": "Membership added.",
+    "addFail": "Could not add",
+    "granted": "Granted {{n}} C",
+    "grantFail": "Grant failed",
+    "statusConfirm": "This changes the user's status.",
+    "grant": "Grant credits",
+    "suspend": "Suspend",
+    "restore": "Restore",
+    "addMembership": "Add membership",
+    "pickOrg": "Select an organization",
+    "noTeamsInOrg": "This organization has no teams.",
+    "grantTitle": "Grant credits — {{name}}",
+    "grantAmount": "Credits to grant (C; negative deducts)",
+    "grantHint": "Applied to the personal credit balance immediately and recorded in the audit log as a one-off adjustment."
   },
   "clusters": {
     "title": "Clusters",
@@ -701,7 +742,12 @@
     "extSshOnly": "With no VSCode/Jupyter/custom port, sessions on this image are SSH-only.",
     "needRef": "Enter an image ref",
     "extFail": "Failed to register external image",
-    "extRegistered": "External image registered"
+    "extRegistered": "External image registered",
+    "notCached": "Not cached",
+    "notFound": "Image not found.",
+    "loading": "…",
+    "info": "Image info",
+    "logsHint": "Loads build and scan logs."
   },
   "anotify": {
     "title": "Notifications",
@@ -888,7 +934,23 @@
     "brandAccent": "Logo color",
     "brandAccentReset": "Default",
     "brandAccentHint": "Leave empty to use the theme color.",
-    "brandPreview": "Preview"
+    "brandPreview": "Preview",
+    "rechargeSaved": "Refill settings saved.",
+    "rechargeTitle": "Recurring credit refill (default and limit)",
+    "rechargeNote": "The platform's default refill cycle and carryover policy. Organizations, teams, and individuals may choose a shorter cycle but never a longer one, and when a parent disallows carryover, unused credits below it expire at that boundary.",
+    "rechargeEnabled": "Enable recurring refill",
+    "rechargeInterval": "Default refill cycle (days) · limit for lower levels",
+    "rechargeCarryover": "Allow carryover",
+    "carryoverOn": "Carry over unused credits",
+    "carryoverOff": "Expire each cycle",
+    "rechargeAmountHint": "Set per-organization, per-team, and per-user refill amounts, cycles, and carryover on their detail pages. A cycle can never be longer than its parent's.",
+    "brandSubtitle": "Subtitle",
+    "brandSubtitleHint": "Small text beside the logo. Leave empty to hide it.",
+    "brandIcon": "Icon",
+    "brandIconUpload": "Upload an icon (optional)",
+    "brandIconTooBig": "The icon must be 120KB or smaller.",
+    "brandIconClear": "Remove",
+    "brandIconUploadHint": "An uploaded icon takes precedence over the Lucide icon above. PNG or SVG under 120KB recommended."
   },
   "datasets": {
     "title": "Datasets",
@@ -934,7 +996,40 @@
     "nodeReady": "Ready",
     "uncache": "Remove",
     "doCache": "Cache",
-    "noNodes": "No nodes"
+    "noNodes": "No nodes",
+    "notFound": "Dataset not found.",
+    "cacheFail": "Cache request failed",
+    "descSaved": "Description saved.",
+    "descFail": "Could not save description",
+    "phaseExtract": "Extracting",
+    "phaseCopy": "Copying",
+    "phaseDownload": "Downloading",
+    "info": "Dataset info",
+    "sizeClass": "Size class",
+    "sizeClassSaved": "Size class saved.",
+    "description": "Description",
+    "descPh": "Describe this dataset",
+    "cache": "Node cache",
+    "regNeedName": "Enter a dataset name.",
+    "regNeedFile": "Select a file from the inbox.",
+    "regNeedUrl": "Enter a URL.",
+    "regStarted": "Registration started — track progress in the list.",
+    "upTaken": "A dataset with that name already exists.",
+    "regFail": "Registration failed",
+    "registering": "Registering",
+    "extracting": "Extracting…",
+    "regTitle": "Register dataset",
+    "regBusy": "Registering…",
+    "regNfs": "NFS copy (SCP)",
+    "regUrl": "URL (wget)",
+    "regNfsHint": "Copy an archive (zip, tar, tar.gz) to the path below, then pick the file to register it. Registering moves it out of the inbox and extracts it automatically.",
+    "regRefresh": "Refresh",
+    "regInboxFile": "Inbox file",
+    "regInboxEmpty": "The inbox is empty. Copy a file to the path above, then refresh.",
+    "regUrlField": "Download URL",
+    "regUrlHint": "The server downloads this URL directly — nothing is uploaded from your browser. Track progress in the list.",
+    "upScope": "Visibility",
+    "regSizeClass": "Size class"
   },
   "announce": {
     "title": "Announcements",
@@ -1059,7 +1154,8 @@
     "removed": "Deleted policy for '{{name}}'",
     "searchUser": "Search user",
     "globalHint": "Global is the fallback for everyone — it cannot be empty and must be at least 1. Org/group/user scopes can override it.",
-    "globalNeedsValue": "All four global limits must be at least 1"
+    "globalNeedsValue": "All four global limits must be at least 1",
+    "capHint": "Maximum allowed — GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · volume ≤ {{vol}}GiB · concurrent sessions ≤ {{sess}}"
   },
   "roles": {
     "org_admin": "Org admin",
@@ -1075,7 +1171,16 @@
     "memberRole": "Org/team role",
     "manage": "Manage",
     "inGroup": "Manage in group",
-    "usersCapped": "showing first {{shown}} of {{total}}"
+    "usersCapped": "showing first {{shown}} of {{total}}",
+    "recurringTitle": "Recurring credits",
+    "recurringNote": "Refills the organization pool by this amount each cycle (0 disables it).",
+    "recurringAmount": "Credits per cycle",
+    "recurringInterval": "Refill cycle (days)",
+    "recurringCarryover": "Carryover",
+    "carryOn": "Carry over",
+    "carryOff": "Expire",
+    "maxIntervalHint": "Platform limit: {{n}} days or fewer",
+    "recurringSaved": "Recurring credits saved."
   },
   "gdetail": {
     "title": "Group",
@@ -1103,7 +1208,25 @@
     "needTarget": "Pick a target group",
     "moveFail": "Failed to move",
     "moved": "Moved {{name}} to {{group}}",
-    "moveHint": "The role carries over. Credit allocated in this group does not, and usage history stays with this group."
+    "moveHint": "The role carries over. Credit allocated in this group does not, and usage history stays with this group.",
+    "refilledNow": "Refilled now: +{{n}} C",
+    "noRecurring": "No recurring refill amount is set",
+    "refillFail": "Refill failed",
+    "memberRefillSaved": "Recurring refill saved",
+    "refillSaved": "Recurring refill saved.",
+    "refillTitle": "Team recurring refill",
+    "nextRefill": "Next refill",
+    "noRecurringShort": "No recurring refill",
+    "refillNow": "Refill now",
+    "refillCol": "Recurring refill",
+    "memberRefillSet": "Set recurring refill",
+    "refillMenu": "Refill",
+    "memberRefillTitle": "Recurring refill — {{name}}",
+    "refillAmount": "Recurring refill amount (C)",
+    "refillInterval": "Cycle (days) — leave empty for the team default",
+    "refillInheritPh": "Inherited",
+    "refillCarryover": "Carry over unused credits",
+    "memberRefillHint": "This amount is paid into the member's wallet each cycle. Use \"Refill now\" to pay it immediately."
   },
   "picker": {
     "allOrgs": "All orgs",
@@ -1125,5 +1248,8 @@
     "reason": "Reason (optional)",
     "reasonPh": "e.g. semester research support",
     "grant": "Grant"
+  },
+  "paged": {
+    "range": "{{from}}–{{to}} of {{total}}"
   }
 }

@@ -67,7 +67,9 @@
       "errorPasswordShort": "Mật khẩu phải có ít nhất 8 ký tự.",
       "errorTerms": "Bạn phải chấp nhận các điều khoản để đăng ký.",
       "subtitle": "Điền vào mẫu dưới đây. Bạn sẽ có thể đăng nhập sau khi quản trị viên phê duyệt yêu cầu của bạn.",
-      "errorPasswordMismatch": "Mật khẩu không khớp."
+      "errorPasswordMismatch": "Mật khẩu không khớp.",
+      "pwMismatch": "Mật khẩu không khớp",
+      "pwMatch": "Mật khẩu trùng khớp"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Nút {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "Nút {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "Nút {{up}}/{{total}} · GPU —",
+    "rolePlatformSub": "Siêu quản trị viên",
+    "creditBalance": "Số dư tín dụng",
+    "alerts": "Cảnh báo",
+    "viewAll": "Xem tất cả trong Trung tâm thông báo",
+    "clusterStatus": "Trạng thái cụm",
+    "rolePlatform": "Toàn bộ nền tảng",
+    "unreadN": "{{n}} chưa đọc",
+    "orgWhole": "Toàn bộ tổ chức",
+    "noAlerts": "Chưa có thông báo nào."
+  },
+  "table": {
+    "empty": "Không có dữ liệu"
+  },
+  "refill": {
+    "title": "Nạp tiền định kỳ",
+    "carryOff": "Hết hạn",
+    "maxHint": "Giới hạn chu kỳ gốc: {{n}} ngày trở xuống",
+    "carryover": "Chuyển tiếp",
+    "carryOn": "Chuyển tiếp",
+    "interval": "Chu kỳ nạp tiền (ngày)",
+    "amount": "Tín dụng mỗi chu kỳ",
+    "note": "Nạp lại số tiền này mỗi chu kỳ (0 vô hiệu hóa nó). Chu kỳ không thể dài hơn chu kỳ gốc và được tự động giới hạn."
+  },
+  "select": {
+    "noMatch": "Không có trận đấu",
+    "placeholder": "Lựa chọn",
+    "search": "Tìm kiếm…"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "Nhóm {{target}} đang thiếu tín dụng",
+      "teamBody": "Tín dụng của nhóm {{target}} ở mức {{value}}, dưới ngưỡng {{threshold}}. Các phiên trong nhóm này có thể sớm dừng lại."
+    }
+  },
+  "close": "Đóng"
 }

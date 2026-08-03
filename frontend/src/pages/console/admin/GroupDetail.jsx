@@ -209,13 +209,13 @@ export default function GroupDetail() {
           <button className="btn primary" onClick={submitAdd}>{t('gdetail.addMember')}</button>
         </>}>
         {add && (<>
-          <label className="fld" style={{ marginTop: 0 }}>{t('gdetail.account')}</label>
+          <label className="fld" id="admin-groupdetail-fld-0-lbl" style={{ marginTop: 0 }}>{t('gdetail.account')}</label>
           {/* 이미 멤버인 사용자는 후보에서 제외 — 중복 추가 시도를 원천 차단. */}
           <UserPicker value={add.account} placeholder={t('gdetail.searchUser')}
             filter={(u) => !memberIds.has(u.id)}
             onChange={(v) => setAdd((a) => ({ ...a, account: v }))} />
           <label className="fld">{t('groups.colRole')}</label>
-          <Select value={add.role} onChange={(v) => setAdd({ ...add, role: v })}
+          <Select ariaLabelledBy="admin-groupdetail-fld-0-lbl" value={add.role} onChange={(v) => setAdd({ ...add, role: v })}
             options={ROLES.map((x) => ({ value: x, label: t(`roles.${x}`) }))} />
           <div className="legend mt">{t('gdetail.roleHint')}</div>
         </>)}
@@ -227,10 +227,10 @@ export default function GroupDetail() {
           <button className="btn primary" onClick={saveMemberRefill}>{t('common.save')}</button>
         </>}>
         {refill && (<>
-          <label className="fld" style={{ marginTop: 0 }}>{t('gdetail.refillAmount', { defaultValue: '정기 리필 금액 (C)' })}</label>
-          <input type="number" min={0} value={refill.recurring} onChange={(e) => setRefill({ ...refill, recurring: e.target.value })} placeholder="0" />
-          <label className="fld">{t('gdetail.refillInterval', { defaultValue: '주기 (일) — 비우면 팀 기본' })}</label>
-          <input type="number" min={0} value={refill.interval} onChange={(e) => setRefill({ ...refill, interval: e.target.value })} placeholder={t('gdetail.refillInheritPh', { defaultValue: '상속' })} />
+          <label className="fld" htmlFor="admin-groupdetail-fld-1" style={{ marginTop: 0 }}>{t('gdetail.refillAmount', { defaultValue: '정기 리필 금액 (C)' })}</label>
+          <input id="admin-groupdetail-fld-1" type="number" min={0} value={refill.recurring} onChange={(e) => setRefill({ ...refill, recurring: e.target.value })} placeholder="0" />
+          <label className="fld" htmlFor="admin-groupdetail-fld-2">{t('gdetail.refillInterval', { defaultValue: '주기 (일) — 비우면 팀 기본' })}</label>
+          <input id="admin-groupdetail-fld-2" type="number" min={0} value={refill.interval} onChange={(e) => setRefill({ ...refill, interval: e.target.value })} placeholder={t('gdetail.refillInheritPh', { defaultValue: '상속' })} />
           <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, cursor: 'pointer', marginTop: 12 }}>
             <input type="checkbox" checked={refill.carryover} onChange={(e) => setRefill({ ...refill, carryover: e.target.checked })} />
             {t('gdetail.refillCarryover', { defaultValue: '미사용분 이월(carryover)' })}
@@ -245,11 +245,11 @@ export default function GroupDetail() {
           <button className="btn primary" onClick={saveEdit}>{t('common.save')}</button>
         </>}>
         {edit && (<>
-          <label className="fld" style={{ marginTop: 0 }}>{t('groups.display')}</label>
-          <input type="text" value={edit.displayName} onChange={(e) => setEdit({ ...edit, displayName: e.target.value })} />
-          <label className="fld">{t('groups.acceptsJoin')}</label>
+          <label className="fld" htmlFor="admin-groupdetail-fld-3" style={{ marginTop: 0 }}>{t('groups.display')}</label>
+          <input id="admin-groupdetail-fld-3" type="text" value={edit.displayName} onChange={(e) => setEdit({ ...edit, displayName: e.target.value })} />
+          <label className="fld" htmlFor="admin-groupdetail-fld-4">{t('groups.acceptsJoin')}</label>
           <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, cursor: 'pointer' }}>
-            <input type="checkbox" checked={edit.acceptsJoin} onChange={(e) => setEdit({ ...edit, acceptsJoin: e.target.checked })} />
+            <input id="admin-groupdetail-fld-4" type="checkbox" checked={edit.acceptsJoin} onChange={(e) => setEdit({ ...edit, acceptsJoin: e.target.checked })} />
             {t('groups.acceptsJoinHint')}
           </label>
         </>)}

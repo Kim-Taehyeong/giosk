@@ -67,7 +67,9 @@
       "errorAdvisor": "Perus- ja jatko-opiskelijoiden on tarjottava neuvonantaja.",
       "submitting": "Lähetetään...",
       "errorTerms": "Sinun on hyväksyttävä ehdot rekisteröityäksesi.",
-      "errorPasswordMismatch": "Salasanat eivät täsmää."
+      "errorPasswordMismatch": "Salasanat eivät täsmää.",
+      "pwMismatch": "Salasanat eivät täsmää",
+      "pwMatch": "Salasanat vastaavat"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Solmut {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "Solmut {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "Solmut {{up}}/{{total}} · GPU —",
+    "viewAll": "Katso kaikki Ilmoituskeskuksessa",
+    "orgWhole": "Koko organisaatio",
+    "noAlerts": "Ei vielä hälytyksiä.",
+    "clusterStatus": "Klusterin tila",
+    "alerts": "Hälytykset",
+    "unreadN": "{{n}} lukematon",
+    "rolePlatform": "Koko alusta",
+    "creditBalance": "Luottosaldo",
+    "rolePlatformSub": "Super admin"
+  },
+  "table": {
+    "empty": "Ei dataa"
+  },
+  "refill": {
+    "carryOn": "Siirtää",
+    "carryover": "Siirto",
+    "amount": "Krediittejä per jakso",
+    "title": "Toistuva täyttö",
+    "note": "Täytetään tällä määrällä joka sykli (0 poistaa sen käytöstä). Jakso ei voi olla pidempi kuin vanhemman ja se on automaattisesti rajoitettu.",
+    "interval": "Täyttöjakso (päiviä)",
+    "carryOff": "Vanhenee",
+    "maxHint": "Vanhempien syklirajoitus: {{n}} päivää tai vähemmän"
+  },
+  "select": {
+    "placeholder": "Valitse",
+    "search": "Haku…",
+    "noMatch": "Ei ottelua"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "{{target}}-tiimin luottot ovat vähissä",
+      "teamBody": "{{target}}-tiimin arvosanat ovat {{value}}, {{threshold}}-kynnyksen alapuolella. Tämän joukkueen istunnot saattavat pysähtyä pian."
+    }
+  },
+  "close": "Lähellä"
 }

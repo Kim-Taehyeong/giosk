@@ -53,7 +53,8 @@
     "create": "Erstellen",
     "edit": "Bearbeiten",
     "optional": "(optional)",
-    "advanced": "Weitere Einstellungen"
+    "advanced": "Weitere Einstellungen",
+    "prev": "Vorherige"
   },
   "dash": {
     "title": "Armaturenbrett",
@@ -197,7 +198,10 @@
     "groupPh": "Gruppe auswählen",
     "bulkDone": "Massenhinzugefügte {{n}}-Benutzer",
     "groupPickOrgFirst": "Wählen Sie zunächst eine Organisation aus",
-    "advBelong": "Mitgliedschaft · Rolle · Passwort"
+    "advBelong": "Mitgliedschaft · Rolle · Passwort",
+    "colRefill": "Wiederkehrende Nachfüllung",
+    "refillDefault": "Standard",
+    "colBalance": "Aktueller Kontostand"
   },
   "groups": {
     "title": "Gruppen",
@@ -248,7 +252,18 @@
     "createFail": "Die Gruppe konnte nicht erstellt werden",
     "adminOpt": "Gruppenadministrator (optional)",
     "bulkDone": "Massenhinzugefügte {{n}}-Gruppen",
-    "grantFail": "Kredit konnte nicht gewährt werden."
+    "grantFail": "Kredit konnte nicht gewährt werden.",
+    "colRefill": "Wiederkehrende Nachfüllung",
+    "refillDefault": "Standard",
+    "refillInterval": "Nachfüllzyklus (Tage)",
+    "deleteFail": "Das Löschen ist fehlgeschlagen",
+    "initCreditAmt": "Erste Credits",
+    "cantDeleteDefault": "Das Standardteam kann nicht gelöscht werden.",
+    "hasMembers": "Dieses Team hat noch Mitglieder. Verschieben oder entfernen Sie sie, bevor Sie sie löschen.",
+    "refillAmt": "Wiederkehrende Nachfüllung (pro Zyklus)",
+    "initCredit": "Erstgutschrift und wiederkehrende Aufladung",
+    "initCreditHint": "Optional aus dem Organisationspool zuweisen und beim Erstellen des Teams eine Wiederauffüllung festlegen. Sie können dies auch später auf der Teamdetailseite tun.",
+    "carryover": "Übertragen Sie ungenutzte Guthaben"
   },
   "orgs": {
     "title": "Organisationen",
@@ -292,7 +307,11 @@
     "grantHint": "Wird sofort auf den Organisationspool angewendet und im Prüfprotokoll aufgezeichnet.",
     "adminOpt": "Organisationsadministrator (optional)",
     "bulkDone": "Massenhinzugefügte {{n}}-Organisationen",
-    "adminHintOpt": "Lassen Sie das Feld leer, um nur die Gruppe „Allgemein“ zu erstellen und später einen Administrator zuzuweisen, über Organisationsdetails → Allgemein → Mitglied mit der Rolle „Organisationsadministrator“ hinzufügen."
+    "adminHintOpt": "Lassen Sie das Feld leer, um nur die Gruppe „Allgemein“ zu erstellen und später einen Administrator zuzuweisen, über Organisationsdetails → Allgemein → Mitglied mit der Rolle „Organisationsadministrator“ hinzufügen.",
+    "deleteFail": "Das Löschen ist fehlgeschlagen",
+    "colRefill": "Wiederkehrende Nachfüllung",
+    "refillDefault": "Standard",
+    "hasUsers": "Diese Organisation hat noch Benutzer. Verschieben oder entfernen Sie sie, bevor Sie sie löschen."
   },
   "billing": {
     "title": "Abrechnung",
@@ -318,7 +337,12 @@
     "vsAlloc": "vs alloc",
     "byUser": "Verbrauch pro Benutzer",
     "byOrg": "Verbrauch nach Org",
-    "tabUser": "Vom Benutzer"
+    "tabUser": "Vom Benutzer",
+    "periodAll": "Alle Zeiten",
+    "periodMonth": "Diesen Monat",
+    "periodLastMonth": "Letzten Monat",
+    "period7d": "Letzte 7 Tage",
+    "periodNote": "Der angezeigte Verbrauch und die GPU-Stunden beziehen sich auf den im ausgewählten Zeitraum laut Ledger aufgetretenen Verbrauch. Budgets und Pools sind nicht periodenbezogen."
   },
   "audit": {
     "title": "Audit-Protokoll",
@@ -476,7 +500,10 @@
     "impDone": "Importiertes Volume {{name}} bis {{user}}.",
     "impOwnerHint": "Wählen Sie zum Importieren ein Konto aus der Liste.",
     "impOwnerPicked": "Ausgewählt: {{name}} ({{id}})",
-    "metricsOffNotice": "Monitoring (DCGM/Prometheus) ist nicht installiert, daher können GPU-Auslastung und VRAM nicht angezeigt werden. Aktivieren Sie das Monitoring, um Live-Metriken zu sehen."
+    "metricsOffNotice": "Monitoring (DCGM/Prometheus) ist nicht installiert, daher können GPU-Auslastung und VRAM nicht angezeigt werden. Aktivieren Sie das Monitoring, um Live-Metriken zu sehen.",
+    "cordon": "Kordon",
+    "uncordon": "Uncordon",
+    "noMetrics": "Keine Metriken"
   },
   "mset": {
     "title": "Einstellungen",
@@ -599,7 +626,21 @@
     "removeConfirm": "Entfernen Sie diesen Benutzer aus {{group}}.",
     "moveTo": "Zielgruppe",
     "moveFail": "Der Umzug ist fehlgeschlagen",
-    "removeTitle": "Aus der Gruppe entfernen"
+    "removeTitle": "Aus der Gruppe entfernen",
+    "suspend": "Aussetzen",
+    "restore": "Wiederherstellen",
+    "addFail": "Konnte nicht hinzugefügt werden",
+    "granted": "Gewährt {{n}} C",
+    "memberAdded": "Mitgliedschaft hinzugefügt.",
+    "grantFail": "Grant ist gescheitert",
+    "pickOrg": "Wählen Sie eine Organisation aus",
+    "addMembership": "Mitgliedschaft hinzufügen",
+    "grant": "Credits gewähren",
+    "statusConfirm": "Dadurch ändert sich der Status des Benutzers.",
+    "grantHint": "Wird sofort auf das persönliche Guthaben angewendet und als einmalige Anpassung im Prüfprotokoll erfasst.",
+    "grantAmount": "Zu gewährende Gutschriften (C; negative Abzüge)",
+    "noTeamsInOrg": "Diese Organisation hat keine Teams.",
+    "grantTitle": "Zuschusskredite – {{name}}"
   },
   "clusters": {
     "title": "Cluster",
@@ -699,7 +740,12 @@
     "webName": "Kanalname (optional)",
     "extTitle": "Externes Bild registrieren",
     "imgRefHint": "Rufen Sie ein Docker Hub-/externes Registrierungsimage ab und verwenden Sie es unverändert (kein Build). z.B. codercom/code-server:latest",
-    "extRegistered": "Externes Bild registriert"
+    "extRegistered": "Externes Bild registriert",
+    "loading": "…",
+    "info": "Bildinfo",
+    "notCached": "Nicht zwischengespeichert",
+    "logsHint": "Lädt Build- und Scan-Protokolle.",
+    "notFound": "Bild nicht gefunden."
   },
   "anotify": {
     "title": "Benachrichtigungen",
@@ -886,7 +932,23 @@
     "featuresHead": "Benutzerfunktionen",
     "brandAccent": "Logofarbe",
     "brandingNote": "Passen Sie den Servicenamen und die Logofarbe an Ihre Organisation an. Wird sofort auf die Anmeldung und den Konsolenheader angewendet.",
-    "brandAccentHint": "Lassen Sie das Feld leer, um die Designfarbe zu verwenden."
+    "brandAccentHint": "Lassen Sie das Feld leer, um die Designfarbe zu verwenden.",
+    "carryoverOn": "Übertragen Sie ungenutzte Guthaben",
+    "rechargeTitle": "Wiederkehrende Guthabenauffüllung (Standard und Limit)",
+    "brandSubtitle": "Untertitel",
+    "brandIcon": "Symbol",
+    "rechargeSaved": "Nachfülleinstellungen gespeichert.",
+    "brandIconClear": "Entfernen",
+    "rechargeInterval": "Standard-Nachfüllzyklus (Tage) · Begrenzung für niedrigere Füllstände",
+    "rechargeNote": "Der Standard-Nachfüllzyklus und die Übertragungsrichtlinie der Plattform. Organisationen, Teams und Einzelpersonen können sich für einen kürzeren Zyklus entscheiden, jedoch niemals für einen längeren. Wenn ein Elternteil die Übertragung nicht zulässt, verfallen ungenutzte Credits darunter an dieser Grenze.",
+    "rechargeCarryover": "Verschleppung zulassen",
+    "rechargeEnabled": "Aktivieren Sie wiederkehrende Nachfüllungen",
+    "carryoverOff": "Lassen Sie jeden Zyklus ablaufen",
+    "brandIconUploadHint": "Ein hochgeladenes Symbol hat Vorrang vor dem Lucide-Symbol oben. PNG oder SVG unter 120 KB empfohlen.",
+    "rechargeAmountHint": "Legen Sie auf den Detailseiten pro Organisation, pro Team und pro Benutzer Nachfüllmengen, Zyklen und Überträge fest. Ein Zyklus kann niemals länger sein als der seines Elternzyklus.",
+    "brandSubtitleHint": "Kleiner Text neben dem Logo. Lassen Sie es leer, um es zu verbergen.",
+    "brandIconTooBig": "Das Symbol darf maximal 120 KB groß sein.",
+    "brandIconUpload": "Laden Sie ein Symbol hoch (optional)"
   },
   "datasets": {
     "title": "Datensätze",
@@ -932,7 +994,40 @@
     "assignTitle": "Cache-Knotenzuweisung",
     "notCached": "Nicht zwischengespeichert",
     "dlHint": "Sobald Sie fertig sind, können Sie unten knotenlokale Caches zuweisen.",
-    "assignHint": "Wählen Sie aus, welche Knoten diesen Datensatz zwischenspeichern. Es wird zur sofortigen Verwendung aus NFS auf den Knotenlokal extrahiert."
+    "assignHint": "Wählen Sie aus, welche Knoten diesen Datensatz zwischenspeichern. Es wird zur sofortigen Verwendung aus NFS auf den Knotenlokal extrahiert.",
+    "phaseCopy": "Kopieren",
+    "phaseDownload": "Herunterladen",
+    "description": "Beschreibung",
+    "cacheFail": "Cache-Anfrage fehlgeschlagen",
+    "info": "Datensatzinformationen",
+    "phaseExtract": "Extrahieren",
+    "descSaved": "Beschreibung gespeichert.",
+    "cache": "Knoten-Cache",
+    "sizeClassSaved": "Größenklasse gespeichert.",
+    "notFound": "Datensatz nicht gefunden.",
+    "descPh": "Beschreiben Sie diesen Datensatz",
+    "sizeClass": "Größenklasse",
+    "descFail": "Beschreibung konnte nicht gespeichert werden",
+    "regFail": "Die Registrierung ist fehlgeschlagen",
+    "regBusy": "Registrieren…",
+    "regStarted": "Die Registrierung hat begonnen – verfolgen Sie den Fortschritt in der Liste.",
+    "registering": "Registrieren",
+    "regRefresh": "Aktualisieren",
+    "regInboxFile": "Posteingangsdatei",
+    "regNeedUrl": "Geben Sie eine URL ein.",
+    "regNeedFile": "Wählen Sie eine Datei aus dem Posteingang aus.",
+    "regNfsHint": "Kopieren Sie ein Archiv (zip, tar, tar.gz) in den untenstehenden Pfad und wählen Sie dann die Datei aus, um sie zu registrieren. Durch die Registrierung wird es aus dem Posteingang verschoben und automatisch extrahiert.",
+    "regNfs": "NFS-Kopie (SCP)",
+    "regSizeClass": "Größenklasse",
+    "regTitle": "Datensatz registrieren",
+    "regUrl": "URL (wget)",
+    "regNeedName": "Geben Sie einen Datensatznamen ein.",
+    "upScope": "Sichtweite",
+    "upTaken": "Ein Datensatz mit diesem Namen existiert bereits.",
+    "extracting": "Extrahieren…",
+    "regUrlHint": "Der Server lädt diese URL direkt herunter – es wird nichts von Ihrem Browser hochgeladen. Verfolgen Sie den Fortschritt in der Liste.",
+    "regUrlField": "Download-URL",
+    "regInboxEmpty": "Der Posteingang ist leer. Kopieren Sie eine Datei in den oben genannten Pfad und aktualisieren Sie sie dann."
   },
   "announce": {
     "title": "Ankündigungen",
@@ -1054,7 +1149,8 @@
     "removed": "Richtlinie für „{{name}}“ gelöscht",
     "globalNeedsValue": "Alle vier globalen Grenzwerte müssen mindestens 1 sein",
     "needTarget": "Wählen Sie einen Umfang und ein Ziel",
-    "removeConfirm": "Durch das Löschen der Richtlinie „{{name}}“ erbt sie vom oben genannten Bereich. Weitermachen?"
+    "removeConfirm": "Durch das Löschen der Richtlinie „{{name}}“ erbt sie vom oben genannten Bereich. Weitermachen?",
+    "capHint": "Maximal zulässig – GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · Volumen ≤ {{vol}}GiB · gleichzeitige Sitzungen ≤ {{sess}}"
   },
   "roles": {
     "org_admin": "Organisationsadministrator",
@@ -1070,7 +1166,16 @@
     "manage": "Verwalten",
     "usersHint": "Rolle ist die Rolle des Benutzers innerhalb seiner Gruppe. Ändern Sie es in der Mitgliederverwaltung dieser Gruppe.",
     "inGroup": "In der Gruppe verwalten",
-    "usersCapped": "Zeigt das erste {{shown}} von {{total}}"
+    "usersCapped": "Zeigt das erste {{shown}} von {{total}}",
+    "recurringAmount": "Credits pro Zyklus",
+    "recurringInterval": "Nachfüllzyklus (Tage)",
+    "recurringCarryover": "Übertragung",
+    "carryOn": "Übertragen",
+    "carryOff": "Erlöschen",
+    "recurringTitle": "Wiederkehrende Credits",
+    "recurringSaved": "Wiederkehrende Credits eingespart.",
+    "maxIntervalHint": "Plattformlimit: {{n}} Tage oder weniger",
+    "recurringNote": "Füllt den Organisationspool in jedem Zyklus um diesen Betrag auf (0 deaktiviert ihn)."
   },
   "gdetail": {
     "title": "Gruppe",
@@ -1098,7 +1203,25 @@
     "roleSet": "Die Rolle von {{name}} wurde in {{role}} geändert",
     "roleHint": "Org-Administrator- und Gruppenadministrator-Berechtigungen stammen von dieser Rolle (getrennt von der Plattformrolle).",
     "moveFail": "Bewegung fehlgeschlagen",
-    "moveHint": "Die Rolle wird übertragen. Das in dieser Gruppe zugewiesene Guthaben ist nicht vorhanden und der Nutzungsverlauf bleibt bei dieser Gruppe."
+    "moveHint": "Die Rolle wird übertragen. Das in dieser Gruppe zugewiesene Guthaben ist nicht vorhanden und der Nutzungsverlauf bleibt bei dieser Gruppe.",
+    "noRecurring": "Es ist kein wiederkehrender Nachfüllbetrag festgelegt",
+    "refillCol": "Wiederkehrende Nachfüllung",
+    "refilledNow": "Jetzt nachgefüllt: +{{n}} C",
+    "refillMenu": "Nachfüllung",
+    "refillFail": "Das Nachfüllen ist fehlgeschlagen",
+    "refillTitle": "Wiederkehrende Nachfüllung für das Team",
+    "noRecurringShort": "Kein wiederkehrendes Nachfüllen",
+    "refillCarryover": "Übertragen Sie ungenutzte Guthaben",
+    "nextRefill": "Nächste Nachfüllung",
+    "refillSaved": "Wiederkehrendes Nachfüllen eingespart.",
+    "memberRefillSet": "Legen Sie eine wiederkehrende Nachfüllung fest",
+    "memberRefillSaved": "Wiederkehrendes Nachfüllen eingespart",
+    "refillNow": "Jetzt auffüllen",
+    "refillAmount": "Wiederkehrende Nachfüllmenge (C)",
+    "memberRefillTitle": "Wiederkehrende Nachfüllung – {{name}}",
+    "refillInheritPh": "Geerbt",
+    "memberRefillHint": "Dieser Betrag wird in jedem Zyklus in die Brieftasche des Mitglieds eingezahlt. Benutzen Sie „Jetzt aufladen“, um sofort zu bezahlen.",
+    "refillInterval": "Zyklus (Tage) – für die Team-Standardeinstellung leer lassen"
   },
   "picker": {
     "allOrgs": "Alle Organisationen",
@@ -1125,5 +1248,8 @@
   "brand": "Giosk-Konsole",
   "confirmTerminate": "Diese Sitzung zwangsweise beenden? Die laufende Arbeit stoppt sofort.",
   "confirmDelete": "Dies löschen? Dies kann nicht rückgängig gemacht werden.",
-  "confirmRemoveMember": "Dieses Mitglied aus der Gruppe entfernen?"
+  "confirmRemoveMember": "Dieses Mitglied aus der Gruppe entfernen?",
+  "paged": {
+    "range": "{{from}}–{{to}} von {{total}}"
+  }
 }

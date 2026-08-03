@@ -53,7 +53,8 @@
     "optional": "(optional)",
     "comingSoon": "În curând",
     "advanced": "Mai multe setări",
-    "empty": "Fără date"
+    "empty": "Fără date",
+    "prev": "Anterior"
   },
   "dash": {
     "title": "Bord",
@@ -197,7 +198,10 @@
     "prev": "Prev",
     "fAdvisor": "Sponsor",
     "colMemberRole": "Rolul organizației/echipei",
-    "advBelong": "Calitatea de membru · rol · parolă"
+    "advBelong": "Calitatea de membru · rol · parolă",
+    "colRefill": "Reîncărcare recurentă",
+    "refillDefault": "Implicit",
+    "colBalance": "Sold curent"
   },
   "groups": {
     "title": "Grupuri",
@@ -248,7 +252,18 @@
     "insufficientOrgPool": "Soldul grupului de credit al organizației este insuficient.",
     "grantHintSuper": "Acordare excepție pentru administratorul platformei. Pentru integritate, aceeași cantitate este adăugată automat la pool-ul organizației părinte.",
     "grantHintOrg": "Dedus din grupul organizației dvs. și adăugat la grupul acestui grup. Nu se poate depăși soldul grupului organizațional.",
-    "grantFail": "Nu s-a acordat creditul."
+    "grantFail": "Nu s-a acordat creditul.",
+    "colRefill": "Reîncărcare recurentă",
+    "deleteFail": "Ștergerea nu a reușit",
+    "refillInterval": "Ciclu de reumplere (zile)",
+    "carryover": "Transferați creditele neutilizate",
+    "refillAmt": "Umplere recurentă (pe ciclu)",
+    "cantDeleteDefault": "Echipa implicită nu poate fi ștearsă.",
+    "hasMembers": "Această echipă mai are membri. Mutați-le sau eliminați-le înainte de a le șterge.",
+    "initCredit": "Credite inițiale și reumplere recurentă",
+    "refillDefault": "Implicit",
+    "initCreditAmt": "Credite inițiale",
+    "initCreditHint": "Opțional, alocați din grupul organizației și setați o reîncărcare la crearea echipei. Puteți face acest lucru și mai târziu în pagina cu detaliile echipei."
   },
   "orgs": {
     "title": "Organizații",
@@ -292,7 +307,11 @@
     "bulkDone": "Organizații {{n}} adăugate în bloc",
     "adminOpt": "Administrator organizație (opțional)",
     "grantHint": "Aplicat la pool-ul organizației imediat și înregistrat în jurnalul de audit.",
-    "adminHintOpt": "Lăsați gol pentru a crea doar grupul „General” și alocați un administrator mai târziu, din Detaliu organizație → General → Adăugați membru cu rolul de administrator organizație."
+    "adminHintOpt": "Lăsați gol pentru a crea doar grupul „General” și alocați un administrator mai târziu, din Detaliu organizație → General → Adăugați membru cu rolul de administrator organizație.",
+    "deleteFail": "Ștergerea nu a reușit",
+    "colRefill": "Reîncărcare recurentă",
+    "refillDefault": "Implicit",
+    "hasUsers": "Această organizație are încă utilizatori. Mutați-le sau eliminați-le înainte de a le șterge."
   },
   "billing": {
     "title": "Facturare",
@@ -318,7 +337,12 @@
     "tabOrg": "Prin org",
     "byGroup": "Consum pe grup (showback)",
     "notSet": "Nu setat",
-    "vsAlloc": "vs aloc"
+    "vsAlloc": "vs aloc",
+    "period7d": "Ultimele 7 zile",
+    "periodMonth": "Luna aceasta",
+    "periodAll": "Tot timpul",
+    "periodLastMonth": "Luna trecută",
+    "periodNote": "Consumul și orele GPU afișate sunt cele care au avut loc în perioada selectată, conform registrului. Bugetele și pool-urile nu sunt acoperite pe perioadă."
   },
   "audit": {
     "title": "Jurnal de audit",
@@ -476,7 +500,10 @@
     "impNoUser": "Contul nu a fost găsit.",
     "impOwnerHint": "Alegeți un cont din listă pentru a importa.",
     "impOwnerPicked": "Selectat: {{name}} ({{id}})",
-    "metricsOffNotice": "Monitorizarea (DCGM/Prometheus) nu este instalată, deci utilizarea GPU și VRAM nu pot fi afișate. Activați monitorizarea pentru a vedea metrici în timp real."
+    "metricsOffNotice": "Monitorizarea (DCGM/Prometheus) nu este instalată, deci utilizarea GPU și VRAM nu pot fi afișate. Activați monitorizarea pentru a vedea metrici în timp real.",
+    "cordon": "Cordon",
+    "uncordon": "Uncordon",
+    "noMetrics": "Fără valori"
   },
   "mset": {
     "title": "Setări",
@@ -599,7 +626,21 @@
     "removeConfirm": "Eliminați acest utilizator din {{group}}.",
     "moveFail": "Mutarea a eșuat",
     "removeTitle": "Eliminați din grup",
-    "removed": "Eliminat din grup"
+    "removed": "Eliminat din grup",
+    "memberAdded": "Calitatea de membru a fost adăugată.",
+    "addFail": "Nu s-a putut adăuga",
+    "suspend": "Suspenda",
+    "restore": "Restabili",
+    "statusConfirm": "Acest lucru schimbă starea utilizatorului.",
+    "granted": "A acordat {{n}} C",
+    "grant": "Acordați credite",
+    "pickOrg": "Selectați o organizație",
+    "grantFail": "Grant a eșuat",
+    "grantTitle": "Acordați credite — {{name}}",
+    "addMembership": "Adăugați calitatea de membru",
+    "noTeamsInOrg": "Această organizație nu are echipe.",
+    "grantAmount": "Credite de acordat (C; deduceri negative)",
+    "grantHint": "Se aplică imediat soldului creditului personal și se înregistrează în jurnalul de audit ca o ajustare unică."
   },
   "clusters": {
     "title": "Clustere",
@@ -699,7 +740,12 @@
     "extSshOnly": "Fără nici un port VSCode/Jupyter/personalizat, sesiunile de pe această imagine sunt doar SSH.",
     "needRef": "Introduceți o imagine ref",
     "extFail": "Nu s-a putut înregistra imaginea externă",
-    "extRegistered": "Imagine externă înregistrată"
+    "extRegistered": "Imagine externă înregistrată",
+    "notFound": "Imaginea nu a fost găsită.",
+    "notCached": "Nu este stocat în cache",
+    "loading": "…",
+    "logsHint": "Încarcă jurnalele de construire și scanare.",
+    "info": "Informații despre imagine"
   },
   "anotify": {
     "title": "Notificări",
@@ -886,7 +932,23 @@
     "brandName": "Nume serviciu",
     "brandAccent": "Culoarea logo-ului",
     "brandPreview": "Previzualizare",
-    "brandAccentHint": "Lăsați gol pentru a utiliza culoarea temei."
+    "brandAccentHint": "Lăsați gol pentru a utiliza culoarea temei.",
+    "carryoverOn": "Transferați creditele neutilizate",
+    "brandSubtitle": "Subtitlu",
+    "brandSubtitleHint": "Text mic lângă logo. Lăsați gol pentru a-l ascunde.",
+    "rechargeTitle": "Reîncărcare recurentă a creditului (implicit și limită)",
+    "rechargeSaved": "Setările de reumplere au fost salvate.",
+    "carryoverOff": "Expiră fiecare ciclu",
+    "rechargeCarryover": "Permite transferul",
+    "brandIcon": "Pictogramă",
+    "rechargeEnabled": "Activați reîncărcarea recurentă",
+    "rechargeNote": "Ciclul implicit de reîncărcare și politica de reportare a platformei. Organizațiile, echipele și indivizii pot alege un ciclu mai scurt, dar niciodată unul mai lung, iar atunci când un părinte nu permite reportarea, creditele neutilizate sub acesta expiră la limita respectivă.",
+    "brandIconClear": "Elimina",
+    "rechargeAmountHint": "Setați cantitățile, ciclurile și reportul pentru fiecare organizație, echipă și utilizator pe paginile lor de detalii. Un ciclu nu poate fi niciodată mai lung decât cel al părintelui său.",
+    "rechargeInterval": "Ciclu de umplere implicit (zile) · limită pentru niveluri inferioare",
+    "brandIconTooBig": "Pictograma trebuie să fie de 120 KB sau mai mică.",
+    "brandIconUpload": "Încărcați o pictogramă (opțional)",
+    "brandIconUploadHint": "O pictogramă încărcată are prioritate față de pictograma Lucide de mai sus. Se recomandă PNG sau SVG sub 120 KB."
   },
   "datasets": {
     "title": "Seturi de date",
@@ -932,7 +994,40 @@
     "assignTitle": "Alocarea nodului în cache",
     "assignHint": "Alegeți ce noduri memorează în cache acest set de date. Este extras din NFS în nod-local pentru utilizare imediată.",
     "notCached": "Nu este stocat în cache",
-    "dlInto": "Se încarcă în /dataset/{{name}}"
+    "dlInto": "Se încarcă în /dataset/{{name}}",
+    "cacheFail": "Solicitarea memoriei cache a eșuat",
+    "descSaved": "Descrierea salvată.",
+    "phaseCopy": "Copierea",
+    "phaseExtract": "Extragerea",
+    "description": "Descriere",
+    "descFail": "Nu s-a putut salva descrierea",
+    "descPh": "Descrieți acest set de date",
+    "info": "Informații despre setul de date",
+    "notFound": "Setul de date nu a fost găsit.",
+    "sizeClass": "Clasa de mărime",
+    "phaseDownload": "Descărcare",
+    "regStarted": "Înregistrarea a început — urmăriți progresul în listă.",
+    "regNeedName": "Introduceți un nume de set de date.",
+    "registering": "Înregistrare",
+    "sizeClassSaved": "Clasa de mărime salvată.",
+    "extracting": "Se extrage…",
+    "regTitle": "Înregistrați setul de date",
+    "regBusy": "Se înregistrează…",
+    "regNeedUrl": "Introduceți o adresă URL.",
+    "cache": "Cache-ul nodului",
+    "regFail": "Înregistrarea a eșuat",
+    "regRefresh": "Reîmprospăta",
+    "upScope": "Vizibilitate",
+    "regSizeClass": "Clasa de mărime",
+    "regNeedFile": "Selectați un fișier din căsuța de e-mail.",
+    "upTaken": "Un set de date cu acest nume există deja.",
+    "regUrl": "URL (wget)",
+    "regUrlField": "Descărcați adresa URL",
+    "regNfs": "copie NFS (SCP)",
+    "regNfsHint": "Copiați o arhivă (zip, tar, tar.gz) în calea de mai jos, apoi alegeți fișierul pentru a-l înregistra. Înregistrarea îl mută din inbox și îl extrage automat.",
+    "regInboxFile": "Fișier inbox",
+    "regInboxEmpty": "Căsuța de e-mail este goală. Copiați un fișier în calea de mai sus, apoi reîmprospătați.",
+    "regUrlHint": "Serverul descarcă direct această adresă URL — nu este încărcat nimic din browser. Urmăriți progresul în listă."
   },
   "announce": {
     "title": "Anunturi",
@@ -1054,7 +1149,8 @@
     "editTitle": "Editați politica — {{name}}",
     "globalNeedsValue": "Toate cele patru limite globale trebuie să fie de cel puțin 1",
     "removeConfirm": "Ștergerea politicii „{{name}}” o face să moștenească din domeniul de mai sus. Continua?",
-    "globalHint": "Global este soluția de rezervă pentru toată lumea — nu poate fi goală și trebuie să fie de cel puțin 1. Domeniile organizației/grupului/utilizatorului îl pot suprascrie."
+    "globalHint": "Global este soluția de rezervă pentru toată lumea — nu poate fi goală și trebuie să fie de cel puțin 1. Domeniile organizației/grupului/utilizatorului îl pot suprascrie.",
+    "capHint": "Maxim permis — GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · volum ≤ {{vol}}GiB · sesiuni simultane ≤ {{sess}}"
   },
   "roles": {
     "org_admin": "Administratorul organizației",
@@ -1070,7 +1166,16 @@
     "usersCapped": "arătând primul {{shown}} din {{total}}",
     "usersHint": "Rolul este rolul utilizatorului în cadrul grupului său. Schimbați-l din managementul membrilor acelui grup.",
     "inGroup": "Gestionați în grup",
-    "subtitle": "Identificator {{name}} · gestionați aici grupurile, utilizatorii și creditele"
+    "subtitle": "Identificator {{name}} · gestionați aici grupurile, utilizatorii și creditele",
+    "recurringAmount": "Credite pe ciclu",
+    "recurringInterval": "Ciclu de reumplere (zile)",
+    "recurringCarryover": "Reportare",
+    "carryOn": "Reportare",
+    "carryOff": "Expira",
+    "recurringTitle": "Credite recurente",
+    "recurringSaved": "Credite recurente salvate.",
+    "recurringNote": "Reîncarcă fondul organizației cu această sumă în fiecare ciclu (0 îl dezactivează).",
+    "maxIntervalHint": "Limită platformă: {{n}} zile sau mai puțin"
   },
   "gdetail": {
     "title": "Grup",
@@ -1098,7 +1203,25 @@
     "moveFail": "Mișcarea eșuată",
     "moved": "S-a mutat {{name}} în {{group}}",
     "needTarget": "Alegeți un grup țintă",
-    "moveHint": "Rolul se preia. Creditul alocat în acest grup nu, iar istoricul utilizării rămâne cu acest grup."
+    "moveHint": "Rolul se preia. Creditul alocat în acest grup nu, iar istoricul utilizării rămâne cu acest grup.",
+    "refillCol": "Reîncărcare recurentă",
+    "noRecurring": "Nu este setată nicio cantitate de reîncărcare recurentă",
+    "refilledNow": "Reumplut acum: +{{n}} C",
+    "memberRefillSaved": "Rezervarea recurentă a fost salvată",
+    "nextRefill": "Următoarea reumplere",
+    "noRecurringShort": "Fără reumplere recurentă",
+    "refillInheritPh": "Moştenit",
+    "refillCarryover": "Transferați creditele neutilizate",
+    "refillSaved": "Rezervarea recurentă a fost salvată.",
+    "refillNow": "Reîncărcați acum",
+    "refillTitle": "Reumplere recurentă a echipei",
+    "refillFail": "Reumplerea a eșuat",
+    "memberRefillSet": "Setați reumplerea recurentă",
+    "refillMenu": "Reumpleți",
+    "refillAmount": "Cantitatea de reîncărcare recurentă (C)",
+    "refillInterval": "Ciclu (zile) — lăsați necompletat pentru implicit pentru echipă",
+    "memberRefillHint": "Această sumă este plătită în portofelul membrului în fiecare ciclu. Folosiți „Reîncărcați acum” pentru a plăti imediat.",
+    "memberRefillTitle": "Reumplere recurentă — {{name}}"
   },
   "picker": {
     "allOrgs": "Toate organizațiile",
@@ -1125,5 +1248,8 @@
   "brand": "Consola Giosk",
   "confirmDelete": "Ștergeți asta? Acest lucru nu poate fi anulat.",
   "confirmTerminate": "Terminați forțat această sesiune? Lucrările rulante se opresc imediat.",
-  "confirmRemoveMember": "Eliminați acest membru din grup?"
+  "confirmRemoveMember": "Eliminați acest membru din grup?",
+  "paged": {
+    "range": "{{from}}–{{to}} din {{total}}"
+  }
 }

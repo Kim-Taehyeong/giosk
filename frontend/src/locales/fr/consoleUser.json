@@ -156,7 +156,11 @@
     "kpiNodes": "Nœuds disponibles",
     "kpiCooldown": "Réessayez le temps de recharge",
     "kpiFree": "Gratuit (illimité)",
-    "kpiMaxLease": "Bail maximum"
+    "kpiMaxLease": "Bail maximum",
+    "slots": "Machines à sous",
+    "hamiFractional": "Fractionnel (par VRAM et cœurs)",
+    "exclusiveWhole": "Dédié (carte entière)",
+    "hamiShared": "HAMi fractionnaire"
   },
   "newSession": {
     "crumb": "Séances",
@@ -310,7 +314,8 @@
     "grpGuaranteedDesc": "Votre partage VRAM est garanti. Les autres sessions sur le même GPU ne peuvent pas utiliser votre mémoire.",
     "grpSlot": "Emplacement partagé · moins cher, sans garantie",
     "tsSlotN": "1 des emplacements {{n}}",
-    "sshKeyChange": "Modifier"
+    "sshKeyChange": "Modifier",
+    "sshCacheCount": "{{n}} mis en cache"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "sshDirect": "Direct (intranet)",
     "regenerated": "Publication d'un nouveau lien d'accès.",
     "sshNeedKey": "Aucune clé publique SSH enregistrée",
-    "sshNeedKeyHint": "Enregistrez-en une ou générez-la ci-dessous — les sessions en cours la prennent en compte immédiatement."
+    "sshNeedKeyHint": "Enregistrez-en une ou générez-la ci-dessous — les sessions en cours la prennent en compte immédiatement.",
+    "webConnectNewWindow": "Ouvre un terminal de navigateur dans une nouvelle fenêtre – aucune clé ou commande SSH n'est nécessaire."
   },
   "account": {
     "title": "Mes paramètres",
@@ -464,7 +470,8 @@
     "sshGenerate": "Générer et télécharger une clé",
     "sshGenerated": "Clé générée. Conservez la clé privée téléchargée en lieu sûr — elle ne peut pas être téléchargée à nouveau.",
     "sshGenFail": "Échec de la génération de la clé SSH.",
-    "sshGenerateHint": "Pas encore de clé ? Cliquez sur « Générer et télécharger une clé ». La clé privée (.pem) est téléchargée une seule fois et la clé publique est enregistrée automatiquement. Connexion : ssh -i cle-telechargee.pem …"
+    "sshGenerateHint": "Pas encore de clé ? Cliquez sur « Générer et télécharger une clé ». La clé privée (.pem) est téléchargée une seule fois et la clé publique est enregistrée automatiquement. Connexion : ssh -i cle-telechargee.pem …",
+    "activeScope": "Actif"
   },
   "notify": {
     "title": "Notifications",
@@ -493,7 +500,19 @@
     "mBudget": "Utilisation du budget",
     "sev_err": "Erreur",
     "sev_info": "Informations",
-    "sev_warn": "Avertissement"
+    "sev_warn": "Avertissement",
+    "inboxTitle": "Boîte de réception",
+    "readAll": "Marquer tout comme lu",
+    "prev": "Précédent",
+    "mSessGpu": "Utilisation du GPU de session",
+    "inboxEmpty": "Aucune notification pour l'instant.",
+    "scopeAccount": "Compte entier",
+    "mSessVram": "Utilisation de la VRAM de session",
+    "next": "Suivant",
+    "mSessCpu": "Utilisation du processeur de session",
+    "rulesHint": "Les règles d'alerte et les notifications sont par compte et partagées entre toutes les équipes. Les métriques de session sont évaluées sur la session sélectionnée.",
+    "selectSession": "Sélectionnez une séance",
+    "noSession": "Aucune séance de course à pied"
   },
   "wallet": {
     "title": "Portefeuille / Crédits",
@@ -535,7 +554,15 @@
     "jandi": "30 dernières semaines",
     "topupSent": "Demande envoyée (en attente d'approbation par l'administrateur du groupe)",
     "desc_storage": "Stockage ({{ref}})",
-    "desc_gpu": "Utilisation du GPU ({{ref}})"
+    "desc_gpu": "Utilisation du GPU ({{ref}})",
+    "nextRecharge": "Prochaine recharge",
+    "rechargeSoon": "Bientôt",
+    "consumedCol": "Consommé",
+    "session": "Session",
+    "viewBySession": "Regrouper par séance",
+    "viewAll": "Toutes les entrées",
+    "rechargeEvery": "Tous les jours {{n}}",
+    "searchPh": "Sessions de recherche, types, détails"
   },
   "volume": {
     "title": "Données / Volumes",
@@ -596,7 +623,16 @@
     "remain": "{{n}} GB restant",
     "afterUse": "Utilisé après",
     "thisVol": "Ce volume",
-    "quota": "Quota de volume"
+    "quota": "Quota de volume",
+    "teamChanged": "L'équipe a changé",
+    "personal": "Personnel",
+    "teamFail": "Impossible de changer d'équipe",
+    "teamQuota": "Dépasse le quota de volume de l'équipe cible",
+    "changeTeam": "Changer d'équipe",
+    "sharedBy": "Partagé par",
+    "changeTeamTitle": "Changer d'équipe — {{name}}",
+    "teamHint": "Le quota de capacité et les crédits de stockage de ce volume proviennent de l'équipe sélectionnée. Vous restez propriétaire.",
+    "teamHome": "Facturé à l'équipe"
   },
   "gmembers": {
     "title": "Membres",

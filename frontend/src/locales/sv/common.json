@@ -67,7 +67,9 @@
       "errorGeneric": "Registreringen misslyckades.",
       "errorGroup": "Du måste välja en organisation och en grupp.",
       "errorRequired": "Vänligen fyll i alla obligatoriska fält.",
-      "errorPasswordMismatch": "Lösenord stämmer inte överens."
+      "errorPasswordMismatch": "Lösenord stämmer inte överens.",
+      "pwMatch": "Lösenord matchar",
+      "pwMismatch": "Lösenord stämmer inte överens"
     },
     "signup": {
       "section": {
@@ -524,6 +526,40 @@
   },
   "topbar": {
     "nodeBadge": "Noder {{up}}/{{total}} · GPU {{gpu}}%",
-    "nodeBadgeNoGpu": "Noder {{up}}/{{total}} · GPU —"
-  }
+    "nodeBadgeNoGpu": "Noder {{up}}/{{total}} · GPU —",
+    "noAlerts": "Inga varningar än.",
+    "creditBalance": "Kreditsaldo",
+    "orgWhole": "Hela organisationen",
+    "rolePlatform": "Hela plattformen",
+    "alerts": "Varningar",
+    "unreadN": "{{n}} oläst",
+    "rolePlatformSub": "Super admin",
+    "clusterStatus": "Klusterstatus",
+    "viewAll": "Se allt i meddelandecenter"
+  },
+  "table": {
+    "empty": "Inga data"
+  },
+  "refill": {
+    "carryOn": "Överföra",
+    "carryOff": "Upphöra",
+    "note": "Fyller på med denna mängd varje cykel (0 inaktiverar den). Cykeln kan inte vara längre än förälderns och begränsas automatiskt.",
+    "title": "Återkommande påfyllning",
+    "interval": "Påfyllningscykel (dagar)",
+    "amount": "Krediter per cykel",
+    "carryover": "Överföring",
+    "maxHint": "Föräldracykelgräns: {{n}} dagar eller färre"
+  },
+  "select": {
+    "placeholder": "Välja",
+    "search": "Söka…",
+    "noMatch": "Ingen match"
+  },
+  "alert": {
+    "credit_balance": {
+      "teamTitle": "{{target}}-teamet har lite krediter",
+      "teamBody": "{{target}}-lagkrediter är på {{value}}, under {{threshold}}-tröskeln. Sessioner i detta team kan sluta snart."
+    }
+  },
+  "close": "Nära"
 }

@@ -156,7 +156,11 @@
     "kpiFree": "Gratis (onbeperkt)",
     "gpuAvail": "GPU beschikbaar",
     "kpiNodes": "Beschikbare knooppunten",
-    "kpiMaxLease": "Maximale huur"
+    "kpiMaxLease": "Maximale huur",
+    "slots": "Slots",
+    "hamiShared": "HAMi fractioneel",
+    "hamiFractional": "Fractioneel (door VRAM en kernen)",
+    "exclusiveWhole": "Toegewijd (hele kaart)"
   },
   "newSession": {
     "crumb": "Sessies",
@@ -310,7 +314,8 @@
     "hoursApprox": "~{{n}} uur",
     "tsSlotN": "1 van {{n}}-slots",
     "runtimeLeft": "Runtime in dit tempo",
-    "sshKeyChange": "Wijzigen"
+    "sshKeyChange": "Wijzigen",
+    "sshCacheCount": "{{n}} in cache opgeslagen"
   },
   "session": {
     "gpuReason": {
@@ -422,7 +427,8 @@
     "regenerate": "Regenereer",
     "sshDirectInHint": "Maak rechtstreeks verbinding met het knooppunt vanuit het kantoornetwerk, waarbij u de gateway omzeilt.",
     "sshNeedKey": "Geen openbare SSH-sleutel geregistreerd",
-    "sshNeedKeyHint": "Registreer of genereer er hieronder een — actieve sessies nemen hem direct over."
+    "sshNeedKeyHint": "Registreer of genereer er hieronder een — actieve sessies nemen hem direct over.",
+    "webConnectNewWindow": "Opent een browserterminal in een nieuw venster – geen SSH-sleutel of commando nodig."
   },
   "account": {
     "title": "Mijn instellingen",
@@ -464,7 +470,8 @@
     "sshGenerate": "Sleutel genereren en downloaden",
     "sshGenerated": "Sleutel gegenereerd. Bewaar de gedownloade privésleutel veilig — hij kan niet opnieuw worden gedownload.",
     "sshGenFail": "Genereren van de SSH-sleutel is mislukt.",
-    "sshGenerateHint": "Nog geen sleutel? Klik op ‘Sleutel genereren en downloaden’. De privésleutel (.pem) wordt eenmalig gedownload en de openbare sleutel wordt automatisch geregistreerd. Verbinden met: ssh -i gedownloade-sleutel.pem …"
+    "sshGenerateHint": "Nog geen sleutel? Klik op ‘Sleutel genereren en downloaden’. De privésleutel (.pem) wordt eenmalig gedownload en de openbare sleutel wordt automatisch geregistreerd. Verbinden met: ssh -i gedownloade-sleutel.pem …",
+    "activeScope": "Actief"
   },
   "notify": {
     "title": "Meldingen",
@@ -493,7 +500,19 @@
     "noRules": "Geen regels. Klik op 'Regel toevoegen' om er een te maken.",
     "sev_err": "Fout",
     "sev_info": "Info",
-    "sev_warn": "Waarschuwing"
+    "sev_warn": "Waarschuwing",
+    "inboxTitle": "Postvak IN",
+    "readAll": "Markeer alles als gelezen",
+    "prev": "Vorig",
+    "next": "Volgende",
+    "mSessVram": "Sessie VRAM-gebruik",
+    "mSessCpu": "CPU-gebruik van sessie",
+    "mSessGpu": "Sessie GPU-gebruik",
+    "rulesHint": "Waarschuwingsregels en meldingen zijn per account en gedeeld door alle teams. Sessiestatistieken worden geëvalueerd voor de geselecteerde sessie.",
+    "noSession": "Geen hardloopsessies",
+    "scopeAccount": "Hele rekening",
+    "selectSession": "Selecteer een sessie",
+    "inboxEmpty": "Nog geen meldingen."
   },
   "wallet": {
     "title": "Portemonnee / Tegoeden",
@@ -535,7 +554,15 @@
     "topupSend": "Verzoek verzenden",
     "topupTitle": "Vraag een kredietopwaardering aan",
     "desc_storage": "Opslag ({{ref}})",
-    "desc_gpu": "GPU-gebruik ({{ref}})"
+    "desc_gpu": "GPU-gebruik ({{ref}})",
+    "nextRecharge": "Volgende vulling",
+    "rechargeSoon": "Spoedig",
+    "session": "Sessie",
+    "consumedCol": "Verbruikt",
+    "rechargeEvery": "Elke {{n}}-dagen",
+    "viewBySession": "Groepeer per sessie",
+    "viewAll": "Alle inzendingen",
+    "searchPh": "Zoeksessies, typen, details"
   },
   "volume": {
     "title": "Gegevens / Volumes",
@@ -596,7 +623,16 @@
     "thisVol": "Dit volume",
     "nfsHint": "Volumes worden aangemaakt op NFS.",
     "quotaHint": "Opslaglimiet per gebruiker voor uw persoonlijke volumes (onafhankelijk van de groep). Nieuwe volumes worden geblokkeerd zodra u deze overschrijdt.",
-    "overQuota": "Overschrijdt resterende quotum ({{remain}} GB)"
+    "overQuota": "Overschrijdt resterende quotum ({{remain}} GB)",
+    "personal": "Persoonlijk",
+    "teamQuota": "Overschrijdt het volumequotum van het doelteam",
+    "sharedBy": "Gedeeld door",
+    "teamChanged": "Team gewijzigd",
+    "changeTeam": "Verander van team",
+    "changeTeamTitle": "Verander team — {{name}}",
+    "teamFail": "Kon niet van team wisselen",
+    "teamHome": "Gefactureerd aan team",
+    "teamHint": "De capaciteitsquota en het opslagtegoed van dit volume zijn afkomstig van het geselecteerde team. Jij blijft eigenaar."
   },
   "gmembers": {
     "title": "Leden",

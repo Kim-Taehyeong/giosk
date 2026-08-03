@@ -261,9 +261,19 @@ func (h *Handler) SetGlobal(c *gin.Context) {
 		MaxVramGB:             pick(body.MaxVramGB, cur.MaxVramGB),
 		MaxVolumeGiB:          pick(body.MaxVolumeGiB, cur.MaxVolumeGiB),
 		MaxConcurrentSessions: pick(body.MaxConcurrentSessions, cur.MaxConcurrentSessions),
+		// 아래 둘을 빠뜨리면 Resolved 제로값(0)으로 저장돼 화면에서 바꿔도 반영되지 않고,
+		// 오히려 기존 상한이 0(무제한)으로 조용히 풀린다.
+		MaxStoppedSessions: pick(body.MaxStoppedSessions, cur.MaxStoppedSessions),
+		MaxEphemeralGiB:    pick(body.MaxEphemeralGiB, cur.MaxEphemeralGiB),
 	}
+	// 1 이상 강제는 "미지정이 없어야 하는" 상한에만. 중단 세션 수·임시 디스크는 0=무제한이 유효한 설정이라
+	// 여기서 막으면 관리자가 제한을 해제할 방법이 없어진다.
 	if next.MaxGpu <= 0 || next.MaxVramGB <= 0 || next.MaxVolumeGiB <= 0 || next.MaxConcurrentSessions <= 0 {
 		httpx.Err(c, 400, "bad_value", "전역 상한은 1 이상이어야 합니다")
+		return
+	}
+	if next.MaxStoppedSessions < 0 || next.MaxEphemeralGiB < 0 {
+		httpx.Err(c, 400, "bad_value", "중단 세션·임시 디스크 상한은 0 이상이어야 합니다(0=무제한)")
 		return
 	}
 	if err := h.setGlobal(next); err != nil {

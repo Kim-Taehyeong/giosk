@@ -53,7 +53,8 @@
     "edit": "Upravit",
     "optional": "(volitelný)",
     "empty": "Žádná data",
-    "advanced": "Další nastavení"
+    "advanced": "Další nastavení",
+    "prev": "Předchozí"
   },
   "dash": {
     "title": "Dashboard",
@@ -197,7 +198,10 @@
     "totalN": "Uživatelé {{n}}",
     "bulkDone": "Hromadně přidáni uživatelé {{n}}",
     "advBelong": "Členství · role · heslo",
-    "prev": "Předchozí"
+    "prev": "Předchozí",
+    "colRefill": "Opakované doplňování",
+    "refillDefault": "Výchozí",
+    "colBalance": "Aktuální zůstatek"
   },
   "groups": {
     "title": "Skupiny",
@@ -248,7 +252,18 @@
     "adminOpt": "Správce skupiny (volitelné)",
     "bulkDone": "Hromadně přidané skupiny {{n}}",
     "adminHintOpt": "Ponechte prázdné, chcete-li vytvořit skupinu bez správce skupiny. Přidejte člena z detailu skupiny a nastavte jeho roli na Správce skupiny.",
-    "insufficientOrgPool": "Nedostatečný zůstatek úvěrového fondu organizace."
+    "insufficientOrgPool": "Nedostatečný zůstatek úvěrového fondu organizace.",
+    "colRefill": "Opakované doplňování",
+    "deleteFail": "Smazání se nezdařilo",
+    "refillInterval": "Cyklus doplňování (dny)",
+    "initCreditHint": "Při vytváření týmu můžete volitelně přidělit z fondu organizací a nastavit doplnění. Můžete to udělat také později na stránce podrobností týmu.",
+    "refillAmt": "Opakované doplňování (za cyklus)",
+    "carryover": "Přeneste nevyužité kredity",
+    "refillDefault": "Výchozí",
+    "initCreditAmt": "Počáteční kredity",
+    "hasMembers": "Tento tým má stále členy. Před odstraněním je přesuňte nebo odstraňte.",
+    "cantDeleteDefault": "Výchozí tým nelze smazat.",
+    "initCredit": "Počáteční kredity a opakované doplňování"
   },
   "orgs": {
     "title": "Organizace",
@@ -292,7 +307,11 @@
     "grantHint": "Okamžitě aplikováno na fond organizací a zaznamenáno do protokolu auditu.",
     "grantAmount": "Částka (C)",
     "adminOpt": "Správce organizace (volitelné)",
-    "adminHintOpt": "Ponechte prázdné, chcete-li vytvořit pouze skupinu 'Obecné' a přiřadit administrátora později, z detailu organizace → Obecné → Přidat člena s rolí administrátora organizace."
+    "adminHintOpt": "Ponechte prázdné, chcete-li vytvořit pouze skupinu 'Obecné' a přiřadit administrátora později, z detailu organizace → Obecné → Přidat člena s rolí administrátora organizace.",
+    "deleteFail": "Smazání se nezdařilo",
+    "colRefill": "Opakované doplňování",
+    "refillDefault": "Výchozí",
+    "hasUsers": "Tato organizace má stále uživatele. Před odstraněním je přesuňte nebo odstraňte."
   },
   "billing": {
     "title": "Fakturace",
@@ -318,7 +337,12 @@
     "consumed": "Kredity",
     "byUser": "Spotřeba uživatelem",
     "vsAlloc": "vs alokace",
-    "byGroup": "Spotřeba podle skupiny (zobrazení)"
+    "byGroup": "Spotřeba podle skupiny (zobrazení)",
+    "period7d": "Posledních 7 dní",
+    "periodLastMonth": "Minulý měsíc",
+    "periodAll": "Celou dobu",
+    "periodMonth": "Tento měsíc",
+    "periodNote": "Zobrazená spotřeba a hodiny GPU jsou ty, které nastaly ve vybraném období podle hlavní knihy. Rozpočty a fondy nejsou časově vymezeny."
   },
   "audit": {
     "title": "Protokol auditu",
@@ -476,7 +500,10 @@
     "impNoUser": "Účet nenalezen.",
     "impOwnerHint": "Pro import vyberte účet ze seznamu.",
     "impOwnerPicked": "Vybráno: {{name}} ({{id}})",
-    "metricsOffNotice": "Monitoring (DCGM/Prometheus) není nainstalován, takže využití GPU a VRAM nelze zobrazit. Zapněte monitoring, abyste viděli živé metriky."
+    "metricsOffNotice": "Monitoring (DCGM/Prometheus) není nainstalován, takže využití GPU a VRAM nelze zobrazit. Zapněte monitoring, abyste viděli živé metriky.",
+    "cordon": "Kordon",
+    "noMetrics": "Žádné metriky",
+    "uncordon": "Uncordon"
   },
   "mset": {
     "title": "Nastavení",
@@ -599,7 +626,21 @@
     "moveFail": "Přesun se nezdařil",
     "removeTitle": "Odebrat ze skupiny",
     "removeConfirm": "Odebrat tohoto uživatele ze {{group}}.",
-    "removed": "Odebráno ze skupiny"
+    "removed": "Odebráno ze skupiny",
+    "memberAdded": "Členství přidáno.",
+    "suspend": "Pozastavit",
+    "restore": "Obnovit",
+    "granted": "Uděleno {{n}} C",
+    "addFail": "Nelze přidat",
+    "grantFail": "Grant selhal",
+    "statusConfirm": "Tím se změní stav uživatele.",
+    "grantAmount": "Kredity k udělení (C; záporné srážky)",
+    "noTeamsInOrg": "Tato organizace nemá žádné týmy.",
+    "grant": "Udělení kreditů",
+    "grantTitle": "Grantové kredity — {{name}}",
+    "addMembership": "Přidat členství",
+    "pickOrg": "Vyberte organizaci",
+    "grantHint": "Okamžitě použito na zůstatek osobního kreditu a zapsáno do protokolu auditu jako jednorázová úprava."
   },
   "clusters": {
     "title": "Shluky",
@@ -699,7 +740,12 @@
     "buildBtn": "Začněte stavět",
     "extTitle": "Zaregistrujte externí obrázek",
     "imgRefHint": "Vytáhněte a použijte obraz Docker Hub / externího registru tak, jak je (bez sestavení). např. codercom/code-server:nejnovější",
-    "extSshOnly": "Bez VSCode/Jupyter/vlastního portu jsou relace na tomto obrázku pouze SSH."
+    "extSshOnly": "Bez VSCode/Jupyter/vlastního portu jsou relace na tomto obrázku pouze SSH.",
+    "loading": "…",
+    "notCached": "Neuloženo do mezipaměti",
+    "notFound": "Obrázek nenalezen.",
+    "info": "Informace o obrázku",
+    "logsHint": "Načte protokoly sestavení a skenování."
   },
   "anotify": {
     "title": "Oznámení",
@@ -886,7 +932,23 @@
     "brandAccentHint": "Chcete-li použít barvu motivu, ponechte prázdné.",
     "leaseHead": "Rozšíření relace (kdo dřív přijde)",
     "featuresHead": "Uživatelské funkce",
-    "brandingNote": "Přizpůsobte název služby a barvu loga vaší organizaci. Okamžitě použito na přihlášení a záhlaví konzoly."
+    "brandingNote": "Přizpůsobte název služby a barvu loga vaší organizaci. Okamžitě použito na přihlášení a záhlaví konzoly.",
+    "carryoverOn": "Přeneste nevyužité kredity",
+    "rechargeEnabled": "Povolit opakované doplňování",
+    "rechargeCarryover": "Povolit přenos",
+    "brandIcon": "Ikona",
+    "rechargeSaved": "Nastavení doplňování uloženo.",
+    "brandSubtitle": "Titulky",
+    "carryoverOff": "Vyprší každý cyklus",
+    "brandIconClear": "Odstranit",
+    "rechargeTitle": "Opakované doplňování kreditu (výchozí a limitní)",
+    "rechargeInterval": "Výchozí cyklus doplňování (dny) · limit pro nižší hladiny",
+    "rechargeAmountHint": "Na jejich stránkách s podrobnostmi nastavte množství, cykly a přenos pro jednotlivé organizace, týmy a uživatele. Cyklus nemůže být nikdy delší než cyklus jeho rodiče.",
+    "rechargeNote": "Výchozí cyklus doplňování a zásady přenosu platformy. Organizace, týmy a jednotlivci si mohou vybrat kratší cyklus, ale nikdy delší, a když rodič nepovolí přenos, nevyužité kredity pod ním vyprší na této hranici.",
+    "brandIconTooBig": "Ikona musí mít velikost 120 kB nebo menší.",
+    "brandIconUpload": "Nahrát ikonu (volitelné)",
+    "brandSubtitleHint": "Malý text vedle loga. Chcete-li to skrýt, nechte prázdné.",
+    "brandIconUploadHint": "Nahraná ikona má přednost před ikonou Lucide výše. Doporučuje se PNG nebo SVG do 120 kB."
   },
   "datasets": {
     "title": "Datové sady",
@@ -932,7 +994,40 @@
     "assign": "Přiřadit uzly",
     "approved": "Registrace schválena",
     "rejected": "Žádost zamítnuta",
-    "dlTitle": "Průběh stahování NFS"
+    "dlTitle": "Průběh stahování NFS",
+    "descFail": "Popis nelze uložit",
+    "notFound": "Datová sada nenalezena.",
+    "phaseDownload": "Stahování",
+    "description": "Popis",
+    "cacheFail": "Požadavek mezipaměti se nezdařil",
+    "phaseCopy": "Kopírování",
+    "descSaved": "Popis uložen.",
+    "phaseExtract": "Extrakce",
+    "info": "Informace o datové sadě",
+    "regNeedName": "Zadejte název datové sady.",
+    "cache": "Mezipaměť uzlu",
+    "regNeedUrl": "Zadejte adresu URL.",
+    "sizeClass": "Velikostní třída",
+    "descPh": "Popište tuto datovou sadu",
+    "sizeClassSaved": "Třída velikosti byla uložena.",
+    "upTaken": "Datová sada s tímto názvem již existuje.",
+    "regNeedFile": "Vyberte soubor z doručené pošty.",
+    "regStarted": "Registrace zahájena — sledujte postup v seznamu.",
+    "regRefresh": "Obnovit",
+    "regBusy": "Registrace…",
+    "regTitle": "Registrovat datovou sadu",
+    "regUrl": "URL (wget)",
+    "extracting": "Extrakce…",
+    "regSizeClass": "Velikostní třída",
+    "regFail": "Registrace se nezdařila",
+    "upScope": "Viditelnost",
+    "registering": "Registrace",
+    "regInboxFile": "Soubor doručené pošty",
+    "regNfs": "NFS kopie (SCP)",
+    "regNfsHint": "Zkopírujte archiv (zip, tar, tar.gz) do níže uvedené cesty a poté vyberte soubor, který chcete zaregistrovat. Registrací se přesune z doručené pošty a automaticky se extrahuje.",
+    "regUrlField": "Stáhnout URL",
+    "regUrlHint": "Server stáhne tuto adresu URL přímo – z vašeho prohlížeče se nic nenahrává. Sledujte pokrok v seznamu.",
+    "regInboxEmpty": "Doručená pošta je prázdná. Zkopírujte soubor do výše uvedené cesty a poté obnovte."
   },
   "announce": {
     "title": "Oznámení",
@@ -1054,7 +1149,8 @@
     "searchUser": "Hledat uživatele",
     "removed": "Smazané zásady pro „{{name}}“",
     "removeConfirm": "Odstranění zásady '{{name}}' způsobí její dědění z výše uvedeného rozsahu. Pokračovat?",
-    "globalHint": "Globální je záložní pro všechny — nemůže být prázdné a musí být alespoň 1. Rozsahy organizace/skupiny/uživatelů jej mohou přepsat."
+    "globalHint": "Globální je záložní pro všechny — nemůže být prázdné a musí být alespoň 1. Rozsahy organizace/skupiny/uživatelů jej mohou přepsat.",
+    "capHint": "Maximální povolené — GPU ≤ {{gpu}} · VRAM ≤ {{vram}}GB · hlasitost ≤ {{vol}}GiB · souběžné relace ≤ {{sess}}"
   },
   "roles": {
     "org_admin": "Správce organizace",
@@ -1070,7 +1166,16 @@
     "subtitle": "Identifikátor {{name}} · zde spravujte své skupiny, uživatele a kredity",
     "usersCapped": "zobrazeno první {{shown}} ze {{total}}",
     "usersHint": "Role je role uživatele v rámci jeho skupiny. Změňte jej ve správě členů této skupiny.",
-    "inGroup": "Správa ve skupině"
+    "inGroup": "Správa ve skupině",
+    "recurringAmount": "Kredity za cyklus",
+    "recurringInterval": "Cyklus doplňování (dny)",
+    "recurringCarryover": "Přenos",
+    "carryOn": "Přenést",
+    "carryOff": "Vyprší",
+    "recurringNote": "Doplní fond organizace o toto množství v každém cyklu (0 jej deaktivuje).",
+    "recurringSaved": "Opakované kredity uloženy.",
+    "recurringTitle": "Opakující se kredity",
+    "maxIntervalHint": "Limit platformy: {{n}} dnů nebo méně"
   },
   "gdetail": {
     "title": "Skupina",
@@ -1098,7 +1203,25 @@
     "removed": "Odebráno {{name}}",
     "needTarget": "Vyberte si cílovou skupinu",
     "roleSet": "Změněna role {{name}} na {{role}}",
-    "moveHint": "Role se přenáší. Kredit přidělený v této skupině ne a historie využití zůstává u této skupiny."
+    "moveHint": "Role se přenáší. Kredit přidělený v této skupině ne a historie využití zůstává u této skupiny.",
+    "refilledNow": "Nyní doplněno: +{{n}} C",
+    "refillCol": "Opakované doplňování",
+    "refillFail": "Doplnění se nezdařilo",
+    "noRecurring": "Není nastaveno žádné opakované plnění",
+    "memberRefillSet": "Nastavte opakované doplňování",
+    "refillMenu": "Doplňte",
+    "refillTitle": "Týmové opakované doplňování",
+    "refillCarryover": "Přeneste nevyužité kredity",
+    "memberRefillSaved": "Opakované doplňování uloženo",
+    "memberRefillTitle": "Opakované doplňování — {{name}}",
+    "refillAmount": "Opakované množství náplně (C)",
+    "noRecurringShort": "Žádné opakované doplňování",
+    "nextRefill": "Další náplň",
+    "refillSaved": "Opakované doplňování uloženo.",
+    "refillNow": "Doplňte hned",
+    "refillInterval": "Cyklus (dny) — pro výchozí nastavení týmu ponechte prázdné",
+    "refillInheritPh": "Zděděno",
+    "memberRefillHint": "Tato částka je vyplácena do peněženky člena každý cyklus. Chcete-li zaplatit okamžitě, použijte „Doplnit nyní“."
   },
   "picker": {
     "allOrgs": "Všechny organizace",
@@ -1125,5 +1248,8 @@
   "brand": "Konzole Giosk",
   "confirmTerminate": "Vynutit ukončení této relace? Běžící práce se okamžitě zastaví.",
   "confirmDelete": "Smazat toto? Toto nelze vrátit zpět.",
-  "confirmRemoveMember": "Odebrat tohoto člena ze skupiny?"
+  "confirmRemoveMember": "Odebrat tohoto člena ze skupiny?",
+  "paged": {
+    "range": "{{from}}–{{to}} ze {{total}}"
+  }
 }

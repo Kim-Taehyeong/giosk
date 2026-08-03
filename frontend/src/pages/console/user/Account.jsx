@@ -90,16 +90,16 @@ export default function Account() {
         <h3><Lock size={16} /> {t('account.pwTitle')}</h3>
         <div className="grid cols-3" style={{ gap: 12 }}>
           <div>
-            <label className="fld" style={{ marginTop: 0 }}>{t('account.pwCurrent')}</label>
-            <input type="password" autoComplete="current-password" value={pw.current} onChange={(e) => setPw({ ...pw, current: e.target.value })} />
+            <label className="fld" htmlFor="user-account-fld-0" style={{ marginTop: 0 }}>{t('account.pwCurrent')}</label>
+            <input id="user-account-fld-0" type="password" autoComplete="current-password" value={pw.current} onChange={(e) => setPw({ ...pw, current: e.target.value })} />
           </div>
           <div>
-            <label className="fld" style={{ marginTop: 0 }}>{t('account.pwNew')}</label>
-            <input type="password" autoComplete="new-password" value={pw.next} onChange={(e) => setPw({ ...pw, next: e.target.value })} />
+            <label className="fld" htmlFor="user-account-fld-1" style={{ marginTop: 0 }}>{t('account.pwNew')}</label>
+            <input id="user-account-fld-1" type="password" autoComplete="new-password" value={pw.next} onChange={(e) => setPw({ ...pw, next: e.target.value })} />
           </div>
           <div>
-            <label className="fld" style={{ marginTop: 0 }}>{t('account.pwConfirm')}</label>
-            <input type="password" autoComplete="new-password" value={pw.confirm} onChange={(e) => setPw({ ...pw, confirm: e.target.value })} />
+            <label className="fld" htmlFor="user-account-fld-2" style={{ marginTop: 0 }}>{t('account.pwConfirm')}</label>
+            <input id="user-account-fld-2" type="password" autoComplete="new-password" value={pw.confirm} onChange={(e) => setPw({ ...pw, confirm: e.target.value })} />
           </div>
         </div>
         <div className="legend">{t('account.pwHint')}</div>
