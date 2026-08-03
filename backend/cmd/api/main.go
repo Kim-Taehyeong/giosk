@@ -118,11 +118,11 @@ func main() {
 	limitResolver := policy.NewResolver(policyRepo, orgSvc, globalQuota)
 	volumeSvc.WithLimits(limitResolver)
 	dashboardSvc := dashboard.NewService(dashboard.NewRepository(db), met, kc, cfg)
+	dashboardSvc.WithLimits(limitResolver) // 동시세션 KPI = 정책값(정책 일원화)
 	auditRepo := audit.NewRepository(db)
 	sessionSvc.WithAudit(auditRepo)                                                           // 세션 로그 탭 = 감사 로그
 	sessionSvc.WithMetrics(met)                                                               // 유휴 판정용
-	sessionSvc.WithMaxSessions(cfg.MaxSessionsPerUser())                                      // 동시 세션 제한(과금 모드별)
-	sessionSvc.WithLimits(limitResolver)                                                      // 하드 정책(GPU·VRAM·동시세션 절대 상한)
+	sessionSvc.WithLimits(limitResolver)                                                      // 동시세션·GPU·VRAM 상한 = 정책(quota) 일원화
 	sessionSvc.WithLeaser(nodeSvc)                                                            // 물리(SSH) 세션 임대
 	sessionSvc.WithExpose(cfg.K8s.SessionExpose)                                              // 웹 노출 모드
 	sessionSvc.WithGateway(cfg.K8s.GatewaySecret, cfg.K8s.GatewayScheme, cfg.K8s.GatewayHost, // 접속 게이트웨이(단기 토큰)

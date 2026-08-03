@@ -38,9 +38,8 @@ export default function UserDashboard() {
   const creditMode = config.billing.mode === 'credit';
   const freeMode = config.billing.mode === 'free';
   const dyn = config.billing.dynamic;
-  const creditLimit = config.billing.credit.maxConcurrentSessions;
-  // free 모드라도 전역 정책 쿼터(최대 동시 세션)는 유효하다 → ∞ 대신 이 상한을 보여준다.
-  const quotaSessions = config.quota?.maxConcurrentSessions;
+  // 동시 세션 상한은 정책(quota)으로 일원화 — 대시보드는 백엔드 k.maxSessions(정책 해석값)를 쓴다.
+  // billing.credit.maxConcurrentSessions 는 폐기.
   const [d, setD] = useState(null);
   const [connSession, setConnSession] = useState(null); // 접속 모달 대상 세션
   const [connTab, setConnTab] = useState(null); // 클릭한 채널(모달 초기 탭)
@@ -153,8 +152,8 @@ export default function UserDashboard() {
         {freeMode ? (
           <>
             <StatCard icon={Layers} tone="free" label={t('dash.kpiConcurrent')} value={`${k.activeSessions}`}
-              unit={quotaSessions ? `/ ${quotaSessions}` : '/ ∞'}
-              bar={quotaSessions ? { value: k.activeSessions, max: quotaSessions, variant: 'free' } : undefined} />
+              unit={k.maxSessions ? `/ ${k.maxSessions}` : '/ ∞'}
+              bar={k.maxSessions ? { value: k.activeSessions, max: k.maxSessions, variant: 'free' } : undefined} />
             <StatCard icon={Clock} tone="gpu" label={t('dash.kpiGpuHours')} value={`${k.gpuHoursMonth}`} unit={t('dash.hoursUnit')} />
             <StatCard icon={Zap} tone="free" label={t('dash.kpiBilling')} value={t('dash.kpiFree')} />
             <StatCard icon={Server} tone="gpu" label={t('dash.kpiNodes')} value={`${avail.byNode.length}`} />
@@ -162,13 +161,13 @@ export default function UserDashboard() {
         ) : creditMode ? (
           <>
             <StatCard icon={Coins} tone="gpu" label={t('dash.kpiBalance')} value={`${k.balance}`} unit={`/ ${k.cap} C`} bar={{ value: k.balance, max: k.cap, variant: 'gpu' }} />
-            <StatCard icon={Layers} tone="free" label={t('dash.kpiSessions')} value={`${k.activeSessions}`} unit={`/ ${creditLimit}`} bar={{ value: k.activeSessions, max: creditLimit, variant: 'free' }} />
+            <StatCard icon={Layers} tone="free" label={t('dash.kpiSessions')} value={`${k.activeSessions}`} unit={k.maxSessions ? `/ ${k.maxSessions}` : '/ ∞'} bar={k.maxSessions ? { value: k.activeSessions, max: k.maxSessions, variant: 'free' } : undefined} />
             <StatCard icon={Clock} tone="gpu" label={t('dash.kpiGpuHours')} value={`${k.gpuHoursMonth}`} unit={t('dash.hoursUnit')} />
             <StatCard icon={Hourglass} tone="warn" label={t('dash.kpiEta')} value={t('dash.kpiEtaVal', { n: k.etaDays })} unit={`(${k.burn} C/day)`} />
           </>
         ) : (
           <>
-            <StatCard icon={Layers} tone="free" label={t('dash.kpiConcurrent')} value={`${k.activeSessions}`} unit={`/ ${dyn.maxConcurrentSessions}`} bar={{ value: k.activeSessions, max: dyn.maxConcurrentSessions, variant: 'free' }} />
+            <StatCard icon={Layers} tone="free" label={t('dash.kpiConcurrent')} value={`${k.activeSessions}`} unit={k.maxSessions ? `/ ${k.maxSessions}` : '/ ∞'} bar={k.maxSessions ? { value: k.activeSessions, max: k.maxSessions, variant: 'free' } : undefined} />
             <StatCard icon={Hourglass} tone="gpu" label={t('dash.kpiMaxLease')} value={`${dyn.maxLeaseHours}`} unit={t('dash.hoursUnit')} />
             <StatCard icon={Clock} tone="gpu" label={t('dash.kpiGpuHours')} value={`${k.gpuHoursMonth}`} unit={t('dash.hoursUnit')} />
             <StatCard icon={Timer} tone="warn" label={t('dash.kpiCooldown')} value={`${dyn.cooldownHours}`} unit={t('dash.hoursUnit')} />
@@ -208,22 +207,58 @@ export default function UserDashboard() {
               ))}
             </div>
           ) : (
-            avail.byType.map((r, i) => (
-              <div className="avail" key={i} style={{ flexDirection: 'column', alignItems: 'stretch', gap: 8 }}>
-                <div className="flex" style={{ justifyContent: 'space-between' }}>
-                  <span className="gpu-name">{r.gpuType}</span>
-                  <span className="flex gap">
-                    <span className="free-n">{r.free}/{r.total}</span>
-                    <Pill variant={r.free > 0 ? 'ok' : 'wait'}>{r.free > 0 ? t('dash.available') : t('dash.unavailable')}</Pill>
-                  </span>
+            avail.byType.map((r, i) => {
+              // 전용(통 카드)과 HAMi(분할)를 분리해 표기한다. 전용=정수 카드, HAMi=소수 GPU 단위
+              //  (물리 GPU=1, 잔여는 VRAM·코어 비율 → 예 1.3/2). "10슬롯 뻥튀기" 폐기.
+              const hasExcl = r.total > 0;
+              const hasHami = r.fractionalTotal > 0;
+              const hamiFree = r.fractionalFreeUnits || 0;
+              const anyFree = (hasExcl && r.free > 0) || (hasHami && hamiFree > 0.05);
+              return (
+                <div className="avail" key={i} style={{ flexDirection: 'column', alignItems: 'stretch', gap: 10 }}>
+                  <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span className="gpu-name">{r.gpuType}</span>
+                    <span className="flex gap" style={{ alignItems: 'center' }}>
+                      {hasHami && <Pill variant="gpu">{t('dash.hamiShared', { defaultValue: 'HAMi 분할' })}</Pill>}
+                      <Pill variant={anyFree ? 'ok' : 'wait'}>{anyFree ? t('dash.available') : t('dash.unavailable')}</Pill>
+                    </span>
+                  </div>
+                  {hasExcl && (
+                    <div>
+                      <div className="flex" style={{ justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
+                        <span className="muted">{t('dash.exclusiveWhole', { defaultValue: '전용 (통 카드)' })}</span>
+                        <span className="free-n">{r.free}/{r.total}</span>
+                      </div>
+                      <div className="flex" style={{ gap: 4 }}>
+                        {Array.from({ length: r.total }).map((_, j) => (
+                          <span key={j} style={{ flex: 1, height: 10, borderRadius: 3, background: j < r.free ? 'var(--free)' : 'var(--danger)' }} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {hasHami && (
+                    <div>
+                      <div className="flex" style={{ justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
+                        <span className="muted">{t('dash.hamiFractional', { defaultValue: '분할 (VRAM·코어 단위)' })}</span>
+                        <span className="free-n">{hamiFree.toFixed(1)}/{r.fractionalTotal} GPU</span>
+                      </div>
+                      {/* 카드별 소수 채움: 카드 j 에 (hamiFree - j) 만큼 부분 채움 */}
+                      <div className="flex" style={{ gap: 4 }}>
+                        {Array.from({ length: r.fractionalTotal }).map((_, j) => {
+                          const fill = Math.max(0, Math.min(1, hamiFree - j));
+                          return (
+                            <span key={j} style={{ flex: 1, height: 10, borderRadius: 3, position: 'relative', overflow: 'hidden', background: 'var(--danger)' }}>
+                              <span style={{ position: 'absolute', inset: 0, width: `${fill * 100}%`, background: 'var(--gpu)' }} />
+                            </span>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  {!hasExcl && !hasHami && <div className="muted" style={{ fontSize: 12 }}>{t('dash.unavailable')}</div>}
                 </div>
-                <div className="flex" style={{ gap: 4 }}>
-                  {Array.from({ length: r.total }).map((_, j) => (
-                    <span key={j} style={{ flex: 1, height: 10, borderRadius: 3, background: j < r.free ? 'var(--free)' : 'var(--danger)' }} />
-                  ))}
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
 

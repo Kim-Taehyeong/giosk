@@ -74,13 +74,20 @@ func toLiveNode(n *corev1.Node, gpuTypeLabel, physicalLabel, cudaLabel string) L
 	gpu := n.Status.Capacity[corev1.ResourceName(resGPU)]
 	cpu := n.Status.Capacity[corev1.ResourceCPU]
 	mem := n.Status.Capacity[corev1.ResourceMemory]
+	// 물리 GPU 개수는 GFD 라벨 nvidia.com/gpu.count 우선(HAMi 가 안 건드림). HAMi 는 nvidia.com/gpu
+	// capacity 를 vGPU 수(물리×deviceSplitCount)로 부풀리므로 capacity 를 물리수로 쓰면 안 된다.
+	// 라벨이 없으면(GFD 미설치·stock device-plugin) capacity 로 폴백(그땐 capacity=물리수).
+	gpuCap := gpu.String()
+	if c := atoiLabel(n.Labels["nvidia.com/gpu.count"]); c > 0 {
+		gpuCap = strconv.Itoa(c)
+	}
 	return LiveNode{
 		Name:        n.Name,
 		GpuType:     n.Labels[gpuTypeLabel],
 		Physical:    n.Labels[physicalLabel] == "true",
 		Cordoned:    n.Spec.Unschedulable,
 		Ready:       isNodeReady(n),
-		GpuCapacity: gpu.String(),
+		GpuCapacity: gpuCap,
 		CPUCores:    int(cpu.Value()),
 		MemGB:       int(mem.Value() / (1024 * 1024 * 1024)),
 		CudaVersion: cudaVersionOf(n.Labels, cudaLabel),
