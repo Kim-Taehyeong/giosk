@@ -222,10 +222,36 @@ func main() {
 			return nil, false
 		}
 	}
+	// credit_balance 를 팀별로 평가 — 크레딧이 팀 지갑에 귀속되므로 "어느 팀" 잔액이 낮은지 발화한다.
+	// Active=그 팀에 활성 세션이 있거나 소비 이력이 있으면 true(안 쓰는 빈 팀은 알림 억제 → 스팸 방지).
+	creditTeams := func(ctx context.Context) map[int64][]notify.TeamBalance {
+		var rows []struct {
+			UserID  int64
+			GroupID int64
+			Name    string
+			Balance int
+			Active  bool
+		}
+		err := db.Raw(`
+			SELECT uw.user_id, uw.group_id, g.display_name AS name, uw.balance,
+			  (EXISTS(SELECT 1 FROM sessions s WHERE s.user_id=uw.user_id AND s.group_id=uw.group_id AND s.phase IN ('provisioning','running'))
+			   OR EXISTS(SELECT 1 FROM memberships m WHERE m.user_id=uw.user_id AND m.group_id=uw.group_id AND m.consumed>0)) AS active
+			FROM user_wallets uw JOIN `+"`groups`"+` g ON g.id=uw.group_id
+			WHERE uw.group_id>0 AND EXISTS(SELECT 1 FROM memberships m WHERE m.user_id=uw.user_id AND m.group_id=uw.group_id AND m.status='active')`).Scan(&rows).Error
+		if err != nil {
+			return nil
+		}
+		out := map[int64][]notify.TeamBalance{}
+		for _, r := range rows {
+			out[r.UserID] = append(out[r.UserID], notify.TeamBalance{GroupID: r.GroupID, Name: r.Name, Balance: r.Balance, Active: r.Active})
+		}
+		return out
+	}
 	go notify.NewEngine(notifyRepo, met, nodesDown, mailer).
 		WithRecorder(alertStore).
 		WithUserAlerts(inboxStore, userMetric).
 		WithSessionMetric(sessionSvc.SessionMetric). // 세션 단위 알림(session_gpu/cpu/vram)
+		WithCreditTeams(creditTeams).                // 팀별 크레딧 알림
 		Run(context.Background(), time.Minute)
 
 	// 데이터셋 — 정규 NFS 경로(<base>/dataset/<name>) 적재 + 리컨실러(다운로드 완료 시 PVC 바인딩).

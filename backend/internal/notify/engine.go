@@ -33,6 +33,17 @@ type UserMetricFn func(ctx context.Context, metric string) (map[int64]float64, b
 // SessionMetricFn은 세션 단위 지표(session_gpu/cpu/vram, %)를 특정 세션에서 평가한다(미가용이면 ok=false).
 type SessionMetricFn func(ctx context.Context, metric, instanceID string) (float64, bool)
 
+// TeamBalance는 한 사용자의 팀별 크레딧 잔액. Active=그 팀을 실제로 쓰는지(세션/소비 이력) — 안 쓰는 빈 팀 알림 억제용.
+type TeamBalance struct {
+	GroupID int64
+	Name    string
+	Balance int
+	Active  bool
+}
+
+// CreditTeamsFn은 userID→팀별 잔액을 반환한다(크레딧이 팀 귀속이라 팀별로 평가·발화).
+type CreditTeamsFn func(ctx context.Context) map[int64][]TeamBalance
+
 // Engine은 관리자(전역) 알림 규칙을 주기적으로 평가해, 위반 시 채널(웹훅/이메일)로 발송한다.
 // 규칙/채널은 notify_rules·notify_channels(관리자 설정)에서 읽는다. 메트릭은 Prometheus(DCGM),
 // 노드 비가용 수는 주입된 함수로 평가한다. 같은 규칙은 cooldown 동안 재발송하지 않는다(스팸 방지).
@@ -50,10 +61,14 @@ type Engine struct {
 	inbox      Inbox           // 사용자 인앱 수신함. nil 이면 사용자 규칙 평가를 건너뛴다.
 	userMetric UserMetricFn    // 사용자 지표 평가기. nil 이면 사용자 규칙 평가를 건너뛴다.
 	sessMetric SessionMetricFn // 세션 단위 지표 평가기(session_* 규칙용). nil 이면 세션 규칙 건너뜀.
+	creditTeams CreditTeamsFn  // credit_balance 를 팀별로 평가(팀 귀속). nil 이면 팀별 크레딧 알림 건너뜀.
 }
 
 // WithSessionMetric은 세션 단위 지표 평가기를 주입한다(session_gpu/cpu/vram 규칙 활성화).
 func (e *Engine) WithSessionMetric(fn SessionMetricFn) *Engine { e.sessMetric = fn; return e }
+
+// WithCreditTeams는 팀별 크레딧 잔액 평가기를 주입한다(credit_balance 를 팀별로 발화).
+func (e *Engine) WithCreditTeams(fn CreditTeamsFn) *Engine { e.creditTeams = fn; return e }
 
 // WithRecorder는 발화 경고를 alert_events 에 이력으로 남기게 한다.
 func (e *Engine) WithRecorder(r *alertlog.Store) *Engine { e.recorder = r; return e }
@@ -126,10 +141,14 @@ func (e *Engine) userTick(ctx context.Context) {
 	if err != nil || len(rules) == 0 {
 		return
 	}
+	e.creditTick(ctx, rules) // credit_balance 는 팀별로 따로 발화(팀 귀속)
 	// metric → (userID → 값) 캐시. 같은 지표를 여러 사용자가 걸어도 한 번만 평가한다.
 	cache := map[string]map[int64]float64{}
 	ok := map[string]bool{}
 	for _, r := range rules {
+		if r.Metric == "credit_balance" && r.Target == "" {
+			continue // 위 creditTick 에서 팀별로 처리
+		}
 		var val float64
 		if r.Target != "" {
 			// 세션 단위 규칙(session_gpu/cpu/vram) — 대상 세션에서 직접 평가.
@@ -175,6 +194,41 @@ func targetLog(t string) string {
 		return ""
 	}
 	return "@" + t
+}
+
+// creditTick은 credit_balance 규칙을 팀별로 평가한다 — 크레딧이 팀 지갑에 귀속되므로 "어느 팀"의
+// 잔액이 낮은지 팀 이름과 함께 발화한다. 안 쓰는 빈 팀(세션/소비 이력 없음)은 억제해 스팸을 막는다.
+func (e *Engine) creditTick(ctx context.Context, rules []Rule) {
+	if e.inbox == nil || e.creditTeams == nil {
+		return
+	}
+	var creditRules []Rule
+	for _, r := range rules {
+		if r.Metric == "credit_balance" && r.Target == "" {
+			creditRules = append(creditRules, r)
+		}
+	}
+	if len(creditRules) == 0 {
+		return
+	}
+	perUser := e.creditTeams(ctx)
+	for _, r := range creditRules {
+		for _, tb := range perUser[r.OwnerID] {
+			if !tb.Active {
+				continue // 안 쓰는 팀은 알림하지 않음
+			}
+			if !breached(r.Op, float64(tb.Balance), float64(r.Value)) {
+				continue
+			}
+			key := r.ID*1_000_000 + tb.GroupID // 규칙×팀 쿨다운(팀마다 개별 억제)
+			if last, seen := e.lastFired[key]; seen && time.Since(last) < e.cooldown {
+				continue
+			}
+			e.lastFired[key] = time.Now()
+			_ = e.inbox.Record(r.OwnerID, userSeverity(r.Metric), r.Metric, float64(tb.Balance), r.Value, tb.Name)
+			log.Printf("[alert-engine] USER FIRE uid=%d credit_balance@%s %s %d (현재 %d)", r.OwnerID, tb.Name, opSymbol(r.Op), r.Value, tb.Balance)
+		}
+	}
 }
 
 // userMsg는 사용자 알림의 제목·본문을 만든다(한국어).

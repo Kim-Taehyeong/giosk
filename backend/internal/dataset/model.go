@@ -49,16 +49,18 @@ type GlobalItem struct {
 	Dataset
 	Nodes    []string       `gorm:"-" json:"nodes"`    // 캐시 완료(cached) 노드 이름(노드별 매칭/개수)
 	Caches   []DatasetCache `gorm:"-" json:"caches"`   // 노드별 캐시 상태(caching/cached/failed) — 토글/진행 표시
-	Progress   int   `gorm:"-" json:"progress"`   // NFS 다운로드 진행률 %(loading 일 때만; 미측정/완료=0)
-	EtaSec     int   `gorm:"-" json:"etaSec"`     // 예상 남은 시간(초). 속도 미측정이면 0
-	Downloaded int64 `gorm:"-" json:"downloaded"` // 현재까지 받은 바이트(loading)
+	Progress   int    `gorm:"-" json:"progress"`   // 현재 단계 진행률 %(loading 일 때만)
+	Phase      string `gorm:"-" json:"phase"`      // download|extract (loading 세부 단계) — 프론트 라벨용
+	EtaSec     int    `gorm:"-" json:"etaSec"`     // 예상 남은 시간(초). 속도 미측정이면 0
+	Downloaded int64  `gorm:"-" json:"downloaded"` // 현재까지 받은 바이트(loading)
 }
 
 // DatasetCache — 노드 로컬 캐시 1건(노드 + 상태 + 진행률).
 type DatasetCache struct {
 	Node     string `json:"node"`
 	Status   string `json:"status"`   // caching|cached|failed
-	Progress int    `json:"progress"` // 복사 진행률 %(caching 일 때만; 미측정=0, 해제 단계=97)
+	Progress int    `json:"progress"` // 현재 단계 진행률 %(caching 일 때만)
+	Phase    string `json:"phase"`    // copy|extract (캐시 세부 단계) — 프론트 라벨용
 }
 
 // ListRes — /datasets 응답.

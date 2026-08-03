@@ -13,6 +13,13 @@ export function notifyText(n, t) {
   const threshold = n?.threshold ?? 0;
   const target = n?.target || '';
   const ns = { ns: 'consoleUser' };
+  // 팀 귀속 크레딧 알림 — 어느 팀 잔액이 낮은지 팀 이름과 함께.
+  if (target && n?.metric === 'credit_balance') {
+    return {
+      title: t('alert.credit_balance.teamTitle', { ...ns, target, defaultValue: `${target} 팀 크레딧 부족` }),
+      body: t('alert.credit_balance.teamBody', { ...ns, value, threshold, target, defaultValue: `${target} 팀 크레딧이 ${value} 로 임계(${threshold}) 이하입니다. 이 팀 세션이 곧 중단될 수 있어요.` }),
+    };
+  }
   // 세션 단위 알림 — 어느 세션인지 + 지표를 함께 보여준다.
   if (target && SESSION_METRIC_LABEL[n?.metric]) {
     const label = SESSION_METRIC_LABEL[n.metric];

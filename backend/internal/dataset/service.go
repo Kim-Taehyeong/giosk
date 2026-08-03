@@ -168,6 +168,18 @@ func (s *Service) RunReconciler(ctx context.Context, interval time.Duration) {
 	}
 }
 
+// parseHash는 해제 잡 로그에서 마지막 "HASH <값>" 을 뽑는다(없으면 "").
+func parseHash(logs string) string {
+	toks := strings.Fields(logs)
+	hash := ""
+	for i := 0; i+1 < len(toks); i++ {
+		if toks[i] == "HASH" && toks[i+1] != "" {
+			hash = toks[i+1]
+		}
+	}
+	return hash
+}
+
 func (s *Service) reconcileOnce(ctx context.Context) {
 	for _, d := range s.repo.ListLoading() {
 		job := fmt.Sprintf("dl-ds-%d", d.ID)
@@ -191,6 +203,12 @@ func (s *Service) reconcileOnce(ctx context.Context) {
 			continue
 		}
 		_ = s.repo.SetPVC(d.ID, pvc, s.namespace)
+		// 해제 잡이 남긴 "HASH <sum>" 을 저장(아카이브 sha256 앞 16자). Job 삭제 전에 읽는다.
+		if d.Hash == "" {
+			if h := parseHash(s.prov.BuildLogs(ctx, s.namespace, job, 60)); h != "" {
+				_ = s.repo.SetHash(d.ID, h)
+			}
+		}
 		_ = s.repo.SetLoadStatus(d.ID, "ready")
 		_ = s.prov.DeleteBuildJob(ctx, s.namespace, job)
 		log.Printf("[dataset] ds %d 적재 완료 → /dataset/%s", d.ID, d.Name)
@@ -221,12 +239,12 @@ func (s *Service) List(ctx context.Context, userID int64) (*ListRes, error) {
 	}
 	for i := range global { // 다운로드 중인 데이터셋은 진행률(%)·ETA·받은 용량 채움
 		if global[i].LoadStatus == "loading" {
-			global[i].Progress, global[i].EtaSec, global[i].Downloaded = s.downloadProgress(ctx, global[i].ID, global[i].SizeBytes)
+			global[i].Phase, global[i].Progress, global[i].EtaSec, global[i].Downloaded = s.loadProgress(ctx, global[i].ID, global[i].SizeBytes)
 		}
-		// 노드 로컬 캐시 복사 중이면 복사 진행률(%)도 채운다("진행중.." 대신 실측 %).
+		// 노드 로컬 캐시 복사 중이면 단계(복사/해제)+진행률(%)을 채운다.
 		for j := range global[i].Caches {
 			if global[i].Caches[j].Status == "caching" {
-				global[i].Caches[j].Progress = s.cacheProgress(ctx, global[i].ID, global[i].Caches[j].Node)
+				global[i].Caches[j].Phase, global[i].Caches[j].Progress = s.cacheProgress(ctx, global[i].ID, global[i].Caches[j].Node)
 			}
 		}
 	}
@@ -241,17 +259,74 @@ func (s *Service) List(ctx context.Context, userID int64) (*ListRes, error) {
 // Prometheus 가 아니라 실제 기록된 파일 크기 기반이라 정밀하다. 로그/용량 미가용이면 0.
 const progressIntervalSec = 2 // 다운로드 Job 의 PROGRESS 출력 간격(RunDatasetFetch 의 sleep 과 일치)
 
-func (s *Service) downloadProgress(ctx context.Context, id int64, total int64) (pct, etaSec int, downloaded int64) {
-	if s.prov == nil || total <= 0 {
-		return 0, 0, 0
+// lastMarker는 로그에서 "<key> <int>" 마지막 값을 찾는다(없으면 ok=false).
+func lastMarker(toks []string, key string) (int64, bool) {
+	var v int64
+	found := false
+	for i := 0; i+1 < len(toks); i++ {
+		if toks[i] == key {
+			if n, err := strconv.ParseInt(toks[i+1], 10, 64); err == nil {
+				v, found = n, true
+			}
+		}
 	}
-	logs := s.prov.BuildLogs(ctx, s.namespace, fmt.Sprintf("dl-ds-%d", id), 20)
+	return v, found
+}
+
+// lastPair는 로그에서 "<key> <int> <int>" 마지막 쌍을 찾는다(해제 진행률 EXPROGRESS <ex> <total> 용).
+func lastPair(toks []string, key string) (a, b int64, ok bool) {
+	for i := 0; i+2 < len(toks); i++ {
+		if toks[i] != key {
+			continue
+		}
+		x, e1 := strconv.ParseInt(toks[i+1], 10, 64)
+		y, e2 := strconv.ParseInt(toks[i+2], 10, 64)
+		if e1 == nil && e2 == nil {
+			a, b, ok = x, y, true
+		}
+	}
+	return
+}
+
+func capPct(v int) int {
+	if v > 99 {
+		return 99
+	}
+	if v < 0 {
+		return 0
+	}
+	return v
+}
+
+// loadProgress는 적재 Job 로그로 현재 단계(download|extract)와 그 단계의 진행률(%)을 산출한다.
+//   다운로드: "PROGRESS <bytes>" / SizeBytes. 해제: "EXTOTAL"·"EXPROGRESS <bytes>". "EXTRACT DONE"=거의 완료.
+func (s *Service) loadProgress(ctx context.Context, id int64, total int64) (phase string, pct, etaSec int, downloaded int64) {
+	if s.prov == nil {
+		return "", 0, 0, 0
+	}
+	logs := s.prov.BuildLogs(ctx, s.namespace, fmt.Sprintf("dl-ds-%d", id), 40)
 	if logs == "" {
-		return 0, 0, 0
+		return "download", 0, 0, 0
 	}
-	// "PROGRESS <n>" 값들을 시간순으로 수집.
-	var vals []int64
 	toks := strings.Fields(logs)
+	// 해제 단계 — EXPROGRESS <ex> <total> 로 판정(로그 tail 밖으로 EXTOTAL 이 밀려나도 견고).
+	if strings.Contains(logs, "EXTRACT DONE") {
+		return "extract", 99, 0, 0
+	}
+	if ex, total, ok := lastPair(toks, "EXPROGRESS"); ok {
+		if total > 0 {
+			return "extract", capPct(int(ex * 100 / total)), 0, 0
+		}
+		return "extract", 0, 0, 0
+	}
+	if strings.Contains(logs, "EXTRACT") || strings.Contains(logs, "EXTOTAL") { // 해제 시작(진행표본 전)
+		return "extract", 0, 0, 0
+	}
+	// 다운로드 단계.
+	if total <= 0 {
+		return "download", 0, 0, 0
+	}
+	var vals []int64
 	for i := 0; i+1 < len(toks); i++ {
 		if toks[i] == "PROGRESS" {
 			if n, err := strconv.ParseInt(toks[i+1], 10, 64); err == nil {
@@ -260,46 +335,46 @@ func (s *Service) downloadProgress(ctx context.Context, id int64, total int64) (
 		}
 	}
 	if len(vals) == 0 {
-		return 0, 0, 0
+		return "download", 0, 0, 0
 	}
 	downloaded = vals[len(vals)-1]
-	pct = int(downloaded * 100 / total)
-	if pct > 99 {
-		pct = 99
-	}
-	if pct < 0 {
-		pct = 0
-	}
-	// 속도 = (마지막-처음)/경과시간 → ETA = 남은바이트/속도. 표본 2개 이상일 때만.
+	pct = capPct(int(downloaded * 100 / total))
 	if len(vals) >= 2 {
 		elapsed := float64(len(vals)-1) * progressIntervalSec
-		rate := float64(downloaded-vals[0]) / elapsed // bytes/s
-		if rate > 0 {
-			etaSec = int(float64(total-downloaded) / rate)
-			if etaSec < 0 {
+		if rate := float64(downloaded-vals[0]) / elapsed; rate > 0 {
+			if etaSec = int(float64(total-downloaded) / rate); etaSec < 0 {
 				etaSec = 0
 			}
 		}
 	}
-	return pct, etaSec, downloaded
+	return "download", pct, etaSec, downloaded
 }
 
-// cacheProgress는 노드 로컬 캐시 복사 Job(dc-<id>-<node>) 로그의 "PROGRESS <cur> <total>" 로
-// 복사 진행률(%)을 낸다. 복사가 끝나 로컬 해제(EXTRACT) 단계면 97%로 표시(해제 진행은 측정 불가).
-// 로그/총량 미가용이면 0. (다운로드 진행률 downloadProgress 와 형제 함수)
-func (s *Service) cacheProgress(ctx context.Context, id int64, node string) int {
+// cacheProgress는 노드 로컬 캐시 Job(dc-<id>-<node>) 로그로 단계(copy|extract)+진행률(%)을 산출한다.
+//   복사: "PROGRESS <cur> <total>". 해제: "EXTOTAL"·"EXPROGRESS <bytes>". "EXTRACT DONE"=거의 완료.
+func (s *Service) cacheProgress(ctx context.Context, id int64, node string) (phase string, pct int) {
 	if s.prov == nil {
-		return 0
+		return "", 0
 	}
-	logs := s.prov.BuildLogs(ctx, s.namespace, fmt.Sprintf("dc-%d-%s", id, node), 20)
+	logs := s.prov.BuildLogs(ctx, s.namespace, fmt.Sprintf("dc-%d-%s", id, node), 40)
 	if logs == "" {
-		return 0
+		return "copy", 0
 	}
-	if strings.Contains(logs, "EXTRACT") { // 복사 완료 → 로컬 해제 중
-		return 97
-	}
-	var cur, total int64
 	toks := strings.Fields(logs)
+	if strings.Contains(logs, "EXTRACT DONE") {
+		return "extract", 99
+	}
+	if ex, total, ok := lastPair(toks, "EXPROGRESS"); ok { // 해제 단계
+		if total > 0 {
+			return "extract", capPct(int(ex * 100 / total))
+		}
+		return "extract", 0
+	}
+	if strings.Contains(logs, "EXTRACT") || strings.Contains(logs, "EXTOTAL") {
+		return "extract", 0
+	}
+	// 복사 단계 — "PROGRESS <cur> <total>".
+	var cur, total int64
 	for i := 0; i+2 < len(toks); i++ {
 		if toks[i] != "PROGRESS" {
 			continue
@@ -311,16 +386,12 @@ func (s *Service) cacheProgress(ctx context.Context, id int64, node string) int 
 		}
 	}
 	if total <= 0 {
-		return 0
+		return "copy", 0
 	}
 	if cur > total {
 		cur = total
 	}
-	pct := int(cur * 100 / total)
-	if pct > 96 {
-		pct = 96 // 복사 100% 도달해도 해제 전이므로 EXTRACT 전까진 96 상한
-	}
-	return pct
+	return "copy", capPct(int(cur * 100 / total))
 }
 
 // Register는 업로드-등록 신청을 접수한다(승인 대기).
@@ -353,8 +424,6 @@ func (s *Service) Register(userID int64, req RegisterReq) error {
 // ErrUploadDisabled — NFS 마운트 미설정 등으로 파일 업로드 불가.
 var ErrUploadDisabled = fmt.Errorf("upload disabled")
 
-// ErrChunkOffset — 청크 offset 이 서버 현재 크기와 불일치(클라이언트가 반환된 offset 으로 재동기화해야 함).
-var ErrChunkOffset = fmt.Errorf("chunk offset mismatch")
 
 // validName은 데이터셋 이름이 NFS 경로로 안전한지 확인한다(경로 조작·구분자 차단).
 func validName(name string) error {
@@ -364,86 +433,54 @@ func validName(name string) error {
 	return nil
 }
 
-// partPath는 업로드 중 아카이브의 NFS 경로(<mount>/dataset/<name>/<archive>)를 만든다.
-func (s *Service) partPath(name, filename string) string {
-	return filepath.Join(s.nfsMount, "dataset", name, safeArchiveName(filename))
+
+// ── 등록 방식 ①: NFS 인박스 (관리자가 SCP로 복사한 파일을 등록) ──
+
+// InboxDir은 관리자가 SCP로 데이터셋 아카이브를 올려두는 NFS 인박스 로컬 경로.
+func (s *Service) inboxDir() string { return filepath.Join(s.nfsMount, "dataset-inbox") }
+
+// InboxTarget은 관리자에게 안내할 SCP 대상(<nfsServer>:<nfsBase>/dataset-inbox/).
+func (s *Service) InboxTarget() string {
+	if s.nfsServer == "" {
+		return ""
+	}
+	return fmt.Sprintf("%s:%s/dataset-inbox/", s.nfsServer, strings.TrimRight(s.nfsBase, "/"))
 }
 
-// UploadInit은 청크 업로드를 시작(또는 재개)한다. 디렉터리/파트 파일을 준비하고 현재 크기(=재개 offset)를 반환한다.
-// Cloudflare 100MB 리밋을 청크로 우회하고, 파트 파일 크기 자체가 재개 지점이라 새로고침 후에도 이어올릴 수 있다.
-func (s *Service) UploadInit(name, filename string) (int64, error) {
+// InboxFile — 인박스에 올라온 아카이브 1개.
+type InboxFile struct {
+	Name  string `json:"name"`
+	Bytes int64  `json:"bytes"`
+}
+
+// InboxList는 인박스 디렉터리의 아카이브 목록을 반환한다(관리자가 등록 대상으로 선택).
+func (s *Service) InboxList() ([]InboxFile, error) {
 	if !s.UploadEnabled() {
-		return 0, ErrUploadDisabled
+		return nil, ErrUploadDisabled
 	}
-	if err := validName(name); err != nil {
-		return 0, err
-	}
-	if s.repo.NameTaken(name) {
-		return 0, ErrNameTaken
-	}
-	dir := filepath.Join(s.nfsMount, "dataset", name)
-	if err := os.MkdirAll(dir, 0o777); err != nil {
-		return 0, fmt.Errorf("데이터셋 디렉터리 생성 실패: %w", err)
-	}
-	p := s.partPath(name, filename)
-	if fi, err := os.Stat(p); err == nil {
-		return fi.Size(), nil // 재개: 이미 올라온 만큼 이어서
-	}
-	f, err := os.Create(p)
+	dir := s.inboxDir()
+	_ = os.MkdirAll(dir, 0o777) // 최초 조회 시 생성해 안내 경로가 실재하게
+	_ = os.Chmod(dir, 0o777)    // umask 로 0755 가 되면 SCP 하는 외부 계정이 못 쓴다 → 강제로 world-writable
+	ents, err := os.ReadDir(dir)
 	if err != nil {
-		return 0, fmt.Errorf("업로드 파일 생성 실패: %w", err)
+		return nil, err
 	}
-	_ = f.Close()
-	return 0, nil
+	out := []InboxFile{}
+	for _, e := range ents {
+		if e.IsDir() {
+			continue
+		}
+		fi, err := e.Info()
+		if err != nil {
+			continue
+		}
+		out = append(out, InboxFile{Name: e.Name(), Bytes: fi.Size()})
+	}
+	return out, nil
 }
 
-// UploadChunk는 offset 위치에 청크를 이어붙인다. offset 이 서버 현재 크기와 다르면 ErrChunkOffset 과
-// 함께 실제 크기를 돌려줘 클라이언트가 그 지점부터 재전송하게 한다. 성공 시 새 크기를 반환한다.
-func (s *Service) UploadChunk(name, filename string, offset int64, r io.Reader) (int64, error) {
-	if !s.UploadEnabled() {
-		return 0, ErrUploadDisabled
-	}
-	if err := validName(name); err != nil {
-		return 0, err
-	}
-	p := s.partPath(name, filename)
-	f, err := os.OpenFile(p, os.O_WRONLY, 0o644)
-	if err != nil {
-		return 0, err
-	}
-	defer f.Close()
-	fi, err := f.Stat()
-	if err != nil {
-		return 0, err
-	}
-	if offset != fi.Size() {
-		return fi.Size(), ErrChunkOffset // 클라이언트가 반환된 크기부터 재전송
-	}
-	if _, err := f.Seek(offset, io.SeekStart); err != nil {
-		return fi.Size(), err
-	}
-	n, err := io.Copy(f, r)
-	if err != nil {
-		return offset + n, err
-	}
-	return offset + n, nil
-}
-
-// UploadStatus는 현재까지 올라온 바이트(파트 파일 크기)를 반환한다(재개 지점 조회). 없으면 0.
-func (s *Service) UploadStatus(name, filename string) int64 {
-	if err := validName(name); err != nil {
-		return 0
-	}
-	fi, err := os.Stat(s.partPath(name, filename))
-	if err != nil {
-		return 0
-	}
-	return fi.Size()
-}
-
-// UploadFinish는 청크 전송이 끝난 파트 파일을 데이터셋으로 확정한다 — 크기 검증 후 레코드 생성(loading) +
-// 해제 Job(dl-ds-<id>). 이후 리컨실러가 PVC 바인딩+ready.
-func (s *Service) UploadFinish(ctx context.Context, userID int64, name, scope, ownerName, filename string, size int64) error {
+// RegisterNFS는 인박스의 파일을 데이터셋으로 등록한다 — dataset/<name>/ 로 이동 후 해제 Job.
+func (s *Service) RegisterNFS(ctx context.Context, userID int64, name, scope, ownerName, filename string) error {
 	if !s.UploadEnabled() {
 		return ErrUploadDisabled
 	}
@@ -453,13 +490,36 @@ func (s *Service) UploadFinish(ctx context.Context, userID int64, name, scope, o
 	if s.repo.NameTaken(name) {
 		return ErrNameTaken
 	}
-	p := s.partPath(name, filename)
-	fi, err := os.Stat(p)
+	src := filepath.Join(s.inboxDir(), safeArchiveName(filename))
+	fi, err := os.Stat(src)
 	if err != nil {
-		return fmt.Errorf("업로드 파일이 없습니다: %w", err)
+		return fmt.Errorf("인박스에 파일이 없습니다: %w", err)
 	}
-	if size > 0 && fi.Size() != size {
-		return fmt.Errorf("불완전한 업로드입니다(%d/%d 바이트)", fi.Size(), size)
+	dir := filepath.Join(s.nfsMount, "dataset", name)
+	if err := os.MkdirAll(dir, 0o777); err != nil {
+		return err
+	}
+	dst := filepath.Join(dir, safeArchiveName(filename))
+	if err := os.Rename(src, dst); err != nil {
+		// 교차 디바이스 등으로 rename 실패하면 복사 폴백.
+		if cerr := copyFile(src, dst); cerr != nil {
+			return fmt.Errorf("인박스 파일 이동 실패: %w", err)
+		}
+		_ = os.Remove(src)
+	}
+	return s.createLoadingAndExtract(ctx, userID, name, scope, ownerName, fi.Size())
+}
+
+// RegisterURL은 관리자가 URL(wget)로 데이터셋을 직접 등록한다(요청/승인 절차 없이).
+func (s *Service) RegisterURL(ctx context.Context, userID int64, name, scope, ownerName, url string) error {
+	if !s.canonical() {
+		return ErrUploadDisabled
+	}
+	if err := validName(name); err != nil {
+		return err
+	}
+	if s.repo.NameTaken(name) {
+		return ErrNameTaken
 	}
 	if scope == "" {
 		scope = ScopeGlobal
@@ -468,18 +528,51 @@ func (s *Service) UploadFinish(ctx context.Context, userID int64, name, scope, o
 	if scope == ScopePersonal {
 		status = StatusPrivate
 	}
-	d := &Dataset{
-		Name: name, Scope: scope, Owner: ownerName, OwnerUserID: &userID,
-		SizeBytes: fi.Size() * 3, Status: status, LoadStatus: "loading",
+	d := &Dataset{Name: name, Scope: scope, Owner: ownerName, OwnerUserID: &userID, SourceURL: url, SizeBytes: remoteSize(url), Status: status, LoadStatus: "loading"}
+	if err := s.repo.CreateDataset(d); err != nil {
+		return err
 	}
+	if err := s.prov.RunDatasetFetch(ctx, s.namespace, fmt.Sprintf("dl-ds-%d", d.ID), s.nfsServer, s.nfsBase, d.Name, url); err != nil {
+		log.Printf("[dataset] URL 적재 Job 실패 ds %d: %v", d.ID, err)
+		_ = s.repo.SetLoadStatus(d.ID, "failed")
+	}
+	return nil
+}
+
+// createLoadingAndExtract는 NFS 에 이미 놓인 아카이브를 loading 데이터셋으로 만들고 해제 Job 을 띄운다.
+func (s *Service) createLoadingAndExtract(ctx context.Context, userID int64, name, scope, ownerName string, bytes int64) error {
+	if scope == "" {
+		scope = ScopeGlobal
+	}
+	status := StatusActive
+	if scope == ScopePersonal {
+		status = StatusPrivate
+	}
+	d := &Dataset{Name: name, Scope: scope, Owner: ownerName, OwnerUserID: &userID, SizeBytes: bytes * 3, Status: status, LoadStatus: "loading"}
 	if err := s.repo.CreateDataset(d); err != nil {
 		return err
 	}
 	if err := s.prov.RunDatasetExtract(ctx, s.namespace, fmt.Sprintf("dl-ds-%d", d.ID), s.nfsServer, s.nfsBase, d.Name); err != nil {
-		log.Printf("[dataset] 업로드 해제 Job 실패 ds %d: %v", d.ID, err)
+		log.Printf("[dataset] 해제 Job 실패 ds %d: %v", d.ID, err)
 		_ = s.repo.SetLoadStatus(d.ID, "failed")
 	}
 	return nil
+}
+
+// copyFile은 rename 폴백용 단순 복사.
+func copyFile(src, dst string) error {
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	_, err = io.Copy(out, in)
+	return err
 }
 
 // safeArchiveName은 업로드 파일명을 안전한 기본명으로 정리한다(경로 조작 방지).
@@ -493,62 +586,29 @@ func safeArchiveName(fn string) string {
 	return base
 }
 
-// Upload는 최고관리자가 zip/tar 아카이브(또는 단일 파일)를 직접 업로드해 데이터셋으로 등록한다.
-// API 가 NFS(<mount>/dataset/<name>)에 스트리밍 기록 → 해제 Job(dl-ds-<id>) → 리컨실러가 PVC 바인딩+ready.
-// 업로드는 승인 절차 없이 즉시 정규경로 데이터셋을 만든다(최고관리자 전용 라우트에서만 호출).
-func (s *Service) Upload(ctx context.Context, userID int64, name, scope, ownerName, filename string, size int64, src io.Reader) error {
-	if !s.UploadEnabled() {
-		return fmt.Errorf("파일 업로드가 비활성화되어 있습니다(데이터셋 NFS 마운트 필요)")
+// Delete는 데이터셋을 삭제하며 노드 로컬 캐시(hostPath)와 NFS 데이터도 함께 정리한다.
+func (s *Service) Delete(ctx context.Context, id int64) error {
+	d, err := s.repo.Get(id)
+	if err == nil {
+		// 처리 중이면 적재/해제 Job 을 먼저 죽인다(고아 Job 방지).
+		if s.prov != nil {
+			_ = s.prov.DeleteBuildJob(ctx, s.namespace, fmt.Sprintf("dl-ds-%d", id))
+		}
+		// 캐시된/진행중 노드의 로컬 디렉터리 정리 + 캐시 Job 정리(best-effort).
+		if s.prov != nil && s.cacheHost != "" {
+			for _, node := range s.repo.CachedNodesOf(id) {
+				_ = s.prov.DeleteBuildJob(ctx, s.namespace, fmt.Sprintf("dc-%d-%s", id, node)) // 복사 중이면 중단
+				_ = s.prov.RunDatasetUncache(ctx, s.namespace, fmt.Sprintf("rm-dc-%d-%s", id, node), node, s.cacheHost, d.Name)
+			}
+		}
+		_ = s.repo.CacheDeleteAll(id)
+		// NFS 정규경로 데이터(dataset/<name>) 정리.
+		if s.nfsMount != "" && d.Name != "" {
+			_ = os.RemoveAll(filepath.Join(s.nfsMount, "dataset", d.Name))
+		}
 	}
-	if scope == "" {
-		scope = ScopeGlobal
-	}
-	if s.repo.NameTaken(name) {
-		return ErrNameTaken
-	}
-	// 1) NFS 에 스트리밍 기록: <mount>/dataset/<name>/<archive>
-	dir := filepath.Join(s.nfsMount, "dataset", name)
-	if err := os.MkdirAll(dir, 0o777); err != nil {
-		return fmt.Errorf("데이터셋 디렉터리 생성 실패: %w", err)
-	}
-	arc := safeArchiveName(filename)
-	dst := filepath.Join(dir, arc)
-	f, err := os.Create(dst)
-	if err != nil {
-		return fmt.Errorf("업로드 파일 생성 실패: %w", err)
-	}
-	written, werr := io.Copy(f, src)
-	cerr := f.Close()
-	if werr != nil {
-		_ = os.Remove(dst)
-		return fmt.Errorf("업로드 저장 실패: %w", werr)
-	}
-	if cerr != nil {
-		return fmt.Errorf("업로드 파일 마감 실패: %w", cerr)
-	}
-	// 2) 데이터셋 레코드(정규경로, loading). PVC 크기는 아카이브의 3배로 넉넉히 잡되(NFS 정적 PVC 는 미강제),
-	//    상태 정확성보다 여유가 낫다.
-	status := StatusActive
-	if scope == ScopePersonal {
-		status = StatusPrivate
-	}
-	d := &Dataset{
-		Name: name, Scope: scope, Owner: ownerName, OwnerUserID: &userID,
-		SizeBytes: written * 3, Status: status, LoadStatus: "loading",
-	}
-	if err := s.repo.CreateDataset(d); err != nil {
-		_ = os.RemoveAll(dir)
-		return err
-	}
-	// 3) 해제 Job(다운로드 없이 제자리 해제). 리컨실러가 dl-ds-<id> 완료를 보고 PVC 바인딩+ready.
-	if err := s.prov.RunDatasetExtract(ctx, s.namespace, fmt.Sprintf("dl-ds-%d", d.ID), s.nfsServer, s.nfsBase, d.Name); err != nil {
-		log.Printf("[dataset] 업로드 해제 Job 실패 ds %d: %v", d.ID, err)
-		_ = s.repo.SetLoadStatus(d.ID, "failed")
-	}
-	return nil
+	return s.repo.Delete(id)
 }
-
-func (s *Service) Delete(id int64) error { return s.repo.Delete(id) }
 
 // UpdateDescription은 데이터셋 설명을 수정한다(관리자).
 func (s *Service) UpdateDescription(id int64, desc string) error { return s.repo.SetDescription(id, desc) }
@@ -607,6 +667,11 @@ func (s *Service) ToggleCache(ctx context.Context, datasetID int64, node string)
 		return err
 	}
 	jobBase := fmt.Sprintf("dc-%d-%s", datasetID, node)
+	// 등록중(loading) 데이터셋은 캐시할 수 없다 — NFS 해제가 끝나야 노드로 복사 가능.
+	// 단 이미 캐시 행이 있으면(해제/취소) 통과시킨다.
+	if _, exists := s.repo.CacheStatus(datasetID, node); !exists && d.LoadStatus != "ready" {
+		return fmt.Errorf("등록이 완료된 뒤에 캐시할 수 있습니다(현재 %s)", d.LoadStatus)
+	}
 	if _, exists := s.repo.CacheStatus(datasetID, node); exists {
 		_ = s.repo.CacheDelete(datasetID, node)
 		if s.prov != nil && s.cacheHost != "" {

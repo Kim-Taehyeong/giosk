@@ -145,7 +145,7 @@ func (c *Client) RunDatasetFetch(ctx context.Context, ns, jobName, nfsServer, nf
 	script := "set -e; mkdir -p '" + dir + "'"
 	if url != "" {
 		script += `
-apk add --no-cache curl unzip tar >/dev/null 2>&1 || true
+apk add --no-cache curl unzip tar coreutils >/dev/null 2>&1 || true
 fn=$(basename "` + url + `" | sed 's/[?].*//'); [ -z "$fn" ] && fn=download.bin
 ( curl -fSL --retry 3 -o "` + dir + `/$fn" "` + url + `" ) &
 pid=$!
@@ -156,18 +156,45 @@ while kill -0 "$pid" 2>/dev/null; do
 done
 wait "$pid"
 echo "PROGRESS DONE"
+a="` + dir + `/$fn"
 case "$fn" in
-  *.zip) echo "EXTRACT zip"; unzip -o -q "` + dir + `/$fn" -d "` + dir + `" || echo "extract failed(아카이브만 보관)" ;;
-  *.tar.gz|*.tgz) echo "EXTRACT tar.gz"; tar -xzf "` + dir + `/$fn" -C "` + dir + `" || echo "extract failed(아카이브만 보관)" ;;
-  *.tar) echo "EXTRACT tar"; tar -xf "` + dir + `/$fn" -C "` + dir + `" || echo "extract failed(아카이브만 보관)" ;;
-  *) echo "no-extract(단일파일 데이터셋)" ;;
-esac
-echo "EXTRACT DONE"`
+  *.zip|*.tar.gz|*.tgz|*.tar) ` + extractWithProgress(dir) + ` ;;
+  *) echo "no-extract(단일파일 데이터셋)"; echo "EXTRACT DONE" ;;
+esac`
 	}
 	vol := []corev1.Volume{{Name: "nfs", VolumeSource: corev1.VolumeSource{NFS: &corev1.NFSVolumeSource{Server: nfsServer, Path: nfsBase}}}}
 	mounts := []corev1.VolumeMount{{Name: "nfs", MountPath: "/nfs"}}
 	// alpine: apk 로 curl/unzip/tar 확보(root 실행 → apk 가능; curlimages 는 non-root 라 apk 불가).
 	return c.runSimpleJobCmd(ctx, ns, jobName, "alpine:3.20", []string{"sh", "-c", script}, nil, nil, vol, mounts)
+}
+
+// extractWithProgress는 아카이브 `$a` 를 dir 로 해제하며 진행률 마커를 로그로 낸다.
+//   EXTOTAL <해제 예상 바이트> / EXPROGRESS <해제된 바이트(2초 간격)> / EXTRACT DONE
+// 총량 추정: zip 은 central directory(빠름), tar 계열은 압축크기×3 추정. du 에 포함된 아카이브 자체 크기(base)는 뺀다.
+func extractWithProgress(dir string) string {
+	return `base=$(stat -c %s "$a")
+case "$a" in
+  *.zip) total=$(unzip -l "$a" 2>/dev/null | tail -1 | awk '{print $1}') ;;
+  *) total=0 ;;
+esac
+{ [ -z "$total" ] || [ "$total" -le 0 ] 2>/dev/null; } && total=$(( base * 3 ))
+echo "EXTOTAL $total"
+echo "EXTRACT"
+( case "$a" in
+    *.zip) unzip -o -q "$a" -d "` + dir + `" ;;
+    *.tar.gz|*.tgz) tar -xzf "$a" -C "` + dir + `" ;;
+    *.tar) tar -xf "$a" -C "` + dir + `" ;;
+  esac ) &
+pid=$!
+while kill -0 "$pid" 2>/dev/null; do
+  du=$(du -sb "` + dir + `" 2>/dev/null | awk '{print $1}')
+  ex=$(( ${du:-0} - base )); [ "$ex" -lt 0 ] && ex=0
+  echo "EXPROGRESS $ex $total"
+  sleep 2
+done
+wait "$pid" || echo "extract failed(아카이브만 보관)"
+echo "HASH $(sha256sum "$a" 2>/dev/null | cut -c1-16)"
+echo "EXTRACT DONE"`
 }
 
 // RunDatasetExtract는 이미 NFS(/nfs/dataset/<name>)에 올라온 아카이브를 제자리 해제한다(원본 보존).
@@ -181,12 +208,10 @@ func (c *Client) RunDatasetExtract(ctx context.Context, ns, jobName, nfsServer, 
 	}
 	_ = c.DeleteBuildJob(ctx, ns, jobName)
 	dir := "/nfs/dataset/" + name
-	script := "set -e; apk add --no-cache unzip tar >/dev/null 2>&1 || true\n" +
+	script := "set -e; apk add --no-cache unzip tar coreutils >/dev/null 2>&1 || true\n" +
 		"a=$(ls " + dir + "/*.zip " + dir + "/*.tar.gz " + dir + "/*.tgz " + dir + "/*.tar 2>/dev/null | head -1)\n" +
-		"[ -z \"$a\" ] && { echo 'no-archive(단일파일)'; exit 0; }\n" +
-		"echo EXTRACT\n" +
-		"case \"$a\" in *.zip) unzip -o -q \"$a\" -d '" + dir + "';; *.tar.gz|*.tgz) tar -xzf \"$a\" -C '" + dir + "';; *.tar) tar -xf \"$a\" -C '" + dir + "';; esac\n" +
-		"echo extracted"
+		"[ -z \"$a\" ] && { echo 'no-archive(단일파일)'; echo 'EXTRACT DONE'; exit 0; }\n" +
+		extractWithProgress(dir)
 	vol := []corev1.Volume{{Name: "nfs", VolumeSource: corev1.VolumeSource{NFS: &corev1.NFSVolumeSource{Server: nfsServer, Path: nfsBase}}}}
 	mounts := []corev1.VolumeMount{{Name: "nfs", MountPath: "/nfs"}}
 	return c.runSimpleJobCmd(ctx, ns, jobName, "alpine:3.20", []string{"sh", "-c", script}, nil, nil, vol, mounts)
@@ -208,7 +233,7 @@ func (c *Client) RunDatasetCache(ctx context.Context, ns, jobName, node, nfsServ
 	// (cp -a) 수많은 작은 파일이 NFS 를 오가 느리다 → 아카이브 1개만 노드로 복사(단일 대용량=빠름)한 뒤
 	// 노드 로컬에서 해제한다. 아카이브가 없으면(단일파일 데이터셋) 폴더 통째 복사로 폴백.
 	// 복사 진행률을 "PROGRESS <cur> <total>" 로 출력 → API 가 파싱해 %.
-	script := "set -e; apk add --no-cache unzip tar >/dev/null 2>&1 || true; mkdir -p '" + dst + `'
+	script := "set -e; apk add --no-cache unzip tar coreutils >/dev/null 2>&1 || true; mkdir -p '" + dst + `'
 arc=$(ls /src/*.zip /src/*.tar.gz /src/*.tgz /src/*.tar 2>/dev/null | head -1)
 if [ -n "$arc" ]; then
   bn=$(basename "$arc"); total=$(stat -c %s "$arc" 2>/dev/null || echo 0)
@@ -220,15 +245,12 @@ if [ -n "$arc" ]; then
   done
   wait "$pid"
   echo "PROGRESS $total $total"
-  echo "EXTRACT"
-  case "$bn" in
-    *.zip) unzip -o -q '` + dst + `/'"$bn" -d '` + dst + `' ;;
-    *.tar.gz|*.tgz) tar -xzf '` + dst + `/'"$bn" -C '` + dst + `' ;;
-    *.tar) tar -xf '` + dst + `/'"$bn" -C '` + dst + `' ;;
-  esac
-  rm -f '` + dst + `/'"$bn"
+  a='` + dst + `/'"$bn"
+  ` + extractWithProgress(dst) + `
+  rm -f "$a"
 else
   cp -a /src/. '` + dst + `/'
+  echo "EXTRACT DONE"
 fi
 echo cached`
 	hostType := corev1.HostPathDirectoryOrCreate
