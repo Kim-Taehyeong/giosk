@@ -124,6 +124,24 @@ func (c *Client) SessionServiceAccess(ctx context.Context, ns, name, mode string
 	return out, nil
 }
 
+// NodeIP는 노드 이름의 InternalIP 를 반환한다(없으면 이름 그대로 폴백).
+// 노드 이름은 클러스터 DNS 에 없어(lookup 실패) SSH/웹터미널이 노드에 붙을 때 IP 가 필요하다.
+func (c *Client) NodeIP(ctx context.Context, node string) string {
+	if !c.Available() || node == "" {
+		return node
+	}
+	n, err := c.cs.CoreV1().Nodes().Get(ctx, node, v1.GetOptions{})
+	if err != nil {
+		return node
+	}
+	for _, a := range n.Status.Addresses {
+		if a.Type == corev1.NodeInternalIP {
+			return a.Address
+		}
+	}
+	return node
+}
+
 // FirstNodeIP는 NodePort 접속용 워커 노드 IP 하나를 반환한다.
 func (c *Client) FirstNodeIP(ctx context.Context) string {
 	if !c.Available() {

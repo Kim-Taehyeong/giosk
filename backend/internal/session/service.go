@@ -49,6 +49,7 @@ type Provisioner interface {
 	// 접속마다 다시 읽으므로, 실행 중 세션에도 키 등록/교체가 즉시 반영된다.
 	UpsertUserKeys(ctx context.Context, ns string, userID int64, keys string) error
 	CreateSessionPod(ctx context.Context, s k8s.SessionSpec) error
+	WaitPVCsBound(ctx context.Context, ns string, names []string, timeout time.Duration) // Pod 생성 전 PVC 바인딩 보장(스케줄 레이스 방지)
 	DeleteSessionPod(ctx context.Context, ns, name string) error
 	PodStatus(ctx context.Context, ns, name string) (*k8s.PodStatus, error)
 	PodLogs(ctx context.Context, ns, name string, tail int64) (string, error)
@@ -62,6 +63,7 @@ type Provisioner interface {
 	DeleteSessionService(ctx context.Context, ns, name string) error
 	SessionServiceAccess(ctx context.Context, ns, name, mode string) (k8s.SvcAccess, error)
 	FirstNodeIP(ctx context.Context) string
+	NodeIP(ctx context.Context, node string) string        // 노드 이름→InternalIP(클러스터 DNS 에 노드명 없음 → SSH/웹터미널 IP 필요)
 	ListNodes(ctx context.Context) ([]k8s.LiveNode, error) // 데이터셋 캐시 노드↔GPU타입 매칭용
 	ExecTerminal(ctx context.Context, ns, pod, container string, cmd []string, tio k8s.ExecIO) error // 웹터미널(컨테이너 exec)
 }
@@ -981,6 +983,19 @@ func (s *Service) provision(ctx context.Context, ns string, sess *Session, image
 			return err
 		}
 	}
+	// PVC(홈/볼륨/데이터셋)는 생성 즉시 바인딩되지 않는다. hami-scheduler 는 unbound PVC 로 스케줄
+	// 실패 후 재큐잉을 안 해 Pod 가 영구 Pending 이 되므로, Pod 생성 전에 바인딩을 기다린다.
+	var pvcNames []string
+	if homePVC != "" {
+		pvcNames = append(pvcNames, homePVC)
+	}
+	for _, m := range mounts {
+		if m.PVCName != "" {
+			pvcNames = append(pvcNames, m.PVCName)
+		}
+	}
+	s.prov.WaitPVCsBound(ctx, ns, pvcNames, 90*time.Second)
+
 	channels := s.sessionChannels(sess.ImageID, sess.WebPassword)
 	if err := s.prov.CreateSessionPod(ctx, k8s.SessionSpec{
 		Namespace:   ns,
@@ -1109,9 +1124,9 @@ func (s *Service) Connection(ctx context.Context, instanceID string, userID int6
 		return nil, err
 	}
 	if sess.Env == "ssh" {
-		// 물리노드 임대 — 노드로 직접 SSH(계정=username, node-agent 가 생성).
+		// 물리노드 임대 — 노드 IP 로 직접 SSH(노드 이름은 클러스터/외부 DNS 에 없어 lookup 실패).
 		return &Connection{
-			SSH: map[string]string{"cmd": fmt.Sprintf("ssh %s@%s", s.usernameOf(userID), sess.Node)},
+			SSH: map[string]string{"cmd": fmt.Sprintf("ssh %s@%s", s.usernameOf(userID), s.prov.NodeIP(ctx, sess.Node))},
 		}, nil
 	}
 	channels := s.sessionChannels(sess.ImageID, sess.WebPassword)
@@ -1235,8 +1250,8 @@ func (s *Service) Access(ctx context.Context, instanceID string, userID int64) (
 		return nil, err
 	}
 	info := &AccessInfo{ExpiresAt: s.now().Add(webAccessTTL)}
-	if sess.Env == "ssh" { // 물리노드 임대 — SSH 만.
-		info.SSH = s.sshAccess(sess.InstanceID, userID, "", sess.Node, gateway.TgtPhysical, s.usernameOf(userID))
+	if sess.Env == "ssh" { // 물리노드 임대 — SSH 만. 노드 이름은 DNS 미해석 → IP 로 접속.
+		info.SSH = s.sshAccess(sess.InstanceID, userID, "", s.prov.NodeIP(ctx, sess.Node), gateway.TgtPhysical, s.usernameOf(userID))
 		info.ExpiresAt = s.now().Add(sshAccessTTL)
 		return info, nil
 	}
@@ -1705,11 +1720,10 @@ func (s *Service) CountIdleRunning(ctx context.Context) int {
 //   - GPU 세션(exclusive/shared): GPU 사용률(DCGM)이 idleGPUThreshold% 미만이면 유휴.
 //   - CPU 세션(cpu): CPU rate 가 idleCPUThreshold 코어 미만이면 유휴.
 //
-// ok=false 면 판정 불가(메트릭 없음/물리 세션) → 보수적으로 정지하지 않는다.
+// ok=false 면 판정 불가(메트릭 없음) → 보수적으로 정지하지 않는다.
+// 물리(SSH) 세션은 GpuMode="exclusive" 라 아래 전용 분기(노드 GPU 사용률)로 흐른다 — 노드를 통째
+// 점유하므로 노드 GPU 사용률이 곧 임대 사용량이고, 유휴면 회수해 다른 세션이 들어오게 한다.
 func (s *Service) isIdle(ctx context.Context, sess *Session, windowMin int) (idle, ok bool) {
-	if sess.Env == "ssh" {
-		return false, false // 물리(SSH) 세션은 Pod 메트릭이 없어 유휴 리퍼 대상 아님
-	}
 	if sess.GpuMode == "cpu" {
 		// CPU 세션은 유휴로 종료하지 않는다(사용자 정책: "CPU 유휴로 끄면 안 됨").
 		// 유휴 리퍼는 희소 자원인 GPU 세션만 회수한다.
@@ -1776,8 +1790,14 @@ func (s *Service) idleStop(ctx context.Context, sess *Session, windowMin int) {
 // autoStop은 세션 Pod/Service 를 정리하고 최종 정산 후 stopped 로 전이한다(소유자 무관, 시스템 동작).
 func (s *Service) autoStop(ctx context.Context, sess *Session, action, logMsg string) {
 	s.settle(ctx, sess, true) // 정지 전 사용분 최종 정산
-	_ = s.prov.DeleteSessionPod(ctx, s.namespaceOf(sess), sess.InstanceID)
-	_ = s.prov.DeleteSessionService(ctx, s.namespaceOf(sess), sess.InstanceID)
+	if sess.Env == "ssh" {
+		if s.leaser != nil {
+			_ = s.leaser.ReleaseLeaseFor(ctx, sess.InstanceID) // 물리 임대 반납(uncordon); 홈(NFS)은 유지
+		}
+	} else {
+		_ = s.prov.DeleteSessionPod(ctx, s.namespaceOf(sess), sess.InstanceID)
+		_ = s.prov.DeleteSessionService(ctx, s.namespaceOf(sess), sess.InstanceID)
+	}
 	if err := s.repo.SetPhase(sess.InstanceID, PhaseStopped); err != nil {
 		return
 	}

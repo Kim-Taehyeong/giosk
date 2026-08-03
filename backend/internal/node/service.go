@@ -396,10 +396,11 @@ func (s *Service) CreateLeaseFor(ctx context.Context, nodeName string, userID in
 	}
 	// 선착순(비-자유): 노드 전용. AcquireLease(exclusive=true)가 갭락으로 직렬화하여
 	// 거의 동시 요청 중 처음 한 건만 임대를 잡고, 나머지는 ErrNodeBusy.
-	const defaultLeaseHours = 8
+	// 고정 만료시간은 두지 않는다 — 물리 임대 회수는 유휴 리퍼(노드 GPU 유휴)·수동 반납·크레딧
+	// 잔액 소진이 담당한다. (예전의 8h 하드코딩은 이를 처리하는 리퍼가 없어 무의미했다.)
 	l := &Lease{
 		Node: nodeName, UserID: userID, InstanceID: instanceID, Status: LeaseActive,
-		LeaseHours: defaultLeaseHours, StartedAt: now, ExpiresAt: now.Add(defaultLeaseHours * time.Hour),
+		LeaseHours: 0, StartedAt: now, ExpiresAt: now.AddDate(100, 0, 0),
 	}
 	if _, err := s.repo.AcquireLease(l, true); err != nil {
 		return err // ErrNodeBusy 포함

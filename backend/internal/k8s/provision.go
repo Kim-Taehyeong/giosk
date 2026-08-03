@@ -4,11 +4,41 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
+
+// WaitPVCsBound은 지정한 PVC 들이 모두 Bound 될 때까지(또는 timeout) 기다린다.
+// PVC 는 생성 즉시 바인딩되지 않는데(비동기), hami-scheduler 는 unbound PVC 로 스케줄 실패 시
+// 재큐잉하지 않아 Pod 가 영구 Pending 이 된다 → Pod 생성 전에 바인딩을 보장한다.
+func (c *Client) WaitPVCsBound(ctx context.Context, ns string, names []string, timeout time.Duration) {
+	if !c.Available() || len(names) == 0 {
+		return
+	}
+	ctx2, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+	for {
+		allBound := true
+		for _, n := range names {
+			pvc, err := c.cs.CoreV1().PersistentVolumeClaims(ns).Get(ctx2, n, metav1.GetOptions{})
+			if err != nil || pvc.Status.Phase != corev1.ClaimBound {
+				allBound = false
+				break
+			}
+		}
+		if allBound {
+			return
+		}
+		select {
+		case <-ctx2.Done():
+			return // 타임아웃 — 그래도 Pod 생성 시도(최선)
+		case <-time.After(500 * time.Millisecond):
+		}
+	}
+}
 
 // SessionSpec은 세션 Pod 프로비저닝 입력(도메인 → k8s 변환 결과).
 type SessionSpec struct {
@@ -175,7 +205,7 @@ func (c *Client) PodDescribe(ctx context.Context, ns, name string) (*PodDescribe
 		Reason: p.Status.Reason, Message: p.Status.Message,
 	}
 	if p.Status.StartTime != nil {
-		d.StartTime = p.Status.StartTime.Format("2006-01-02T15:04:05Z")
+		d.StartTime = p.Status.StartTime.UTC().Format(time.RFC3339)
 	}
 	for _, cs := range p.Status.ContainerStatuses {
 		st := ContainerState{Name: cs.Name, Ready: cs.Ready, RestartCount: cs.RestartCount, Image: cs.Image}
@@ -198,9 +228,9 @@ func (c *Client) PodDescribe(ctx context.Context, ns, name string) (*PodDescribe
 	})
 	if err == nil {
 		for _, e := range evs.Items {
-			last := e.LastTimestamp.Format("2006-01-02T15:04:05Z")
+			last := e.LastTimestamp.UTC().Format(time.RFC3339)
 			if e.LastTimestamp.IsZero() {
-				last = e.EventTime.Format("2006-01-02T15:04:05Z")
+				last = e.EventTime.UTC().Format(time.RFC3339)
 			}
 			d.Events = append(d.Events, PodEvent{Type: e.Type, Reason: e.Reason, Message: e.Message, Count: e.Count, Last: last})
 		}
@@ -213,7 +243,9 @@ func (c *Client) PodLogs(ctx context.Context, ns, name string, tail int64) (stri
 	if !c.Available() {
 		return "", ErrNoCluster
 	}
-	req := c.cs.CoreV1().Pods(ns).GetLogs(name, &corev1.PodLogOptions{TailLines: &tail})
+	// sshd 사이드카가 붙어 Pod 에 컨테이너가 여러 개다. Container 를 지정하지 않으면
+	// "a container name must be specified" 로 실패하므로 세션 본체("session") 로그를 콕 집는다.
+	req := c.cs.CoreV1().Pods(ns).GetLogs(name, &corev1.PodLogOptions{Container: "session", TailLines: &tail})
 	stream, err := req.Stream(ctx)
 	if err != nil {
 		return "", err
