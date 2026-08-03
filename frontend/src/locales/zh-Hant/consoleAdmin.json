@@ -115,7 +115,10 @@
     "gpuTempMax": "最高 GPU 溫度",
     "noActiveUsers": "目前沒有正在運行的會話",
     "modeHint_dynamic": "先到先得模式－無積分；搶佔可用容量。透過會話/空閒統計資料和警報進行監控。",
-    "modeHint_free": "免費模式－沒有信用限制。透過會話/空閒統計資料和 GPU 時間監控利用率。"
+    "modeHint_free": "免費模式－沒有信用限制。透過會話/空閒統計資料和 GPU 時間監控利用率。",
+    "metricsOffTitle": "未安裝監控元件",
+    "metricsOffAll": "缺少 Prometheus 與 DCGM exporter，無法顯示 GPU 使用率、顯示記憶體與溫度。啟用監控後即可看到即時指標。",
+    "metricsOffDcgm": "Prometheus 已連線，但找不到 DCGM exporter 的指標。安裝 dcgm-exporter 後即可即時檢視 GPU 使用率、顯示記憶體與溫度。"
   },
   "approvals": {
     "title": "核准",
@@ -470,7 +473,10 @@
     "importTitle": "將現有 NFS 路徑匯入為磁碟區",
     "impSize": "顯示大小 (GiB)",
     "impOwner": "所有者（帳戶）",
-    "impPath": "NFS 路徑（導出）"
+    "impPath": "NFS 路徑（導出）",
+    "impOwnerHint": "請從清單中選擇一個帳號以匯入。",
+    "impOwnerPicked": "已選擇：{{name}}（{{id}}）",
+    "metricsOffNotice": "未安裝監控（DCGM/Prometheus），因此無法顯示 GPU 使用率與顯示記憶體。啟用監控後即可看到即時指標。"
   },
   "mset": {
     "title": "設定",
@@ -838,7 +844,9 @@
     "hint": "獨立於學分的絕對上限。空字段繼承自父級（群組 → 組織 → 全域）。",
     "groupHint": "該組成員的硬上限。空字段繼承自 org → global。",
     "orgHint": "該組織成員的硬性上限。空字段繼承自全域。",
-    "saved": "已儲存 {{name}} 的限制"
+    "saved": "已儲存 {{name}} 的限制",
+    "maxStoppedSessions": "最大已停止工作階段數",
+    "maxEphemeralGib": "最大暫存磁碟"
   },
   "settings": {
     "mode": {

@@ -324,6 +324,13 @@ func gpuLimits(s SessionSpec) corev1.ResourceList {
 	if s.EphemeralGiB > 0 {
 		limits[corev1.ResourceEphemeralStorage] = resource.MustParse(fmt.Sprintf("%dGi", s.EphemeralGiB))
 	}
+	// 메모리 상한 = request × MemBurst. CPU 와 달리 메모리는 압축 불가라 limit 이 없으면
+	// 한 세션이 노드 RAM 을 다 먹고 kubelet 이 "다른 사용자의" 파드를 축출한다 —
+	// 버스트의 대가를 남이 치르는 구조. 배수를 주어 버스트는 살리되 연쇄는 끊는다.
+	// (CPU 는 압축 가능해 경합 시 느려질 뿐이므로 지금처럼 limit 없이 둔다.)
+	if s.MemGB > 0 && s.MemBurst > 1 {
+		limits[corev1.ResourceMemory] = resource.MustParse(fmt.Sprintf("%dGi", s.MemGB*s.MemBurst))
+	}
 	if len(limits) == 0 {
 		return nil
 	}

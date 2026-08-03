@@ -309,7 +309,8 @@
     "tsSlotN": "1 slot {{n}}",
     "grpSlotTech": "Teknologi: Pemotongan waktu NVIDIA (tanpa isolasi memori)",
     "grpSlotDesc": "Beberapa orang bergantian menggunakan satu GPU. Memori tidak dijamin — jika sesi lain menghabiskan VRAM, sesi Anda juga bisa gagal.",
-    "notEnough": "Pulsa tidak cukup — diperlukan minimum 1 jam"
+    "notEnough": "Pulsa tidak cukup — diperlukan minimum 1 jam",
+    "sshKeyChange": "Ubah"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "detNoActivity": "Belum ada aktivitas",
     "detLogs": "Log terbaru",
     "detNoLogs": "Tidak ada log",
-    "detActivity": "Catatan aktivitas"
+    "detActivity": "Catatan aktivitas",
+    "detReclaimTitle": "Penyimpanan sesi terhenti",
+    "reclaimIn": "Dapat ditarik dalam {{n}} hr",
+    "reclaimDue": "Dapat ditarik",
+    "reclaimKept": "Disimpan",
+    "reclaimHint": "Sesi yang dihentikan tetap memakai disk home. Setelah {{n}} hari terhenti, sesi dapat ditarik kembali, dan yang paling lama menganggur dapat dihapus ketika disk sebuah node menipis.",
+    "reclaimKeptHint": "Sesi terhenti terbaru Anda tidak pernah ditarik.",
+    "reclaimResumeHint": "Memulai ulang akan mengatur ulang hitungan. Hapus sesi yang tidak perlu Anda simpan lagi."
   },
   "conn": {
     "loading": "Memuat info koneksi…",
@@ -412,7 +420,9 @@
     "sshProxy": "Proksi (gerbang)",
     "sshDirect": "Langsung (intranet)",
     "sshExternal": "SSH (eksternal — melalui proxy)",
-    "regenerated": "Mengeluarkan tautan akses baru."
+    "regenerated": "Mengeluarkan tautan akses baru.",
+    "sshNeedKey": "Belum ada kunci publik SSH terdaftar",
+    "sshNeedKeyHint": "Daftarkan atau buat satu di bawah — sesi yang sedang berjalan langsung memakainya."
   },
   "account": {
     "title": "Pengaturan Saya",
@@ -448,7 +458,13 @@
     "localAcctNote": "Akun lokal disediakan untuk Anda di setiap node fisik.",
     "homeHint": "Penggunaan direktori home node fisik Anda dalam mode hybrid (SSH).",
     "sshHint": "Dimasukkan ke dalam wadah pada pembuatan sesi.",
-    "pwHint": "Gunakan minimal 8 karakter."
+    "pwHint": "Gunakan minimal 8 karakter.",
+    "sshBad": "Kunci publik tidak valid. Tempel satu baris seperti “ssh-ed25519 AAAA…”.",
+    "sshFail": "Gagal menyimpan kunci publik SSH.",
+    "sshGenerate": "Buat & unduh kunci",
+    "sshGenerated": "Kunci dibuat. Simpan kunci privat yang diunduh dengan aman — kunci tidak dapat diunduh lagi.",
+    "sshGenFail": "Gagal membuat kunci SSH.",
+    "sshGenerateHint": "Belum punya kunci? Klik “Buat & unduh kunci”. Kunci privat (.pem) diunduh sekali dan kunci publik didaftarkan otomatis. Koneksi: ssh -i kunci-terunduh.pem …"
   },
   "notify": {
     "title": "Pemberitahuan",

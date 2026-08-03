@@ -309,7 +309,8 @@
     "guaranteeHint": "Ang CPU at memorya ay ginagarantiyahan sa proporsyon sa iyong bahagi ng GPU. Maaari kang gumamit ng higit pa kapag ang node ay idle (ito ay isang sahig, hindi isang takip).",
     "hoursApprox": "~{{n}} oras",
     "tsSlotN": "1 ng {{n}} slots",
-    "notEnough": "Hindi sapat na credit — 1 oras na minimum na kinakailangan"
+    "notEnough": "Hindi sapat na credit — 1 oras na minimum na kinakailangan",
+    "sshKeyChange": "Palitan"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "detActivity": "Log ng aktibidad",
     "detNoLogs": "Walang mga log",
     "detAutoStopDesc": "Awtomatikong hihinto pagkatapos ng {{n}} min ng GPU idle (nagse-save ng mga credit).",
-    "idlePolicy": "Auto-reclaim ang mga session pagkatapos ng {{n}} min na idle."
+    "idlePolicy": "Auto-reclaim ang mga session pagkatapos ng {{n}} min na idle.",
+    "detReclaimTitle": "Pag-iimbak ng huminto na session",
+    "reclaimIn": "Mababawi sa {{n}} araw",
+    "reclaimDue": "Mababawi",
+    "reclaimKept": "Iniingatan",
+    "reclaimHint": "Gumagamit pa rin ng home disk ang mga huminto na session. Pagkatapos ng {{n}} araw na nakahinto, mababawi na sila, at maaaring burahin ang pinakamatagal nang hindi ginagamit kapag nauubusan ng disk ang isang node.",
+    "reclaimKeptHint": "Hindi kailanman binabawi ang pinakahuli mong huminto na session.",
+    "reclaimResumeHint": "Ang pag-restart ay magre-reset ng bilang. Pakibura ang mga session na hindi mo na kailangang itago."
   },
   "conn": {
     "webConnect": "Kumonekta sa pamamagitan ng web",
@@ -412,7 +420,9 @@
     "sshProxyHint": "Kumonekta sa pamamagitan ng iisang gateway entry point mula sa kahit saan. Kapag napatotohanan, mananatiling konektado ang session (walang pana-panahong muling pagsusuri).",
     "sshExternalHint": "Mula sa labas ng campus network, gamitin ang command na ito (tumalon sa isang proxy host patungo sa gateway).",
     "sshDirectInHint": "Kumonekta nang diretso sa node mula sa loob ng network ng opisina — pag-bypass sa gateway.",
-    "sshDirectHint": "Direktang kumokonekta sa node gamit ang iyong nakarehistrong pampublikong key (kinakailangan ang network ng campus / VPN)."
+    "sshDirectHint": "Direktang kumokonekta sa node gamit ang iyong nakarehistrong pampublikong key (kinakailangan ang network ng campus / VPN).",
+    "sshNeedKey": "Walang nakarehistrong SSH public key",
+    "sshNeedKeyHint": "Magrehistro o gumawa ng isa sa ibaba — agad itong ginagamit ng mga tumatakbong session."
   },
   "account": {
     "title": "Aking Mga Setting",
@@ -448,7 +458,13 @@
     "pwWrong": "Mali ang kasalukuyang password",
     "pwMismatch": "Hindi tugma ang mga bagong password",
     "homeHint": "Ang iyong pisikal na node na paggamit ng home directory sa hybrid (SSH) mode.",
-    "localAcctNote": "Ang isang lokal na account ay nakalaan para sa iyo sa bawat pisikal na node."
+    "localAcctNote": "Ang isang lokal na account ay nakalaan para sa iyo sa bawat pisikal na node.",
+    "sshBad": "Hindi wastong public key. Mag-paste ng isang linya tulad ng “ssh-ed25519 AAAA…”.",
+    "sshFail": "Nabigong i-save ang SSH public key.",
+    "sshGenerate": "Gumawa at i-download ang key",
+    "sshGenerated": "Nagawa na ang key. Ingatan ang na-download na private key — hindi na ito puwedeng i-download muli.",
+    "sshGenFail": "Nabigong gumawa ng SSH key.",
+    "sshGenerateHint": "Wala pang key? I-click ang “Gumawa at i-download ang key”. Isang beses lang mada-download ang private key (.pem) at awtomatikong nakarehistro ang public key. Koneksyon: ssh -i na-download-na-key.pem …"
   },
   "notify": {
     "title": "Mga abiso",

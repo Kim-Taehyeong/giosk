@@ -448,7 +448,8 @@
       "times": "volte",
       "month": "mo",
       "sessions": "sessioni",
-      "creditPerStep": "C/gradino"
+      "creditPerStep": "C/gradino",
+      "day": "giorni"
     },
     "mode": {
       "container": "Modalità contenitore",
@@ -510,9 +511,19 @@
     "next": "Prossimo",
     "wizardSubtitle": "Configurare la modalità operativa e le policy predefinite. Tutto può essere modificato in seguito in Amministrazione → Impostazioni di sistema.",
     "finish": "Termina la configurazione",
-    "wizardTitle": "Configurazione iniziale di Giosk"
+    "wizardTitle": "Configurazione iniziale di Giosk",
+    "reclaim": {
+      "stoppedTtl": "Conservazione delle sessioni arrestate",
+      "stoppedTtlHint": "Le sessioni arrestate occupano ancora il proprio disco home. Superato questo periodo diventano candidate al recupero. 0 = nessun recupero automatico.",
+      "diskThreshold": "Utilizzo disco per avviare il recupero",
+      "diskThresholdHint": "Il recupero viene eseguito solo sui nodi oltre questo utilizzo del disco. Se lo spazio è sufficiente, le vecchie sessioni arrestate restano intatte.",
+      "note": "Il recupero parte dalle sessioni inattive da più tempo degli utenti che ne accumulano di più, e si ferma appena il nodo torna sotto la soglia.",
+      "exemptNote": "L'ultima sessione arrestata di ogni utente non viene mai recuperata. Le sessioni in esecuzione non vengono mai toccate.",
+      "offNote": "Il recupero automatico è disattivato. Le sessioni arrestate sono limitate solo dal tetto numerico e dai costi di archiviazione; quando i dischi si riempiono gli amministratori dovranno intervenire manualmente."
+    }
   },
   "topbar": {
-    "nodeBadge": "Nodi {{up}}/{{total}} · GPU {{gpu}}%"
+    "nodeBadge": "Nodi {{up}}/{{total}} · GPU {{gpu}}%",
+    "nodeBadgeNoGpu": "Nodi {{up}}/{{total}} · GPU —"
   }
 }

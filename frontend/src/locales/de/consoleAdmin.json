@@ -115,7 +115,10 @@
     "alertFeed": "Alarm-Feed",
     "noCredit": "Kein Kredit",
     "modeHint_dynamic": "Wer zuerst kommt – keine Credits; Greifkapazität, sofern verfügbar. Überwachen Sie über Sitzungs-/Leerlaufstatistiken und Warnungen.",
-    "modeHint_free": "Kostenloser Modus – keine Kreditlimits. Überwachen Sie die Auslastung anhand von Sitzungs-/Leerlaufstatistiken und GPU-Stunden."
+    "modeHint_free": "Kostenloser Modus – keine Kreditlimits. Überwachen Sie die Auslastung anhand von Sitzungs-/Leerlaufstatistiken und GPU-Stunden.",
+    "metricsOffTitle": "Monitoring-Stack ist nicht installiert",
+    "metricsOffAll": "Ohne Prometheus und DCGM-Exporter können GPU-Auslastung, VRAM und Temperatur nicht angezeigt werden. Aktivieren Sie das Monitoring, um Live-Metriken zu sehen.",
+    "metricsOffDcgm": "Prometheus ist verbunden, aber es wurden keine Metriken des DCGM-Exporters gefunden. Installieren Sie dcgm-exporter, um GPU-Auslastung, VRAM und Temperatur live zu sehen."
   },
   "approvals": {
     "title": "Zulassungen",
@@ -470,7 +473,10 @@
     "impName": "Datenträgername",
     "impFail": "Der Import ist fehlgeschlagen",
     "impNoUser": "Konto nicht gefunden.",
-    "impDone": "Importiertes Volume {{name}} bis {{user}}."
+    "impDone": "Importiertes Volume {{name}} bis {{user}}.",
+    "impOwnerHint": "Wählen Sie zum Importieren ein Konto aus der Liste.",
+    "impOwnerPicked": "Ausgewählt: {{name}} ({{id}})",
+    "metricsOffNotice": "Monitoring (DCGM/Prometheus) ist nicht installiert, daher können GPU-Auslastung und VRAM nicht angezeigt werden. Aktivieren Sie das Monitoring, um Live-Metriken zu sehen."
   },
   "mset": {
     "title": "Einstellungen",
@@ -838,7 +844,9 @@
     "hint": "Absolute Obergrenzen unabhängig von Credits. Leere Felder erben vom übergeordneten Element (Gruppe → Organisation → Global).",
     "saved": "Gespeicherte Limits für {{name}}",
     "maxGpu": "Maximale GPUs",
-    "maxVolumeGib": "Maximale Lautstärke"
+    "maxVolumeGib": "Maximale Lautstärke",
+    "maxStoppedSessions": "Max. gestoppte Sitzungen",
+    "maxEphemeralGib": "Max. temporärer Speicher"
   },
   "settings": {
     "mode": {

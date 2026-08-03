@@ -115,7 +115,10 @@
     "modeHint_free": "מצב חופשי - ללא מגבלות אשראי. עקוב אחר ניצול באמצעות סטטיסטיקות הפעלה/לא פעיל ושעות GPU.",
     "noAlerts": "אין התראות",
     "activeUsers": "משתמשים פעילים",
-    "byGpuType": "הפעלות לפי סוג GPU"
+    "byGpuType": "הפעלות לפי סוג GPU",
+    "metricsOffTitle": "ערכת הניטור אינה מותקנת",
+    "metricsOffAll": "ללא Prometheus ומייצא DCGM לא ניתן להציג ניצול GPU, VRAM וטמפרטורה. הפעילו ניטור כדי לראות מדדים בזמן אמת.",
+    "metricsOffDcgm": "Prometheus מחובר אך לא נמצאו מדדים של מייצא DCGM. התקינו dcgm-exporter כדי לראות ניצול GPU, VRAM וטמפרטורה בזמן אמת."
   },
   "approvals": {
     "title": "אישורים",
@@ -470,7 +473,10 @@
     "impPath": "נתיב NFS (ייצוא)",
     "impName": "שם כרך",
     "impOwner": "בעלים (חשבון)",
-    "impDone": "נפח מיובא {{name}} ל-{{user}}."
+    "impDone": "נפח מיובא {{name}} ל-{{user}}.",
+    "impOwnerHint": "בחרו חשבון מהרשימה כדי לייבא.",
+    "impOwnerPicked": "נבחר: {{name}} ({{id}})",
+    "metricsOffNotice": "הניטור (DCGM/Prometheus) אינו מותקן, ולכן לא ניתן להציג ניצול GPU ו-VRAM. הפעילו ניטור כדי לראות מדדים בזמן אמת."
   },
   "mset": {
     "title": "הגדרות",
@@ -838,7 +844,9 @@
     "saved": "מגבלות שמורות עבור {{name}}",
     "maxGpu": "מקסימום GPUs",
     "short": "גבולות",
-    "title": "מגבלות משאבים קשים"
+    "title": "מגבלות משאבים קשים",
+    "maxStoppedSessions": "מקסימום מפגשים עצורים",
+    "maxEphemeralGib": "מקסימום דיסק זמני"
   },
   "settings": {
     "mode": {

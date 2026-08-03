@@ -115,7 +115,10 @@
     "noCredit": "Nincs hitel",
     "modeHint_dynamic": "érkezési sorrend – kredit nélkül; megragadható kapacitás, ha rendelkezésre áll. Figyelemmel kíséri a munkamenet/tétlenségi statisztikákat és riasztásokat.",
     "noActiveUsers": "Jelenleg nincs futó munkamenet",
-    "modeHint_free": "Ingyenes mód – nincs hitelkeret. Kövesse nyomon a kihasználtságot a munkamenet/tétlenségi statisztikák és a GPU órák segítségével."
+    "modeHint_free": "Ingyenes mód – nincs hitelkeret. Kövesse nyomon a kihasználtságot a munkamenet/tétlenségi statisztikák és a GPU órák segítségével.",
+    "metricsOffTitle": "A megfigyelési stack nincs telepítve",
+    "metricsOffAll": "Prometheus és DCGM exportáló nélkül a GPU-kihasználtság, a VRAM és a hőmérséklet nem jeleníthető meg. Kapcsolja be a megfigyelést az élő mutatókhoz.",
+    "metricsOffDcgm": "A Prometheus csatlakozik, de nem található DCGM exportáló metrika. Telepítse a dcgm-exportert a GPU-kihasználtság, VRAM és hőmérséklet élő megjelenítéséhez."
   },
   "approvals": {
     "title": "Jóváhagyások",
@@ -470,7 +473,10 @@
     "impMissing": "Adja meg a nevet, a tulajdonost, az NFS-kiszolgálót és az elérési utat.",
     "impPath": "NFS elérési út (exportálás)",
     "impSize": "Megjelenített méret (GiB)",
-    "impNoUser": "Fiók nem található."
+    "impNoUser": "Fiók nem található.",
+    "impOwnerHint": "Az importáláshoz válasszon fiókot a listából.",
+    "impOwnerPicked": "Kiválasztva: {{name}} ({{id}})",
+    "metricsOffNotice": "A megfigyelés (DCGM/Prometheus) nincs telepítve, ezért a GPU-kihasználtság és a VRAM nem jeleníthető meg. Kapcsolja be a megfigyelést az élő mutatókhoz."
   },
   "mset": {
     "title": "Beállítások elemre",
@@ -838,7 +844,9 @@
     "title": "Kemény erőforrás korlátok",
     "orgHint": "Kemény sapkák ennek a szervezetnek a tagjai számára. Az üres mezők a globálistól öröklődnek.",
     "hint": "A kreditektől független abszolút felső határok. Az üres mezők a szülőtől öröklődnek (csoport → org → globális).",
-    "saved": "Mentett határértékek a {{name}} számára"
+    "saved": "Mentett határértékek a {{name}} számára",
+    "maxStoppedSessions": "Max. leállított munkamenet",
+    "maxEphemeralGib": "Max. ideiglenes lemez"
   },
   "settings": {
     "mode": {

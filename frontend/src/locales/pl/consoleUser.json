@@ -309,7 +309,8 @@
     "hoursApprox": "~{{n}} godz",
     "tsSlotN": "1 z gniazd {{n}}",
     "guaranteed": "Gwarantowane zasoby",
-    "runtimeLeft": "Czas działania w tym tempie"
+    "runtimeLeft": "Czas działania w tym tempie",
+    "sshKeyChange": "Zmień"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "usageUnavailable": "Wskaźniki użycia są niedostępne.",
     "detNoAutoStop": "Nie obowiązują żadne zasady automatycznego zatrzymywania.",
     "detStoppedIdle": "Automatyczne zatrzymanie z powodu bezczynności procesora graficznego",
-    "idlePolicy": "Sesje są automatycznie odzyskiwane po min. bezczynności {{n}}."
+    "idlePolicy": "Sesje są automatycznie odzyskiwane po min. bezczynności {{n}}.",
+    "detReclaimTitle": "Przechowywanie zatrzymanych sesji",
+    "reclaimIn": "Do odzyskania za {{n}} dni",
+    "reclaimDue": "Do odzyskania",
+    "reclaimKept": "Zachowana",
+    "reclaimHint": "Zatrzymane sesje nadal korzystają z dysku domowego. Po {{n}} dniach zatrzymania stają się możliwe do odzyskania, a najdłużej bezczynne mogą zostać usunięte, gdy węzłowi zabraknie miejsca na dysku.",
+    "reclaimKeptHint": "Twoja ostatnio zatrzymana sesja nigdy nie jest odzyskiwana.",
+    "reclaimResumeHint": "Ponowne uruchomienie zeruje licznik. Usuń sesje, których nie musisz już przechowywać."
   },
   "conn": {
     "webConnect": "Połącz się przez internet",
@@ -412,7 +420,9 @@
     "sshDirectInHint": "Połącz się bezpośrednio z węzłem z sieci biurowej — omijając bramę.",
     "sshProxyHint": "Połącz się z dowolnego miejsca za pośrednictwem pojedynczej bramy wejściowej. Po uwierzytelnieniu sesja pozostaje połączona (bez okresowego ponownego sprawdzania).",
     "sshProxy": "Serwer proxy (brama)",
-    "regenerated": "Wydano nowy link dostępu."
+    "regenerated": "Wydano nowy link dostępu.",
+    "sshNeedKey": "Nie zarejestrowano klucza publicznego SSH",
+    "sshNeedKeyHint": "Zarejestruj lub wygeneruj go poniżej — działające sesje przejmą go natychmiast."
   },
   "account": {
     "title": "Moje ustawienia",
@@ -448,7 +458,13 @@
     "pwChanged": "Hasło zmienione",
     "ssh": "Klucz publiczny SSH",
     "homeHint": "Wykorzystanie katalogu domowego węzła fizycznego w trybie hybrydowym (SSH).",
-    "localAcctNote": "W każdym węźle fizycznym udostępniane jest konto lokalne."
+    "localAcctNote": "W każdym węźle fizycznym udostępniane jest konto lokalne.",
+    "sshBad": "Nieprawidłowy klucz publiczny. Wklej pojedynczy wiersz, np. „ssh-ed25519 AAAA…”.",
+    "sshFail": "Nie udało się zapisać klucza publicznego SSH.",
+    "sshGenerate": "Wygeneruj i pobierz klucz",
+    "sshGenerated": "Klucz wygenerowany. Przechowuj pobrany klucz prywatny w bezpiecznym miejscu — nie da się go pobrać ponownie.",
+    "sshGenFail": "Nie udało się wygenerować klucza SSH.",
+    "sshGenerateHint": "Nie masz jeszcze klucza? Kliknij „Wygeneruj i pobierz klucz”. Klucz prywatny (.pem) pobiera się raz, a publiczny rejestrowany jest automatycznie. Połączenie: ssh -i pobrany-klucz.pem …"
   },
   "notify": {
     "title": "Powiadomienia",

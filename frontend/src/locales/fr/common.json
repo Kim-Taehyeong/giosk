@@ -448,7 +448,8 @@
       "credit": "C",
       "sessions": "séances",
       "times": "fois",
-      "creditPerStep": "C/étape"
+      "creditPerStep": "C/étape",
+      "day": "jours"
     },
     "mode": {
       "hybridDesc": "Ajoute un accès SSH direct aux nœuds physiques au-dessus des conteneurs. Idéal pour les petits laboratoires ou lorsque la location de nœuds physiques est nécessaire.",
@@ -510,9 +511,19 @@
     "next": "Suivant",
     "wizardSubtitle": "Configurez le mode de fonctionnement et les politiques par défaut. Tout peut être modifié ultérieurement dans Admin → Paramètres système.",
     "wizardTitle": "Configuration initiale de Giosk",
-    "finish": "Terminer la configuration"
+    "finish": "Terminer la configuration",
+    "reclaim": {
+      "stoppedTtl": "Conservation des sessions arrêtées",
+      "stoppedTtlHint": "Les sessions arrêtées occupent toujours leur disque personnel. Passé ce délai, elles deviennent récupérables. 0 = jamais de récupération automatique.",
+      "diskThreshold": "Utilisation disque déclenchant la récupération",
+      "diskThresholdHint": "La récupération ne s'exécute que sur les nœuds dépassant ce taux d'utilisation. S'il reste de la place, les anciennes sessions arrêtées ne sont pas touchées.",
+      "note": "La récupération commence par les sessions les plus longtemps inactives des utilisateurs qui en accumulent le plus, et s'arrête dès que le nœud repasse sous le seuil.",
+      "exemptNote": "La session arrêtée la plus récente de chaque utilisateur n'est jamais récupérée. Les sessions en cours ne sont jamais touchées.",
+      "offNote": "La récupération automatique est désactivée. Les sessions arrêtées ne sont limitées que par le plafond de nombre et la facturation du stockage ; les administrateurs devront nettoyer manuellement lorsque les disques se rempliront."
+    }
   },
   "topbar": {
-    "nodeBadge": "Nœuds {{up}}/{{total}} · GPU {{gpu}}%"
+    "nodeBadge": "Nœuds {{up}}/{{total}} · GPU {{gpu}}%",
+    "nodeBadgeNoGpu": "Nœuds {{up}}/{{total}} · GPU —"
   }
 }

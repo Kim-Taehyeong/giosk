@@ -448,7 +448,8 @@
       "credit": "C",
       "sessions": "phiên",
       "times": "lần",
-      "creditPerStep": "C/bước"
+      "creditPerStep": "C/bước",
+      "day": "ngày"
     },
     "mode": {
       "hybridNote": "Việc chọn kết hợp cho phép cho thuê nút vật lý, tài khoản SSH và hạn mức trang chủ trên mỗi nút. (Thực hiện ở giai đoạn sau)",
@@ -510,9 +511,19 @@
     "next": "Kế tiếp",
     "finish": "Hoàn tất thiết lập",
     "wizardSubtitle": "Cấu hình chế độ vận hành và các chính sách mặc định. Mọi thứ có thể được thay đổi sau trong Quản trị → Cài đặt hệ thống.",
-    "wizardTitle": "Thiết lập ban đầu Giosk"
+    "wizardTitle": "Thiết lập ban đầu Giosk",
+    "reclaim": {
+      "stoppedTtl": "Thời gian lưu phiên đã dừng",
+      "stoppedTtlHint": "Phiên đã dừng vẫn chiếm dụng đĩa home của nó. Quá thời gian này, phiên trở thành ứng viên thu hồi. 0 = không bao giờ thu hồi tự động.",
+      "diskThreshold": "Mức sử dụng đĩa bắt đầu thu hồi",
+      "diskThresholdHint": "Chỉ thu hồi trên các nút vượt mức sử dụng đĩa này. Nếu còn dư dung lượng, các phiên đã dừng cũ vẫn được giữ nguyên.",
+      "note": "Thu hồi bắt đầu từ những phiên nhàn rỗi lâu nhất của người dùng tích trữ nhiều phiên đã dừng nhất, và dừng lại ngay khi nút trở về dưới ngưỡng.",
+      "exemptNote": "Phiên đã dừng gần nhất của mỗi người dùng không bao giờ bị thu hồi. Phiên đang chạy không bao giờ bị đụng đến.",
+      "offNote": "Thu hồi tự động đang tắt. Phiên đã dừng chỉ bị kiềm chế bởi giới hạn số lượng và phí lưu trữ; khi đĩa đầy, quản trị viên phải dọn thủ công."
+    }
   },
   "topbar": {
-    "nodeBadge": "Nút {{up}}/{{total}} · GPU {{gpu}}%"
+    "nodeBadge": "Nút {{up}}/{{total}} · GPU {{gpu}}%",
+    "nodeBadgeNoGpu": "Nút {{up}}/{{total}} · GPU —"
   }
 }

@@ -13,6 +13,7 @@ import { useConfirm } from '../../../components/console/Confirm';
 import { getMySessionsWithUsage, stopSession, startSession, deleteSession, extendSession, getSessionAudit } from '../../../api/console/sessions';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { measureRows, gpuUnmeasurable } from '../../../utils/sessionUsage';
+import { reclaimInfo, RECLAIM_VARIANT } from '../../../utils/reclaim';
 import { cU } from '../../../lib/credit';
 
 const CONN_ICON = { vscode: Code2, jupyter: NotebookPen, ssh: TerminalSquare, terminal: TerminalSquare };
@@ -92,6 +93,21 @@ export default function Sessions() {
     if (s === 'terminated') return <Pill variant="pause" dot>{t('session.terminated')}</Pill>;
     return <Pill variant="pause" dot>{s}</Pill>;
   };
+  // 중단 세션 홈 회수 안내 — 상태 pill 아래에 작게. 실제 삭제는 노드 디스크가 찰 때만
+  // 일어나므로 "삭제 예정"이 아니라 "회수 대상"으로 적는다(title 에 조건 전문).
+  const reclaimPill = (r) => {
+    const { state, days } = reclaimInfo(r, config);
+    if (state === 'off' || state === 'ok') return null;
+    const label = state === 'exempt' ? t('session.reclaimKept')
+      : state === 'due' ? t('session.reclaimDue')
+        : t('session.reclaimIn', { n: days });
+    return (
+      <div style={{ marginTop: 4 }} title={state === 'exempt' ? t('session.reclaimKeptHint') : t('session.reclaimHint', { n: config.reclaim.stoppedTtlDays })}>
+        <Pill variant={RECLAIM_VARIANT[state]}>{label}</Pill>
+      </div>
+    );
+  };
+
   const modePill = (m) => {
     if (m === 'ssh') return <Pill variant="primary">{t('session.physical')}</Pill>;
     if (m === 'exclusive') return <Pill variant="primary">{t('session.exclusive')}</Pill>;
@@ -148,7 +164,7 @@ export default function Sessions() {
             {list.map((r) => (
               <tr key={r.id} className="row-link" style={{ cursor: 'pointer' }}
                 onClick={(e) => { if (e.target.closest('button, a, input, select, textarea')) return; navigate(`/console/sessions/${r.id}`); }}>
-                <td>{statusPill(r.status)}</td>
+                <td>{statusPill(r.status)}{reclaimPill(r)}</td>
                 <td style={{ fontWeight: 600 }}>{r.name}</td>
                 <td>{modePill(r.mode)}</td>
                 <td className="mono">{r.offering}</td>

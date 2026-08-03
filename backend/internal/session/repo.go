@@ -52,6 +52,13 @@ type Repository interface {
 	ListAll() ([]AdminRow, error)
 	AdminOne(instanceID string) (*AdminRow, error)
 	ListRunning() ([]Session, error)
+	// 중단 세션의 홈 PVC 회계 — 중단 구간을 열고(MarkStopped) 닫으며(ClearStopped) 그 사이를 정산한다.
+	ListStopped() ([]Session, error) // 중단 세션(컨테이너만) — 스토리지 과금·홈 회수(T1) 대상
+	MarkStopped(instanceID string, at time.Time) error
+	ClearStopped(instanceID string, accrued int) error // 재개: 구간 종료(누적 초 반영, stopped_since=NULL)
+	SetStorageBilled(instanceID string, stoppedSeconds, billed int, at time.Time) error
+	NewestStoppedInstance(userID int64) string // 회수 면책 대상(사용자별 가장 최근 중단 세션)
+
 	ListActiveContainer() ([]Session, error)       // 컨테이너 활성(provisioning|running) 세션 — phase 리컨실용
 	CountActive(userID int64) int                  // 활성(provisioning|running) 세션 수
 	CountStopped(userID int64) int                 // 중단(stopped) 세션 수 — 로컬 홈 PVC 점유로 상한 대상
@@ -223,6 +230,50 @@ func (r *gormRepo) AdminOne(instanceID string) (*AdminRow, error) {
 func (r *gormRepo) ListRunning() ([]Session, error) {
 	var out []Session
 	return out, r.db.Where("phase = ?", PhaseRunning).Find(&out).Error
+}
+
+// ListStopped는 중단된 컨테이너 세션을 반환한다. 물리(ssh)는 로컬 홈 PVC 가 없어 제외 —
+// 스토리지 과금도 홈 회수(T1)도 대상이 아니다.
+func (r *gormRepo) ListStopped() ([]Session, error) {
+	var out []Session
+	return out, r.db.Where("phase = ? AND env <> ?", PhaseStopped, "ssh").Find(&out).Error
+}
+
+// MarkStopped는 중단 구간의 시작 시각을 찍는다(스토리지 과금·방치기간 산정 기준).
+func (r *gormRepo) MarkStopped(instanceID string, at time.Time) error {
+	return r.db.Model(&Session{}).Where("instance_id = ?", instanceID).Update("stopped_since", at).Error
+}
+
+// ClearStopped는 재개 시 중단 구간을 닫는다 — 구간 길이(accrued 초)를 누적에 더하고 시작점을 비운다.
+// 누적(stopped_seconds)은 남겨야 이미 청구한 스토리지 크레딧과의 델타 회계가 깨지지 않는다.
+func (r *gormRepo) ClearStopped(instanceID string, accrued int) error {
+	if accrued < 0 {
+		accrued = 0
+	}
+	return r.db.Exec(`UPDATE sessions SET stopped_seconds = stopped_seconds + ?, stopped_since = NULL
+		WHERE instance_id = ?`, accrued, instanceID).Error
+}
+
+// SetStorageBilled는 스토리지 정산 결과를 반영한다 — 누적 중단 시간을 확정하고 구간 시작점을
+// 정산 기준시각(at)으로 리셋한다. at 은 누적을 계산할 때 쓴 바로 그 시각이어야 한다
+// (now() 를 여기서 다시 읽으면 계산~기록 사이 시간이 과금에서 누락된다).
+func (r *gormRepo) SetStorageBilled(instanceID string, stoppedSeconds, billed int, at time.Time) error {
+	return r.db.Model(&Session{}).Where("instance_id = ?", instanceID).
+		Updates(map[string]any{
+			"stopped_seconds":        stoppedSeconds,
+			"storage_billed_credits": billed,
+			"stopped_since":          at,
+		}).Error
+}
+
+// NewestStoppedInstance는 사용자의 가장 최근 중단 세션 instance_id 를 반환한다(없으면 "").
+// 회수 면책 규칙과 같은 기준이라 팀 스코프를 걸지 않는다 — 리퍼도 사용자 전체에서 하나를 남긴다.
+func (r *gormRepo) NewestStoppedInstance(userID int64) string {
+	var id string
+	r.db.Raw(`SELECT instance_id FROM sessions
+		WHERE user_id = ? AND phase = ? AND env <> 'ssh' AND stopped_since IS NOT NULL
+		ORDER BY stopped_since DESC LIMIT 1`, userID, PhaseStopped).Scan(&id)
+	return id
 }
 
 // ListActiveContainer는 Pod 가 있는(컨테이너) 활성 세션을 반환한다(라이브 phase 리컨실 대상).

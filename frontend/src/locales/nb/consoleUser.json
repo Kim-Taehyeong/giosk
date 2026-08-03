@@ -309,7 +309,8 @@
     "grpGuaranteedTech": "Teknologi: HAMi-partisjonering (isolert VRAM/kjerner)",
     "grpGuaranteed": "Partisjonert GPU · VRAM garantert",
     "tsSlotN": "1 av {{n}}-spor",
-    "hoursApprox": "~{{n}} timer"
+    "hoursApprox": "~{{n}} timer",
+    "sshKeyChange": "Endre"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "detActivity": "Aktivitetslogg",
     "detLogs": "Nylige logger",
     "detNoAutoStop": "Ingen retningslinjer for autostopp gjelder.",
-    "detNoActivity": "Ingen aktivitet ennå"
+    "detNoActivity": "Ingen aktivitet ennå",
+    "detReclaimTitle": "Oppbevaringstid for stoppede økter",
+    "reclaimIn": "Kan gjenvinnes om {{n}} d",
+    "reclaimDue": "Kan gjenvinnes",
+    "reclaimKept": "Beholdes",
+    "reclaimHint": "Stoppede økter bruker fortsatt hjemmedisk. Etter {{n}} dager som stoppet kan de gjenvinnes, og de lengst inaktive kan bli slettet når en node går tom for diskplass.",
+    "reclaimKeptHint": "Din sist stoppede økt blir aldri gjenvunnet.",
+    "reclaimResumeHint": "Omstart nullstiller telleren. Slett økter du ikke lenger trenger å beholde."
   },
   "conn": {
     "openVscode": "Åpne VSCode",
@@ -412,7 +420,9 @@
     "sshDirectInHint": "Koble rett til noden fra kontornettverket – forbi gatewayen.",
     "sshProxyHint": "Koble til gjennom enkelt gateway-inngangspunktet fra hvor som helst. Når den er autentisert, forblir økten tilkoblet (ingen periodisk ny sjekk).",
     "regenerated": "Utstedte en ny tilgangslenke.",
-    "sshDirect": "Direkte (intranett)"
+    "sshDirect": "Direkte (intranett)",
+    "sshNeedKey": "Ingen offentlig SSH-nøkkel registrert",
+    "sshNeedKeyHint": "Registrer eller generer en nedenfor – kjørende økter tar den i bruk umiddelbart."
   },
   "account": {
     "title": "Mine innstillinger",
@@ -448,7 +458,13 @@
     "pwHint": "Bruk minst 8 tegn.",
     "homeHint": "Din fysiske node-hjemmekatalogbruk i hybrid (SSH)-modus.",
     "localAcctNote": "En lokal konto er klargjort for deg på hver fysisk node.",
-    "homeTitle": "SSH hjemmekvote"
+    "homeTitle": "SSH hjemmekvote",
+    "sshBad": "Ugyldig offentlig nøkkel. Lim inn én enkelt linje som «ssh-ed25519 AAAA…».",
+    "sshFail": "Kunne ikke lagre den offentlige SSH-nøkkelen.",
+    "sshGenerate": "Generer og last ned nøkkel",
+    "sshGenerated": "Nøkkel generert. Oppbevar den nedlastede private nøkkelen trygt – den kan ikke lastes ned igjen.",
+    "sshGenFail": "Kunne ikke generere SSH-nøkkel.",
+    "sshGenerateHint": "Ingen nøkkel ennå? Klikk «Generer og last ned nøkkel». Den private nøkkelen (.pem) lastes ned én gang, og den offentlige registreres automatisk. Koble til med: ssh -i nedlastet-noekkel.pem …"
   },
   "notify": {
     "title": "Varsler",

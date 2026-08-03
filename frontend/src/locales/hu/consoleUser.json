@@ -309,7 +309,8 @@
     "grpGuaranteedDesc": "A VRAM megosztása garantált. Más munkamenetek ugyanazon a GPU-n nem foglalják el a memóriát.",
     "grpGuaranteed": "Particionált GPU · VRAM garantált",
     "notEnough": "Nincs elég kredit – minimum 1 óra szükséges",
-    "hoursApprox": "~{{n}} óra"
+    "hoursApprox": "~{{n}} óra",
+    "sshKeyChange": "Módosítás"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "detIdleWarn": "Üresjárat {{cur}} / {{max}} min – hamarosan leáll",
     "detNoAutoStop": "Nem érvényes az automatikus leállításra vonatkozó szabályzat.",
     "detNoActivity": "Még nincs tevékenység",
-    "idlePolicy": "A munkamenetek automatikusan visszanyerhetők {{n}} perc tétlenség után."
+    "idlePolicy": "A munkamenetek automatikusan visszanyerhetők {{n}} perc tétlenség után.",
+    "detReclaimTitle": "Leállított munkamenetek megőrzése",
+    "reclaimIn": "Visszanyerhető {{n}} nap múlva",
+    "reclaimDue": "Visszanyerhető",
+    "reclaimKept": "Megőrizve",
+    "reclaimHint": "A leállított munkamenetek továbbra is használják a home-lemezt. {{n}} nap leállított állapot után visszanyerhetővé válnak, és a legrégebb óta tétlenek törlődhetnek, ha egy csomóponton kevés a lemezterület.",
+    "reclaimKeptHint": "A legutóbb leállított munkamenete soha nem kerül visszanyerésre.",
+    "reclaimResumeHint": "Az újraindítás nullázza a számlálót. Törölje azokat a munkameneteket, amelyeket már nem kell megőriznie."
   },
   "conn": {
     "loading": "Csatlakozási adatok betöltése…",
@@ -412,7 +420,9 @@
     "sshDirectHint": "Közvetlenül csatlakozik a csomóponthoz a regisztrált nyilvános kulccsal (kampuszhálózat / VPN szükséges).",
     "sshProxyHint": "Csatlakozzon az egyetlen átjáró belépési pontján keresztül bárhonnan. A hitelesítés után a munkamenet kapcsolatban marad (nincs rendszeres újraellenőrzés).",
     "sshDirect": "Közvetlen (intranet)",
-    "regenerated": "Friss hozzáférési hivatkozást adtak ki."
+    "regenerated": "Friss hozzáférési hivatkozást adtak ki.",
+    "sshNeedKey": "Nincs regisztrált SSH nyilvános kulcs",
+    "sshNeedKeyHint": "Regisztráljon vagy hozzon létre egyet alább — a futó munkamenetek azonnal átveszik."
   },
   "account": {
     "title": "Saját beállítások",
@@ -448,7 +458,13 @@
     "localAcctNote": "Minden fizikai csomóponton egy helyi fiók áll rendelkezésre.",
     "homeTitle": "SSH otthoni kvóta",
     "pwChanged": "Jelszó megváltozott",
-    "pwMismatch": "Az új jelszavak nem egyeznek"
+    "pwMismatch": "Az új jelszavak nem egyeznek",
+    "sshBad": "Érvénytelen nyilvános kulcs. Illesszen be egyetlen sort, például „ssh-ed25519 AAAA…”.",
+    "sshFail": "Az SSH nyilvános kulcs mentése nem sikerült.",
+    "sshGenerate": "Kulcs létrehozása és letöltése",
+    "sshGenerated": "A kulcs elkészült. Őrizze biztonságos helyen a letöltött privát kulcsot — újra nem tölthető le.",
+    "sshGenFail": "Az SSH kulcs létrehozása nem sikerült.",
+    "sshGenerateHint": "Még nincs kulcsa? Kattintson a „Kulcs létrehozása és letöltése” gombra. A privát kulcs (.pem) egyszer töltődik le, a nyilvános automatikusan regisztrálódik. Csatlakozás: ssh -i letoltott-kulcs.pem …"
   },
   "notify": {
     "title": "Értesítések",

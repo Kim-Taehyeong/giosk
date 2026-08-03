@@ -26,8 +26,9 @@ type fakeHier struct {
 	hasOrg bool
 }
 
-func (h fakeHier) GroupOfUser(int64) (int64, bool) { return h.group, h.hasGrp }
-func (h fakeHier) OrgOfUser(int64) (int64, bool)   { return h.org, h.hasOrg }
+func (h fakeHier) GroupOfUser(int64) (int64, bool)  { return h.group, h.hasGrp }
+func (h fakeHier) OrgOfUser(int64) (int64, bool)    { return h.org, h.hasOrg }
+func (h fakeHier) OrgOfGroup(int64) (int64, bool)   { return h.org, h.hasOrg }
 
 var global = Resolved{MaxGpu: 64, MaxVramGB: 512, MaxVolumeGiB: 2000, MaxConcurrentSessions: 50}
 

@@ -115,7 +115,10 @@
     "noActiveUsers": "Tiada sesi berjalan sekarang",
     "noAlerts": "Tiada makluman",
     "modeHint_dynamic": "Mod first-come — tiada kredit; merebut kapasiti apabila tersedia. Pantau melalui statistik sesi/terbiar dan makluman.",
-    "modeHint_free": "Mod percuma — tiada had kredit. Pantau penggunaan melalui statistik sesi/terbiar dan jam GPU."
+    "modeHint_free": "Mod percuma — tiada had kredit. Pantau penggunaan melalui statistik sesi/terbiar dan jam GPU.",
+    "metricsOffTitle": "Timbunan pemantauan belum dipasang",
+    "metricsOffAll": "Tanpa Prometheus dan pengeksport DCGM, penggunaan GPU, VRAM dan suhu tidak dapat dipaparkan. Aktifkan pemantauan untuk melihat metrik langsung.",
+    "metricsOffDcgm": "Prometheus disambungkan tetapi metrik pengeksport DCGM tidak ditemui. Pasang dcgm-exporter untuk melihat penggunaan GPU, VRAM dan suhu secara langsung."
   },
   "approvals": {
     "title": "Kelulusan",
@@ -470,7 +473,10 @@
     "importNfs": "Import volum NFS",
     "impName": "Nama jilid",
     "impFail": "Import gagal",
-    "impNoUser": "Akaun tidak ditemui."
+    "impNoUser": "Akaun tidak ditemui.",
+    "impOwnerHint": "Pilih akaun daripada senarai untuk mengimport.",
+    "impOwnerPicked": "Dipilih: {{name}} ({{id}})",
+    "metricsOffNotice": "Pemantauan (DCGM/Prometheus) belum dipasang, jadi penggunaan GPU dan VRAM tidak dapat dipaparkan. Aktifkan pemantauan untuk melihat metrik langsung."
   },
   "mset": {
     "title": "tetapan",
@@ -838,7 +844,9 @@
     "maxVolumeGib": "Kelantangan maksimum",
     "hint": "Had mutlak bebas daripada kredit. Medan kosong diwarisi daripada induk (kumpulan → org → global).",
     "maxGpu": "GPU maks",
-    "saved": "Had disimpan untuk {{name}}"
+    "saved": "Had disimpan untuk {{name}}",
+    "maxStoppedSessions": "Maks. sesi terhenti",
+    "maxEphemeralGib": "Maks. cakera sementara"
   },
   "settings": {
     "mode": {

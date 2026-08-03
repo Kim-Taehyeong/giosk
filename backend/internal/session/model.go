@@ -30,6 +30,18 @@ type Session struct {
 	BilledCredits  int        `gorm:"column:billed_credits" json:"billedCredits"`
 	ExtensionsUsed int        `gorm:"column:extensions_used" json:"extensionsUsed"` // 선착순(dynamic) 임대 연장 횟수
 
+	// 중단 세션 스토리지 회계 — 중단 중에도 홈 PVC(노드 디스크)를 점유하므로 별도 정산한다.
+	// billed_credits 는 재개 시 리셋되지만 이쪽은 세션 수명 전체에 걸쳐 단조 누적된다.
+	StoppedSeconds       int        `gorm:"column:stopped_seconds" json:"stoppedSeconds"`
+	StorageBilledCredits int        `gorm:"column:storage_billed_credits" json:"storageBilledCredits"`
+	StoppedSince         *time.Time `gorm:"column:stopped_since" json:"stoppedSince,omitempty"` // 현재 중단 구간 시작(실행 중이면 nil)
+
+	// ReclaimExempt는 이 세션이 홈 회수(T1) 면책 대상인지(전송용, 비영속).
+	// 사용자별 "가장 최근 중단 세션 1개"는 회수하지 않는다 — 프론트가 이 값으로
+	// "보관됨" vs "D-n 후 회수 대상"을 가른다. 프론트에서 계산하면 목록이 팀 스코프로
+	// 걸러진 상태라 전역 최신과 달라져, 실제로는 회수될 세션을 안전하다고 표시할 수 있다.
+	ReclaimExempt bool `gorm:"-" json:"reclaimExempt,omitempty"`
+
 	// 웹 접속(code-server/jupyter) 랜덤 시크릿(비밀번호/토큰) — 소유자에게만 노출.
 	WebPassword string `gorm:"column:web_password" json:"-"`
 

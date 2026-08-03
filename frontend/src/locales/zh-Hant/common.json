@@ -448,7 +448,8 @@
       "credit": "C",
       "sessions": "會議",
       "times": "次",
-      "creditPerStep": "C/步"
+      "creditPerStep": "C/步",
+      "day": "天"
     },
     "mode": {
       "container": "容器模式",
@@ -510,9 +511,19 @@
     "next": "下一個",
     "finish": "完成設定",
     "wizardSubtitle": "配置運作模式和預設策略。一切都可以稍後在管理 → 系統設定中變更。",
-    "wizardTitle": "Giosk 初始設置"
+    "wizardTitle": "Giosk 初始設置",
+    "reclaim": {
+      "stoppedTtl": "已停止工作階段保留期",
+      "stoppedTtlHint": "已停止的工作階段仍會占用其家目錄磁碟。超過此期限未使用即成為回收候選。0 = 從不自動回收。",
+      "diskThreshold": "觸發回收的磁碟使用率",
+      "diskThresholdHint": "僅在磁碟使用率超過此值的節點上執行回收。空間充裕時，舊的已停止工作階段也不會被動。",
+      "note": "回收優先從閒置最久、且積壓已停止工作階段最多的使用者開始，只回收到節點降回門檻以下為止。",
+      "exemptNote": "每位使用者最近停止的一個工作階段永不回收。執行中的工作階段絕不觸碰。",
+      "offNote": "自動回收已關閉。已停止工作階段僅受數量上限與儲存計費約束；磁碟寫滿時需管理員手動清理。"
+    }
   },
   "topbar": {
-    "nodeBadge": "節點 {{up}}/{{total}} · GPU {{gpu}}%"
+    "nodeBadge": "節點 {{up}}/{{total}} · GPU {{gpu}}%",
+    "nodeBadgeNoGpu": "節點 {{up}}/{{total}} · GPU —"
   }
 }

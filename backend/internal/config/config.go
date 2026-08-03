@@ -68,6 +68,11 @@ type Quota struct {
 	MaxStoppedSessions    int // 사용자당 중단(대기) 세션 상한(0=무제한). 중단 세션은 로컬 홈 PVC 로 노드 디스크 점유.
 	VolumeQuotaGB         int
 	MaxEphemeralGiB       int // 세션 임시 디스크(ephemeral-storage) 전역 상한(GiB)
+	MemBurst              int // 메모리 limit 배수(limit = GPU 지분 비례 보장 × 배수). 1 이하=상한 없음.
+	// 홈 회수(T1) 초기값 — 유휴 타임아웃과 같은 운영 정책이라 런타임 설정(systemconfig)이 우선한다.
+	// 여기 값은 관리자가 아직 저장한 적 없을 때의 폴백일 뿐.
+	StoppedTTLDays int // 중단 세션이 홈 회수 후보가 되기까지의 방치 일수(0=회수 비활성)
+	HomeReapPct    int // 노드 루트 디스크 사용률 임계(%) — 이 이상인 노드에서만 T1 회수를 집행
 }
 
 // K8s — 클러스터 연동 설정. GPU 타입은 노드 라벨에서 수집(운영=GFD 라벨, 개발=fake 라벨).
@@ -290,6 +295,15 @@ func Load(lookup func(string) (string, bool)) (*Config, error) {
 			MaxStoppedSessions:    g.intv("GIOSK_QUOTA_MAX_STOPPED", 5),
 			VolumeQuotaGB:         g.intv("GIOSK_VOLUME_QUOTA_GB", 2000),
 			MaxEphemeralGiB:       g.intv("GIOSK_QUOTA_MAX_EPHEMERAL_GIB", 0), // 0=무제한(기본). 캡의 강제수단이 eviction(세션 종료)이라 기본으론 안 건다 — 정책으로 티어별 opt-in. 진짜 하드캡은 ENOSPC(디스크 추가) 후.
+			// 메모리 limit = GPU 지분 비례 보장(request) × 2. request 가 노드의 50% 이하로 잡히므로
+			// 배수 2 = "산 지분만큼까지 버스트". 메모리는 압축 불가라 상한이 없으면 한 세션이
+			// 노드 RAM 을 고갈시켜 kubelet 이 남의 세션을 축출한다(CPU 는 압축 가능해 상한 없음 유지).
+			MemBurst: g.intv("GIOSK_QUOTA_MEM_BURST", 2),
+			// 중단 세션 홈 회수(T1). 방치 14일 + 노드 디스크 88% 초과일 때만 집행.
+			// 88% = 정리 DaemonSet 의 scratch(85)/home(92) 사이 — 임시 공간을 먼저 비우고,
+			// 그래도 모자라면 세션 홈을 건드리고, 사용자 작업 홈(92)이 마지막이다.
+			StoppedTTLDays: g.intv("GIOSK_STOPPED_TTL_DAYS", 14),
+			HomeReapPct:    g.intv("GIOSK_HOME_REAP_PCT", 88),
 		},
 		PrometheusURL: g.str("GIOSK_PROMETHEUS_URL", ""),
 		SMTP: SMTP{

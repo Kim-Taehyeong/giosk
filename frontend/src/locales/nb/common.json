@@ -448,7 +448,8 @@
       "credit": "C",
       "times": "ganger",
       "creditPerStep": "C/trinn",
-      "sessions": "økter"
+      "sessions": "økter",
+      "day": "dager"
     },
     "mode": {
       "hybrid": "Beholder + SSH hybrid",
@@ -510,9 +511,19 @@
     "next": "Neste",
     "wizardSubtitle": "Konfigurer driftsmodus og standardpolicyer. Alt kan endres senere i Admin → Systeminnstillinger.",
     "wizardTitle": "Giosk Initial Setup",
-    "finish": "Fullfør oppsettet"
+    "finish": "Fullfør oppsettet",
+    "reclaim": {
+      "stoppedTtl": "Oppbevaringstid for stoppede økter",
+      "stoppedTtlHint": "Stoppede økter opptar fortsatt hjemmedisken sin. Etter denne perioden blir de kandidater for gjenvinning. 0 = aldri gjenvinn automatisk.",
+      "diskThreshold": "Diskbruk som starter gjenvinning",
+      "diskThresholdHint": "Gjenvinning kjører bare på noder over denne diskbruken. Er det god plass, får også gamle stoppede økter være i fred.",
+      "note": "Gjenvinningen starter med de lengst inaktive øktene til brukerne som har flest stoppede økter, og stopper så snart noden er under terskelen igjen.",
+      "exemptNote": "Hver brukers sist stoppede økt blir aldri gjenvunnet. Kjørende økter røres aldri.",
+      "offNote": "Automatisk gjenvinning er av. Stoppede økter begrenses bare av antallsgrensen og lagringskostnadene; når diskene fylles, må administratorer rydde manuelt."
+    }
   },
   "topbar": {
-    "nodeBadge": "Noder {{up}}/{{total}} · GPU {{gpu}} %"
+    "nodeBadge": "Noder {{up}}/{{total}} · GPU {{gpu}} %",
+    "nodeBadgeNoGpu": "Noder {{up}}/{{total}} · GPU —"
   }
 }

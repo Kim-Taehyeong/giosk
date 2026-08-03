@@ -309,7 +309,8 @@
     "grpSlotDesc": "Várias pessoas se revezam em uma GPU. A memória não é garantida – se outra sessão esgotar a VRAM, a sua também poderá falhar.",
     "grpSlotTech": "Tecnologia: divisão de tempo NVIDIA (sem isolamento de memória)",
     "tsSlotN": "1 dos slots {{n}}",
-    "guaranteed": "Recursos garantidos"
+    "guaranteed": "Recursos garantidos",
+    "sshKeyChange": "Alterar"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "idlePolicy": "As sessões são recuperadas automaticamente após {{n}} min inativo.",
     "detLogs": "Registros recentes",
     "detActivity": "Registro de atividades",
-    "detNoActivity": "Nenhuma atividade ainda"
+    "detNoActivity": "Nenhuma atividade ainda",
+    "detReclaimTitle": "Retenção de sessões paradas",
+    "reclaimIn": "Recuperável em {{n}} d",
+    "reclaimDue": "Recuperável",
+    "reclaimKept": "Mantida",
+    "reclaimHint": "As sessões paradas continuam a usar disco pessoal. Após {{n}} dias paradas tornam-se recuperáveis e as há mais tempo inativas podem ser eliminadas quando um nó ficar com pouco espaço em disco.",
+    "reclaimKeptHint": "A sua sessão parada mais recente nunca é recuperada.",
+    "reclaimResumeHint": "Reiniciar repõe a contagem. Elimine as sessões que já não precisa de manter."
   },
   "conn": {
     "title": "Conectar – {{name}}",
@@ -412,7 +420,9 @@
     "sshDirect": "Direto (intranet)",
     "sshProxyHint": "Conecte-se através do ponto de entrada de gateway único de qualquer lugar. Uma vez autenticada, a sessão permanece conectada (sem nova verificação periódica).",
     "sshDirectInHint": "Conecte-se diretamente ao nó de dentro da rede do escritório – ignorando o gateway.",
-    "regenerated": "Emitido um novo link de acesso."
+    "regenerated": "Emitido um novo link de acesso.",
+    "sshNeedKey": "Nenhuma chave pública SSH registada",
+    "sshNeedKeyHint": "Registe ou gere uma abaixo — as sessões em execução aplicam-na de imediato."
   },
   "account": {
     "title": "Minhas configurações",
@@ -448,7 +458,13 @@
     "memberRole": "Função do grupo",
     "pwChanged": "Senha alterada",
     "localAcctNote": "Uma conta local é fornecida para você em cada nó físico.",
-    "homeHint": "O uso do diretório inicial do nó físico no modo híbrido (SSH)."
+    "homeHint": "O uso do diretório inicial do nó físico no modo híbrido (SSH).",
+    "sshBad": "Chave pública inválida. Cole uma única linha como «ssh-ed25519 AAAA…».",
+    "sshFail": "Falha ao guardar a chave pública SSH.",
+    "sshGenerate": "Gerar e transferir chave",
+    "sshGenerated": "Chave gerada. Guarde em segurança a chave privada transferida — não é possível transferi-la novamente.",
+    "sshGenFail": "Falha ao gerar a chave SSH.",
+    "sshGenerateHint": "Ainda sem chave? Clique em «Gerar e transferir chave». A chave privada (.pem) é transferida uma única vez e a pública é registada automaticamente. Ligação: ssh -i chave-transferida.pem …"
   },
   "notify": {
     "title": "Notificações",

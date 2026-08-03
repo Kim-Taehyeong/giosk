@@ -309,7 +309,8 @@
     "grpGuaranteedDesc": "Ihr VRAM-Anteil ist garantiert. Andere Sitzungen auf derselben GPU können Ihren Speicher nicht beanspruchen.",
     "hoursApprox": "~{{n}} Stunden",
     "guaranteed": "Garantierte Ressourcen",
-    "grpSlot": "Shared Slot · günstiger, keine Garantie"
+    "grpSlot": "Shared Slot · günstiger, keine Garantie",
+    "sshKeyChange": "Ändern"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "detStoppedIdle": "Automatischer Stopp aufgrund von GPU-Leerlauf",
     "detActivity": "Aktivitätsprotokoll",
     "idlePolicy": "Sitzungen werden nach {{n}} Min. Inaktivität automatisch wiederhergestellt.",
-    "detNoAutoStop": "Es gilt keine Auto-Stopp-Richtlinie."
+    "detNoAutoStop": "Es gilt keine Auto-Stopp-Richtlinie.",
+    "detReclaimTitle": "Aufbewahrung gestoppter Sitzungen",
+    "reclaimIn": "Rückgewinnbar in {{n}} T",
+    "reclaimDue": "Rückgewinnbar",
+    "reclaimKept": "Behalten",
+    "reclaimHint": "Gestoppte Sitzungen belegen weiterhin Home-Speicher. Nach {{n}} Tagen im gestoppten Zustand werden sie rückgewinnbar, und die am längsten ungenutzten können gelöscht werden, wenn der Speicher eines Knotens knapp wird.",
+    "reclaimKeptHint": "Ihre zuletzt gestoppte Sitzung wird nie zurückgewonnen.",
+    "reclaimResumeHint": "Ein Neustart setzt die Frist zurück. Bitte löschen Sie Sitzungen, die Sie nicht mehr aufbewahren müssen."
   },
   "conn": {
     "loading": "Verbindungsinformationen werden geladen…",
@@ -412,7 +420,9 @@
     "sshProxyHint": "Stellen Sie von überall aus eine Verbindung über den einzigen Gateway-Einstiegspunkt her. Nach der Authentifizierung bleibt die Sitzung verbunden (keine regelmäßige erneute Überprüfung).",
     "sshDirectInHint": "Stellen Sie vom Büronetzwerk aus eine direkte Verbindung zum Knoten her – unter Umgehung des Gateways.",
     "sshDirect": "Direkt (Intranet)",
-    "regenerated": "Es wurde ein neuer Zugangslink herausgegeben."
+    "regenerated": "Es wurde ein neuer Zugangslink herausgegeben.",
+    "sshNeedKey": "Kein öffentlicher SSH-Schlüssel registriert",
+    "sshNeedKeyHint": "Registrieren oder erzeugen Sie unten einen – laufende Sitzungen übernehmen ihn sofort."
   },
   "account": {
     "title": "Meine Einstellungen",
@@ -448,7 +458,13 @@
     "homeTitle": "SSH-Home-Kontingent",
     "pwChanged": "Passwort geändert",
     "localAcctNote": "Auf jedem physischen Knoten wird für Sie ein lokales Konto bereitgestellt.",
-    "homeHint": "Nutzung des Home-Verzeichnisses Ihres physischen Knotens im Hybridmodus (SSH)."
+    "homeHint": "Nutzung des Home-Verzeichnisses Ihres physischen Knotens im Hybridmodus (SSH).",
+    "sshBad": "Ungültiger öffentlicher Schlüssel. Fügen Sie eine einzelne Zeile wie „ssh-ed25519 AAAA…“ ein.",
+    "sshFail": "Der öffentliche SSH-Schlüssel konnte nicht gespeichert werden.",
+    "sshGenerate": "Schlüssel erzeugen & herunterladen",
+    "sshGenerated": "Schlüssel erzeugt. Bewahren Sie den heruntergeladenen privaten Schlüssel sicher auf – er kann nicht erneut heruntergeladen werden.",
+    "sshGenFail": "Der SSH-Schlüssel konnte nicht erzeugt werden.",
+    "sshGenerateHint": "Noch kein Schlüssel? Klicken Sie auf „Schlüssel erzeugen & herunterladen“. Der private Schlüssel (.pem) wird einmalig heruntergeladen, der öffentliche wird automatisch registriert. Verbinden mit: ssh -i heruntergeladener-schluessel.pem …"
   },
   "notify": {
     "title": "Benachrichtigungen",

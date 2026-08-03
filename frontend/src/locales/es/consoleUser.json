@@ -309,7 +309,8 @@
     "hoursApprox": "~{{n}} horas",
     "guaranteeCpu": "CPU virtual {{n}} garantizada",
     "runtimeLeft": "Tiempo de ejecución a este ritmo",
-    "tsSlotN": "1 de las ranuras {{n}}"
+    "tsSlotN": "1 de las ranuras {{n}}",
+    "sshKeyChange": "Cambiar"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "idlePolicy": "Las sesiones se recuperan automáticamente después de {{n}} mini inactivo.",
     "detAutoStopDesc": "Se detiene automáticamente después de {{n}} min de inactividad de la GPU (ahorra créditos).",
     "detNode": "Nodo·GPU",
-    "detNoLogs": "Sin registros"
+    "detNoLogs": "Sin registros",
+    "detReclaimTitle": "Retención de sesiones detenidas",
+    "reclaimIn": "Recuperable en {{n}} d",
+    "reclaimDue": "Recuperable",
+    "reclaimKept": "Conservada",
+    "reclaimHint": "Las sesiones detenidas siguen usando disco personal. Tras {{n}} días detenidas pasan a ser recuperables, y las más antiguas pueden eliminarse cuando a un nodo le falte espacio en disco.",
+    "reclaimKeptHint": "Su sesión detenida más reciente nunca se recupera.",
+    "reclaimResumeHint": "Reiniciarla pone el contador a cero. Elimine las sesiones que ya no necesite conservar."
   },
   "conn": {
     "loading": "Cargando información de conexión…",
@@ -412,7 +420,9 @@
     "sshExternalHint": "Desde fuera de la red del campus, utilice este comando (salta a través de un host proxy hasta la puerta de enlace).",
     "sshDirect": "Directo (intranet)",
     "regenerated": "Se emitió un nuevo enlace de acceso.",
-    "sshDirectInHint": "Conéctese directamente al nodo desde el interior de la red de la oficina, sin pasar por la puerta de enlace."
+    "sshDirectInHint": "Conéctese directamente al nodo desde el interior de la red de la oficina, sin pasar por la puerta de enlace.",
+    "sshNeedKey": "No hay ninguna clave pública SSH registrada",
+    "sshNeedKeyHint": "Registre o genere una abajo: las sesiones en ejecución la aplican de inmediato."
   },
   "account": {
     "title": "Mi configuración",
@@ -448,7 +458,13 @@
     "memberRole": "rol de grupo",
     "homeTitle": "Cuota de inicio SSH",
     "pwChanged": "Contraseña cambiada",
-    "localAcctNote": "Se le proporciona una cuenta local en cada nodo físico."
+    "localAcctNote": "Se le proporciona una cuenta local en cada nodo físico.",
+    "sshBad": "Clave pública no válida. Pegue una sola línea como «ssh-ed25519 AAAA…».",
+    "sshFail": "No se pudo guardar la clave pública SSH.",
+    "sshGenerate": "Generar y descargar clave",
+    "sshGenerated": "Clave generada. Guarde a buen recaudo la clave privada descargada: no se puede volver a descargar.",
+    "sshGenFail": "No se pudo generar la clave SSH.",
+    "sshGenerateHint": "¿Aún sin clave? Pulse «Generar y descargar clave». La clave privada (.pem) se descarga una sola vez y la pública se registra automáticamente. Conexión: ssh -i clave-descargada.pem …"
   },
   "notify": {
     "title": "Notificaciones",

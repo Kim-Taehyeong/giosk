@@ -448,7 +448,8 @@
       "credit": "C",
       "sessions": "mga session",
       "times": "beses",
-      "creditPerStep": "C/hakbang"
+      "creditPerStep": "C/hakbang",
+      "day": "araw"
     },
     "mode": {
       "hybrid": "Lalagyan + SSH hybrid",
@@ -510,9 +511,19 @@
     "next": "Susunod",
     "wizardTitle": "Giosk Initial Setup",
     "finish": "Tapusin ang setup",
-    "wizardSubtitle": "I-configure ang operating mode at mga default na patakaran. Maaaring baguhin ang lahat sa ibang pagkakataon sa Admin → Mga Setting ng System."
+    "wizardSubtitle": "I-configure ang operating mode at mga default na patakaran. Maaaring baguhin ang lahat sa ibang pagkakataon sa Admin → Mga Setting ng System.",
+    "reclaim": {
+      "stoppedTtl": "Tagal ng pag-iimbak ng huminto na session",
+      "stoppedTtlHint": "Patuloy pa ring ginagamit ng mga huminto na session ang home disk nila. Lampas sa tagal na ito, nagiging kandidato sila sa pagbawi. 0 = huwag kailanman bawiin nang awtomatiko.",
+      "diskThreshold": "Paggamit ng disk na magsisimula ng pagbawi",
+      "diskThresholdHint": "Tumatakbo lamang ang pagbawi sa mga node na lampas sa paggamit ng disk na ito. Kung may sapat na espasyo, hindi ginagalaw kahit ang mga lumang huminto na session.",
+      "note": "Nagsisimula ang pagbawi sa pinakamatagal nang hindi ginagamit na session ng mga user na may pinakamaraming huminto na session, at humihinto agad pagbalik ng node sa ilalim ng threshold.",
+      "exemptNote": "Hindi kailanman binabawi ang pinakahuling huminto na session ng bawat user. Hindi kailanman ginagalaw ang mga tumatakbong session.",
+      "offNote": "Naka-off ang awtomatikong pagbawi. Napipigilan lamang ang mga huminto na session ng limitasyon sa bilang at ng singil sa storage; kapag napuno ang disk, kailangang manu-manong maglinis ng mga admin."
+    }
   },
   "topbar": {
-    "nodeBadge": "Mga node {{up}}/{{total}} · GPU {{gpu}}%"
+    "nodeBadge": "Mga node {{up}}/{{total}} · GPU {{gpu}}%",
+    "nodeBadgeNoGpu": "Mga node {{up}}/{{total}} · GPU —"
   }
 }

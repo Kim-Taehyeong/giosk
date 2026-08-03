@@ -115,7 +115,10 @@
     "noAlerts": "Brak alertów",
     "activeUsers": "Aktywni użytkownicy",
     "modeHint_dynamic": "Tryb „kto pierwszy, ten lepszy” — brak kredytów; pojemność, jeśli jest dostępna. Monitoruj za pomocą statystyk sesji/bezczynności i alertów.",
-    "modeHint_free": "Tryb darmowy — brak limitów kredytowych. Monitoruj wykorzystanie za pomocą statystyk sesji/bezczynności i godzin pracy procesora graficznego."
+    "modeHint_free": "Tryb darmowy — brak limitów kredytowych. Monitoruj wykorzystanie za pomocą statystyk sesji/bezczynności i godzin pracy procesora graficznego.",
+    "metricsOffTitle": "Stos monitorowania nie jest zainstalowany",
+    "metricsOffAll": "Bez Prometheusa i eksportera DCGM nie można pokazać użycia GPU, VRAM ani temperatury. Włącz monitorowanie, aby zobaczyć metryki na żywo.",
+    "metricsOffDcgm": "Prometheus jest podłączony, ale nie znaleziono metryk eksportera DCGM. Zainstaluj dcgm-exporter, aby na żywo widzieć użycie GPU, VRAM i temperaturę."
   },
   "approvals": {
     "title": "Zatwierdzenia",
@@ -470,7 +473,10 @@
     "impOwner": "Właściciel (konto)",
     "impMissing": "Wprowadź nazwę, właściciela, serwer NFS i ścieżkę.",
     "impDone": "Zaimportowany wolumen {{name}} do {{user}}.",
-    "impFail": "Import nie powiódł się"
+    "impFail": "Import nie powiódł się",
+    "impOwnerHint": "Wybierz konto z listy, aby zaimportować.",
+    "impOwnerPicked": "Wybrano: {{name}} ({{id}})",
+    "metricsOffNotice": "Monitorowanie (DCGM/Prometheus) nie jest zainstalowane, więc użycie GPU i VRAM nie mogą być pokazane. Włącz monitorowanie, aby zobaczyć metryki na żywo."
   },
   "mset": {
     "title": "Ustawienia",
@@ -838,7 +844,9 @@
     "orgHint": "Twarde limity dla członków tej organizacji. Puste pola dziedziczą z global.",
     "groupHint": "Hard capy dla członków tej grupy. Puste pola dziedziczą z org → global.",
     "hint": "Absolutne ograniczenia niezależne od kredytów. Puste pola dziedziczą od rodzica (grupa → org → global).",
-    "saved": "Zapisane limity dla {{name}}"
+    "saved": "Zapisane limity dla {{name}}",
+    "maxStoppedSessions": "Maks. zatrzymanych sesji",
+    "maxEphemeralGib": "Maks. dysk tymczasowy"
   },
   "settings": {
     "mode": {

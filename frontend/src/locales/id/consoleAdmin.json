@@ -115,7 +115,10 @@
     "noCredit": "Tidak ada kredit",
     "alertFeed": "Umpan peringatan",
     "modeHint_free": "Mode bebas — tanpa batas kredit. Pantau pemanfaatan melalui statistik sesi/idle dan jam GPU.",
-    "modeHint_dynamic": "Mode siapa yang datang pertama — tanpa kredit; ambil kapasitas bila tersedia. Pantau melalui statistik dan peringatan sesi/idle."
+    "modeHint_dynamic": "Mode siapa yang datang pertama — tanpa kredit; ambil kapasitas bila tersedia. Pantau melalui statistik dan peringatan sesi/idle.",
+    "metricsOffTitle": "Tumpukan pemantauan belum terpasang",
+    "metricsOffAll": "Tanpa Prometheus dan DCGM exporter, penggunaan GPU, VRAM, dan suhu tidak dapat ditampilkan. Aktifkan pemantauan untuk melihat metrik langsung.",
+    "metricsOffDcgm": "Prometheus terhubung tetapi metrik DCGM exporter tidak ditemukan. Pasang dcgm-exporter untuk melihat penggunaan GPU, VRAM, dan suhu secara langsung."
   },
   "approvals": {
     "title": "Persetujuan",
@@ -470,7 +473,10 @@
     "impFail": "Impor gagal",
     "importHint": "Memetakan jalur NFS yang ada (sudah berisi data) secara langsung sebagai volume (untuk diadopsi ke dalam lingkungan yang sudah ada). Alih-alih membuat volume kosong baru, ini mengikat server:path yang diberikan sebagai PV statis.",
     "impDone": "Volume yang diimpor {{name}} ke {{user}}.",
-    "impMissing": "Masukkan nama, pemilik, server NFS, dan jalur."
+    "impMissing": "Masukkan nama, pemilik, server NFS, dan jalur.",
+    "impOwnerHint": "Pilih akun dari daftar untuk mengimpor.",
+    "impOwnerPicked": "Dipilih: {{name}} ({{id}})",
+    "metricsOffNotice": "Pemantauan (DCGM/Prometheus) belum terpasang, sehingga penggunaan GPU dan VRAM tidak dapat ditampilkan. Aktifkan pemantauan untuk melihat metrik langsung."
   },
   "mset": {
     "title": "Pengaturan",
@@ -838,7 +844,9 @@
     "maxVolumeGib": "Volume maksimal",
     "saved": "Batas tersimpan untuk {{name}}",
     "maxGpu": "GPU maksimal",
-    "hint": "Batasan mutlak tidak bergantung pada kredit. Bidang kosong diwarisi dari induknya (grup → organisasi → global)."
+    "hint": "Batasan mutlak tidak bergantung pada kredit. Bidang kosong diwarisi dari induknya (grup → organisasi → global).",
+    "maxStoppedSessions": "Maks. sesi terhenti",
+    "maxEphemeralGib": "Maks. disk sementara"
   },
   "settings": {
     "mode": {

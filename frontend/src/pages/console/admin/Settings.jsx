@@ -89,7 +89,11 @@ export default function Settings() {
   // 운영 중 조정 항목만 백엔드에 영속(유휴 타임아웃 + 단순 기능 토글). 무거운 항목은 무시됨.
   const save = async () => {
     try {
-      await putSystemConfig({ idle: { timeoutMin: config.idle.timeoutMin }, features: config.features });
+      await putSystemConfig({
+        idle: { timeoutMin: config.idle.timeoutMin },
+        reclaim: config.reclaim, // 중단 세션 홈 회수(방치 일수 · 디스크 임계)
+        features: config.features,
+      });
       await refresh();
       toast(t('settings.saved'));
     } catch {

@@ -115,7 +115,10 @@
     "noAlerts": "Ei hälytyksiä",
     "noActiveUsers": "Ei juoksutunteja juuri nyt",
     "modeHint_dynamic": "Saapumistila – ei krediittejä; kaappauskapasiteettia, kun se on käytettävissä. Valvo istunto/tyhjäkäyntitilastojen ja hälytysten avulla.",
-    "modeHint_free": "Ilmainen tila – ei luottorajoja. Seuraa käyttöä istunto-/tyhjäkäyntitilastojen ja GPU-tuntien avulla."
+    "modeHint_free": "Ilmainen tila – ei luottorajoja. Seuraa käyttöä istunto-/tyhjäkäyntitilastojen ja GPU-tuntien avulla.",
+    "metricsOffTitle": "Valvontapinoa ei ole asennettu",
+    "metricsOffAll": "Ilman Prometheusta ja DCGM-vientiohjelmaa GPU-käyttöä, VRAM-muistia ja lämpötilaa ei voi näyttää. Ota valvonta käyttöön nähdäksesi reaaliaikaiset mittarit.",
+    "metricsOffDcgm": "Prometheus on yhdistetty, mutta DCGM-vientiohjelman mittareita ei löytynyt. Asenna dcgm-exporter nähdäksesi GPU-käytön, VRAM-muistin ja lämpötilan reaaliajassa."
   },
   "approvals": {
     "title": "Hyväksynnät",
@@ -470,7 +473,10 @@
     "impOwner": "Omistaja (tili)",
     "impSize": "Näytön koko (GiB)",
     "impMissing": "Anna nimi, omistaja, NFS-palvelin ja polku.",
-    "impDone": "Tuotu määrä {{name}} kohteeseen {{user}}."
+    "impDone": "Tuotu määrä {{name}} kohteeseen {{user}}.",
+    "impOwnerHint": "Valitse tuotava tili luettelosta.",
+    "impOwnerPicked": "Valittu: {{name}} ({{id}})",
+    "metricsOffNotice": "Valvontaa (DCGM/Prometheus) ei ole asennettu, joten GPU-käyttöä ja VRAM-muistia ei voi näyttää. Ota valvonta käyttöön nähdäksesi reaaliaikaiset mittarit."
   },
   "mset": {
     "title": "Asetukset",
@@ -838,7 +844,9 @@
     "userTitle": "{{name}} — resurssirajat",
     "hint": "Absoluuttiset enimmäismäärät krediitistä riippumatta. Tyhjät kentät periytyvät ylätasolta (ryhmä → organisaatio → globaali).",
     "saved": "Tallennetut rajat {{name}}:lle",
-    "maxVolumeGib": "Suurin äänenvoimakkuus"
+    "maxVolumeGib": "Suurin äänenvoimakkuus",
+    "maxStoppedSessions": "Enintään pysäytettyjä istuntoja",
+    "maxEphemeralGib": "Enintään väliaikaislevyä"
   },
   "settings": {
     "mode": {

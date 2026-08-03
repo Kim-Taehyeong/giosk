@@ -448,7 +448,8 @@
       "credit": "C",
       "times": "czasy",
       "sessions": "sesje",
-      "creditPerStep": "C/krok"
+      "creditPerStep": "C/krok",
+      "day": "dni"
     },
     "mode": {
       "container": "Tryb kontenera",
@@ -510,9 +511,19 @@
     "next": "Następny",
     "wizardTitle": "Początkowa konfiguracja Gioska",
     "finish": "Zakończ konfigurację",
-    "wizardSubtitle": "Skonfiguruj tryb pracy i domyślne zasady. Wszystko można później zmienić w Admin → Ustawienia systemowe."
+    "wizardSubtitle": "Skonfiguruj tryb pracy i domyślne zasady. Wszystko można później zmienić w Admin → Ustawienia systemowe.",
+    "reclaim": {
+      "stoppedTtl": "Czas przechowywania zatrzymanych sesji",
+      "stoppedTtlHint": "Zatrzymane sesje nadal zajmują swój dysk domowy. Po tym czasie stają się kandydatami do odzyskania. 0 = nigdy nie odzyskuj automatycznie.",
+      "diskThreshold": "Zużycie dysku uruchamiające odzyskiwanie",
+      "diskThresholdHint": "Odzyskiwanie działa tylko na węzłach powyżej tego zużycia dysku. Gdy miejsca jest pod dostatkiem, stare zatrzymane sesje pozostają nietknięte.",
+      "note": "Odzyskiwanie zaczyna się od najdłużej bezczynnych sesji użytkowników, którzy mają ich najwięcej, i kończy, gdy tylko węzeł wróci poniżej progu.",
+      "exemptNote": "Ostatnio zatrzymana sesja każdego użytkownika nigdy nie jest odzyskiwana. Działające sesje nigdy nie są ruszane.",
+      "offNote": "Automatyczne odzyskiwanie jest wyłączone. Zatrzymane sesje ogranicza jedynie limit liczby i opłata za magazyn; gdy dyski się zapełnią, administratorzy muszą posprzątać ręcznie."
+    }
   },
   "topbar": {
-    "nodeBadge": "Węzły {{up}}/{{total}} · GPU {{gpu}}%"
+    "nodeBadge": "Węzły {{up}}/{{total}} · GPU {{gpu}}%",
+    "nodeBadgeNoGpu": "Węzły {{up}}/{{total}} · GPU —"
   }
 }

@@ -261,6 +261,16 @@ quota:
   maxConcurrentSessions: 50
   maxStoppedSessions: 5   # 사용자당 중단(대기) 세션 상한(0=무제한). 중단 세션은 로컬 홈 PVC 로 노드 디스크 점유.
   volumeQuotaGb: 2000
+  # 메모리 limit 배수(limit = GPU 지분 비례 보장 × 배수, 1 이하=상한 없음).
+  # 메모리는 압축 불가라 상한이 없으면 한 세션이 노드 RAM 을 고갈시켜 kubelet 이 남의 세션을 축출한다.
+  memBurst: 2
+  # 중단 세션 홈 회수(T1) — 방치 stoppedTtlDays 일 초과 + 노드 디스크 homeReapPct% 초과일 때만 집행.
+  # 여유가 있으면 오래된 중단 세션도 그대로 둔다(scratch/로컬홈 정리 DaemonSet 과 같은 계약).
+  # ⚠️ 아래 둘은 "초기값"일 뿐이다 — 유휴 타임아웃과 같은 운영 정책이라 관리자 설정(PUT /admin/config)에서
+  #    바꾸면 그 값이 우선하고 재배포 없이 다음 틱부터 반영된다. 여기 값을 고쳐도 이미 저장된 설정은 안 바뀐다.
+  # stoppedTtlDays: 0 이면 자동 회수 비활성 → 개수 상한과 스토리지 과금만으로 억제.
+  stoppedTtlDays: 14
+  homeReapPct: 88         # nodeCleaner scratch(85) 와 home(92) 사이 — 임시공간 → 세션홈 → 작업홈 순으로 개입
 
 branding:
   name: Giosk

@@ -448,7 +448,8 @@
       "hour": "h",
       "times": "časy",
       "creditPerStep": "C/krok",
-      "sessions": "sezení"
+      "sessions": "sezení",
+      "day": "dní"
     },
     "mode": {
       "hybridDesc": "Přidává přímý přístup SSH k fyzickým uzlům nad kontejnery. Nejlepší pro malé laboratoře nebo když je potřeba pronajmout fyzický uzel.",
@@ -510,9 +511,19 @@
     "next": "Další",
     "wizardTitle": "Počáteční nastavení Giosku",
     "finish": "Dokončete nastavení",
-    "wizardSubtitle": "Nakonfigurujte provozní režim a výchozí zásady. Vše lze později změnit v Admin → Nastavení systému."
+    "wizardSubtitle": "Nakonfigurujte provozní režim a výchozí zásady. Vše lze později změnit v Admin → Nastavení systému.",
+    "reclaim": {
+      "stoppedTtl": "Doba uchování zastavených relací",
+      "stoppedTtlHint": "Zastavené relace stále zabírají svůj domovský disk. Po této době se stanou kandidáty na uvolnění. 0 = nikdy neuvolňovat automaticky.",
+      "diskThreshold": "Využití disku spouštějící uvolňování",
+      "diskThresholdHint": "Uvolňování běží jen na uzlech nad tímto využitím disku. Je-li místa dost, staré zastavené relace zůstanou nedotčené.",
+      "note": "Uvolňování začíná u nejdéle nečinných relací uživatelů, kteří jich mají zastavených nejvíc, a končí, jakmile se uzel vrátí pod práh.",
+      "exemptNote": "Naposledy zastavená relace každého uživatele se nikdy neuvolňuje. Běžících relací se to nikdy netýká.",
+      "offNote": "Automatické uvolňování je vypnuté. Zastavené relace omezuje jen početní limit a poplatky za úložiště; až se disky zaplní, budou muset správci uklidit ručně."
+    }
   },
   "topbar": {
-    "nodeBadge": "Uzly {{up}}/{{total}} · GPU {{gpu}}%"
+    "nodeBadge": "Uzly {{up}}/{{total}} · GPU {{gpu}}%",
+    "nodeBadgeNoGpu": "Uzly {{up}}/{{total}} · GPU —"
   }
 }

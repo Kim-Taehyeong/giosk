@@ -16,13 +16,15 @@ type Repository interface {
 	ListShared(userID int64) ([]Volume, error)
 	Get(id int64) (*Volume, error)
 	Delete(id int64) error
+	SetGroup(id, groupID int64) error
 	AllocatedGiB(userID int64) (int, error)
+	AllocatedGiBInTeam(userID, groupID int64) (int, error)
 	AddShare(volumeID int64, userID, groupID *int64, perm string) error
 	ResolveUserID(username string) (*int64, error)
 	ListAll(orgID, groupID int64) ([]AdminVolume, error) // 전체 볼륨(관리자 목록; org/group>0=스코프 필터)
-	UsersAllocated() []UserAlloc       // 사용자별 볼륨 할당 합(관리자 스토리지 뷰)
-	LeasedNodes(userID int64) []string // 사용자가 대여한 적 있는 물리노드(로컬 Home 노출 대상)
-	ListBillable() ([]Volume, error)   // 과금 대상 볼륨(bound + 소유자 있음)
+	UsersAllocated() []UserAlloc                         // 사용자별 볼륨 할당 합(관리자 스토리지 뷰)
+	LeasedNodes(userID int64) []string                   // 사용자가 대여한 적 있는 물리노드(로컬 Home 노출 대상)
+	ListBillable() ([]Volume, error)                     // 과금 대상 볼륨(bound + 소유자 있음)
 	SetBilled(id int64, credits int) error
 }
 
@@ -53,16 +55,22 @@ func (r *gormRepo) SetBound(id int64, pvcName, ns, status string) error {
 
 func (r *gormRepo) ListOwned(userID int64) ([]Volume, error) {
 	var out []Volume
-	return out, r.db.Where("owner_user_id = ?", userID).Order("id").Find(&out).Error
+	// 귀속 팀 표시명(team_name)을 함께 — 볼륨의 쿼터·과금이 어느 팀에서 나가는지 보인다.
+	err := r.db.Raw(`SELECT v.*, COALESCE(g.display_name,'') AS team_name
+		FROM volumes v LEFT JOIN `+"`groups`"+` g ON g.id = v.group_id
+		WHERE v.owner_user_id = ? ORDER BY v.id`, userID).Scan(&out).Error
+	return out, err
 }
 
 // ListShared — 나에게 공유된 볼륨(직접 공유 + 내 활성 그룹 공유). 내가 소유한 건 제외.
 func (r *gormRepo) ListShared(userID int64) ([]Volume, error) {
 	var out []Volume
 	err := r.db.Raw(`
-		SELECT v.*, CASE WHEN SUM(s.permission = 'rw') > 0 THEN 'rw' ELSE 'ro' END AS perm
+		SELECT v.*, CASE WHEN SUM(s.permission = 'rw') > 0 THEN 'rw' ELSE 'ro' END AS perm,
+		       COALESCE(NULLIF(TRIM(CONCAT(COALESCE(ou.last_name,''),COALESCE(ou.first_name,''))),''), ou.username, '') AS owner_name
 		FROM volumes v
 		JOIN volume_shares s ON s.volume_id = v.id
+		LEFT JOIN users ou ON ou.id = v.owner_user_id
 		WHERE (
 			s.shared_with_user_id = ?
 			OR s.shared_with_group_id IN (
@@ -86,6 +94,15 @@ func (r *gormRepo) Get(id int64) (*Volume, error) {
 
 func (r *gormRepo) Delete(id int64) error { return r.db.Delete(&Volume{}, id).Error }
 
+// SetGroup은 볼륨의 귀속 팀(group_id)을 바꾼다(0=팀 미귀속=개인). 쿼터·과금 홈 변경.
+func (r *gormRepo) SetGroup(id, groupID int64) error {
+	var gid interface{}
+	if groupID > 0 {
+		gid = groupID
+	}
+	return r.db.Model(&Volume{}).Where("id = ?", id).Update("group_id", gid).Error
+}
+
 // ListBillable은 과금 대상(bound 상태 + 소유자 존재) 볼륨을 반환한다.
 func (r *gormRepo) ListBillable() ([]Volume, error) {
 	var out []Volume
@@ -99,6 +116,13 @@ func (r *gormRepo) SetBilled(id int64, credits int) error {
 func (r *gormRepo) AllocatedGiB(userID int64) (int, error) {
 	var sum int
 	err := r.db.Raw(`SELECT COALESCE(SUM(size_gib),0) FROM volumes WHERE owner_user_id = ?`, userID).Scan(&sum).Error
+	return sum, err
+}
+
+// AllocatedGiBInTeam은 사용자가 특정 팀(group)에 귀속시킨 볼륨 용량 합(팀별 쿼터 강제용).
+func (r *gormRepo) AllocatedGiBInTeam(userID, groupID int64) (int, error) {
+	var sum int
+	err := r.db.Raw(`SELECT COALESCE(SUM(size_gib),0) FROM volumes WHERE owner_user_id = ? AND group_id = ?`, userID, groupID).Scan(&sum).Error
 	return sum, err
 }
 

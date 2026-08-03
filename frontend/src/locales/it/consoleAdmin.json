@@ -115,7 +115,10 @@
     "noAlerts": "Nessun avviso",
     "noActiveUsers": "Nessuna sessione in corso al momento",
     "modeHint_dynamic": "Modalità primo arrivato: nessun credito; capacità di prelievo quando disponibile. Monitora tramite statistiche e avvisi di sessione/inattività.",
-    "modeHint_free": "Modalità gratuita: nessun limite di credito. Monitora l'utilizzo tramite statistiche di sessione/inattività e ore GPU."
+    "modeHint_free": "Modalità gratuita: nessun limite di credito. Monitora l'utilizzo tramite statistiche di sessione/inattività e ore GPU.",
+    "metricsOffTitle": "Lo stack di monitoraggio non è installato",
+    "metricsOffAll": "Senza Prometheus e l’exporter DCGM non è possibile mostrare utilizzo GPU, VRAM e temperatura. Attiva il monitoraggio per vedere le metriche in tempo reale.",
+    "metricsOffDcgm": "Prometheus è connesso ma non sono state trovate metriche dell’exporter DCGM. Installa dcgm-exporter per vedere in tempo reale utilizzo GPU, VRAM e temperatura."
   },
   "approvals": {
     "title": "Approvazioni",
@@ -470,7 +473,10 @@
     "impSize": "Dimensioni visualizzate (GiB)",
     "impNoUser": "Conto non trovato.",
     "impDone": "Volume importato da {{name}} a {{user}}.",
-    "impMissing": "Inserisci nome, proprietario, server NFS e percorso."
+    "impMissing": "Inserisci nome, proprietario, server NFS e percorso.",
+    "impOwnerHint": "Scegli un account dall’elenco per importare.",
+    "impOwnerPicked": "Selezionato: {{name}} ({{id}})",
+    "metricsOffNotice": "Il monitoraggio (DCGM/Prometheus) non è installato, quindi utilizzo GPU e VRAM non possono essere mostrati. Attiva il monitoraggio per vedere le metriche in tempo reale."
   },
   "mset": {
     "title": "Impostazioni",
@@ -838,7 +844,9 @@
     "hint": "Tetti assoluti indipendenti dai crediti. I campi vuoti ereditano dal genitore (gruppo → organizzazione → globale).",
     "saved": "Limiti salvati per {{name}}",
     "maxVolumeGib": "Volume massimo",
-    "maxGpu": "GPU massime"
+    "maxGpu": "GPU massime",
+    "maxStoppedSessions": "Max sessioni arrestate",
+    "maxEphemeralGib": "Max disco temporaneo"
   },
   "settings": {
     "mode": {

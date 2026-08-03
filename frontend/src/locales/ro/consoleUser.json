@@ -309,7 +309,8 @@
     "guaranteed": "Resurse garantate",
     "runtimeLeft": "Timp de rulare la acest ritm",
     "notEnough": "Credit insuficient – ​​este necesară minim 1 oră",
-    "tsSlotN": "1 dintre sloturile {{n}}"
+    "tsSlotN": "1 dintre sloturile {{n}}",
+    "sshKeyChange": "Modifică"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "detIdleWarn": "Idle {{cur}} / {{max}} min — se oprește în curând",
     "detNoAutoStop": "Nu se aplică nicio politică de oprire automată.",
     "detActivity": "Jurnal de activitate",
-    "detLogs": "Jurnalele recente"
+    "detLogs": "Jurnalele recente",
+    "detReclaimTitle": "Păstrarea sesiunilor oprite",
+    "reclaimIn": "Recuperabilă în {{n}} z",
+    "reclaimDue": "Recuperabilă",
+    "reclaimKept": "Păstrată",
+    "reclaimHint": "Sesiunile oprite folosesc în continuare discul home. După {{n}} zile de oprire devin recuperabile, iar cele inactive de cel mai mult timp pot fi șterse când un nod rămâne fără spațiu pe disc.",
+    "reclaimKeptHint": "Cea mai recentă sesiune oprită a dvs. nu este niciodată recuperată.",
+    "reclaimResumeHint": "Repornirea resetează contorul. Ștergeți sesiunile pe care nu mai trebuie să le păstrați."
   },
   "conn": {
     "title": "Conectare — {{name}}",
@@ -412,7 +420,9 @@
     "sshUnavailable": "SSH nu este disponibil pentru această sesiune (un administrator trebuie să activeze containerul SSH).",
     "sshDirectHint": "Se conectează direct la nod cu cheia dvs. publică înregistrată (rețeaua campusului / VPN necesar).",
     "sshExternalHint": "Din afara rețelei campusului, utilizați această comandă (sare printr-o gazdă proxy la gateway).",
-    "sshDirect": "Direct (intranet)"
+    "sshDirect": "Direct (intranet)",
+    "sshNeedKey": "Nicio cheie publică SSH înregistrată",
+    "sshNeedKeyHint": "Înregistrați sau generați una mai jos — sesiunile în execuție o preiau imediat."
   },
   "account": {
     "title": "Setările mele",
@@ -448,7 +458,13 @@
     "homeTitle": "Cotă de acasă SSH",
     "pwFail": "Schimbarea parolei a eșuat",
     "homeHint": "Utilizarea directorului de domiciliu al nodului fizic în modul hibrid (SSH).",
-    "localAcctNote": "Pentru fiecare nod fizic este furnizat un cont local."
+    "localAcctNote": "Pentru fiecare nod fizic este furnizat un cont local.",
+    "sshBad": "Cheie publică nevalidă. Lipiți o singură linie, de exemplu „ssh-ed25519 AAAA…”.",
+    "sshFail": "Salvarea cheii publice SSH a eșuat.",
+    "sshGenerate": "Generează și descarcă cheia",
+    "sshGenerated": "Cheie generată. Păstrați în siguranță cheia privată descărcată — nu poate fi descărcată din nou.",
+    "sshGenFail": "Generarea cheii SSH a eșuat.",
+    "sshGenerateHint": "Încă nu aveți o cheie? Faceți clic pe „Generează și descarcă cheia”. Cheia privată (.pem) se descarcă o singură dată, iar cea publică se înregistrează automat. Conectare: ssh -i cheie-descarcata.pem …"
   },
   "notify": {
     "title": "Notificări",

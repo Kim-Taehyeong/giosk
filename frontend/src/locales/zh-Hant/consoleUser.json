@@ -309,7 +309,8 @@
     "hoursApprox": "~{{n}} 小時",
     "tsSlotN": "1 個 {{n}} 插槽",
     "guaranteed": "資源有保障",
-    "runtimeLeft": "以此速度運行"
+    "runtimeLeft": "以此速度運行",
+    "sshKeyChange": "變更"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "detIdleWarn": "空閒 {{cur}} / {{max}} 分鐘 — 即將停止",
     "detStoppedIdle": "由於 GPU 空閒而自動停止",
     "extendRemaining": "{{n}} 左延伸",
-    "detNode": "節點·GPU"
+    "detNode": "節點·GPU",
+    "detReclaimTitle": "已停止工作階段保留",
+    "reclaimIn": "{{n}} 天後可回收",
+    "reclaimDue": "可回收",
+    "reclaimKept": "保留中",
+    "reclaimHint": "已停止的工作階段仍在占用家目錄磁碟。停止超過 {{n}} 天後即可被回收；當節點磁碟不足時，閒置最久的可能會被刪除。",
+    "reclaimKeptHint": "您最近停止的一個工作階段永不回收。",
+    "reclaimResumeHint": "重新啟動會重設計時。不再需要保留的工作階段請刪除。"
   },
   "conn": {
     "webConnect": "透過網路連線",
@@ -412,7 +420,9 @@
     "sshDirectInHint": "繞過網關，從辦公室網路內部直接連接到節點。",
     "sshProxyHint": "從任何地方透過單一網關入口點進行連接。經過身份驗證後，會話將保持連線狀態（無需定期重新檢查）。",
     "sshDirect": "直接（內部網路）",
-    "sshProxy": "代理（網關）"
+    "sshProxy": "代理（網關）",
+    "sshNeedKey": "尚未註冊 SSH 公開金鑰",
+    "sshNeedKeyHint": "請在下方註冊或產生；執行中的工作階段會立即生效。"
   },
   "account": {
     "title": "我的設定",
@@ -448,7 +458,13 @@
     "sshHint": "在會話創建時注入到容器中。",
     "homeHint": "您在混合 (SSH) 模式下的實體節點主目錄使用情況。",
     "homeTitle": "SSH 家庭配額",
-    "localAcctNote": "在每個實體節點上為您配置一個本機帳戶。"
+    "localAcctNote": "在每個實體節點上為您配置一個本機帳戶。",
+    "sshBad": "公開金鑰格式無效。請貼上形如「ssh-ed25519 AAAA…」的單行內容。",
+    "sshFail": "SSH 公開金鑰儲存失敗。",
+    "sshGenerate": "產生並下載金鑰",
+    "sshGenerated": "金鑰已產生。請妥善保管下載的私密金鑰——無法再次下載。",
+    "sshGenFail": "SSH 金鑰產生失敗。",
+    "sshGenerateHint": "還沒有金鑰？點選「產生並下載金鑰」。私密金鑰（.pem）只會下載一次，公開金鑰自動註冊。連線方式：ssh -i 下載的金鑰.pem …"
   },
   "notify": {
     "title": "通知",

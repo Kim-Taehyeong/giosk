@@ -309,7 +309,8 @@
     "tsSlotN": "1 kati ya nafasi za {{n}}",
     "hoursApprox": "~Saa {{n}}",
     "guaranteed": "Rasilimali zilizohakikishwa",
-    "runtimeLeft": "Muda wa kukimbia kwa kiwango hiki"
+    "runtimeLeft": "Muda wa kukimbia kwa kiwango hiki",
+    "sshKeyChange": "Badilisha"
   },
   "session": {
     "gpuReason": {
@@ -376,7 +377,14 @@
     "detStoppedIdle": "Imezimwa kiotomatiki kwa sababu ya kutokuwa na shughuli kwa GPU",
     "detNoAutoStop": "Hakuna sera ya kukomesha kiotomatiki inatumika.",
     "idlePolicy": "Vipindi hurejeshwa kiotomatiki baada ya dakika ya {{n}} bila kufanya kitu.",
-    "detLogs": "Kumbukumbu za hivi karibuni"
+    "detLogs": "Kumbukumbu za hivi karibuni",
+    "detReclaimTitle": "Uhifadhi wa vipindi vilivyosimamishwa",
+    "reclaimIn": "Kinaweza kurejeshwa baada ya siku {{n}}",
+    "reclaimDue": "Kinaweza kurejeshwa",
+    "reclaimKept": "Kimehifadhiwa",
+    "reclaimHint": "Vipindi vilivyosimamishwa bado vinatumia diski ya nyumbani. Baada ya siku {{n}} vikiwa vimesimamishwa vinaweza kurejeshwa, na vilivyokaa bila kutumika kwa muda mrefu zaidi vinaweza kufutwa nodi inapoishiwa na nafasi ya diski.",
+    "reclaimKeptHint": "Kipindi chako cha karibuni zaidi kilichosimamishwa hakirejeshwi kamwe.",
+    "reclaimResumeHint": "Kuanzisha upya hurudisha hesabu mwanzo. Tafadhali futa vipindi ambavyo huhitaji tena kuvihifadhi."
   },
   "conn": {
     "title": "Unganisha - {{name}}",
@@ -412,7 +420,9 @@
     "sshDirectInHint": "Unganisha moja kwa moja kwenye nodi kutoka ndani ya mtandao wa ofisi - kwa kupita lango.",
     "sshProxyHint": "Unganisha kupitia lango moja la kuingilia kutoka mahali popote. Baada ya kuthibitishwa, kipindi husalia kuunganishwa (hakuna ukaguzi wa mara kwa mara).",
     "regenerated": "Imetoa kiungo kipya cha ufikiaji.",
-    "regenerate": "Tengeneza upya"
+    "regenerate": "Tengeneza upya",
+    "sshNeedKey": "Hakuna ufunguo wa umma wa SSH uliosajiliwa",
+    "sshNeedKeyHint": "Sajili au tengeneza mmoja hapa chini — vipindi vinavyoendeshwa huuchukua mara moja."
   },
   "account": {
     "title": "Mipangilio Yangu",
@@ -448,7 +458,13 @@
     "pwShort": "Nenosiri lazima liwe na angalau vibambo 8",
     "pwMismatch": "Manenosiri mapya hayalingani",
     "pwWrong": "Nenosiri la sasa si sahihi",
-    "localAcctNote": "Akaunti ya ndani imetolewa kwa ajili yako kwenye kila nodi halisi."
+    "localAcctNote": "Akaunti ya ndani imetolewa kwa ajili yako kwenye kila nodi halisi.",
+    "sshBad": "Ufunguo wa umma si sahihi. Bandika mstari mmoja kama “ssh-ed25519 AAAA…”.",
+    "sshFail": "Imeshindwa kuhifadhi ufunguo wa umma wa SSH.",
+    "sshGenerate": "Tengeneza na pakua ufunguo",
+    "sshGenerated": "Ufunguo umetengenezwa. Hifadhi kwa usalama ufunguo binafsi uliopakuliwa — hauwezi kupakuliwa tena.",
+    "sshGenFail": "Imeshindwa kutengeneza ufunguo wa SSH.",
+    "sshGenerateHint": "Bado huna ufunguo? Bofya “Tengeneza na pakua ufunguo”. Ufunguo binafsi (.pem) hupakuliwa mara moja tu na ule wa umma husajiliwa kiotomatiki. Kuunganisha: ssh -i downloaded-key.pem …"
   },
   "notify": {
     "title": "Arifa",

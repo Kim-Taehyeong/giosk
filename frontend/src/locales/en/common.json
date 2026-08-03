@@ -449,6 +449,7 @@
     "unit": {
       "hour": "h",
       "min": "min",
+      "day": "days",
       "month": "mo",
       "credit": "C",
       "creditPerStep": "C/step",
@@ -484,6 +485,15 @@
       "timeoutHint": "Sessions are auto-reclaimed when the GPU stays idle for this long.",
       "containerNote": "Container mode: reclaimed via Stop, preserving data.",
       "sshNote": "SSH mode: data stays on local disk and can be reused as-is."
+    },
+    "reclaim": {
+      "stoppedTtl": "Stopped session retention",
+      "stoppedTtlHint": "Stopped sessions still hold their home disk. Past this age they become reclaim candidates. 0 = never reclaim automatically.",
+      "diskThreshold": "Disk usage to start reclaiming",
+      "diskThresholdHint": "Reclaim only runs on nodes above this disk usage. With room to spare, old stopped sessions are left alone.",
+      "note": "Reclaim starts with the longest-idle sessions of users holding the most stopped sessions, and stops once the node is back under the threshold.",
+      "exemptNote": "Each user's most recent stopped session is never reclaimed. Running sessions are never touched.",
+      "offNote": "Automatic reclaim is off. Stopped sessions are held back only by the count limit and storage charges; admins must clean up manually when disks fill."
     },
     "lease": {
       "extHours": "Max hours per extension",

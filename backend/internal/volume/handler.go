@@ -3,6 +3,7 @@ package volume
 import (
 	"errors"
 	"strconv"
+	"strings"
 
 	"giosk/internal/auth"
 	"giosk/pkg/httpx"
@@ -30,7 +31,7 @@ func (h *Handler) Create(c *gin.Context) {
 		httpx.BadRequest(c, "name, sizeGib 필요")
 		return
 	}
-	v, err := h.svc.Create(c.Request.Context(), auth.CurrentUser(c).ID, req)
+	v, err := h.svc.Create(c.Request.Context(), auth.CurrentUser(c).ID, scopeGroup(c), req)
 	if errors.Is(err, ErrQuotaExceeded) {
 		httpx.Err(c, 409, "quota_exceeded", "볼륨 쿼터를 초과했습니다")
 		return
@@ -130,7 +131,30 @@ func (h *Handler) Register(authed gin.IRouter) {
 	authed.GET("/volumes", h.List)
 	authed.POST("/volumes", h.Create)
 	authed.POST("/volumes/:id/share", h.Share)
+	authed.PUT("/volumes/:id/team", h.SetTeam)
 	authed.DELETE("/volumes/:id", h.Delete)
+}
+
+// SetTeam은 볼륨의 귀속 팀을 바꾼다(소유자; 대상 팀 쿼터 확인).
+func (h *Handler) SetTeam(c *gin.Context) {
+	var req struct {
+		GroupID int64 `json:"groupId"`
+	}
+	_ = c.ShouldBindJSON(&req)
+	err := h.svc.SetVolumeTeam(auth.CurrentUser(c).ID, idParam(c), req.GroupID)
+	if errors.Is(err, ErrQuotaExceeded) {
+		httpx.Err(c, 409, "quota_exceeded", "대상 팀의 볼륨 쿼터를 초과합니다")
+		return
+	}
+	if errors.Is(err, ErrNotFound) {
+		httpx.NotFound(c, "볼륨을 찾을 수 없습니다")
+		return
+	}
+	if err != nil {
+		httpx.Internal(c, "귀속 팀 변경 실패")
+		return
+	}
+	httpx.OK(c, gin.H{"ok": true})
 }
 
 // RegisterAdmin은 플랫폼 관리자 스토리지 현황 라우트.
@@ -146,3 +170,12 @@ func (h *Handler) RegisterScoped(mgmt gin.IRouter) {
 }
 
 func idParam(c *gin.Context) int64 { id, _ := strconv.ParseInt(c.Param("id"), 10, 64); return id }
+
+// scopeGroup은 X-Console-Scope 헤더가 group:N 이면 N(활성 팀), 아니면 0(팀 미지정)을 반환한다.
+func scopeGroup(c *gin.Context) int64 {
+	if sel := c.GetHeader("X-Console-Scope"); strings.HasPrefix(sel, "group:") {
+		id, _ := strconv.ParseInt(sel[len("group:"):], 10, 64)
+		return id
+	}
+	return 0
+}
