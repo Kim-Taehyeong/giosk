@@ -389,7 +389,8 @@
     "reclaimKept": "Bevares",
     "reclaimHint": "Stoppede sessioner bruger stadig hjemmedisk. Efter {{n}} dage som stoppet kan de frigives, og de længst inaktive kan blive slettet, når en node løber tør for diskplads.",
     "reclaimKeptHint": "Din senest stoppede session frigives aldrig.",
-    "reclaimResumeHint": "Genstart nulstiller tælleren. Slet de sessioner, du ikke længere behøver at gemme."
+    "reclaimResumeHint": "Genstart nulstiller tælleren. Slet de sessioner, du ikke længere behøver at gemme.",
+    "actionFailed": "Anmodningen kunne ikke gennemføres"
   },
   "conn": {
     "title": "Tilslut — {{name}}",

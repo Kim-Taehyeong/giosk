@@ -561,5 +561,12 @@
       "teamBody": "Kredit pasukan {{target}} berada pada {{value}}, di bawah ambang {{threshold}}. Sesi dalam pasukan ini mungkin berhenti tidak lama lagi."
     }
   },
-  "close": "tutup"
+  "close": "tutup",
+  "rowMenu": {
+    "more": "Lagi"
+  },
+  "nav": {
+    "openMenu": "Buka menu",
+    "label": "Menu konsol"
+  }
 }

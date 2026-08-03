@@ -142,5 +142,6 @@
   "e141": "Cài đặt trước lưu không thành công",
   "e138": "Không thể cấp tín dụng",
   "e144": "Chủ đề thông báo không được phép",
-  "e142": "Tra cứu cài sẵn không thành công"
+  "e142": "Tra cứu cài sẵn không thành công",
+  "e145": "Hiện tại không có GPU. Hãy thử lại ngay hoặc chọn một ưu đãi khác."
 }

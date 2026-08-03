@@ -561,5 +561,12 @@
       "teamBody": "{{target}}-lagkrediter är på {{value}}, under {{threshold}}-tröskeln. Sessioner i detta team kan sluta snart."
     }
   },
-  "close": "Nära"
+  "close": "Nära",
+  "rowMenu": {
+    "more": "Mer"
+  },
+  "nav": {
+    "openMenu": "Öppna menyn",
+    "label": "Konsolmeny"
+  }
 }

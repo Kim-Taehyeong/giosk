@@ -389,7 +389,8 @@
     "reclaimKept": "Säilytetään",
     "reclaimHint": "Pysäytetyt istunnot käyttävät edelleen kotilevyä. {{n}} päivän pysäytyksen jälkeen ne ovat vapautettavissa, ja pisimpään käyttämättöminä olleet voidaan poistaa, kun solmun levytila käy vähiin.",
     "reclaimKeptHint": "Viimeisimmäksi pysäyttämääsi istuntoa ei koskaan vapauteta.",
-    "reclaimResumeHint": "Uudelleenkäynnistys nollaa laskurin. Poista istunnot, joita ei enää tarvitse säilyttää."
+    "reclaimResumeHint": "Uudelleenkäynnistys nollaa laskurin. Poista istunnot, joita ei enää tarvitse säilyttää.",
+    "actionFailed": "Pyyntöä ei voitu suorittaa loppuun"
   },
   "conn": {
     "loading": "Ladataan yhteystietoja…",

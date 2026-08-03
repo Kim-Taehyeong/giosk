@@ -561,5 +561,12 @@
       "teamBody": "{{target}}-tiimin arvosanat ovat {{value}}, {{threshold}}-kynnyksen alapuolella. Tämän joukkueen istunnot saattavat pysähtyä pian."
     }
   },
-  "close": "Lähellä"
+  "close": "Lähellä",
+  "rowMenu": {
+    "more": "Lisää"
+  },
+  "nav": {
+    "openMenu": "Avaa valikko",
+    "label": "Konsolin valikko"
+  }
 }

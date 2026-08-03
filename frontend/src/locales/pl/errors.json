@@ -142,5 +142,6 @@
   "e139": "Konfiguracja uzupełniania zespołu nie powiodła się",
   "e136": "Zwolnienie pamięci podręcznej nie powiodło się",
   "e141": "Błąd zapisu ustawień wstępnych",
-  "e144": "Niedozwolony temat powiadomienia"
+  "e144": "Niedozwolony temat powiadomienia",
+  "e145": "Żaden procesor graficzny nie jest obecnie dostępny. Spróbuj ponownie wkrótce lub wybierz inną ofertę."
 }

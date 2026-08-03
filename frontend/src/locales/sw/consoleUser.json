@@ -389,7 +389,8 @@
     "reclaimKept": "Kimehifadhiwa",
     "reclaimHint": "Vipindi vilivyosimamishwa bado vinatumia diski ya nyumbani. Baada ya siku {{n}} vikiwa vimesimamishwa vinaweza kurejeshwa, na vilivyokaa bila kutumika kwa muda mrefu zaidi vinaweza kufutwa nodi inapoishiwa na nafasi ya diski.",
     "reclaimKeptHint": "Kipindi chako cha karibuni zaidi kilichosimamishwa hakirejeshwi kamwe.",
-    "reclaimResumeHint": "Kuanzisha upya hurudisha hesabu mwanzo. Tafadhali futa vipindi ambavyo huhitaji tena kuvihifadhi."
+    "reclaimResumeHint": "Kuanzisha upya hurudisha hesabu mwanzo. Tafadhali futa vipindi ambavyo huhitaji tena kuvihifadhi.",
+    "actionFailed": "Ombi halijakamilika"
   },
   "conn": {
     "title": "Unganisha - {{name}}",

@@ -82,6 +82,18 @@ function adaptSession(s) {
     autoStopIdleMin: 0,
     logs: [],
     extensionsUsed: s.extensionsUsed || 0,
+    // 원시 사양 — 중단 세션 자원 변경(GPU 붙이기) 모달이 현재 값에서 시작하기 위해 그대로 보존한다.
+    // (표시용 offering/node 는 '—' 같은 표기가 섞여 그대로 쓸 수 없다.)
+    spec: {
+      gpuMode: s.gpuMode || '',
+      gpuType: s.gpuType || '',
+      gpuCount: s.gpuCount || 0,
+      offeringId: s.offeringId || null,
+      imageId: s.imageId || null,
+      vramMb: s.vramMb || 0,
+      corePercent: s.corePercent || 0,
+      node: s.node || '', // 홈 PVC 가 묶인 노드(비면 아직 뜬 적 없음 = 노드 제약 없음)
+    },
   };
 }
 
@@ -114,6 +126,8 @@ export const createSession = (body) => apiPost('/instances', body);
 export const stopSession = (id) => apiPost(`/instances/${id}/stop`);
 export const startSession = (id) => apiPost(`/instances/${id}/start`);
 export const extendSession = (id) => apiPost(`/instances/${id}/extend`, { hours: 1 });
+// 중단 세션 자원 변경(GPU 붙이기/떼기). start=true 면 서버가 적용 후 바로 재개한다.
+export const reconfigureSession = (id, body) => apiPost(`/instances/${id}/reconfigure`, body);
 export const deleteSession = (id) => apiDelete(`/instances/${id}`);
 
 // 실시간 누적 크레딧(= 시간당 단가 × 실행시간, 내림). 정산(billed)과 동일 공식이라 더 즉각적.

@@ -389,7 +389,8 @@
     "reclaimKept": "Conservata",
     "reclaimHint": "Le sessioni arrestate continuano a usare il disco home. Dopo {{n}} giorni da ferme diventano recuperabili, e quelle inattive da più tempo possono essere eliminate quando lo spazio su un nodo si esaurisce.",
     "reclaimKeptHint": "La tua sessione arrestata più recente non viene mai recuperata.",
-    "reclaimResumeHint": "Riavviandola il conteggio riparte da zero. Elimina le sessioni che non devi più conservare."
+    "reclaimResumeHint": "Riavviandola il conteggio riparte da zero. Elimina le sessioni che non devi più conservare.",
+    "actionFailed": "Impossibile completare la richiesta"
   },
   "conn": {
     "openVscode": "Apri VSCode",

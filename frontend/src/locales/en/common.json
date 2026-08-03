@@ -561,5 +561,12 @@
       "teamTitle": "{{target}} team is low on credits",
       "teamBody": "{{target}} team credits are at {{value}}, below the {{threshold}} threshold. Sessions in this team may stop soon."
     }
+  },
+  "rowMenu": {
+    "more": "More"
+  },
+  "nav": {
+    "label": "Console menu",
+    "openMenu": "Open menu"
   }
 }

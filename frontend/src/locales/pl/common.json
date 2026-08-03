@@ -561,5 +561,12 @@
       "teamBody": "Kredyty zespołu {{target}} są na poziomie {{value}}, poniżej progu {{threshold}}. Sesje w tym zespole mogą wkrótce zostać zakończone."
     }
   },
-  "close": "Zamknąć"
+  "close": "Zamknąć",
+  "rowMenu": {
+    "more": "Więcej"
+  },
+  "nav": {
+    "openMenu": "Otwórz menu",
+    "label": "Menu konsoli"
+  }
 }

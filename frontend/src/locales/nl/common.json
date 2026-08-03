@@ -561,5 +561,12 @@
       "teamBody": "{{target}}-teamcredits bevinden zich op {{value}}, onder de {{threshold}}-drempel. Sessies in dit team kunnen binnenkort stoppen."
     }
   },
-  "close": "Dichtbij"
+  "close": "Dichtbij",
+  "rowMenu": {
+    "more": "Meer"
+  },
+  "nav": {
+    "openMenu": "Menu openen",
+    "label": "Consolemenu"
+  }
 }

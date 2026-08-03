@@ -14,7 +14,7 @@ function initials(user) {
 function Item({ icon, label, hint, onClick }) {
   return (
     <div {...clickable(onClick, { role: 'menuitem' })}
-      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 10px', borderRadius: 8, cursor: 'pointer', fontSize: 13 }}
+      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 10px', borderRadius: 'var(--r-control)', cursor: 'pointer', fontSize: 13 }}
       onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface-2)'; }}
       onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>
       {icon}
@@ -57,7 +57,7 @@ export default function UserMenu({ ns }) {
       {open && (
         <div role="menu" style={{
           position: 'absolute', top: 'calc(100% + 8px)', right: 0, minWidth: 236, zIndex: 70,
-          background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12,
+          background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-container)',
           boxShadow: '0 16px 40px rgba(10,15,28,.22)', padding: 8,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px 10px' }}>

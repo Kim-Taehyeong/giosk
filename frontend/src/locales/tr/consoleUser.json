@@ -389,7 +389,8 @@
     "reclaimKept": "Saklanıyor",
     "reclaimHint": "Durdurulmuş oturumlar ana diski kullanmaya devam eder. {{n}} gün durdurulmuş kaldıktan sonra geri kazanılabilir hale gelir ve bir düğümün disk alanı azaldığında en uzun süredir boşta duranlar silinebilir.",
     "reclaimKeptHint": "En son durdurduğunuz oturum asla geri kazanılmaz.",
-    "reclaimResumeHint": "Yeniden başlatmak sayacı sıfırlar. Artık saklamanız gerekmeyen oturumları silin."
+    "reclaimResumeHint": "Yeniden başlatmak sayacı sıfırlar. Artık saklamanız gerekmeyen oturumları silin.",
+    "actionFailed": "İstek tamamlanamadı"
   },
   "conn": {
     "webConnectHint": "Doğrudan tarayıcınızda bir terminal açar (SSH anahtarına veya komutuna gerek yoktur).",

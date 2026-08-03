@@ -561,5 +561,12 @@
       "teamTitle": "{{target}} 팀 크레딧 부족",
       "teamBody": "{{target}} 팀 크레딧이 {{value}} 로 임계({{threshold}}) 이하입니다. 이 팀 세션이 곧 중단될 수 있어요."
     }
+  },
+  "rowMenu": {
+    "more": "더 보기"
+  },
+  "nav": {
+    "label": "콘솔 메뉴",
+    "openMenu": "메뉴 열기"
   }
 }

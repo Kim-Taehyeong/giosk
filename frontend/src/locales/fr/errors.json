@@ -142,5 +142,6 @@
   "e142": "La recherche de préréglage a échoué",
   "e143": "Champ obligatoire manquant",
   "e136": "La libération du cache a échoué",
-  "e139": "Échec de la configuration de la recharge d'équipe"
+  "e139": "Échec de la configuration de la recharge d'équipe",
+  "e145": "Aucun GPU n'est disponible pour le moment. Réessayez sous peu ou choisissez une offre différente."
 }

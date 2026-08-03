@@ -142,5 +142,6 @@
   "e143": "Erforderliches Feld fehlt",
   "e138": "Kredit konnte nicht gewährt werden",
   "e139": "Das Einrichten der Teamauffüllung ist fehlgeschlagen",
-  "e144": "Unzulässiger Benachrichtigungsbetreff"
+  "e144": "Unzulässiger Benachrichtigungsbetreff",
+  "e145": "Derzeit ist keine GPU verfügbar. Versuchen Sie es in Kürze noch einmal oder wählen Sie ein anderes Angebot."
 }

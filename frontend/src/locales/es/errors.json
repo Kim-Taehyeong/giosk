@@ -142,5 +142,6 @@
   "e139": "Error al configurar la recarga del equipo",
   "e138": "No se pudo otorgar el crédito",
   "e143": "Falta el campo obligatorio",
-  "e141": "Error al guardar ajustes preestablecidos"
+  "e141": "Error al guardar ajustes preestablecidos",
+  "e145": "No hay ninguna GPU disponible en este momento. Vuelve a intentarlo en breve o elige una oferta diferente."
 }

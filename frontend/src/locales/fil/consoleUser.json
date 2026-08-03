@@ -389,7 +389,8 @@
     "reclaimKept": "Iniingatan",
     "reclaimHint": "Gumagamit pa rin ng home disk ang mga huminto na session. Pagkatapos ng {{n}} araw na nakahinto, mababawi na sila, at maaaring burahin ang pinakamatagal nang hindi ginagamit kapag nauubusan ng disk ang isang node.",
     "reclaimKeptHint": "Hindi kailanman binabawi ang pinakahuli mong huminto na session.",
-    "reclaimResumeHint": "Ang pag-restart ay magre-reset ng bilang. Pakibura ang mga session na hindi mo na kailangang itago."
+    "reclaimResumeHint": "Ang pag-restart ay magre-reset ng bilang. Pakibura ang mga session na hindi mo na kailangang itago.",
+    "actionFailed": "Hindi makumpleto ang kahilingan"
   },
   "conn": {
     "webConnect": "Kumonekta sa pamamagitan ng web",

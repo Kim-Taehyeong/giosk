@@ -103,7 +103,7 @@ export default function OrgGroupSelector({ variant, ns }) {
   const menu = (items, activeId, onPick, emptyKey, emptyDefault, headKey, headDefault) => (
     <div role="menu" style={{
       position: 'absolute', top: 'calc(100% + 6px)', left: 0, minWidth: 240, zIndex: 70,
-      background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12,
+      background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-container)',
       boxShadow: '0 16px 40px rgba(10,15,28,.22)', padding: 8,
     }}>
       <div className="muted" style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '.04em', padding: '4px 8px' }}>{t(headKey, { defaultValue: headDefault })}</div>
@@ -112,7 +112,7 @@ export default function OrgGroupSelector({ variant, ns }) {
         const on = it.id === activeId;
         return (
           <div key={it.id} {...clickableProps(() => onPick(it), { role: 'menuitem' })} aria-current={on || undefined}
-            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', borderRadius: 8, cursor: 'pointer', background: on ? 'var(--primary-soft)' : 'transparent', color: on ? 'var(--primary)' : 'var(--text)', fontWeight: on ? 700 : 500 }}>
+            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', borderRadius: 'var(--r-control)', cursor: 'pointer', background: on ? 'var(--primary-soft)' : 'transparent', color: on ? 'var(--primary)' : 'var(--text)', fontWeight: on ? 700 : 500 }}>
             {it.icon}
             <span style={{ flex: 1, fontSize: 13 }}>{it.label}</span>
             {on && <Check size={14} />}

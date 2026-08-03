@@ -561,5 +561,12 @@
       "teamBody": "Les crédits de l'équipe {{target}} sont à {{value}}, en dessous du seuil {{threshold}}. Les sessions dans cette équipe pourraient bientôt s’arrêter."
     }
   },
-  "close": "Fermer"
+  "close": "Fermer",
+  "rowMenu": {
+    "more": "Plus"
+  },
+  "nav": {
+    "openMenu": "Ouvrir le menu",
+    "label": "Menu de la console"
+  }
 }

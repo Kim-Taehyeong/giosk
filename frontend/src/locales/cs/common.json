@@ -561,5 +561,12 @@
       "teamBody": "Týmové kredity {{target}} jsou na {{value}}, pod hranicí {{threshold}}. Relace v tomto týmu se mohou brzy zastavit."
     }
   },
-  "close": "Blízko"
+  "close": "Blízko",
+  "rowMenu": {
+    "more": "Více"
+  },
+  "nav": {
+    "openMenu": "Otevřít nabídku",
+    "label": "Nabídka konzole"
+  }
 }

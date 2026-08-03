@@ -561,5 +561,12 @@
       "teamTitle": "{{target}} 团队积分不足"
     }
   },
-  "close": "关闭"
+  "close": "关闭",
+  "rowMenu": {
+    "more": "更多的"
+  },
+  "nav": {
+    "openMenu": "打开菜单",
+    "label": "控制台菜单"
+  }
 }

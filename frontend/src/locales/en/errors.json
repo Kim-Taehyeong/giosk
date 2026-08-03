@@ -142,5 +142,11 @@
   "e141": "Preset save failure",
   "e142": "Preset lookup failed",
   "e143": "Required field missing",
-  "e144": "Disallowed notification subject"
+  "e144": "Disallowed notification subject",
+  "e145": "No GPU is available right now. Try again shortly or pick a different offering.",
+  "e146": "Resources cannot be changed while the session is running. Stop it first, then try again.",
+  "e147": "This session's resources cannot be changed.",
+  "e148": "The requested resource spec is not valid.",
+  "e149": "This session's home disk lives on one node, so it can only resume there. Pick a GPU that is available on that node.",
+  "e150": "This session is already starting."
 }

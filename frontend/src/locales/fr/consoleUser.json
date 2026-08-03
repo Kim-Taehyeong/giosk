@@ -389,7 +389,8 @@
     "reclaimKept": "Conservée",
     "reclaimHint": "Les sessions arrêtées utilisent toujours le disque personnel. Après {{n}} jours à l'arrêt, elles deviennent récupérables, et les plus anciennes peuvent être supprimées lorsqu'un nœud manque d'espace disque.",
     "reclaimKeptHint": "Votre session arrêtée la plus récente n'est jamais récupérée.",
-    "reclaimResumeHint": "Un redémarrage remet le compteur à zéro. Supprimez les sessions que vous n'avez plus besoin de conserver."
+    "reclaimResumeHint": "Un redémarrage remet le compteur à zéro. Supprimez les sessions que vous n'avez plus besoin de conserver.",
+    "actionFailed": "La demande n'a pas pu être complétée"
   },
   "conn": {
     "webConnect": "Connectez-vous via le Web",

@@ -389,7 +389,8 @@
     "reclaimKept": "Behalten",
     "reclaimHint": "Gestoppte Sitzungen belegen weiterhin Home-Speicher. Nach {{n}} Tagen im gestoppten Zustand werden sie rückgewinnbar, und die am längsten ungenutzten können gelöscht werden, wenn der Speicher eines Knotens knapp wird.",
     "reclaimKeptHint": "Ihre zuletzt gestoppte Sitzung wird nie zurückgewonnen.",
-    "reclaimResumeHint": "Ein Neustart setzt die Frist zurück. Bitte löschen Sie Sitzungen, die Sie nicht mehr aufbewahren müssen."
+    "reclaimResumeHint": "Ein Neustart setzt die Frist zurück. Bitte löschen Sie Sitzungen, die Sie nicht mehr aufbewahren müssen.",
+    "actionFailed": "Die Anfrage konnte nicht abgeschlossen werden"
   },
   "conn": {
     "loading": "Verbindungsinformationen werden geladen…",

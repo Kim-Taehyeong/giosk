@@ -561,5 +561,12 @@
       "teamBody": "{{target}} takım kredileri {{value}} seviyesinde, yani {{threshold}} eşiğinin altındadır. Bu ekibin oturumları yakında durdurulabilir."
     }
   },
-  "close": "Kapalı"
+  "close": "Kapalı",
+  "rowMenu": {
+    "more": "Daha"
+  },
+  "nav": {
+    "openMenu": "Menüyü aç",
+    "label": "Konsol menüsü"
+  }
 }

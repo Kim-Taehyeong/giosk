@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Code2, NotebookPen, TerminalSquare, ChevronRight, Power, RotateCcw, Trash2, Clock } from 'lucide-react';
+import { Code2, NotebookPen, TerminalSquare, Power, RotateCcw, Trash2, Clock, Cpu } from 'lucide-react';
 import PageHead from '../../../components/console/PageHead';
 import Pill from '../../../components/console/Pill';
 import Bar from '../../../components/console/Bar';
 import ConnectionModal from '../../../components/console/ConnectionModal';
+import ReconfigureModal from '../../../components/console/ReconfigureModal';
+import RowMenu from '../../../components/console/RowMenu';
 import { useToast } from '../../../components/console/Toast';
 import { useConfirm } from '../../../components/console/Confirm';
 import { getMySessionsWithUsage, stopSession, startSession, deleteSession, extendSession } from '../../../api/console/sessions';
@@ -28,12 +30,14 @@ export default function Sessions() {
   const { config } = useSystemConfig();
   const creditMode = config.billing.mode === 'credit';
   const dynamicMode = config.billing.mode === 'dynamic';
-  // 기본 10열(상태·이름·종류·오퍼링·노드·사용률·실행시간·접속·작업·상세화살표) + 모드별 1열
+  // 기본 9열(상태·이름·종류·오퍼링·노드·사용률·실행시간·접속·작업) + 모드별 1열
   // (credit=크레딧 / dynamic=남은시간 / free=없음).
-  const colCount = 10 + ((creditMode || dynamicMode) ? 1 : 0);
+  // 상세로 가는 화살표 열은 없앴다 — 행 전체가 클릭이고 키보드로도 열리므로 열 하나를 더 쓸 이유가 없다.
+  const colCount = 9 + ((creditMode || dynamicMode) ? 1 : 0);
   const [rows, setRows] = useState(null);
   const [conn, setConn] = useState(null);
   const [connTab, setConnTab] = useState(null); // 클릭한 채널(모달 초기 탭) — 안 넘기면 항상 VSCode 로 열린다
+  const [reconf, setReconf] = useState(null); // 자원 변경(GPU 붙이기) 대상 세션 — 중단 상태에서만
   const navigate = useNavigate();
   const { toast } = useToast();
   const confirm = useConfirm();
@@ -55,7 +59,23 @@ export default function Sessions() {
     const id = setInterval(load, 4000);
     return () => clearInterval(id);
   }, []);
-  const act = async (fn, id, msg) => { await fn(id); toast(msg); load(); };
+  // 정지·재시작·삭제 공통. 실패도 반드시 말해준다 — 가용성 관문이 재시작을 거절할 수 있는데
+  // (자리 없으면 대기 없이 거절) 조용히 삼키면 사용자에겐 "버튼이 안 먹는다"로 보인다.
+  // 진행 중인 행 동작(연타 방지). 서버도 CAS 로 중복 시작을 막지만, 버튼이 눌리는 족족 요청이
+  // 나가면 두 번째는 "이미 시작 중"이라는 실패 토스트로 돌아와 사용자에겐 오작동처럼 보인다.
+  const [pending, setPending] = useState({});
+  const act = async (fn, id, msg) => {
+    if (pending[id]) return;
+    setPending((p) => ({ ...p, [id]: true }));
+    try {
+      await fn(id);
+      toast(msg);
+    } catch (e) {
+      toast(e?.message || t('session.actionFailed', { defaultValue: '요청을 처리하지 못했습니다' }));
+    }
+    setPending((p) => { const n = { ...p }; delete n[id]; return n; });
+    load();
+  };
   // 임대 연장 — 백엔드가 정책(maxExtensions) 내에서 연장 횟수를 +1(영속). 성공 시 재조회.
   // 연장 시간은 사용자가 고르는 값이 아니라 정책값(lease.extensionHours)이다 — 백엔드 Extend 는
   // 시간 인자를 받지 않고 "maxLeaseHours + 연장횟수 × extensionHours" 로 만료를 계산한다.
@@ -105,9 +125,14 @@ export default function Sessions() {
     );
   };
 
-  // 행 작업 — 실행 중이면 중지, 중단이면 재시작/삭제. 예전엔 이 열에 접속 칩만 있어서
-  // 중단된 세션은 목록에서 아무것도 할 수 없었다(상세로 들어가야만 재시작·삭제 가능).
-  // 중단 세션은 홈 디스크를 계속 물고 있으므로, 정리하는 길이 목록에 바로 있어야 한다.
+  // 행 작업 — 예전엔 이 열에 접속 칩만 있어서 중단된 세션은 목록에서 아무것도 할 수 없었다
+  // (상세로 들어가야만 재시작·삭제 가능). 중단 세션은 홈 디스크를 계속 물고 있으므로,
+  // 정리하는 길이 목록에 바로 있어야 한다 — 그 결정은 유지한다.
+  //
+  // 다만 노출 무게는 다르게 준다. 행마다 "지금 할 일" 하나만 고스트 버튼으로 내놓고
+  // (실행 중=정지, 중단=재시작), 되돌릴 수 없는 삭제는 케밥 메뉴 뒤로 보낸다.
+  // 그래야 행마다 버튼 폭이 같아 열이 세로로 정렬되고, 빨간 아이콘이 상태 배지보다
+  // 시끄러워지는 일도 없다.
   const rowActions = (r) => {
     const stop = () => act(stopSession, r.id, t('session.stopped'));
     const start = () => act(startSession, r.id, t('session.restarted'));
@@ -119,14 +144,22 @@ export default function Sessions() {
     if (r.status === 'running') {
       const canExtend = dynamicMode && r.mode !== 'cpu' && (r.extensionsUsed || 0) < lease.maxExtensions;
       return (<>
-        {canExtend && <button className="btn sm" onClick={() => doExtend(r)} title={t('session.extend')}><Clock size={13} /> {t('session.extend')}</button>}
-        <button className="btn sm" onClick={stop} title={t('session.stop')}><Power size={13} /> {t('session.stop')}</button>
+        <button className="btn sm ghost" onClick={stop} disabled={!!pending[r.id]} title={t('session.stop')}><Power size={13} /> {t('session.stop')}</button>
+        {/* 연장은 동적 임대 모드에서만, 그것도 가끔 쓰는 행위 → 메뉴로 */}
+        <RowMenu label={r.name} items={[
+          canExtend && { key: 'extend', label: t('session.extend'), icon: Clock, onSelect: () => doExtend(r) },
+        ].filter(Boolean)} />
       </>);
     }
     if (r.status === 'stopped') {
       return (<>
-        <button className="btn sm" onClick={start} title={t('session.restart')}><RotateCcw size={13} /> {t('session.restart')}</button>
-        <button className="btn sm danger" onClick={del} title={t('session.delete')}><Trash2 size={13} /></button>
+        <button className="btn sm ghost" onClick={start} disabled={!!pending[r.id]} title={t('session.restart')}><RotateCcw size={13} /> {t('session.restart')}</button>
+        {/* 자원 변경은 중단 상태에서만 가능하다(Pod 스펙은 실행 중 못 바꾼다) — 그래서 이 자리에 둔다.
+            "CPU로 데이터 준비 → GPU 붙이기"가 이 메뉴의 주 용도. */}
+        <RowMenu label={r.name} items={[
+          { key: 'reconf', label: t('reconf.menu'), icon: Cpu, onSelect: () => setReconf(r) },
+          { key: 'delete', label: t('session.delete'), icon: Trash2, tone: 'danger', onSelect: del },
+        ]} />
       </>);
     }
     return null; // provisioning/queued 등 전이 중에는 조작을 막는다(중복 요청 방지)
@@ -180,14 +213,21 @@ export default function Sessions() {
               <th>{t('session.offering')}</th><th>{t('session.detNode')}</th><th>{t('session.usage')}</th><th>{t('session.runtime')}</th>
               {creditMode && <th>{t('session.credit')}</th>}
               {dynamicMode && <th>{t('session.leaseLeftCol')}</th>}
-              <th>{t('session.conn')}</th><th>{t('session.action')}</th><th />
+              <th>{t('session.conn')}</th><th>{t('session.action')}</th>
             </tr>
           </thead>
           <tbody>
             {list.length === 0 && <tr><td colSpan={colCount} style={{ textAlign: 'center', color: 'var(--muted)' }}>{t('common.empty')}</td></tr>}
             {list.map((r) => (
               <tr key={r.id} className="row-link" style={{ cursor: 'pointer' }}
-                onClick={(e) => { if (e.target.closest('button, a, input, select, textarea')) return; navigate(`/console/sessions/${r.id}`); }}>
+                tabIndex={0} aria-label={r.name}
+                onClick={(e) => { if (e.target.closest('button, a, input, select, textarea')) return; navigate(`/console/sessions/${r.id}`); }}
+                onKeyDown={(e) => {
+                  if (e.key !== 'Enter' && e.key !== ' ') return;
+                  if (e.target.closest('button, a, input, select, textarea')) return; // 행 안 컨트롤의 키 입력은 그쪽 것
+                  e.preventDefault();
+                  navigate(`/console/sessions/${r.id}`);
+                }}>
                 <td>{statusPill(r.status)}{reclaimPill(r)}</td>
                 <td style={{ fontWeight: 600 }}>{r.name}</td>
                 <td>{modePill(r.mode)}</td>
@@ -203,7 +243,6 @@ export default function Sessions() {
                     : <span className="muted">—</span>}
                 </td>
                 <td className="flex">{rowActions(r) || <span className="muted">—</span>}</td>
-                <td><ChevronRight size={15} style={{ color: 'var(--muted)' }} /></td>
               </tr>
             ))}
           </tbody>
@@ -211,6 +250,8 @@ export default function Sessions() {
       </div>
 
       <ConnectionModal session={conn} initialTab={connTab} onClose={() => setConn(null)} />
+      {/* 세션별 key + 조건부 렌더 — 선택 상태가 그 세션의 현재 사양에서 시작하도록 새로 마운트한다. */}
+      {reconf && <ReconfigureModal key={reconf.id} session={reconf} onClose={() => setReconf(null)} onDone={load} />}
     </div>
   );
 }
