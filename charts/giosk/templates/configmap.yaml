@@ -41,6 +41,10 @@ data:
   GIOSK_DATASETS_NFS_SERVER: {{ .Values.storage.datasets.nfs.server | quote }}
   GIOSK_DATASETS_NFS_PATH: {{ .Values.storage.datasets.nfs.path | quote }}
   GIOSK_DATASET_CACHE_HOSTPATH: {{ .Values.storage.datasets.cacheHostPath | default "/dataset-cache" | quote }}
+  {{- if .Values.storage.datasets.enabled }}
+  # 파일(zip/tar) 직접 업로드: API 파드에 데이터셋 NFS 가 마운트된 로컬 경로(api-deployment 가 이 경로로 마운트).
+  GIOSK_DATASETS_NFS_MOUNT: "/nfs-datasets"
+  {{- end }}
   GIOSK_PHYSICAL_NODES_ENABLED: {{ .Values.physicalNodes.enabled | quote }}
   GIOSK_PHYSICAL_LABEL: {{ .Values.physicalNodes.label | default "giosk.io/physical" | quote }}
   # NVIDIA device plugin 설정 ConfigMap(GPU Operator). 지정 시 웹에서 타임셰어링을 켜면

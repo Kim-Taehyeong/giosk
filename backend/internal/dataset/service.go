@@ -3,8 +3,11 @@ package dataset
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -53,6 +56,7 @@ func remoteSize(url string) int64 {
 type Provisioner interface {
 	CreatePVC(ctx context.Context, s k8s.PVCSpec) error
 	RunDatasetFetch(ctx context.Context, ns, jobName, nfsServer, nfsBase, name, url string) error // mkdir <base>/dataset/<name> + curl
+	RunDatasetExtract(ctx context.Context, ns, jobName, nfsServer, nfsBase, name string) error    // NFS 에 이미 올라온 아카이브 제자리 해제(업로드 경로)
 	EnsureSharedNFSPVC(ctx context.Context, s k8s.SharedNFSSpec) error                            // 정규경로에 정적 NFS PVC 바인딩
 	RunDatasetCache(ctx context.Context, ns, jobName, node, nfsServer, nfsDatasetPath, hostBase, name string) error
 	RunDatasetUncache(ctx context.Context, ns, jobName, node, hostBase, name string) error
@@ -70,6 +74,7 @@ type Service struct {
 	nfsServer    string // 데이터셋 정규 NFS 서버(설정 시 정규경로 모드)
 	nfsBase      string // 데이터셋 정규 NFS 베이스(예: /export) — 데이터는 <base>/dataset/<name>
 	cacheHost    string // 노드 로컬 캐시 루트(hostPath, 예: /dataset-cache)
+	nfsMount     string // API 파드에 데이터셋 NFS 가 마운트된 로컬 경로(파일 업로드 직접 기록). 빈값=업로드 비활성.
 	met          *metrics.Client // 다운로드 진행률(다운로드 Pod 수신 바이트) 조회용
 }
 
@@ -84,6 +89,12 @@ func (s *Service) WithStorage(prov Provisioner, storageClass, namespace, nfsServ
 	s.nfsServer, s.nfsBase, s.cacheHost = nfsServer, nfsBase, cacheHost
 	return s
 }
+
+// WithUploadMount는 파일 업로드용 로컬 NFS 마운트 경로를 주입한다(설정 시 zip/tar 직접 업로드 가능).
+func (s *Service) WithUploadMount(path string) *Service { s.nfsMount = path; return s }
+
+// UploadEnabled는 파일 직접 업로드 가능 여부(정규경로 모드 + NFS 로컬 마운트 존재).
+func (s *Service) UploadEnabled() bool { return s.canonical() && s.nfsMount != "" }
 
 // CacheHostPath는 노드 로컬 캐시 루트(세션 hostPath 마운트 산정용). 빈값=캐시 비활성.
 func (s *Service) CacheHostPath() string { return s.cacheHost }
@@ -335,6 +346,72 @@ func (s *Service) Register(userID int64, req RegisterReq) error {
 				_ = s.repo.SetRequestSize(id, b)
 			}
 		}(r.ID, r.SourceURL)
+	}
+	return nil
+}
+
+// safeArchiveName은 업로드 파일명을 안전한 기본명으로 정리한다(경로 조작 방지).
+// 허용 확장자(zip/tar/tar.gz/tgz)만; 그 외는 단일 파일로 그대로 저장(해제 잡이 스킵).
+func safeArchiveName(fn string) string {
+	base := filepath.Base(strings.ReplaceAll(fn, "\\", "/"))
+	base = strings.TrimSpace(base)
+	if base == "" || base == "." || base == ".." {
+		return "upload.bin"
+	}
+	return base
+}
+
+// Upload는 최고관리자가 zip/tar 아카이브(또는 단일 파일)를 직접 업로드해 데이터셋으로 등록한다.
+// API 가 NFS(<mount>/dataset/<name>)에 스트리밍 기록 → 해제 Job(dl-ds-<id>) → 리컨실러가 PVC 바인딩+ready.
+// 업로드는 승인 절차 없이 즉시 정규경로 데이터셋을 만든다(최고관리자 전용 라우트에서만 호출).
+func (s *Service) Upload(ctx context.Context, userID int64, name, scope, ownerName, filename string, size int64, src io.Reader) error {
+	if !s.UploadEnabled() {
+		return fmt.Errorf("파일 업로드가 비활성화되어 있습니다(데이터셋 NFS 마운트 필요)")
+	}
+	if scope == "" {
+		scope = ScopeGlobal
+	}
+	if s.repo.NameTaken(name) {
+		return ErrNameTaken
+	}
+	// 1) NFS 에 스트리밍 기록: <mount>/dataset/<name>/<archive>
+	dir := filepath.Join(s.nfsMount, "dataset", name)
+	if err := os.MkdirAll(dir, 0o777); err != nil {
+		return fmt.Errorf("데이터셋 디렉터리 생성 실패: %w", err)
+	}
+	arc := safeArchiveName(filename)
+	dst := filepath.Join(dir, arc)
+	f, err := os.Create(dst)
+	if err != nil {
+		return fmt.Errorf("업로드 파일 생성 실패: %w", err)
+	}
+	written, werr := io.Copy(f, src)
+	cerr := f.Close()
+	if werr != nil {
+		_ = os.Remove(dst)
+		return fmt.Errorf("업로드 저장 실패: %w", werr)
+	}
+	if cerr != nil {
+		return fmt.Errorf("업로드 파일 마감 실패: %w", cerr)
+	}
+	// 2) 데이터셋 레코드(정규경로, loading). PVC 크기는 아카이브의 3배로 넉넉히 잡되(NFS 정적 PVC 는 미강제),
+	//    상태 정확성보다 여유가 낫다.
+	status := StatusActive
+	if scope == ScopePersonal {
+		status = StatusPrivate
+	}
+	d := &Dataset{
+		Name: name, Scope: scope, Owner: ownerName, OwnerUserID: &userID,
+		SizeBytes: written * 3, Status: status, LoadStatus: "loading",
+	}
+	if err := s.repo.CreateDataset(d); err != nil {
+		_ = os.RemoveAll(dir)
+		return err
+	}
+	// 3) 해제 Job(다운로드 없이 제자리 해제). 리컨실러가 dl-ds-<id> 완료를 보고 PVC 바인딩+ready.
+	if err := s.prov.RunDatasetExtract(ctx, s.namespace, fmt.Sprintf("dl-ds-%d", d.ID), s.nfsServer, s.nfsBase, d.Name); err != nil {
+		log.Printf("[dataset] 업로드 해제 Job 실패 ds %d: %v", d.ID, err)
+		_ = s.repo.SetLoadStatus(d.ID, "failed")
 	}
 	return nil
 }

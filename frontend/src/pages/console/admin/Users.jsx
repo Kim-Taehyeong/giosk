@@ -14,6 +14,7 @@ import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { useAuth } from '../../../context/AuthContext';
 import { getUsers, grantUserCredit, updateUserStatus, createUser, bulkCreateUsers } from '../../../api/console/misc';
 import { getOrgs, getGroups } from '../../../api/console/governance';
+import { c, cU } from '../../../lib/credit';
 
 const roleVariant = { member: 'pause', admin: 'err' };
 // 멤버십(조직/팀) 역할 — 플랫폼 역할과 색을 구분해 둘을 헷갈리지 않게.
@@ -139,8 +140,8 @@ export default function Users() {
               ? <Pill variant={memberRoleVariant[r.memberRole] || 'pause'}>{t(`roles.${r.memberRole}`)}</Pill>
               : <span className="muted">—</span>) },
             ...(creditMode ? [
-              { key: 'balance', header: t('users.colBalance', { defaultValue: '현재 잔여' }), render: (r) => <b>{r.balance || 0} C</b> },
-              { key: 'refill', header: t('users.colRefill', { defaultValue: '정기 리필' }), render: (r) => (r.recurringCredit ? <span>{r.recurringCredit} C <span className="muted" style={{ fontSize: 12 }}>/ {r.refillIntervalDays || t('users.refillDefault', { defaultValue: '기본' })}{r.refillIntervalDays ? '일' : ''}</span></span> : <span className="muted">—</span>) },
+              { key: 'balance', header: t('users.colBalance', { defaultValue: '현재 잔여' }), render: (r) => <b>{cU(r.balance)}</b> },
+              { key: 'refill', header: t('users.colRefill', { defaultValue: '정기 리필' }), render: (r) => (r.recurringCredit ? <span>{c(r.recurringCredit)} C <span className="muted" style={{ fontSize: 12 }}>/ {r.refillIntervalDays || t('users.refillDefault', { defaultValue: '기본' })}{r.refillIntervalDays ? '일' : ''}</span></span> : <span className="muted">—</span>) },
             ] : []),
             { key: 'status', header: t('users.colStatus'), render: (r) => <Pill variant={statusVariant[r.status] || 'pause'} dot>{r.status}</Pill> },
             { key: 'act', header: t('users.colAct'), className: 'flex', render: (r) => (

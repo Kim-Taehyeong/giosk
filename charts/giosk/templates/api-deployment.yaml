@@ -82,6 +82,18 @@ spec:
           resources:
             requests: { cpu: 100m, memory: 128Mi }
             limits: { cpu: "1", memory: 512Mi }
+          {{- if .Values.storage.datasets.enabled }}
+          # 데이터셋 파일 업로드용: API 가 NFS(<base>/dataset/<name>)에 직접 스트리밍 기록.
+          volumeMounts:
+            - { name: dataset-nfs, mountPath: /nfs-datasets }
+          {{- end }}
+      {{- if .Values.storage.datasets.enabled }}
+      volumes:
+        - name: dataset-nfs
+          nfs:
+            server: {{ .Values.storage.datasets.nfs.server | quote }}
+            path: {{ .Values.storage.datasets.nfs.path | quote }}
+      {{- end }}
 ---
 apiVersion: v1
 kind: Service

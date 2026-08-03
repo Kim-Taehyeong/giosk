@@ -228,6 +228,7 @@ func main() {
 	datasetSvc := dataset.NewService(dataset.NewRepository(db)).
 		WithStorage(kc, cfg.Storage.NFSClass, cfg.K8s.NamespacePrefix+"datasets",
 					cfg.Storage.Datasets.NFS.Server, cfg.Storage.Datasets.NFS.Path, cfg.Storage.DatasetCacheHost).
+		WithUploadMount(cfg.Storage.Datasets.LocalMount). // zip/tar 직접 업로드(설정 시 API 가 NFS 에 직접 기록)
 		WithMetrics(met) // 다운로드 진행률(%)
 	go datasetSvc.RunReconciler(context.Background(), 10*time.Second)
 	sessionSvc.WithDatasetCache(datasetSvc) // 세션이 캐시된 노드선 데이터셋을 hostPath 로 마운트

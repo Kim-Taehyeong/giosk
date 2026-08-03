@@ -170,15 +170,16 @@ func (r *gormRepo) NameCreditsScoped(kind string, orgID, groupID int64, limit in
 			where += " AND g.org_id=?"
 			args = append(args, orgID)
 		}
-		r.db.Raw(`SELECT g.display_name AS name, w.balance AS credit
-			FROM group_wallets w JOIN `+"`groups`"+` g ON g.id=w.group_id
-			WHERE `+where+` ORDER BY w.balance DESC LIMIT ?`, append(args, limit)...).Scan(&out)
+		// "상위 그룹" = 소비(누적 사용 크레딧) 순. 잔액이 아니라 memberships.consumed 합계.
+		r.db.Raw(`SELECT g.display_name AS name, COALESCE(SUM(m.consumed),0) AS credit
+			FROM `+"`groups`"+` g LEFT JOIN memberships m ON m.group_id=g.id
+			WHERE `+where+` GROUP BY g.id, g.display_name ORDER BY credit DESC LIMIT ?`, append(args, limit)...).Scan(&out)
 		return out
 	}
-	cl, args := userScopeClause("w.user_id", orgID, groupID)
-	// 멤버십 지갑((user,group))이라 유저별 합산 — 안 그러면 한 유저가 팀 수만큼 중복.
-	r.db.Raw(`SELECT u.username AS name, CAST(SUM(w.balance) AS SIGNED) AS credit
-		FROM user_wallets w JOIN users u ON u.id=w.user_id
+	cl, args := userScopeClause("m.user_id", orgID, groupID)
+	// "상위 사용자" = 소비 순. 멤버십별 consumed 를 유저 단위로 합산.
+	r.db.Raw(`SELECT u.username AS name, COALESCE(SUM(m.consumed),0) AS credit
+		FROM memberships m JOIN users u ON u.id=m.user_id
 		WHERE `+cl+` GROUP BY u.id, u.username ORDER BY credit DESC LIMIT ?`, append(args, limit)...).Scan(&out)
 	return out
 }
@@ -187,12 +188,13 @@ func (r *gormRepo) NameCredits(scope string, limit int) []NameCredit {
 	var out []NameCredit
 	switch scope {
 	case "group":
-		r.db.Raw(`SELECT g.display_name AS name, w.balance AS credit
-			FROM group_wallets w JOIN `+"`groups`"+` g ON g.id = w.group_id
-			ORDER BY w.balance DESC LIMIT ?`, limit).Scan(&out)
+		// 소비 순(잔액 아님). memberships.consumed 합계.
+		r.db.Raw(`SELECT g.display_name AS name, COALESCE(SUM(m.consumed),0) AS credit
+			FROM `+"`groups`"+` g LEFT JOIN memberships m ON m.group_id = g.id
+			WHERE g.status='active' GROUP BY g.id, g.display_name ORDER BY credit DESC LIMIT ?`, limit).Scan(&out)
 	case "org":
-		r.db.Raw(`SELECT u.username AS name, CAST(SUM(w.balance) AS SIGNED) AS credit
-			FROM user_wallets w JOIN users u ON u.id = w.user_id
+		r.db.Raw(`SELECT u.username AS name, COALESCE(SUM(m.consumed),0) AS credit
+			FROM memberships m JOIN users u ON u.id = m.user_id
 			GROUP BY u.id, u.username ORDER BY credit DESC LIMIT ?`, limit).Scan(&out)
 	}
 	return out

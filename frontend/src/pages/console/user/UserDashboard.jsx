@@ -13,6 +13,7 @@ import { getAvailability } from '../../../api/console/resources';
 import { getAnnouncements } from '../../../api/console/announcements';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { useAuth } from '../../../context/AuthContext';
+import { c } from '../../../lib/credit';
 
 // 공지 레벨별 스타일. critical 은 사용자가 닫을 수 없음(고정 노출).
 const NOTICE_STYLE = {
@@ -160,10 +161,10 @@ export default function UserDashboard() {
           </>
         ) : creditMode ? (
           <>
-            <StatCard icon={Coins} tone="gpu" label={t('dash.kpiBalance')} value={`${k.balance}`} unit={`/ ${k.cap} C`} bar={{ value: k.balance, max: k.cap, variant: 'gpu' }} />
+            <StatCard icon={Coins} tone="gpu" label={t('dash.kpiBalance')} value={c(k.balance)} unit={`/ ${c(k.cap)} C`} bar={{ value: k.balance, max: k.cap, variant: 'gpu' }} />
             <StatCard icon={Layers} tone="free" label={t('dash.kpiSessions')} value={`${k.activeSessions}`} unit={k.maxSessions ? `/ ${k.maxSessions}` : '/ ∞'} bar={k.maxSessions ? { value: k.activeSessions, max: k.maxSessions, variant: 'free' } : undefined} />
             <StatCard icon={Clock} tone="gpu" label={t('dash.kpiGpuHours')} value={`${k.gpuHoursMonth}`} unit={t('dash.hoursUnit')} />
-            <StatCard icon={Hourglass} tone="warn" label={t('dash.kpiEta')} value={t('dash.kpiEtaVal', { n: k.etaDays })} unit={`(${k.burn} C/day)`} />
+            <StatCard icon={Hourglass} tone="warn" label={t('dash.kpiEta')} value={t('dash.kpiEtaVal', { n: k.etaDays })} unit={`(${c(k.burn)} C/day)`} />
           </>
         ) : (
           <>
@@ -269,7 +270,7 @@ export default function UserDashboard() {
             { key: 'name', header: t('dash.colName') },
             { key: 'kind', header: t('dash.colKind'), render: (r) => <Pill variant={r.kind.includes('CPU') ? 'free' : 'gpu'}>{r.kind}</Pill> },
             { key: 'spec', header: t('dash.colSpec'), className: 'mono' },
-            ...(creditMode ? [{ key: 'credit', header: t('dash.colCredit'), render: (r) => (r.credit ? `${r.credit} C/h` : t('dash.free')) }] : []),
+            ...(creditMode ? [{ key: 'credit', header: t('dash.colCredit'), render: (r) => (r.credit ? `${c(r.credit)} C/h` : t('dash.free')) }] : []),
             { key: 'conn', header: t('dash.colConn'), render: (r) => (
               (r.status === 'running' && (r.conn || []).length)
                 ? <span className="flex" style={{ gap: 6, flexWrap: 'wrap' }}>

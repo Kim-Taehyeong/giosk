@@ -13,6 +13,7 @@ import { useConfirm } from '../../../components/console/Confirm';
 import { getMySessionsWithUsage, stopSession, startSession, deleteSession, extendSession, getSessionAudit } from '../../../api/console/sessions';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { measureRows, gpuUnmeasurable } from '../../../utils/sessionUsage';
+import { cU } from '../../../lib/credit';
 
 const CONN_ICON = { vscode: Code2, jupyter: NotebookPen, ssh: TerminalSquare, terminal: TerminalSquare };
 const CONN_LABEL = { vscode: 'VSCode', jupyter: 'Jupyter', ssh: 'SSH', terminal: 'SSH' };
@@ -154,7 +155,7 @@ export default function Sessions() {
                 <td className="mono" style={{ fontSize: 12 }}>{r.node || '—'}{r.gpuId ? <span className="muted"> · {r.gpuId}</span> : null}</td>
                 <td>{usageCell(r)}</td>
                 <td>{r.runtime}{r.idleMin > 0 && <span className="muted"> ({t('session.idle', { n: r.idleMin })})</span>}</td>
-                {creditMode && <td>{r.pricePerHour > 0 ? `${r.credit || 0} C` : t('session.free')}</td>}
+                {creditMode && <td>{r.pricePerHour > 0 ? cU(r.credit) : t('session.free')}</td>}
                 {dynamicMode && <td>{r.mode === 'cpu' ? '—' : leaseLeftText(r)}</td>}
                 <td className="flex">
                   {r.status === 'running' && r.conn.length

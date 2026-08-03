@@ -16,6 +16,7 @@ import { useConfirm } from '../../../components/console/Confirm';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { getOrgs, getGroups, createGroup, deleteGroup, grantOrgCredit, updateOrg, deleteOrg } from '../../../api/console/governance';
 import { getUsers } from '../../../api/console/misc';
+import { c, cU } from '../../../lib/credit';
 
 const roleVariant = { org_admin: 'gpu', project_admin: 'primary', member: 'pause' };
 
@@ -125,7 +126,7 @@ export default function OrgDetail() {
       <div className={`grid ${creditMode ? 'cols-3' : 'cols-2'} mb`}>
         <StatCard icon={Layers} tone="primary" label={t('orgs.colGroups')} value={`${groups.length}`} />
         <StatCard icon={Users} tone="free" label={t('orgs.colUsers')} value={`${org?.userCount ?? users.length}`} />
-        {creditMode && <StatCard icon={Coins} tone="gpu" label={t('orgs.colPool')} value={`${org?.creditPool ?? 0}`} unit="C" />}
+        {creditMode && <StatCard icon={Coins} tone="gpu" label={t('orgs.colPool')} value={c(org?.creditPool)} unit="C" />}
       </div>
 
       {creditMode && (
@@ -149,7 +150,7 @@ export default function OrgDetail() {
             { key: 'displayName', header: t('groups.colGroup'), render: (r) => (
               <span>{r.displayName} <span className="muted mono" style={{ fontSize: 11.5 }}>({r.name})</span></span>) },
             { key: 'memberCount', header: t('groups.colMembers'), render: (r) => t('groups.memberN', { n: r.memberCount }) },
-            ...(creditMode ? [{ key: 'balance', header: t('groups.colWallet'), render: (r) => `${r.balance || 0} C` }] : []),
+            ...(creditMode ? [{ key: 'balance', header: t('groups.colWallet'), render: (r) => cU(r.balance) }] : []),
             { key: 'status', header: t('groups.colStatus'), render: (r) => <Pill variant="ok" dot>{r.status}</Pill> },
             { key: 'act', header: t('groups.colAct'), className: 'flex', render: (r) => (
               <span className="flex gap">

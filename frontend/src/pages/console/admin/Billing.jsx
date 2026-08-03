@@ -7,6 +7,7 @@ import Pill from '../../../components/console/Pill';
 import PagedTable from '../../../components/console/PagedTable';
 import { getBilling } from '../../../api/console/misc';
 import { downloadCsv } from '../../../utils/csv';
+import { cU } from '../../../lib/credit';
 
 export default function Billing() {
   const { t } = useTranslation('consoleAdmin');
@@ -36,8 +37,8 @@ export default function Billing() {
       <PageHead title={t('billing.title')} subtitle={t('billing.subtitle')}
         actions={<button className="btn" onClick={exportCsv}>{t('billing.csv')}</button>} />
       <div className="grid cols-3 mb">
-        <StatCard icon={Coins} tone="gpu" label={t('billing.totalConsumed')} value={`${d.totalConsumed} C`} />
-        <StatCard icon={WalletIcon} tone="primary" label={t('billing.totalBudget')} value={`${d.totalBudget} C`} />
+        <StatCard icon={Coins} tone="gpu" label={t('billing.totalConsumed')} value={cU(d.totalConsumed)} />
+        <StatCard icon={WalletIcon} tone="primary" label={t('billing.totalBudget')} value={cU(d.totalBudget)} />
         <StatCard icon={Percent} tone="warn" label={t('billing.vsBudget')} value={d.totalBudget ? `${Math.round(d.totalConsumed / d.totalBudget * 100)}%` : '—'} />
       </div>
 
@@ -56,7 +57,7 @@ export default function Billing() {
             { key: 'groups', header: t('billing.groupCount') },
             { key: 'users', header: t('billing.userCount') },
             { key: 'gpuHours', header: t('billing.gpuHours'), render: (r) => `${r.gpuHours} h` },
-            { key: 'consumed', header: t('billing.consumed'), render: (r) => `${r.consumed} C` },
+            { key: 'consumed', header: t('billing.consumed'), render: (r) => cU(r.consumed) },
             { key: 'pool', header: t('billing.vsAlloc'), render: (r) => <Pill variant={r.consumed >= r.creditPool ? 'err' : 'ok'}>{Math.round(r.consumed / r.creditPool * 100)}%</Pill> },
           ]} />
         )}
@@ -67,8 +68,8 @@ export default function Billing() {
             { key: 'orgName', header: t('billing.org') },
             { key: 'sessions', header: t('billing.sessions') },
             { key: 'gpuHours', header: t('billing.gpuHours'), render: (r) => `${r.gpuHours} h` },
-            { key: 'consumed', header: t('billing.consumed'), render: (r) => `${r.consumed} C` },
-            { key: 'budgetCap', header: t('billing.budget'), render: (r) => (r.budgetCap ? `${r.budgetCap} C` : t('billing.notSet')) },
+            { key: 'consumed', header: t('billing.consumed'), render: (r) => cU(r.consumed) },
+            { key: 'budgetCap', header: t('billing.budget'), render: (r) => (r.budgetCap ? cU(r.budgetCap) : t('billing.notSet')) },
             { key: 'usagePct', header: t('billing.vsBudget2'), render: (r) => <Pill variant={r.usagePct >= 100 ? 'err' : r.usagePct >= 80 ? 'warn' : 'ok'}>{Math.round(r.usagePct)}%</Pill> },
           ]} />
         )}
@@ -79,7 +80,7 @@ export default function Billing() {
             { key: 'group', header: t('billing.group'), render: (r) => <Pill variant="primary">{r.group}</Pill> },
             { key: 'sessions', header: t('billing.sessions') },
             { key: 'gpuHours', header: t('billing.gpuHours'), render: (r) => `${r.gpuHours} h` },
-            { key: 'consumed', header: t('billing.consumed'), render: (r) => `${r.consumed} C` },
+            { key: 'consumed', header: t('billing.consumed'), render: (r) => cU(r.consumed) },
           ]} />
         )}
       </div>

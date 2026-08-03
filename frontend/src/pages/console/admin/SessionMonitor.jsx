@@ -9,6 +9,7 @@ import { useSystemConfig } from '../../../context/SystemConfigContext';
 import Bar from '../../../components/console/Bar';
 import { getAllSessionsWithUsage } from '../../../api/console/sessions';
 import { measureRows, gpuUnmeasurable } from '../../../utils/sessionUsage';
+import { cU } from '../../../lib/credit';
 
 // 상태 → (Pill 변형, i18n 키). 미정의 상태는 원문 표시(폴백).
 const ST = {
@@ -81,7 +82,7 @@ export default function SessionMonitor() {
             { key: 'runtime', header: t('monitor.runtime'), render: (r) => (
               <span>{r.runtime}{r.idle > 0 && <span className="muted"> ({t('monitor.idle', { n: r.idle })})</span>}</span>
             ) },
-            ...(creditMode ? [{ key: 'credit', header: t('monitor.credit'), render: (r) => `${r.credit} C` }] : []),
+            ...(creditMode ? [{ key: 'credit', header: t('monitor.credit'), render: (r) => cU(r.credit) }] : []),
             { key: 'act', header: '', render: () => <ChevronRight size={15} style={{ color: 'var(--muted)' }} /> },
           ]}
         />

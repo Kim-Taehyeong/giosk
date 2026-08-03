@@ -9,6 +9,7 @@ import Modal from '../../../components/console/Modal';
 import UserPicker from '../../../components/console/UserPicker';
 import Advanced, { Req } from '../../../components/console/Advanced';
 import BulkImport from '../../../components/console/BulkImport';
+import { c, cU } from '../../../lib/credit';
 import { useToast } from '../../../components/console/Toast';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { getGroups, getOrgs, createGroup } from '../../../api/console/governance';
@@ -66,8 +67,8 @@ export default function Groups() {
             { key: 'orgName', header: t('groups.colOrg') },
             { key: 'memberCount', header: t('groups.colMembers'), render: (r) => t('groups.memberN', { n: r.memberCount }) },
             ...(creditMode ? [
-              { key: 'wallet', header: t('groups.colWallet', { defaultValue: '현재 잔여' }), render: (r) => <b>{r.balance || 0} C</b> },
-              { key: 'refill', header: t('groups.colRefill', { defaultValue: '정기 리필' }), render: (r) => (r.recurringCredit ? <span>{r.recurringCredit} C <span className="muted" style={{ fontSize: 12 }}>/ {r.refillIntervalDays || t('groups.refillDefault', { defaultValue: '기본' })}{r.refillIntervalDays ? '일' : ''}</span></span> : <span className="muted">—</span>) },
+              { key: 'wallet', header: t('groups.colWallet', { defaultValue: '현재 잔여' }), render: (r) => <b>{cU(r.balance)}</b> },
+              { key: 'refill', header: t('groups.colRefill', { defaultValue: '정기 리필' }), render: (r) => (r.recurringCredit ? <span>{c(r.recurringCredit)} C <span className="muted" style={{ fontSize: 12 }}>/ {r.refillIntervalDays || t('groups.refillDefault', { defaultValue: '기본' })}{r.refillIntervalDays ? '일' : ''}</span></span> : <span className="muted">—</span>) },
             ] : []),
             { key: 'status', header: t('groups.colStatus'), render: (r) => <Pill variant="ok" dot>{r.status}</Pill> },
             { key: 'act', header: t('groups.colAct'), className: 'flex', render: () => (
