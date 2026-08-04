@@ -31,7 +31,9 @@ type Inbox interface {
 type UserMetricFn func(ctx context.Context, metric string) (map[int64]float64, bool)
 
 // SessionMetricFn은 세션 단위 지표(session_gpu/cpu/vram, %)를 특정 세션에서 평가한다(미가용이면 ok=false).
-type SessionMetricFn func(ctx context.Context, metric, instanceID string) (float64, bool)
+// 인자 순서는 구현(session.Service.SessionMetric)과 반드시 같아야 한다. 둘 다 string 이라
+// 뒤바뀌어도 컴파일이 통과하고, 그러면 지표 이름으로 세션을 찾다가 조용히 못 찾는다.
+type SessionMetricFn func(ctx context.Context, instanceID, metric string) (float64, bool)
 
 // TeamBalance는 한 사용자의 팀별 크레딧 잔액이다. Active 는 그 팀을 실제로 쓰는지(세션이나 소비 이력)를 뜻하며, 안 쓰는 빈 팀의 알림을 억제한다.
 type TeamBalance struct {
@@ -155,7 +157,7 @@ func (e *Engine) userTick(ctx context.Context) {
 			if e.sessMetric == nil {
 				continue
 			}
-			v, good := e.sessMetric(ctx, r.Metric, r.Target)
+			v, good := e.sessMetric(ctx, r.Target, r.Metric)
 			if !good {
 				continue // 세션이 없거나 정지했거나 측정 불가면 발화하지 않는다
 			}
