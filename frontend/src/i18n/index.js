@@ -33,11 +33,28 @@ async function fetchLanguage(lng) {
 // init 이후에 언어를 추가로 받아 넣는다.
 // (init 전에는 i18next 의 리소스 저장소가 없어 addResourceBundle 을 부를 수 없다. 그래서 초기 언어는
 //  아래에서 미리 받아 init 의 resources 로 넘긴다.)
-async function loadLanguage(lng) {
-  if (!lng || loaded.has(lng) || !index[lng]) return;
-  loaded.add(lng);
-  const bundles = await fetchLanguage(lng);
-  for (const [ns, bundle] of Object.entries(bundles)) i18n.addResourceBundle(lng, ns, bundle, true, true);
+//
+// 진행 중인 요청은 loading 에 담아 같은 언어를 두 번 받지 않는다. loaded 표시는 실제로 다 넣은
+// 뒤에 한다. 먼저 표시하면 아직 안 들어온 언어를 "이미 있다"고 보고 그냥 지나친다.
+const loading = new Map();
+function loadLanguage(lng) {
+  if (!lng || !index[lng] || loaded.has(lng)) return Promise.resolve();
+  if (loading.has(lng)) return loading.get(lng);
+  const p = fetchLanguage(lng)
+    .then((bundles) => {
+      for (const [ns, bundle] of Object.entries(bundles)) i18n.addResourceBundle(lng, ns, bundle, true, true);
+      loaded.add(lng);
+    })
+    .finally(() => loading.delete(lng));
+  loading.set(lng, p);
+  return p;
+}
+
+// 언어 전환은 번역을 받은 뒤에 한다. 먼저 바꾸면 아직 번역이 없어 영어로 한 번 그려지고,
+// 뒤늦게 도착한 번역이 화면에 반영되지 않는다(바로 그 증상이 있었다).
+export async function setLanguage(lng) {
+  await loadLanguage(lng);
+  await i18n.changeLanguage(lng);
 }
 
 // 문서 방향/언어 속성 반영(RTL 언어 지원).
@@ -90,13 +107,16 @@ i18n
       lookupLocalStorage: 'giosk_lang',
       caches: ['localStorage'],
     },
+    // 번역을 지연 로딩하므로 리소스가 나중에 들어온다. bindI18nStore 를 켜지 않으면
+    // addResourceBundle 로 번역이 도착해도 컴포넌트가 다시 그려지지 않아 영어가 그대로 남는다.
+    react: { bindI18nStore: 'added' },
   });
 
-// 언어를 바꾸면 그 언어를 받아온 뒤 다시 그려준다.
+// setLanguage 를 거치지 않고 언어가 바뀌는 경로(감지기 등)를 위한 그물이다.
+// 번역이 없으면 받아오고, 도착하면 bindI18nStore 가 다시 그린다.
 i18n.on('languageChanged', (lng) => {
   applyDir(lng);
-  if (loaded.has(lng) || !index[lng]) return;
-  loadLanguage(lng).then(() => i18n.changeLanguage(lng));
+  loadLanguage(lng);
 });
 applyDir(i18n.resolvedLanguage || i18n.language);
 
