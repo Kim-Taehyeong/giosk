@@ -422,7 +422,14 @@
     "appliedStarted": "Resources changed; start requested",
     "failed": "Could not change the resources",
     "startBlocked": "No room on this node right now, so it cannot start immediately. Save the spec and restart once capacity frees up.",
-    "shareOff": "GPU sharing (HAMi) is off on this node, so shared GPU is unavailable. Ask an administrator to enable sharing on it."
+    "shareOff": "GPU sharing (HAMi) is off on this node, so shared GPU is unavailable. Ask an administrator to enable sharing on it.",
+    "currentBadge": "Current",
+    "whyNoGpu": "This node has no GPU.",
+    "whyShareOff": "GPU sharing (HAMi) is off on this node. Ask an administrator.",
+    "whyNoOffering": "No shared offering exists for this GPU.",
+    "whyAllShared": "This node is sharing-only, so a whole card cannot be assigned.",
+    "full": "No capacity",
+    "tooBig": "Exceeds this node"
   },
   "conn": {
     "title": "Connect — {{name}}",

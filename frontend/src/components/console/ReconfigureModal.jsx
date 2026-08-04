@@ -28,17 +28,27 @@ const MODES = [
   { key: 'exclusive', icon: Lock },
 ];
 
-function ModeBox({ on, onClick, icon, title, desc }) {
+// 쓸 수 없는 모드는 누르지 못하게 하고 그 자리에 이유를 적는다. 눌러 놓고 나중에 막으면
+// 사용자는 무엇이 잘못됐는지 모른 채 되돌아 나와야 한다.
+function ModeBox({ on, onClick, icon, title, desc, disabled, reason, current, currentLabel }) {
   const Icon = icon;
   return (
-    <div className={`selbox${on ? ' on' : ''}`} {...clickable(onClick)}
-      style={{ padding: 12, borderRadius: 10, cursor: 'pointer',
+    <div className={`selbox${on ? ' on' : ''}`} {...(disabled ? { 'aria-disabled': true } : clickable(onClick))}
+      title={disabled ? reason : undefined}
+      style={{ padding: 12, borderRadius: 10,
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.5 : 1,
+        filter: disabled ? 'saturate(.3)' : 'none',
         border: '2px solid ' + (on ? 'var(--primary)' : 'var(--border)'),
         background: on ? 'var(--primary-soft)' : 'var(--surface)' }}>
       <div style={{ fontWeight: 800, fontSize: 14, display: 'flex', alignItems: 'center', gap: 7 }}>
         {on && <Check size={14} color="var(--primary)" />}<Icon size={15} /> {title}
+        {current && <Pill variant="primary">{currentLabel}</Pill>}
       </div>
       <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>{desc}</div>
+      {disabled && reason && (
+        <div style={{ fontSize: 11.5, marginTop: 6, color: 'var(--warn)' }}>{reason}</div>
+      )}
     </div>
   );
 }
@@ -53,7 +63,7 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
   const [data, setData] = useState(null); // { offerings, gpuTypes, cpuPrice, images, byNode }
   // 선택 상태는 현재 사양에서 출발한다. 카탈로그를 받고 나면 유효하지 않은 선택은 아래에서
   // 유효한 값으로 해석해 쓴다(effective*). 상태를 effect 로 되돌려 쓰면 렌더가 연쇄된다.
-  const [mode, setMode] = useState(spec.gpuMode || 'cpu');
+  const [modeSel, setMode] = useState(spec.gpuMode || 'cpu');
   const [gpuType, setGpuType] = useState(spec.gpuType || '');
   const [offeringId, setOfferingId] = useState(spec.offeringId || null);
   const [gpuCount, setGpuCount] = useState(spec.gpuCount || 1);
@@ -81,6 +91,26 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
   }, [data, spec.node]);
   // 노드 고정이면 후보 노드는 그 한 대뿐이다.
   const nodes = useMemo(() => (pinned ? [pinned] : (data?.byNode || [])), [data, pinned]);
+
+  // 각 모드를 이 노드에서 쓸 수 있는지. 못 쓰면 왜 못 쓰는지까지 같이 준다.
+  // 구조적으로 불가한 것(공유가 꺼진 노드, 카드가 없는 노드)만 여기서 막는다.
+  // "지금 자리가 없다"는 구조가 아니라 상태라서 막지 않는다. 사양은 저장해 두고 나중에 시작하면 된다.
+  const modeState = useMemo(() => {
+    const withGpu = nodes.filter((n) => n.gpuType);
+    const frac = withGpu.filter((n) => n.fractional);
+    const hasOffering = (name) => !!data?.offerings.some((o) => o.gpuType === name && o.mode === 'fractional');
+    const shared = withGpu.length === 0 ? { ok: false, why: t('reconf.whyNoGpu') }
+      : frac.length === 0 ? { ok: false, why: t('reconf.whyShareOff') }
+        : !frac.some((n) => hasOffering(n.gpuType)) ? { ok: false, why: t('reconf.whyNoOffering') }
+          : { ok: true };
+    const exclusive = withGpu.length === 0 ? { ok: false, why: t('reconf.whyNoGpu') }
+      : withGpu.every((n) => n.fractional) ? { ok: false, why: t('reconf.whyAllShared') }
+        : { ok: true };
+    return { cpu: { ok: true }, shared, exclusive };
+  }, [data, nodes, t]);
+  // 못 쓰는 모드가 골라져 있으면(현재 사양이 그랬거나 노드 설정이 바뀐 경우) 쓸 수 있는 모드로 해석한다.
+  // 상태는 그대로 두고 표시와 전송만 보정한다.
+  const mode = modeState[modeSel]?.ok ? modeSel : (MODES.find((m) => modeState[m.key]?.ok)?.key || 'cpu');
 
   // 고른 모드에서 이 노드가 원리상 줄 수 있는 GPU 모델. 지금 여유가 없어도 목록에 남긴다.
   // 여유가 없다고 목록에서 빼면 사양을 저장조차 못 해, 자리가 날 때까지 아무것도 예약해 둘 수 없다.
@@ -113,16 +143,21 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
       .filter((o) => o.gpuType === selGpu && o.mode === 'fractional')
       .map((o) => ({
         ...o,
+        // fits = 지금 들어갈 자리가 있다. capable = 노드 총량으로는 애초에 담을 수 있다.
+        // 둘을 갈라야 "지금 만석"과 "이 노드엔 영원히 안 들어감"을 다르게 다룰 수 있다.
         fits: fracNodes.some((n) => (n.fracSlotsFree || 0) >= 1
           && (!o.vramMb || (n.fracVramFreeMb || 0) >= o.vramMb)
           && (!o.corePercent || (n.fracCoresFree || 0) >= o.corePercent)),
+        capable: fracNodes.some((n) => (!o.vramMb || (n.fracVramTotalMb || 0) >= o.vramMb)
+          && (!o.corePercent || (n.fracCoresTotal || 100) >= o.corePercent)),
       }));
   }, [data, nodes, mode, selGpu]);
-  // 들어가는 오퍼링을 우선 고르되, 하나도 안 들어가면 첫 오퍼링으로 둔다.
-  // 사양 저장(적용만)은 되어야 하고, 지금 못 뜨는 것은 canStart 가 막는다.
-  const selOfferingId = offerings.some((o) => o.id === offeringId)
+  // 담을 수 있는 오퍼링 중에서 고른다. 지금 자리가 있는 것을 우선하되, 만석이면 그중 첫 번째로 둔다.
+  // (담을 수 없는 오퍼링은 아예 고를 수 없다.)
+  const usableOfferings = offerings.filter((o) => o.capable);
+  const selOfferingId = usableOfferings.some((o) => o.id === offeringId)
     ? offeringId
-    : (offerings.find((o) => o.fits)?.id || offerings[0]?.id || null);
+    : (usableOfferings.find((o) => o.fits)?.id || usableOfferings[0]?.id || null);
 
   // 이미지는 GPU 모드면 GPU 이미지를, CPU 모드면 CPU 이미지를 우선한다(없으면 전체).
   const images = useMemo(() => {
@@ -198,7 +233,9 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
           <div className="grid cols-3" style={{ gap: 10 }}>
             {MODES.map((m) => (
               <ModeBox key={m.key} on={mode === m.key} onClick={() => setMode(m.key)} icon={m.icon}
-                title={t(`reconf.mode_${m.key}`)} desc={t(`reconf.modeDesc_${m.key}`)} />
+                title={t(`reconf.mode_${m.key}`)} desc={t(`reconf.modeDesc_${m.key}`)}
+                disabled={!modeState[m.key]?.ok} reason={modeState[m.key]?.why}
+                current={(spec.gpuMode || 'cpu') === m.key} currentLabel={t('reconf.currentBadge')} />
             ))}
           </div>
 
@@ -215,7 +252,12 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
                 </div>
               ) : (
                 <Select value={selGpu} onChange={setGpuType} ariaLabel={t('reconf.gpuModel')}
-                  options={gpuChoices.map((g) => ({ value: g.name, label: `${g.name} (${t('reconf.freeN', { n: g.free })})` }))} />
+                  options={gpuChoices.map((g) => ({
+                    value: g.name,
+                    // 지금 쓰고 있는 모델과 여유 개수를 라벨에 같이 적는다.
+                    label: `${g.name} (${g.free > 0 ? t('reconf.freeN', { n: g.free }) : t('reconf.full')})`
+                      + (spec.gpuType === g.name ? ` · ${t('reconf.currentBadge')}` : ''),
+                  }))} />
               )}
             </div>
           )}
@@ -235,10 +277,14 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
                 <div className="grid" style={{ gap: 8 }}>
                   {offerings.map((o) => {
                     const on = selOfferingId === o.id;
+                    // 담을 수 없는 오퍼링만 잠근다. 지금 만석인 것은 고를 수 있게 두고
+                    // (사양은 저장 가능) "여유 없음"만 알린다.
                     return (
-                      <div key={o.id} {...clickable(o.fits ? () => setOfferingId(o.id) : undefined)} aria-pressed={on}
+                      <div key={o.id} {...(o.capable ? clickable(() => setOfferingId(o.id)) : { 'aria-disabled': true })}
+                        aria-pressed={on} title={o.capable ? undefined : t('reconf.tooBig')}
                         style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderRadius: 9,
-                          cursor: o.fits ? 'pointer' : 'not-allowed', opacity: o.fits ? 1 : 0.55,
+                          cursor: o.capable ? 'pointer' : 'not-allowed', opacity: o.capable ? 1 : 0.5,
+                          filter: o.capable ? 'none' : 'saturate(.3)',
                           border: '1.5px solid ' + (on ? 'var(--primary)' : 'var(--border)'),
                           background: on ? 'var(--primary-soft)' : 'var(--surface)' }}>
                         <span style={{ width: 16, height: 16, borderRadius: '50%', flex: '0 0 auto', display: 'grid', placeItems: 'center',
@@ -246,12 +292,15 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
                           {on && <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--primary)' }} />}
                         </span>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontWeight: 700, fontSize: 14 }}>{o.name}</div>
+                          <div style={{ fontWeight: 700, fontSize: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
+                            {o.name}
+                            {spec.offeringId === o.id && <Pill variant="primary">{t('reconf.currentBadge')}</Pill>}
+                          </div>
                           <div className="muted" style={{ fontSize: 12 }}>{(o.vramMb / 1024).toFixed(0)}GB · GPU {o.corePercent}%</div>
                         </div>
-                        {o.fits
-                          ? (creditMode ? <Pill variant="gpu">{c(o.pricePerHour)} C/h</Pill> : null)
-                          : <Pill variant="err">{t('newSession.unavailable')}</Pill>}
+                        {!o.capable ? <Pill variant="err">{t('reconf.tooBig')}</Pill>
+                          : !o.fits ? <Pill variant="warn">{t('reconf.full')}</Pill>
+                            : (creditMode ? <Pill variant="gpu">{c(o.pricePerHour)} C/h</Pill> : null)}
                       </div>
                     );
                   })}

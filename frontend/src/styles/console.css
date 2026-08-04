@@ -261,6 +261,9 @@ html[data-theme="dark"] .console-modal-bg .btn.primary{color:#0f1218}
 .console-modal-bg .pill.gpu{background:var(--gpu-soft);color:var(--gpu)}
 .console-modal-bg .pill.free{background:var(--free-soft);color:var(--free)}
 .console-modal-bg .pill.pause{background:var(--surface-2);color:var(--muted)}
+/* 모달 안에서도 경고·불가 배지가 필요하다. 없으면 색 없는 맨 텍스트로 나온다. */
+.console-modal-bg .pill.warn{background:var(--warn-soft);color:var(--warn)}
+.console-modal-bg .pill.err{background:var(--danger-soft);color:var(--danger)}
 .console-modal-bg .muted{color:var(--muted)}
 .console-modal-bg h3{font-size:15.5px;font-weight:700;margin-bottom:12px}
 .console-modal-bg .modal-body, .console-root .modal-body{padding:22px}
