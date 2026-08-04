@@ -435,7 +435,9 @@
     "reallocWarn": "This session is bound to the home disk on {{node}}. Moving it to another node requires wiping the home directory (/home/work), and everything in it will be deleted. This cannot be undone.\n\n~/nfs, volumes and datasets are kept. Move anything you need out of home first.",
     "reallocConfirm": "Wipe home and reallocate",
     "reallocDone": "Home wiped, started on another node",
-    "startBlockedElsewhere": "No room on this node. Another node has capacity, so wiping home lets it start."
+    "startBlockedElsewhere": "No room on this node. Another node has capacity, so wiping home lets it start.",
+    "node": "Node",
+    "needsOtherNode": "This spec cannot start on {{node}} right now. Another node has room, so wiping home lets it start there."
   },
   "conn": {
     "title": "Connect — {{name}}",
