@@ -397,7 +397,7 @@
     "menu": "Change resources",
     "title": "Change resources — {{name}}",
     "hint": "Keeps your data and home directory; only changes the compute this session runs on next. Available while the session is stopped.",
-    "pinned": "This session's home disk lives on node {{node}}, so it can only resume there — choices are limited to that node's GPU ({{gpu}}).",
+    "pinned": "Shared GPU can only run on {{node}}, where this session’s home disk lives, so the choices are limited to that node’s GPU ({{gpu}}).",
     "noGpu": "no GPU",
     "mode_cpu": "CPU only",
     "mode_shared": "Shared GPU",
@@ -407,7 +407,7 @@
     "modeDesc_exclusive": "A whole GPU card",
     "gpuModel": "GPU model",
     "freeN": "{{n}} free",
-    "noGpuAvail": "No GPU is available to this session right now.",
+    "noGpuAvail": "This node has no GPU.",
     "offering": "Offering",
     "noOffering": "No shared offering exists for this GPU.",
     "image": "Image",
@@ -420,7 +420,8 @@
     "applyStart": "Apply and start",
     "applied": "Resources changed",
     "appliedStarted": "Resources changed; start requested",
-    "failed": "Could not change the resources"
+    "failed": "Could not change the resources",
+    "startBlocked": "No room on this node right now, so it cannot start immediately. Save the spec and restart once capacity frees up."
   },
   "conn": {
     "title": "Connect — {{name}}",

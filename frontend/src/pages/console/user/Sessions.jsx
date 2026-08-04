@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Code2, NotebookPen, TerminalSquare, Power, RotateCcw, Trash2, Clock, Cpu } from 'lucide-react';
+import { Code2, NotebookPen, TerminalSquare, Power, RotateCcw, Trash2, Clock } from 'lucide-react';
 import PageHead from '../../../components/console/PageHead';
 import Pill from '../../../components/console/Pill';
 import Bar from '../../../components/console/Bar';
 import ConnectionModal from '../../../components/console/ConnectionModal';
-import ReconfigureModal from '../../../components/console/ReconfigureModal';
 import RowMenu from '../../../components/console/RowMenu';
 import { useToast } from '../../../components/console/Toast';
 import { useConfirm } from '../../../components/console/Confirm';
@@ -37,7 +36,6 @@ export default function Sessions() {
   const [rows, setRows] = useState(null);
   const [conn, setConn] = useState(null);
   const [connTab, setConnTab] = useState(null); // 클릭한 채널(모달 초기 탭). 안 넘기면 항상 VSCode 로 열린다
-  const [reconf, setReconf] = useState(null); // 자원 변경(GPU 붙이기) 대상 세션. 중단 상태에서만 연다
   const navigate = useNavigate();
   const { toast } = useToast();
   const confirm = useConfirm();
@@ -154,10 +152,9 @@ export default function Sessions() {
     if (r.status === 'stopped') {
       return (<>
         <button className="btn sm ghost" onClick={start} disabled={!!pending[r.id]} title={t('session.restart')}><RotateCcw size={13} /> {t('session.restart')}</button>
-        {/* 자원 변경은 중단 상태에서만 가능하다(Pod 스펙은 실행 중 못 바꾼다) — 그래서 이 자리에 둔다.
-            "CPU로 데이터 준비 → GPU 붙이기"가 이 메뉴의 주 용도. */}
+        {/* 자원 변경은 상세 페이지에만 둔다. 사양을 바꾸려면 지금 사양과 남은 자리를 보고 판단해야 하는데
+            목록에는 그 정보가 없다. 목록에서는 재시작과 삭제까지만 한다. */}
         <RowMenu label={r.name} items={[
-          { key: 'reconf', label: t('reconf.menu'), icon: Cpu, onSelect: () => setReconf(r) },
           { key: 'delete', label: t('session.delete'), icon: Trash2, tone: 'danger', onSelect: del },
         ]} />
       </>);
@@ -251,7 +248,6 @@ export default function Sessions() {
 
       <ConnectionModal session={conn} initialTab={connTab} onClose={() => setConn(null)} />
       {/* 세션별 key + 조건부 렌더 — 선택 상태가 그 세션의 현재 사양에서 시작하도록 새로 마운트한다. */}
-      {reconf && <ReconfigureModal key={reconf.id} session={reconf} onClose={() => setReconf(null)} onDone={load} />}
-    </div>
+          </div>
   );
 }

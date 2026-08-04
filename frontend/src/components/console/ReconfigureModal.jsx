@@ -82,15 +82,17 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
   // 노드 고정이면 후보 노드는 그 한 대뿐이다.
   const nodes = useMemo(() => (pinned ? [pinned] : (data?.byNode || [])), [data, pinned]);
 
-  // 고른 모드에서 쓸 수 있는 GPU 모델(지금 여유가 있는 것만).
+  // 고른 모드에서 이 노드가 원리상 줄 수 있는 GPU 모델. 지금 여유가 없어도 목록에 남긴다.
+  // 여유가 없다고 목록에서 빼면 사양을 저장조차 못 해, 자리가 날 때까지 아무것도 예약해 둘 수 없다.
+  // 지금 뜰 수 있는지는 아래 canStart 가 따로 판정한다.
   const gpuChoices = useMemo(() => {
     if (!data) return [];
     const frac = new Set(data.offerings.filter((o) => o.gpuType && o.mode === 'fractional').map((o) => o.gpuType));
     const names = [...new Set(nodes.filter((n) => n.gpuType).map((n) => n.gpuType))];
     return names
       .filter((name) => (mode === 'shared'
-        ? frac.has(name) && nodes.some((n) => n.gpuType === name && n.fractional && n.fracSlotsFree > 0)
-        : nodes.some((n) => n.gpuType === name && n.gpuFree > 0)))
+        ? frac.has(name) && nodes.some((n) => n.gpuType === name && n.fractional)
+        : true))
       .map((name) => ({ name, free: nodes.filter((n) => n.gpuType === name).reduce((sum, n) => sum + (n.gpuFree || 0), 0) }));
   }, [data, nodes, mode]);
   // 현재 선택이 이 모드에서 유효하지 않으면 첫 후보로 해석한다(상태는 그대로 두고 표시·전송만 보정).
@@ -116,9 +118,11 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
           && (!o.corePercent || (n.fracCoresFree || 0) >= o.corePercent)),
       }));
   }, [data, nodes, mode, selGpu]);
-  const selOfferingId = offerings.some((o) => o.id === offeringId && o.fits)
+  // 들어가는 오퍼링을 우선 고르되, 하나도 안 들어가면 첫 오퍼링으로 둔다.
+  // 사양 저장(적용만)은 되어야 하고, 지금 못 뜨는 것은 canStart 가 막는다.
+  const selOfferingId = offerings.some((o) => o.id === offeringId)
     ? offeringId
-    : (offerings.find((o) => o.fits)?.id || null);
+    : (offerings.find((o) => o.fits)?.id || offerings[0]?.id || null);
 
   // 이미지는 GPU 모드면 GPU 이미지를, CPU 모드면 CPU 이미지를 우선한다(없으면 전체).
   const images = useMemo(() => {
@@ -136,8 +140,12 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
   const specText = mode === 'cpu' ? t('reconf.cpuOnly')
     : mode === 'exclusive' ? (selGpu ? `${selGpu} ×${selCount}` : '—')
       : offering ? `${selGpu} · ${(offering.vramMb / 1024).toFixed(0)}GB · ${offering.corePercent}%` : '—';
-  const ready = !!selImageId && (mode === 'cpu'
-    || (mode === 'exclusive' ? !!selGpu && maxGpu >= selCount : !!offering));
+  // 사양이 저장 가능한가(적용만)와 지금 뜰 수 있는가(적용하고 시작)는 다른 질문이다.
+  // 자리가 없으면 저장은 되고 시작만 막힌다. 나중에 자리가 나면 재시작만 누르면 된다.
+  const specValid = !!selImageId && (mode === 'cpu'
+    || (mode === 'exclusive' ? !!selGpu : !!offering));
+  const canStart = specValid && (mode === 'cpu'
+    || (mode === 'exclusive' ? maxGpu >= selCount : !!offering?.fits));
   const changed = mode !== (spec.gpuMode || '') || selGpu !== (spec.gpuType || '')
     || (selOfferingId || null) !== (spec.offeringId || null) || (selImageId || null) !== (spec.imageId || null)
     || (mode === 'exclusive' && selCount !== spec.gpuCount);
@@ -169,15 +177,18 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
         <>
           <button className="btn" onClick={onClose} disabled={busy}>{t('newSession.cancel')}</button>
           <span className="flex" style={{ gap: 8 }}>
-            <button className="btn" onClick={() => apply(false)} disabled={busy || !ready || !changed}>{t('reconf.applyOnly')}</button>
-            <button className="btn primary" onClick={() => apply(true)} disabled={busy || !ready}>{t('reconf.applyStart')}</button>
+            <button className="btn" onClick={() => apply(false)} disabled={busy || !specValid || !changed}>{t('reconf.applyOnly')}</button>
+            <button className="btn primary" onClick={() => apply(true)} disabled={busy || !canStart}
+              title={specValid && !canStart ? t('reconf.startBlocked') : undefined}>{t('reconf.applyStart')}</button>
           </span>
         </>
       )}>
       {!data ? <Spinner pad /> : (
         <>
           <div className="legend mb">{t('reconf.hint')}</div>
-          {pinned && (
+          {/* 노드 고정 안내는 공유 GPU 를 고를 때만 띄운다. CPU 는 그 노드에서 그냥 뜨고,
+              전용은 아래 모델 목록이 이미 그 노드 것만 보여준다. */}
+          {pinned && mode === 'shared' && (
             <div className="legend mb" style={{ color: 'var(--warn)' }}>
               {t('reconf.pinned', { node: pinned.node, gpu: pinned.gpuType || t('reconf.noGpu') })}
             </div>
@@ -255,6 +266,10 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
             <div className="row big"><span>{t('reconf.next')}</span><span>{specText}</span></div>
             {creditMode && <div className="row"><span>{t('newSession.estCost')}</span><span>{price ? `${c(price)} C/h` : t('session.free')}</span></div>}
             <div className="legend">{t('reconf.keepData')}</div>
+            {/* 왜 "적용하고 시작"이 꺼져 있는지 말해준다. 사양은 저장할 수 있다. */}
+            {specValid && !canStart && (
+              <div className="legend" style={{ color: 'var(--warn)' }}>{t('reconf.startBlocked')}</div>
+            )}
           </div>
         </>
       )}
