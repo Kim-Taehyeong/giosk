@@ -206,7 +206,13 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
             <div className="mt">
               <label className="fld">{t('reconf.gpuModel')}</label>
               {gpuChoices.length === 0 ? (
-                <div className="muted" style={{ fontSize: 12.5 }}>{t('reconf.noGpuAvail')}</div>
+                // 왜 고를 게 없는지를 갈라서 말한다. "GPU 가 없다"와 "공유가 꺼져 있다"는
+                // 사용자가 할 일이 다르다(포기 vs 관리자에게 요청).
+                <div className="muted" style={{ fontSize: 12.5 }}>
+                  {mode === 'shared' && nodes.some((n) => n.gpuType && !n.fractional)
+                    ? t('reconf.shareOff')
+                    : t('reconf.noGpuAvail')}
+                </div>
               ) : (
                 <Select value={selGpu} onChange={setGpuType} ariaLabel={t('reconf.gpuModel')}
                   options={gpuChoices.map((g) => ({ value: g.name, label: `${g.name} (${t('reconf.freeN', { n: g.free })})` }))} />

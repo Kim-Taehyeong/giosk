@@ -421,7 +421,8 @@
     "applied": "Resources changed",
     "appliedStarted": "Resources changed; start requested",
     "failed": "Could not change the resources",
-    "startBlocked": "No room on this node right now, so it cannot start immediately. Save the spec and restart once capacity frees up."
+    "startBlocked": "No room on this node right now, so it cannot start immediately. Save the spec and restart once capacity frees up.",
+    "shareOff": "GPU sharing (HAMi) is off on this node, so shared GPU is unavailable. Ask an administrator to enable sharing on it."
   },
   "conn": {
     "title": "Connect — {{name}}",
