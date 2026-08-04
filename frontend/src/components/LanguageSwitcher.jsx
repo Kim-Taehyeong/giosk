@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Globe, ChevronDown, Check, Search } from 'lucide-react';
 import { LANGUAGES, langMeta, flagCC } from '../i18n/languages';
+import { setLanguage } from '../i18n';
 
 // 국기 SVG 를 파일 URL 로만 가져온다.
 // flag-icons 의 통짜 CSS(약 430KB)는 138개국 배경 규칙을 전부 싣는데, 우리가 쓰는 건 언어 목록에
@@ -54,8 +55,10 @@ export default function LanguageSwitcher({ align = 'right' }) {
     );
   }, [query]);
 
+  // setLanguage 는 번역을 받은 뒤에 언어를 바꾼다. i18n.changeLanguage 를 직접 부르면
+  // 번역이 오기 전에 영어로 한 번 그려진다.
   const change = (code) => {
-    if (code !== current) i18n.changeLanguage(code);
+    if (code !== current) setLanguage(code);
     setOpen(false);
   };
 
