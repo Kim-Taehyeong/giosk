@@ -49,6 +49,8 @@ helm upgrade "$RELEASE" charts/giosk -n "$NS" -f "$VALUES" \
   --set image.sshd.tag="$TAG" \
   --wait --timeout "${TIMEOUT:-10m}"
 
+# 무엇이 도는지 이미지 태그로 확인한다. 파드 라벨은 app=giosk-<컴포넌트> 라 이름으로 거른다.
 echo
-kubectl -n "$NS" get pods -l app.kubernetes.io/instance="$RELEASE" \
-  -o custom-columns=NAME:.metadata.name,READY:.status.containerStatuses[0].ready,IMAGE:.spec.containers[0].image
+kubectl -n "$NS" get pods \
+  -o custom-columns=NAME:.metadata.name,READY:.status.containerStatuses[0].ready,IMAGE:.spec.containers[0].image \
+  | grep -E "NAME|$TAG" || true
