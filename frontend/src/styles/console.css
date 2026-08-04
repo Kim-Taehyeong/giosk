@@ -252,7 +252,9 @@ html[data-theme="dark"] .console-modal-bg .btn.primary{color:#0f1218}
   cursor:pointer;display:inline-grid;place-items:center;font-size:15px;color:var(--text);vertical-align:middle}
 .console-modal-bg .btn{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex:0 0 auto;padding:8px 14px;border-radius:var(--r-control);
   border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-weight:700;font-size:13px;cursor:pointer;transition:.15s}
-.console-modal-bg .btn:hover{filter:brightness(.98)}
+.console-modal-bg .btn:hover:not(:disabled){filter:brightness(.98)}
+/* 모달 안에서도 못 누르는 버튼은 못 누르게 보여야 한다(.console-root 규칙은 포털 밖이라 안 닿는다). */
+.console-modal-bg .btn:disabled{opacity:.45;filter:saturate(.35);cursor:not-allowed;box-shadow:none;transform:none}
 .console-modal-bg .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
 .console-modal-bg .btn.danger{color:var(--danger);border-color:var(--danger)}
 .console-modal-bg .btn.sm{padding:5px 10px;font-size:12px}

@@ -153,6 +153,8 @@ func main() {
 			VramMB: p.VramMB, CorePercent: p.CorePercent, Node: p.Node,
 		})
 	})
+	// 노드가 그 모드를 원리상 주는지 묻는다. 관리자가 공유 모드를 바꾼 경우를 자리 부족과 갈라 말한다.
+	sessionSvc.WithNodeSupports(resourceSvc.NodeSupports)
 	// 배치 잠금. "관문 통과 후 예약"을 한 번에 하나만 지나게 해서 동시 요청이 같은 자리를 두 번 받는 걸 막는다.
 	// API replica 가 늘어나도 유효하도록 DB 이름잠금을 쓴다(프로세스 뮤텍스는 세션 서비스가 항상 함께 건다).
 	sessionSvc.WithAdmissionLock(func(ctx context.Context) (func(), error) {

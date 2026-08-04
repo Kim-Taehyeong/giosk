@@ -10,8 +10,9 @@ import Toggle from '../../../components/console/Toggle';
 import Spinner from '../../../components/console/Spinner';
 import UtilLineChart from '../../../components/console/UtilLineChart';
 import { useToast } from '../../../components/console/Toast';
+import { useConfirm } from '../../../components/console/Confirm';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
-import { getAdminNode, getNodeGPUs, getNodeMetrics, saveNodeConfig, cordonNode, uncordonNode } from '../../../api/console/nodes';
+import { getAdminNode, getNodeGPUs, getNodeMetrics, saveNodeConfig, getNodeModeImpact, cordonNode, uncordonNode } from '../../../api/console/nodes';
 import { getDatasets } from '../../../api/console/datasets';
 import { getImages } from '../../../api/console/resources';
 
@@ -29,6 +30,7 @@ export default function NodeDetailPage() {
   const navigate = useNavigate();
   const { t } = useTranslation('consoleAdmin');
   const { toast } = useToast();
+  const confirm = useConfirm();
   const { config } = useSystemConfig();
   const hybrid = config.deploymentMode === 'hybrid';
 
@@ -49,6 +51,23 @@ export default function NodeDetailPage() {
 
   // 설정 저장이다. 로컬에 반영하고 영속화한다.
   const save = (p) => { setNode((n) => ({ ...n, ...p })); saveNodeConfig(name, p).catch(() => {}); };
+  // 공유 모드 변경은 되돌리기 어려운 영향을 남긴다. 이 노드에 홈이 묶인 세션 중
+  // 새 모드에서 못 뜨는 것이 있으면, 몇 개인지 밝히고 확인을 받는다.
+  const setShareMode = async (m) => {
+    if ((node.shareMode || (node.hami ? 'hami' : 'exclusive')) === m) return;
+    let impact = { count: 0 };
+    try { impact = await getNodeModeImpact(name, m); } catch { /* 못 세면 그냥 진행 */ }
+    if (impact.count > 0) {
+      const ok = await confirm({
+        title: t('nodes.modeChangeTitle'),
+        message: t('nodes.modeChangeWarn', { n: impact.count }),
+        confirmText: t('nodes.modeChangeConfirm'),
+        danger: true,
+      });
+      if (!ok) return;
+    }
+    save({ shareMode: m, hami: m === 'hami' });
+  };
   const setCordon = async (on) => {
     setNode((n) => ({ ...n, status: on ? 'cordoned' : 'ready' }));
     try { await (on ? cordonNode(name) : uncordonNode(name)); } catch { /* 낙관 유지 */ }
@@ -202,7 +221,7 @@ export default function NodeDetailPage() {
                 {[{ k: 'exclusive', label: t('nodes.modeExclusive') }, { k: 'hami', label: t('nodes.modeHami') }].map((m) => {
                   const on = shareMode === m.k;
                   return (
-                    <button key={m.k} onClick={() => save({ shareMode: m.k, hami: m.k === 'hami' })}
+                    <button key={m.k} onClick={() => setShareMode(m.k)}
                       style={{ padding: '7px 14px', borderRadius: 7, border: 'none', cursor: 'pointer', fontSize: 12.5, fontWeight: on ? 700 : 600,
                         background: on ? 'var(--surface)' : 'transparent', color: on ? 'var(--primary)' : 'var(--muted)', boxShadow: on ? '0 1px 2px rgba(0,0,0,.1)' : 'none' }}>
                       {m.label}

@@ -1,7 +1,9 @@
 package resource
 
 import (
+	"errors"
 	"strconv"
+	"strings"
 
 	"giosk/pkg/httpx"
 
@@ -31,6 +33,10 @@ func (h *Handler) SaveOffering(c *gin.Context) {
 	}
 	o.ID = idParam(c) // 0=생성, >0=수정
 	if err := h.svc.SaveOffering(&o); err != nil {
+		if errors.Is(err, ErrOfferingDup) {
+			httpx.Err(c, 409, "offering_dup", "같은 규격의 오퍼링이 이미 있습니다: "+strings.TrimPrefix(err.Error(), ErrOfferingDup.Error()+": "))
+			return
+		}
 		httpx.Internal(c, "오퍼링 저장 실패")
 		return
 	}

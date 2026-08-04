@@ -505,7 +505,10 @@
     "metricsOffNotice": "Monitoring (DCGM/Prometheus) is not installed, so GPU utilization and VRAM cannot be shown. Enable monitoring to see live metrics.",
     "uncordon": "Uncordon",
     "cordon": "Cordon",
-    "noMetrics": "No metrics"
+    "noMetrics": "No metrics",
+    "modeChangeTitle": "Change sharing mode?",
+    "modeChangeWarn": "{{n}} session(s) whose home lives on this node will no longer be able to restart under the new setting.\n\nSession home sits on the node local disk, so those sessions only come back to this node. Users will have to pick another mode or wipe home and reallocate to another node.",
+    "modeChangeConfirm": "Change anyway"
   },
   "mset": {
     "title": "Settings",

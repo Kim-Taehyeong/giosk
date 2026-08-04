@@ -212,6 +212,8 @@ func (h *Handler) writeErr(c *gin.Context, err error, msg string) {
 		httpx.Err(c, 409, "reconfigure_unavailable", "이 세션은 자원을 바꿀 수 없습니다")
 	case errors.Is(err, ErrAlreadyStarting):
 		httpx.Err(c, 409, "already_starting", "이미 시작 중인 세션입니다")
+	case errors.Is(err, ErrNodeModeChanged):
+		httpx.Err(c, 409, "node_mode_changed", "관리자가 이 세션이 있는 노드의 공유 설정을 바꿔서 지금 사양으로는 뜰 수 없습니다. 자원 변경에서 다른 방식을 고르거나 다른 노드로 재할당하세요")
 	case errors.Is(err, ErrNodePinned):
 		httpx.Err(c, 409, "node_pinned", "이 세션의 홈 디스크가 특정 노드에 있어 그 노드에서만 재개됩니다. 해당 노드에서 쓸 수 있는 GPU를 선택하세요")
 	case errors.Is(err, ErrBadSpec):

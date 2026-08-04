@@ -269,12 +269,14 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
           <button className="btn" onClick={onClose} disabled={busy}>{t('newSession.cancel')}</button>
           <span className="flex" style={{ gap: 8 }}>
             <button className="btn" onClick={() => apply(false)} disabled={busy || !specValid || !changed}>{t('reconf.applyOnly')}</button>
-            {/* 이 노드에서 못 뜨는데 다른 노드엔 자리가 있으면, 홈을 버리고 옮겨 갈 길을 준다. */}
-            {canElsewhere && (
-              <button className="btn danger" onClick={applyElsewhere} disabled={busy}>{t('reconf.applyElsewhere')}</button>
-            )}
-            <button className="btn primary" onClick={() => apply(true)} disabled={busy || !canStart}
-              title={specValid && !canStart ? t('reconf.startBlocked') : undefined}>{t('reconf.applyStart')}</button>
+            {/* 시작 버튼은 하나만 둔다. 이 노드에서 뜨면 그냥 시작하고, 못 뜨는데 다른 노드엔
+                자리가 있으면 그 자리를 홈 비우고 옮겨 가는 버튼이 대신 차지한다. */}
+            {canElsewhere
+              ? <button className="btn danger" onClick={applyElsewhere} disabled={busy}>{t('reconf.applyElsewhere')}</button>
+              : (
+                <button className="btn primary" onClick={() => apply(true)} disabled={busy || !canStart}
+                  title={specValid && !canStart ? t('reconf.startBlocked') : undefined}>{t('reconf.applyStart')}</button>
+              )}
           </span>
         </>
       )}>

@@ -16,6 +16,7 @@ func RegisterAdmin(admin gin.IRouter, h *Handler) {
 	admin.GET("/nodes", h.List)
 	admin.GET("/nodes/:name/gpus", h.GPUs)
 	admin.GET("/nodes/:name/metrics", h.Metrics)
+	admin.GET("/nodes/:name/mode-impact", h.ModeImpact) // 공유 모드 변경 전 영향 세션 수
 	admin.PUT("/nodes/:name", h.SetConfig)
 	admin.POST("/nodes/:name/cordon", h.Cordon)
 	admin.POST("/nodes/:name/uncordon", h.Uncordon)

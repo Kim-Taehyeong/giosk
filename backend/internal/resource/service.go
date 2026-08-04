@@ -2,9 +2,14 @@ package resource
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	"giosk/internal/k8s"
 )
+
+// ErrOfferingDup은 같은 규격(GPU 타입·모드·VRAM·코어%)의 오퍼링이 이미 있을 때.
+var ErrOfferingDup = errors.New("duplicate offering")
 
 // GpuLister는 클러스터에서 GPU 타입/노드를 수집한다(k8s.Client 가 구현).
 type GpuLister interface {
@@ -33,7 +38,26 @@ func (s *Service) WithCachedDatasets(fn func() map[string][]CachedDS) *Service {
 func (s *Service) ListOfferings(activeOnly bool) ([]Offering, error) {
 	return s.repo.ListOfferings(activeOnly)
 }
-func (s *Service) SaveOffering(o *Offering) error { return s.repo.SaveOffering(o) }
+// SaveOffering은 저장 전에 같은 규격이 이미 있는지 본다.
+//
+// 오퍼링은 "GPU 를 이만큼 떼어 준다"는 규격이라, (GPU 타입, 모드, VRAM, 코어%)가 같으면
+// 이름만 다른 같은 물건이다. 단가도 GPU 단가에서 자동 산출되므로 값까지 같아진다.
+// 목록에 똑같은 줄이 둘 뜨면 사용자는 무엇이 다른지 찾다가 아무거나 고른다.
+func (s *Service) SaveOffering(o *Offering) error {
+	all, err := s.repo.ListOfferings(false)
+	if err != nil {
+		return err
+	}
+	for _, e := range all {
+		if e.ID == o.ID {
+			continue // 자기 자신(수정)
+		}
+		if e.GpuType == o.GpuType && e.Mode == o.Mode && e.VramMB == o.VramMB && e.CorePercent == o.CorePercent {
+			return fmt.Errorf("%w: %s", ErrOfferingDup, e.Name)
+		}
+	}
+	return s.repo.SaveOffering(o)
+}
 func (s *Service) DeleteOffering(id int64) error  { return s.repo.DeleteOffering(id) }
 
 func (s *Service) ListPresets(activeOnly bool) ([]Preset, error) {

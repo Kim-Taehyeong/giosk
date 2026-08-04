@@ -17,6 +17,9 @@ export const getScopedVolumes = () => apiGet('/console/volumes').then((d) => ({ 
 
 // 노드 설정(공유 모드/분할/홈쿼터) 저장.
 export const saveNodeConfig = (name, body) => apiPut(`/admin/nodes/${name}`, body);
+// 공유 모드를 바꾸기 전에 재시작이 막힐 세션을 센다. 세션 홈이 노드에 묶여 있어
+// 모드를 바꾸면 그 노드의 일부 세션은 영영 다시 뜨지 못한다.
+export const getNodeModeImpact = (name, mode) => apiGet(`/admin/nodes/${name}/mode-impact?mode=${encodeURIComponent(mode)}`);
 export const cordonNode = (name) => apiPost(`/admin/nodes/${name}/cordon`);
 export const uncordonNode = (name) => apiPost(`/admin/nodes/${name}/uncordon`);
 
