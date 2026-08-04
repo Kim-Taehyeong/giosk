@@ -7,7 +7,7 @@ import Spinner from '../../../components/console/Spinner';
 import { useToast } from '../../../components/console/Toast';
 import { getGroups, updateGroup } from '../../../api/console/governance';
 
-// 중간관리자(조직/그룹) 설정 — 지금은 그룹별 가입 신청 수락 여부. 스코프 안의 그룹만 보인다.
+// 중간관리자(조직이나 그룹) 설정이다. 지금은 그룹별 가입 신청 수락 여부만 있고 스코프 안의 그룹만 보인다.
 export default function ManagerSettings() {
   const { t } = useTranslation('consoleAdmin');
   const { toast } = useToast();

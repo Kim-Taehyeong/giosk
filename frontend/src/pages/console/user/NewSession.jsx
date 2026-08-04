@@ -49,7 +49,7 @@ function SshKeyField({ t, registered, value, onChange }) {
 
 // saveSshKey는 위저드에서 입력/수정한 공개키를 계정(users.ssh_public_key)에 등록한다.
 // 계정에 저장돼야 세션 컨테이너/물리노드 authorized_keys 에 주입된다(예전엔 localStorage 에만 두어 유실됐다).
-// 저장 실패는 세션 생성을 막지 않는다 — 내정보 화면에서 다시 등록할 수 있다.
+// 저장 실패는 세션 생성을 막지 않는다. 내정보 화면에서 다시 등록할 수 있다.
 async function saveSshKey(key, current, refreshUser) {
   const k = (key || '').trim();
   if (!k || k === (current || '').trim()) return;
@@ -61,7 +61,7 @@ const CONN_ICON = { VSCode: Code2, Jupyter: NotebookPen, SSH: TerminalSquare };
 const connIcon = (c) => CONN_ICON[c] || Boxes;
 const TYPE_ICON = { shared: Users, exclusive: Lock, cpu: HardDriveDownload };
 const dsSizeVariant = { Large: 'primary', Medium: 'gpu', Small: 'free' };
-// 오퍼링 슬라이스 크기 라벨 — GPU 지분(core%)으로 자동 산출(관리자 설정 불필요).
+// 오퍼링 슬라이스 크기 라벨. GPU 지분(core%)으로 자동 산출하므로 관리자 설정이 필요 없다.
 //   ≤25% Small · ≤50% Medium · 그 외 Large. 일반 사용자가 "얼마나 큰 조각인지" 바로 알 수 있게.
 const sizeTierOf = (corePercent) => {
   const c = corePercent || 0;
@@ -71,7 +71,7 @@ const sizeTierOf = (corePercent) => {
 };
 const SIZE_VARIANT = { small: 'free', medium: 'gpu', large: 'primary' };
 // CPU·메모리 최소 보장 = 최소 후보 노드 사양 × GPU 지분 × requestFactor. 지분은 "노드 GPU 총수 대비 내 몫".
-//   전용 N개 → N/G · 분할(코어 c%) → (c/100)/G. (타임셰어링은 제거됨)
+//   전용 N개는 N/G, 분할(코어 c%)은 (c/100)/G 다. (타임셰어링은 제거했다)
 // 서버(applyGuarantee)와 동일한 식이며, Pod 에는 request 로만 걸려 여유 시 초과 사용 가능(상한 아님).
 const shareOf = (mode, { gpuCount = 1, corePercent = 0, nodeGpus = 1 }) => {
   const g = Math.max(1, nodeGpus);
@@ -83,7 +83,7 @@ const shareOf = (mode, { gpuCount = 1, corePercent = 0, nodeGpus = 1 }) => {
 // 50% 이하로 눌러 CPU/Mem 부족으로 스케줄 실패하는 일을 원천 차단한다. 표기도 실제 예약값과 맞춰야
 // "보장 32 vCPU" 처럼 실제(16)의 2배로 보이는 오표기가 안 생긴다. 서버 상수와 반드시 동일하게 유지.
 const REQUEST_FACTOR = 0.5;
-// gt=선택된 GPU 타입 정보(nodeCpu/nodeMemGb/nodeGpus). 정보가 없으면 null → 표기 생략.
+// gt 는 선택된 GPU 타입 정보(nodeCpu/nodeMemGb/nodeGpus)다. 정보가 없으면 null 이라 표기를 생략한다.
 const guaranteeOf = (gt, mode, opts) => {
   if (!gt || !gt.nodeCpu) return null;
   const sh = Math.min(1, shareOf(mode, { ...opts, nodeGpus: gt.nodeGpus })); // share 상한 1.0(서버와 동일)
@@ -149,7 +149,7 @@ function DatasetRow({ t, d, selectable, on, onClick }) {
   );
 }
 
-// 좌측 스텝 사이드바 — 컨테이너/SSH 위저드 공용.
+// 좌측 스텝 사이드바. 컨테이너와 SSH 위저드가 함께 쓴다.
 function StepSidebar({ steps, step, maxReached, summary, onGoto, labels }) {
   return (
     <div className="grid" style={{ gap: 12 }}>
@@ -202,10 +202,10 @@ export default function NewSession() {
   const [cpuPrice, setCpuPrice] = useState(0); // CPU 전용 세션 시간당 단가(과금됨, 무료 아님)
   const [images, setImages] = useState([]); // 이미지 카탈로그(실 백엔드)
   const [nodes, setNodes] = useState([]);
-  const [availMap, setAvailMap] = useState({}); // gpuType → {free,total,vramFree,vramTotal} (실시간 가용)
+  const [availMap, setAvailMap] = useState({}); // gpuType 별 {free,total,vramFree,vramTotal} (실시간 가용)
   const [fracNodes, setFracNodes] = useState([]); // 분할 노드별 VRAM/코어/슬롯 잔여(오퍼링 가용 계산)
-  const [nodeGpu, setNodeGpu] = useState({}); // node → gpuType (빠른 생성 배지: 캐시노드 타입 매칭)
-  const [nodesAvail, setNodesAvail] = useState([]); // byNode 원본 — 전용 GPU 개수 상한(단일 노드 free) 계산용
+  const [nodeGpu, setNodeGpu] = useState({}); // node 별 gpuType (빠른 생성 배지에서 캐시노드 타입 매칭에 쓴다)
+  const [nodesAvail, setNodesAvail] = useState([]); // byNode 원본. 전용 GPU 개수 상한(단일 노드 free) 계산에 쓴다
   const [wtype, setWtype] = useState(null);
   const [offeringId, setOfferingId] = useState(null);
   const [exGpuType, setExGpuType] = useState(null);
@@ -218,7 +218,7 @@ export default function NewSession() {
   const [vols, setVols] = useState({ owned: [], shared: [], localHomes: [] });
   const [selVols, setSelVols] = useState([]); // [{ id, name, mountPath, perm }]
   const [localHomeNode, setLocalHomeNode] = useState(''); // 로컬 Home 선택(빈값=노드 로컬 임시 home, 영속은 ~/nfs)
-  const [selNode, setSelNode] = useState('auto'); // 데이터셋 고급 선택 — 실제 노드 지정
+  const [selNode, setSelNode] = useState('auto'); // 데이터셋 고급 선택에서 실제 노드를 지정한다
   const [selDs, setSelDs] = useState([]); // 선택한 캐시 데이터셋명
   const [name, setName] = useState('');
   const [sshKey, setSshKey] = useState(user?.sshPublicKey || '');
@@ -273,10 +273,10 @@ export default function NewSession() {
   const setMount = (id, p) => setSelVols((cur) => cur.map((x) => (x.id === id ? { ...x, mountPath: p } : x)));
 
   const sharedOfferings = useMemo(() => offerings.filter((o) => o.gpuType && o.mode === 'fractional'), [offerings]);
-  // CUDA 물리 지원 범위(min~max) — min=GPU 아키텍처(컴퓨트 능력), max=드라이버. gpuTypes 에서 모델별 조회.
+  // CUDA 물리 지원 범위(min~max). min 은 GPU 아키텍처(컴퓨트 능력), max 는 드라이버다. gpuTypes 에서 모델별로 조회한다.
   const fmtCuda = (min, max) => (min && max ? `${min}–${max}` : min ? `${min}+` : max ? `≤${max}` : '');
   const cudaOfType = (name) => { const g = gpuTypes.find((x) => x.name === name); return g ? fmtCuda(g.cudaMin, g.cudaMax) : ''; };
-  // 공유 GPU 모델 목록(단계 선택 1단계) — 분할 오퍼링이 있는 GPU 모델을 유니크하게.
+  // 공유 GPU 모델 목록(단계 선택 1단계). 분할 오퍼링이 있는 GPU 모델을 유니크하게 모은다.
   //   각 모델의 분할 가용(HAMi 노드 잔여)과 오퍼링 개수를 함께 계산.
   const sharedGpuModels = useMemo(() => {
     const names = [...new Set(sharedOfferings.map((o) => o.gpuType))];
@@ -292,7 +292,7 @@ export default function NewSession() {
     });
   }, [sharedOfferings, availMap, gpuTypes]);
 
-  // offeringFit — 이 오퍼링이 지금 몇 개 더 가능(free) / 비었을 때 최대 몇 개(total)인지.
+  // offeringFit 은 이 오퍼링이 지금 몇 개 더 가능(free)하고 비었을 때 최대 몇 개(total)인지를 뜻한다.
   // 분할 노드별로 min(VRAM 여유/오퍼링VRAM, 코어 여유/오퍼링코어, 슬롯 여유)을 구해 합산(노드 단위 패킹).
   const offeringFit = (o, useTotal) => (fracNodes || [])
     .filter((n) => n.gpuType === o.gpuType)
@@ -309,7 +309,7 @@ export default function NewSession() {
     () => sharedOfferings.filter((o) => o.gpuType === sharedGpu),
     [sharedOfferings, sharedGpu],
   );
-  // 전용 GPU는 노드 인벤토리(클러스터 GPU 모델)에서 — 오퍼링과 무관. 풀 단가는 모델 단위로 정의.
+  // 전용 GPU는 오퍼링과 무관하게 노드 인벤토리(클러스터 GPU 모델)에서 고른다. 풀 단가는 모델 단위로 정의한다.
   const exclusiveTypes = useMemo(
     () => gpuTypes.map((g) => ({ gpuType: g.name, fullPrice: g.fullPricePerHour || 0, cuda: fmtCuda(g.cudaMin, g.cudaMax) })),
     [gpuTypes],
@@ -317,7 +317,7 @@ export default function NewSession() {
 
   const offering = offerings.find((o) => o.id === offeringId);
   // CPU 세션은 CPU 전용 이미지를 우선 보여주되, 카탈로그에 CPU 이미지가 없으면 전체 이미지로 폴백한다
-  // (GPU/CUDA 이미지도 CPU 세션에서 정상 동작 — GPU 가속만 없을 뿐). 그래야 "CPU면 이미지가 아예 안 뜨는" 문제가 없다.
+  // (GPU/CUDA 이미지도 CPU 세션에서 정상 동작한다. GPU 가속만 없을 뿐이다.) 그래야 CPU 를 고르면 이미지가 아예 안 뜨는 일이 없다.
   // GPU 세션은 GPU 이미지만.
   const cpuImgs = images.filter((im) => !im.gpu);
   const imageChoices = wtype === 'cpu' ? (cpuImgs.length ? cpuImgs : images) : images.filter((im) => im.gpu);
@@ -325,7 +325,7 @@ export default function NewSession() {
   const selectedGpuType = wtype === 'exclusive' ? exGpuType
     : wtype === 'shared' ? offering?.gpuType
       : null;
-  // 빠른 생성 = 이미지가 "내가 고른 GPU 모델을 가진 캐시 노드"에 있음(스케줄러가 그 노드 선호 → 풀 없이 시작).
+  // 빠른 생성은 이미지가 내가 고른 GPU 모델을 가진 캐시 노드에 있다는 뜻이다. 스케줄러가 그 노드를 선호해 풀 없이 시작한다.
   // CPU 세션은 타입 제약이 없으므로 캐시된 노드가 하나라도 있으면 빠름.
   const isFastImage = (im) => {
     const cached = im.cachedNodes || [];
@@ -337,7 +337,7 @@ export default function NewSession() {
   const image = images.find((i) => i.id === imageId) || imageChoices[0] || images[0];
   const exType = exclusiveTypes.find((x) => x.gpuType === exGpuType);
   // 전용 세션은 한 노드에서 N개를 co-locate 해야 하므로, 요청 가능 최대 = "단일 노드의 최대 free GPU 수".
-  // (전체 free 합이 아니라 노드별 free 의 최댓값 — 파드는 노드에 걸칠 수 없음. 노드가 2장인데 1장 사용중이면 최대 1)
+  // (전체 free 합이 아니라 노드별 free 의 최댓값이다. 파드는 노드에 걸칠 수 없어서, 노드가 2장인데 1장을 쓰는 중이면 최대 1이다)
   const exPerNodeMaxFree = exGpuType
     ? nodesAvail.filter((n) => n.gpuType === exGpuType).reduce((mx, n) => Math.max(mx, n.gpuFree || 0), 0)
     : 0;
@@ -349,7 +349,7 @@ export default function NewSession() {
   const pickType = (k, list = offerings) => {
     setWtype(k); setExGpuType(null); setSharedGpu(null); setOfferingId(null); setSelNode('auto'); setSelDs([]);
     if (k === 'shared') {
-      // 공유는 단계 선택 — 분할 가용한 GPU 모델을 자동 선택하되, 오퍼링은 사용자가 고른다.
+      // 공유는 단계 선택이다. 분할 가용한 GPU 모델을 자동으로 고르되 오퍼링은 사용자가 정한다.
       const frac = list.filter((o) => o.gpuType && o.mode === 'fractional');
       const firstModel = [...new Set(frac.map((o) => o.gpuType))]
         .find((n) => (availMap[n]?.vramFree ?? 0) > 0) || [...new Set(frac.map((o) => o.gpuType))][0];
@@ -389,10 +389,10 @@ export default function NewSession() {
     : wtype === 'exclusive' ? `${exGpuType || ''} ${gpuCount}`
       : `${(vram / 1024).toFixed(0)}GB · ${cores}%${dc.cpu ? ` · ${t('newSession.guaranteeCpu', { n: dc.cpu })}` : ''}`;
 
-  // 가용성 — 선택 자원 기준. 가용하지 않으면 생성 불가, 대신 알림 신청.
+  // 가용성은 선택 자원 기준이다. 가용하지 않으면 생성할 수 없고 대신 알림을 신청한다.
   const selGpuType = wtype === 'exclusive' ? exGpuType : (offering ? offering.gpuType : null);
   const rawAvail = selGpuType ? availMap[selGpuType] : null;
-  // 공유(분할)는 선택 오퍼링 기준 "몇 개 더 가능"(VRAM/코어/슬롯 패킹). HAMi 노드 없으면 0 → 가용없음.
+  // 공유(분할)는 선택 오퍼링 기준으로 몇 개 더 가능한지 본다(VRAM, 코어, 슬롯 패킹). HAMi 노드가 없으면 0 이라 가용 없음이다.
   const avail = wtype === 'cpu' ? { free: 1, total: 1 }
     : wtype === 'exclusive' ? (rawAvail || { free: 0, total: 0 })
       : (offering ? { free: offeringFit(offering, false), total: offeringFit(offering, true) } : null);
@@ -427,7 +427,7 @@ export default function NewSession() {
   ) : (
     <div className="row big"><span>{t('newSession.estCost')}</span><span>{priceText}</span></div>
   );
-  // 비용 확인(크레딧 모드) — 잔액과 "이 단가로 몇 시간 돌릴 수 있는지". 부족하면 경고.
+  // 비용 확인(크레딧 모드)은 잔액과 이 단가로 몇 시간 돌릴 수 있는지를 본다. 부족하면 경고한다.
   const costCheck = (!isFree && !isDynamic && balance !== null && pricePerHour > 0) ? (() => {
     const hours = Math.floor(balance / pricePerHour);
     const short = balance < pricePerHour; // 1시간치도 안 되면 생성 자체가 거부된다(서버 checkAffordable)
@@ -598,7 +598,7 @@ export default function NewSession() {
                         <label className="fld">{t('newSession.gpuCount')}</label>
                         <div className="grid cols-3" style={{ gap: 12 }}>
                           {GPU_COUNTS.map((g) => {
-                            // 단일 노드의 "빈(free)" GPU 수를 넘는 개수는 막는다 — 파드는 여러 노드에 걸칠 수 없고,
+                            // 단일 노드의 빈(free) GPU 수를 넘는 개수는 막는다. 파드는 여러 노드에 걸칠 수 없고,
                             // 노드가 2장이어도 1장이 이미 대여중이면 2개는 스케줄 불가(영구 Pending). 전체 free 합이 아니라
                             // 노드별 free 의 최댓값(exPerNodeMaxFree)이 실제 상한이다.
                             const un = g.n > exPerNodeMaxFree;
@@ -781,7 +781,7 @@ export default function NewSession() {
   );
 }
 
-// 볼륨 선택 — 컨테이너/SSH 공용. NFS 기반 볼륨을 마운트.
+// 볼륨 선택. 컨테이너와 SSH 가 함께 쓰며 NFS 기반 볼륨을 마운트한다.
 function VolumePicker({ t, vols, selVols, toggleVol, setMount, localHomeNode, setLocalHomeNode }) {
   const groups = [
     { label: t('newSession.volMine'), list: vols.owned },
@@ -848,7 +848,7 @@ function VolumePicker({ t, vols, selVols, toggleVol, setMount, localHomeNode, se
   );
 }
 
-// 데이터셋 고급 선택 — 실행 노드만 지정한다(데이터셋은 서버가 전부 자동 마운트하므로 개별 선택 없음).
+// 데이터셋 고급 선택은 실행 노드만 지정한다(데이터셋은 서버가 전부 자동 마운트하므로 개별 선택이 없다).
 // 각 노드에 캐시된 데이터셋을 정보로 보여줘 "여기로 배치하면 빠른" 노드를 고르게 한다.
 function DatasetNodePicker({ t, nodes, selGpuType, selNode, setSelNode }) {
   const [open, setOpen] = useState(false);
@@ -911,7 +911,7 @@ function DatasetNodePicker({ t, nodes, selGpuType, selNode, setSelNode }) {
   );
 }
 
-// SSH 물리노드 위저드 (하이브리드 전용) — 컨테이너와 동일한 좌측 스텝 + 우측 패널 레이아웃.
+// SSH 물리노드 위저드(하이브리드 전용). 컨테이너와 같은 좌측 스텝에 우측 패널 레이아웃이다.
 function SSHWizard({ t, navigate, toast, nodes, vols, labels }) {
   const { user, refreshUser } = useAuth();
   const { activeGroup } = useConsole();

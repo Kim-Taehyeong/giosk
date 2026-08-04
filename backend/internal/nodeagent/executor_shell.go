@@ -13,12 +13,12 @@ import (
 //
 // home 모델: home(l.MountPath = <homeBase>/<user>)은 노드 로컬 디스크(useradd -m -d). 개인 영속은
 // l.NFSServer:l.NFSPath/<user> 를 ~/nfs 로 마운트(없으면 부모 export 에 서브디렉터리 생성). 데이터셋·
-// 추가 볼륨은 l.Volumes(NFS). 반납 시 마운트 해제 후 userdel(홈 보존 — 안정 UID 라 재임대 시 소유권 회복).
+// 추가 볼륨은 l.Volumes(NFS)다. 반납할 때 마운트를 풀고 userdel 한다(홈은 보존한다. 안정 UID 라 재임대 시 소유권이 돌아온다).
 type ShellExecutor struct {
 	node       string
 	homeBase   string // 물리 로컬 home 루트(/home/giosk)
 	nsenter    bool   // true=nsenter 로 호스트 실행(DaemonSet), false=직접(호스트에서 직접 구동 시)
-	gatewayKey string // 게이트웨이 SSH 관리키의 공개키(authorized_keys 에 사용자 키와 병기 → 게이트웨이 프록시 접속)
+	gatewayKey string // 게이트웨이 SSH 관리키의 공개키. authorized_keys 에 사용자 키와 함께 넣어 게이트웨이 프록시 접속을 허용한다
 }
 
 func NewShellExecutor(node, homeBase string, nsenter bool) *ShellExecutor {
@@ -66,7 +66,7 @@ func (e *ShellExecutor) Provision(l Lease) error {
 		}
 		log.Printf("[node-agent:%s] useradd %s uid=%d home=%s", e.node, l.Username, l.UID, home)
 	}
-	// 2) SSH authorized_keys — 사용자 키 + 게이트웨이 관리키(복붙 프록시 접속용)를 병기.
+	// 2) SSH authorized_keys 에 사용자 키와 게이트웨이 관리키(복붙 프록시 접속용)를 함께 넣는다.
 	keys := joinKeys(l.SSHPublicKey, e.gatewayKey)
 	if keys != "" {
 		script := strings.Join([]string{
@@ -81,7 +81,7 @@ func (e *ShellExecutor) Provision(l Lease) error {
 			log.Printf("[node-agent:%s] authorized_keys %s 실패: %v (%s)", e.node, l.Username, err, strings.TrimSpace(out))
 		}
 	}
-	// 3) 개인 영속 ~/nfs — NFSServer:NFSPath/<user>. 서버측 서브디렉터리 없으면 부모 export 에 생성.
+	// 3) 개인 영속 ~/nfs 는 NFSServer:NFSPath/<user> 다. 서버측 서브디렉터리가 없으면 부모 export 에 만든다.
 	if l.NFSServer != "" && l.NFSPath != "" {
 		e.ensureNFSHome(l, home)
 	}
@@ -111,7 +111,7 @@ func (e *ShellExecutor) ensureNFSHome(l Lease, home string) {
 	base := strings.TrimRight(l.NFSPath, "/")
 	userPath := base + "/" + l.Username
 	target := home + "/nfs"
-	// 서브디렉터리 보장(부모 export 임시 마운트 → mkdir → 해제). $T 확장 위해 user 는 쉘 변수로.
+	// 서브디렉터리를 보장한다(부모 export 를 임시 마운트해 mkdir 하고 해제). $T 확장을 위해 user 는 쉘 변수로 둔다.
 	ensure := fmt.Sprintf(
 		"U=%s; T=$(mktemp -d); mount -t nfs %s:%s \"$T\" && mkdir -p \"$T/$U\" && umount \"$T\"; rmdir \"$T\" 2>/dev/null || true",
 		shq(l.Username), l.NFSServer, shq(base))
@@ -124,13 +124,13 @@ func (e *ShellExecutor) ensureNFSHome(l Lease, home string) {
 		log.Printf("[node-agent:%s] ~/nfs mount %s 실패: %v (%s)", e.node, l.Username, err, strings.TrimSpace(out))
 		return
 	}
-	// ~/nfs 디렉터리를 사용자 소유로(no_root_squash NFS) → 컨테이너(runAsUser=UID)와 동일 UID 권한.
+	// ~/nfs 디렉터리를 사용자 소유로 만든다(no_root_squash NFS). 컨테이너(runAsUser=UID)와 같은 UID 권한이 된다.
 	_, _ = e.run("chown", strconv.Itoa(l.UID)+":"+strconv.Itoa(l.UID), target)
 }
 
 func (e *ShellExecutor) Deprovision(username string) error {
 	home := e.homeBase + "/" + username
-	// home 하위 모든 마운트 해제(역순, lazy) — 데이터셋·~/nfs·볼륨.
+	// home 하위 모든 마운트를 역순으로 lazy 해제한다(데이터셋, ~/nfs, 볼륨).
 	e.sh(fmt.Sprintf("for m in $(mount | awk '{print $3}' | grep '^%s/' | sort -r); do umount -l \"$m\" 2>/dev/null; done", home))
 	// 계정 삭제(홈은 보존: -r 미사용). 안정 UID 라 재임대 시 소유권 회복.
 	if out, err := e.run("userdel", username); err != nil {

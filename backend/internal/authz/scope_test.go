@@ -27,7 +27,7 @@ func (f fakeScope) ManagerScopes(userID int64) []Scope {
 	return nil
 }
 
-type fakeOrgOfGroup map[int64]int64 // groupID → orgID
+type fakeOrgOfGroup map[int64]int64 // groupID 별 orgID
 
 func (f fakeOrgOfGroup) OrgOfGroup(gid int64) (int64, bool) { o, ok := f[gid]; return o, ok }
 
@@ -65,7 +65,7 @@ func TestRequireManager_Levels(t *testing.T) {
 	orgAdmin := &auth.User{ID: 2, Role: "member"}
 	member := &auth.User{ID: 3, Role: "member"}
 
-	// platform admin → 통과, scope=platform
+	// platform admin 은 통과하고 scope=platform 이다
 	if c := run([]gin.HandlerFunc{withUser(admin), RequireManager(fakeScope{}, nil), func(c *gin.Context) {
 		if CurrentScope(c).Level != "platform" {
 			t.Errorf("admin scope=%s", CurrentScope(c).Level)
@@ -73,11 +73,11 @@ func TestRequireManager_Levels(t *testing.T) {
 	}}, ""); c != 200 {
 		t.Errorf("admin code=%d", c)
 	}
-	// org admin → 통과
+	// org admin 도 통과한다
 	if c := run([]gin.HandlerFunc{withUser(orgAdmin), RequireManager(fakeScope{level: "org", org: 7, ok: true}, nil)}, ""); c != 200 {
 		t.Errorf("org admin code=%d", c)
 	}
-	// 일반 멤버 → 403
+	// 일반 멤버는 403
 	if c := run([]gin.HandlerFunc{withUser(member), RequireManager(fakeScope{level: "member", ok: true}, nil)}, ""); c != 403 {
 		t.Errorf("member should be 403, got %d", c)
 	}
@@ -93,25 +93,25 @@ func TestRequireManager_AdminAdoptsScope(t *testing.T) {
 		s := CurrentScope(c)
 		got = s.Level
 		if s.Level != "org" || s.OrgID != 7 {
-			t.Errorf("admin org:7 → level=%s org=%d", s.Level, s.OrgID)
+			t.Errorf("admin org:7 결과 level=%s org=%d", s.Level, s.OrgID)
 		}
 	}}, "")
 	if got != "org" {
 		t.Errorf("handler not reached, got=%q", got)
 	}
 
-	// group:200 → OrgID 가 부모(9)로 보강돼야 한다.
+	// group:200 이면 OrgID 가 부모(9)로 보강돼야 한다.
 	run([]gin.HandlerFunc{withUserScope(admin, "group:200"), RequireManager(fakeScope{}, oog), func(c *gin.Context) {
 		s := CurrentScope(c)
 		if s.Level != "group" || s.GroupID != 200 || s.OrgID != 9 {
-			t.Errorf("admin group:200 → level=%s grp=%d org=%d (want group/200/9)", s.Level, s.GroupID, s.OrgID)
+			t.Errorf("admin group:200 결과 level=%s grp=%d org=%d (want group/200/9)", s.Level, s.GroupID, s.OrgID)
 		}
 	}}, "")
 
-	// 헤더 없음/platform → 기본 platform 유지.
+	// 헤더가 없거나 platform 이면 기본 platform 을 유지한다.
 	run([]gin.HandlerFunc{withUser(admin), RequireManager(fakeScope{}, oog), func(c *gin.Context) {
 		if CurrentScope(c).Level != "platform" {
-			t.Errorf("admin no-header → %s (want platform)", CurrentScope(c).Level)
+			t.Errorf("admin no-header 결과 %s (want platform)", CurrentScope(c).Level)
 		}
 	}}, "")
 }
@@ -120,38 +120,38 @@ func TestRequireGroupInScope(t *testing.T) {
 	oog := fakeOrgOfGroup{100: 7, 200: 9} // group100∈org7, group200∈org9
 	orgAdmin := &auth.User{ID: 2, Role: "member"}
 
-	// org7 admin → 자기 조직 산하 group100 통과
+	// org7 admin 은 자기 조직 산하 group100 을 통과한다
 	if c := run([]gin.HandlerFunc{withUser(orgAdmin), RequireManager(fakeScope{level: "org", org: 7, ok: true}, nil), RequireGroupInScope(oog)}, "100"); c != 200 {
-		t.Errorf("org7 → group100 should pass, got %d", c)
+		t.Errorf("org7 의 group100 은 통과해야 하는데 %d", c)
 	}
-	// org7 admin → 타 조직 group200 거부(403)
+	// org7 admin 은 타 조직 group200 을 거부한다(403)
 	if c := run([]gin.HandlerFunc{withUser(orgAdmin), RequireManager(fakeScope{level: "org", org: 7, ok: true}, nil), RequireGroupInScope(oog)}, "200"); c != 403 {
-		t.Errorf("org7 → group200 should 403, got %d", c)
+		t.Errorf("org7 의 group200 은 403 이어야 하는데 %d", c)
 	}
-	// group admin → 자기 그룹만
+	// group admin 은 자기 그룹만 본다
 	if c := run([]gin.HandlerFunc{withUser(orgAdmin), RequireManager(fakeScope{level: "group", org: 7, group: 100, ok: true}, nil), RequireGroupInScope(oog)}, "100"); c != 200 {
-		t.Errorf("group100 admin → group100 should pass, got %d", c)
+		t.Errorf("group100 admin 의 group100 은 통과해야 하는데 %d", c)
 	}
 	if c := run([]gin.HandlerFunc{withUser(orgAdmin), RequireManager(fakeScope{level: "group", org: 7, group: 100, ok: true}, nil), RequireGroupInScope(oog)}, "200"); c != 403 {
-		t.Errorf("group100 admin → group200 should 403, got %d", c)
+		t.Errorf("group100 admin 의 group200 은 403 이어야 하는데 %d", c)
 	}
-	// platform → 무조건 통과
+	// platform 은 무조건 통과
 	admin := &auth.User{ID: 1, Role: auth.RoleAdmin}
 	if c := run([]gin.HandlerFunc{withUser(admin), RequireManager(fakeScope{}, nil), RequireGroupInScope(oog)}, "200"); c != 200 {
-		t.Errorf("platform → any group should pass, got %d", c)
+		t.Errorf("platform 은 어느 그룹이든 통과해야 하는데 %d", c)
 	}
 }
 
 func TestRequireOrgInScope(t *testing.T) {
 	orgAdmin := &auth.User{ID: 2, Role: "member"}
 	if c := run([]gin.HandlerFunc{withUser(orgAdmin), RequireManager(fakeScope{level: "org", org: 7, ok: true}, nil), RequireOrgInScope()}, "7"); c != 200 {
-		t.Errorf("org7 → org7 should pass, got %d", c)
+		t.Errorf("org7 의 org7 은 통과해야 하는데 %d", c)
 	}
 	if c := run([]gin.HandlerFunc{withUser(orgAdmin), RequireManager(fakeScope{level: "org", org: 7, ok: true}, nil), RequireOrgInScope()}, "9"); c != 403 {
-		t.Errorf("org7 → org9 should 403, got %d", c)
+		t.Errorf("org7 의 org9 는 403 이어야 하는데 %d", c)
 	}
-	// group admin → 조직 라우트 거부
+	// group admin 은 조직 라우트를 거부당한다
 	if c := run([]gin.HandlerFunc{withUser(orgAdmin), RequireManager(fakeScope{level: "group", org: 7, group: 100, ok: true}, nil), RequireOrgInScope()}, "7"); c != 403 {
-		t.Errorf("group admin → org route should 403, got %d", c)
+		t.Errorf("group admin 의 org 라우트는 403 이어야 하는데 %d", c)
 	}
 }

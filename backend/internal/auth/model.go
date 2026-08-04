@@ -23,7 +23,7 @@ type User struct {
 
 func (User) TableName() string { return "users" }
 
-// Session은 sessions 테이블 매핑(세션키 → user).
+// Session은 sessions 테이블 매핑(세션키로 user 를 찾는다).
 type Session struct {
 	SessionKey string    `gorm:"primaryKey;column:session_key" json:"sessionkey"`
 	UserID     int64     `gorm:"column:user_id" json:"-"`
@@ -44,7 +44,7 @@ const (
 	RoleMember = "member"
 )
 
-// LoginReq / SignupReq — 요청 바디.
+// LoginReq 와 SignupReq 는 요청 바디.
 type LoginReq struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
@@ -54,7 +54,7 @@ type SignupReq struct {
 	Username      string `json:"username" binding:"required"`
 	Password      string `json:"password" binding:"required"`
 	Email         string `json:"email" binding:"required"`
-	FirstName     string `json:"firstName"`                   // 선택 — 단일 '이름'은 LastName 에 저장
+	FirstName     string `json:"firstName"`                   // 선택 항목이다. 단일 이름은 LastName 에 저장한다
 	LastName      string `json:"lastName" binding:"required"` // 표시 이름(성+이름 합본 또는 전체 이름)
 	FirstNameEn   string `json:"firstNameEn"`
 	LastNameEn    string `json:"lastNameEn"`
@@ -63,7 +63,7 @@ type SignupReq struct {
 	TermsAccepted bool   `json:"termsAccepted"`
 }
 
-// LoginRes — 로그인 성공 응답(프론트 user 객체와 호환).
+// LoginRes는 로그인 성공 응답(프론트 user 객체와 호환).
 type LoginRes struct {
 	SessionKey string `json:"sessionkey"`
 	User       *User  `json:"user"`

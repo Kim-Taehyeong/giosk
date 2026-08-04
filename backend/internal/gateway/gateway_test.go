@@ -100,7 +100,7 @@ func TestExchangeFlow(t *testing.T) {
 		t.Fatalf("token reuse should be 403, got %d", rr2.Code)
 	}
 
-	// anti-swap: jupyter 토큰을 vscode 서브도메인에 → 거부.
+	// anti-swap: jupyter 토큰을 vscode 서브도메인에 쓰면 거부된다.
 	swapHost := "ses-abc-vscode.gw.giosk.local"
 	rr3 := httptest.NewRecorder()
 	req3 := httptest.NewRequest("GET", "http://"+swapHost+"/?access="+mk("j2"), nil)
@@ -111,7 +111,7 @@ func TestExchangeFlow(t *testing.T) {
 	}
 }
 
-// TestVSCodeFullFlow는 가짜 code-server 업스트림으로 교환→로그인프라임→프록시 전 과정을 실제로 구동한다.
+// TestVSCodeFullFlow는 가짜 code-server 업스트림으로 교환, 로그인 프라임, 프록시 전 과정을 실제로 구동한다.
 // 사용자는 비밀을 모르고 게이트웨이가 /login 을 대신 수행해 인증 쿠키를 브라우저에 전달, 이후 프록시가 200 을 낸다.
 func TestVSCodeFullFlow(t *testing.T) {
 	const pw = "secret-pw"
@@ -140,13 +140,13 @@ func TestVSCodeFullFlow(t *testing.T) {
 	p := NewProxy(Config{Domain: "gw.giosk.local", Secret: secret, CookieTTL: 3600})
 	p.now = func() time.Time { return time.Unix(1_700_000_000, 0) }
 	p.dial = func(ctx context.Context, network, _ string) (net.Conn, error) {
-		return (&net.Dialer{}).DialContext(ctx, network, upAddr) // svc DNS → 로컬 업스트림 리다이렉트
+		return (&net.Dialer{}).DialContext(ctx, network, upAddr) // svc DNS 를 로컬 업스트림으로 리다이렉트
 	}
 	host := "ses-abc-vscode.gw.giosk.local"
 	tok, _ := Sign(Claims{IID: "ses-abc", Ch: ChanVSCode, NS: "giosk-grp-1", Port: 8080,
 		Typ: TypWeb, Tgt: TgtContainer, Secret: pw, Exp: p.now().Add(2 * time.Minute).Unix(), Jti: "v1"}, secret)
 
-	// 1) 교환 → 302 + cs 쿠키(업스트림 로그인 결과) + gw_sess.
+	// 1) 교환하면 302 와 함께 cs 쿠키(업스트림 로그인 결과), gw_sess 가 온다.
 	rr := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "http://"+host+"/?access="+tok, nil)
 	req.Host = host
@@ -167,7 +167,7 @@ func TestVSCodeFullFlow(t *testing.T) {
 		t.Fatalf("expected gw_sess and cs cookies, got %v", rr.Result().Cookies())
 	}
 
-	// 2) 후속 요청(gw_sess + cs 쿠키) → 프록시 200 EDITOR-OK (비밀 노출 없이 인증됨).
+	// 2) 후속 요청(gw_sess 와 cs 쿠키)은 프록시 200 EDITOR-OK 를 받는다(비밀 노출 없이 인증됨).
 	rr2 := httptest.NewRecorder()
 	req2 := httptest.NewRequest("GET", "http://"+host+"/", nil)
 	req2.Host = host

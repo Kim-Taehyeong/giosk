@@ -8,7 +8,7 @@ import (
 // ErrDuplicateName은 같은 이름의 조직이 이미 있을 때(unique 충돌).
 var ErrDuplicateName = errors.New("duplicate org name")
 
-// ErrOrgHasUsers는 조직 산하에 아직 사용자가 있어 삭제할 수 없을 때(고아 방지) — 전원 이전/삭제 후 가능.
+// ErrOrgHasUsers는 조직 산하에 아직 사용자가 있어 삭제할 수 없을 때다(고아 방지). 전원을 옮기거나 지운 뒤에야 삭제할 수 있다.
 var ErrOrgHasUsers = errors.New("organization still has users")
 
 func isDuplicate(err error) bool {
@@ -36,7 +36,7 @@ func (s *Service) WithBootstrapper(b AdminGroupBootstrapper) *Service { s.bootst
 func (s *Service) List() ([]Summary, error) { return s.repo.List() }
 
 func (s *Service) Create(req CreateReq) (*Organization, error) {
-	// 관리자 계정을 지정했으면 조직을 만들기 전에 먼저 검증한다(잘못된 계정인데 조직만 생성되는 문제 방지 — 원자성).
+	// 관리자 계정을 지정했으면 조직을 만들기 전에 먼저 검증한다. 잘못된 계정인데 조직만 생기는 걸 막는 원자성 처리다.
 	if req.AdminAccount != "" && s.bootstrapper != nil {
 		if err := s.bootstrapper.ResolveAdmin(req.AdminAccount); err != nil {
 			return nil, err
@@ -54,7 +54,7 @@ func (s *Service) Create(req CreateReq) (*Organization, error) {
 		}
 		return nil, err
 	}
-	// 기본('일반') 그룹은 관리자 지정과 무관하게 항상 만든다 — org_admin 이 멤버십 역할이라
+	// 기본 그룹(일반)은 관리자 지정과 무관하게 항상 만든다. org_admin 이 멤버십 역할이라
 	// 나중에 관리자를 앉히려면 그룹이 먼저 있어야 한다(계정은 위에서 이미 검증됨).
 	if s.bootstrapper != nil {
 		if err := s.bootstrapper.CreateOrgAdminGroup(o.ID, req.AdminAccount); err != nil {
@@ -76,7 +76,7 @@ func (s *Service) Update(id int64, req UpdateReq) error {
 }
 
 // Archive는 조직을 삭제한다. 데이터 무결성 가드: 산하에 활성 사용자가 하나라도 있으면 삭제 불가
-// (모든 사용자를 다른 조직으로 이전하거나 삭제한 뒤에야 삭제 가능) → 고아 사용자 방지.
+// 모든 사용자를 다른 조직으로 옮기거나 지운 뒤에야 삭제할 수 있고, 그래야 고아 사용자가 안 생긴다.
 func (s *Service) Archive(id int64) error {
 	if s.repo.ActiveUserCount(id) > 0 {
 		return ErrOrgHasUsers
@@ -84,7 +84,7 @@ func (s *Service) Archive(id int64) error {
 	return s.repo.Archive(id)
 }
 
-// Grant는 조직 크레딧 풀에 가산한다(크레딧 모드 전용 — 게이팅은 라우트/상위에서).
+// Grant는 조직 크레딧 풀에 가산한다(크레딧 모드 전용이며 게이팅은 라우트나 상위에서 한다).
 // PlatformInterval은 플랫폼 기본 리필 주기(일)를 반환한다(조직 주기 캡). nil 이면 캡 없음.
 func (s *Service) WithPlatformInterval(fn func() int) *Service { s.platInterval = fn; return s }
 
@@ -94,13 +94,13 @@ func (s *Service) Grant(id int64, req GrantReq) error {
 			return err
 		}
 	}
-	// 정기 크레딧 설정 — 매 주기 재생성 잡(RunCreditRecharge)이 이 값으로 조직 풀을 채운다.
+	// 정기 크레딧 설정이다. 매 주기 재생성 잡(RunCreditRecharge)이 이 값으로 조직 풀을 채운다.
 	if req.Recurring != nil {
 		if err := s.repo.SetRecurring(id, *req.Recurring); err != nil {
 			return err
 		}
 	}
-	// 리필 주기/이월 — 주기는 플랫폼 기본보다 길 수 없다(하드캡).
+	// 리필 주기와 이월. 주기는 플랫폼 기본보다 길 수 없다(하드캡).
 	if req.Interval != nil || req.Carryover != nil {
 		iv := 0
 		if req.Interval != nil {

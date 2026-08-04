@@ -18,11 +18,11 @@ export default function AdminNotifications() {
   // 백엔드에서 관리자(전역) 알림 규칙/채널 로드(없으면 백엔드 기본 규칙).
   useEffect(() => {
     getAdminNotify().then((cfg) => {
-      // 기본 규칙은 미저장이라 id=0 → 고유 id 부여(중복 React key·updateRule 오작동 방지).
+      // 기본 규칙은 저장돼 있지 않아 id 가 0 이라 고유 id 를 부여한다(React key 중복과 updateRule 오작동 방지).
       setRules((cfg.rules || []).map((r, i) => ({ ...r, id: r.id || Date.now() + i })));
       setEmails(cfg.emails || []);
       setWebhooks(cfg.webhooks || []);
-    }).catch(() => {}); // 플랫폼 전용 — 매니저가 URL 직접 진입 시 403. 미처리 rejection(화이트스크린) 방지.
+    }).catch(() => {}); // 플랫폼 전용이라 매니저가 URL 로 직접 들어오면 403 이다. 미처리 rejection(화이트스크린)을 막는다.
   }, []);
 
   const save = async () => { await saveAdminNotify({ rules, emails, webhooks }); toast(t('anotify.saved', { n: rules.length })); };

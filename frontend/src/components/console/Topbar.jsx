@@ -31,7 +31,7 @@ export default function Topbar({ variant, ns, onMenu, navOpen }) {
 
   const isAdmin = user?.role === 'admin';
 
-  // 벨 클릭 — 최근 알림 드롭다운 토글. 열 때 최신 목록 로드.
+  // 벨을 누르면 최근 알림 드롭다운을 토글한다. 열 때 최신 목록을 불러온다.
   const toggleBell = () => {
     const next = !bellOpen;
     setBellOpen(next);
@@ -45,7 +45,7 @@ export default function Topbar({ variant, ns, onMenu, navOpen }) {
     setUnread((u) => Math.max(0, u - 1));
   };
 
-  // 인앱 알림 미읽음 수 — 60초 폴링(알림센터가 새 알림을 놓치지 않도록).
+  // 인앱 알림 미읽음 수는 60초마다 폴링한다(알림센터가 새 알림을 놓치지 않도록).
   useEffect(() => {
     let alive = true;
     const tick = () => getInboxUnread().then((n) => { if (alive) setUnread(n); }).catch(() => {});
@@ -54,14 +54,14 @@ export default function Topbar({ variant, ns, onMenu, navOpen }) {
     return () => { alive = false; clearInterval(id); };
   }, []);
 
-  // 탑바 배지 요약 채우기 — 플랫폼 관리자만 노드·GPU 현황(대시보드는 플랫폼 전용),
+  // 탑바 배지 요약을 채운다. 노드와 GPU 현황은 플랫폼 관리자만 본다(대시보드가 플랫폼 전용이다),
   // 조직/그룹 관리자·사용자는 개인 크레딧 잔액(크레딧 모드).
   useEffect(() => {
     if (variant === 'admin' && isAdmin) {
       getAdminDashboard()
         .then((d) => {
           const k = d.kpis || {};
-          // 모니터링(DCGM) 이 없으면 GPU 사용률은 0% 가 아니라 미측정 — 0% 로 보이면 "GPU 가 논다"고 오해된다.
+          // 모니터링(DCGM)이 없으면 GPU 사용률은 0% 가 아니라 미측정이다. 0% 로 보이면 GPU 가 논다고 오해된다.
           const nt = { up: k.nodesUp ?? 0, total: k.nodesTotal ?? 0 };
           const badge = d.metrics?.dcgm
             ? t('topbar.nodeBadge', { ...nt, gpu: k.gpuUtil ?? 0, defaultValue: 'Nodes {{up}}/{{total}} · GPU {{gpu}}%' })
@@ -75,7 +75,7 @@ export default function Topbar({ variant, ns, onMenu, navOpen }) {
     getWallet()
       .then((w) => setSummary((s) => ({ ...s, credit: w.balance })))
       .catch(() => {});
-    // activeScope 포함 — 팀(스코프) 전환 시 새 팀 지갑 잔액으로 배지를 다시 채운다.
+    // activeScope 를 포함한다. 팀(스코프)을 바꾸면 새 팀 지갑 잔액으로 배지를 다시 채운다.
   }, [variant, isAdmin, creditMode, setSummary, activeScope]);
   // 모드 토글 노출 여부: 관리 권한(플랫폼 admin 또는 org/group 스코프)이 있어야 관리자↔사용자 전환 가능.
   const hasRoles = isAdmin || (user?.scopes?.length > 0);

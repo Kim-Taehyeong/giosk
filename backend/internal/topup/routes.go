@@ -16,7 +16,7 @@ func RegisterGroupScoped(authed gin.IRouter, h *Handler, projAdmin gin.HandlerFu
 	g.POST("/topup-requests/:reqId/reject", h.Reject)
 }
 
-// RegisterAdmin은 플랫폼 관리자 승인 큐(그룹→조직, 조직→플랫폼).
+// RegisterAdmin은 플랫폼 관리자 승인 큐다(그룹은 조직이, 조직은 플랫폼이 승인한다).
 func RegisterAdmin(admin gin.IRouter, h *Handler) {
 	admin.GET("/topup-requests", h.PlatformQueue)
 	admin.POST("/topup-requests/:reqId/approve", h.Approve)

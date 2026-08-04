@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 프론트 전용 빠른 반영 — 이미지 재빌드/9노드 배급/rollout 없이 dist 를 실행 중 파드에 직접 복사.
+# 프론트 전용 빠른 반영이다. 이미지 재빌드나 9노드 배급, rollout 없이 dist 를 실행 중 파드에 직접 복사한다.
 # 테스트 환경 전용(파드 재시작 시 사라짐 = ephemeral). 백엔드 변경엔 못 씀(그건 full deploy).
 #
 # 사용:  ./scripts/fast-frontend.sh

@@ -15,7 +15,7 @@ type Alert struct {
 
 func (Alert) TableName() string { return "workload_alerts" }
 
-// CreateReq — 알림 생성 바디.
+// CreateReq는 알림 생성 바디.
 type CreateReq struct {
 	Type   string `json:"type" binding:"required"`
 	Target string `json:"target" binding:"required"`

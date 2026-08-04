@@ -10,7 +10,7 @@ func TestCanPlaceOnNode_그_노드_기준으로만_판정한다(t *testing.T) {
 	}}
 	none := Reservation{GpuByType: map[string]int{}, SharedByType: map[string]ShareUse{}}
 
-	// 다른 모델을 요청하면 거절 — 클러스터에 A100 이 남아 있어도 이 세션은 gpu-1 에서만 뜬다.
+	// 다른 모델을 요청하면 거절한다. 클러스터에 A100 이 남아 있어도 이 세션은 gpu-1 에서만 뜬다.
 	if canPlaceOnNode(av, PlaceReq{Node: "gpu-1", GpuMode: "exclusive", GpuType: "A100", GpuCount: 1}, none) {
 		t.Fatal("고정 노드에 없는 GPU 모델을 승인했다")
 	}
@@ -23,7 +23,7 @@ func TestCanPlaceOnNode_그_노드_기준으로만_판정한다(t *testing.T) {
 	}
 	// 인벤토리에 없는 노드는 막지 않는다(조회 공백으로 사용자를 잠그지 않는다).
 	if !canPlaceOnNode(av, PlaceReq{Node: "unknown", GpuMode: "exclusive", GpuType: "RTX4090", GpuCount: 1}, none) {
-		t.Fatal("모르는 노드에서 거절됐다 — 관문은 확실할 때만 막아야 한다")
+		t.Fatal("모르는 노드에서 거절됐다. 관문은 확실할 때만 막아야 한다")
 	}
 }
 

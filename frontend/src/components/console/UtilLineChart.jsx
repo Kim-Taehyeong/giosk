@@ -31,7 +31,7 @@ export default function UtilLineChart({ labels, values, height = 220, percent = 
       g.addColorStop(1, `${color}00`);
       return g;
     };
-    // 점이 많으면(예: 24h 스냅샷) 마커를 숨겨 선만 보이게 한다 — 점이 촘촘하면 그래프가 안 보인다.
+    // 점이 많으면(예를 들어 24h 스냅샷) 마커를 숨겨 선만 보이게 한다. 점이 촘촘하면 그래프가 안 보인다.
     const n = (values || []).length;
     const dot = n > 40 ? 0 : n > 20 ? 1.5 : 2.5;
     const base = (color, vals, name) => ({

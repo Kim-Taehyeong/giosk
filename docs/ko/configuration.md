@@ -6,9 +6,9 @@
 
 설치 후에 바꿀 수 있는 것과 고정되는 것을 구분해 두는 게 중요하다.
 
-- **설치 시 고정** — 배포 모드, 스토리지 클래스, 번들 인프라 토글, 게이트웨이 도메인.
+- **설치 시 고정**: 배포 모드, 스토리지 클래스, 번들 인프라 토글, 게이트웨이 도메인.
   바꾸려면 `helm upgrade`가 필요하다.
-- **런타임 변경** — 정책 한도, GPU 단가, 알림 규칙, 브랜딩, 기능 토글 일부.
+- **런타임 변경**: 정책 한도, GPU 단가, 알림 규칙, 브랜딩, 기능 토글 일부.
   콘솔의 시스템 설정 화면에서 바꾸며 DB에 저장된다.
 
 ## 운영 모드
@@ -18,11 +18,11 @@
 | `deployment.mode` | `container` \| `hybrid` | `hybrid`면 물리 노드 SSH 임대 세션이 추가로 열린다 |
 | `billing.mode` | `credit` \| `dynamic` \| `free` | 크레딧 차감 / 선착순 임대 / 무제한 |
 
-- **credit** — 세션 실행 시간 × GPU 단가만큼 차감한다. 잔액이 떨어지면 세션을 자동 중지한다.
-  조직 → 팀 → 멤버 순으로 크레딧을 배분한다.
-- **dynamic** — 크레딧 없이 선착순으로 빌려 쓰고 만료되면 회수한다.
+- **credit**: 세션 실행 시간 × GPU 단가만큼 차감한다. 잔액이 떨어지면 세션을 자동 중지한다.
+  조직에서 팀으로, 팀에서 멤버로 크레딧을 배분한다.
+- **dynamic**: 크레딧 없이 선착순으로 빌려 쓰고 만료되면 회수한다.
   `billing.dynamic.maxLeaseHours`, `cooldownHours`로 제한한다.
-- **free** — 제한 없음. 초기 구축·검증 단계에 쓴다.
+- **free**: 제한 없음. 초기 구축·검증 단계에 쓴다.
 
 ## 인프라 번들 토글
 
@@ -43,7 +43,7 @@
 storage:
   localClass: local-path              # 세션 홈(노드 로컬 영속) StorageClass
   persistence:
-    storageClass: nfs                 # 영속 홈 ~/nfs (RWX) — 모든 모드에서 필수
+    storageClass: nfs                 # 영속 홈 ~/nfs (RWX). 모든 모드에서 필수
   datasets:
     enabled: true
     nfs: { server: ..., path: ... }   # 공유 데이터셋 export
@@ -59,7 +59,7 @@ storage:
 ```yaml
 nodeCleaner:
   enabled: true
-  scratchThreshold: 85     # scratch 는 계약상 임시 공간 → 바로 정리
+  scratchThreshold: 85     # scratch 는 계약상 임시 공간이라 바로 정리
   homeThreshold: 92        # 세션 홈은 더 늦게, 최근 파일은 보호
   homeMinAgeDays: 3
 ```
@@ -77,7 +77,7 @@ k8s:
 
 ## 정책 한도
 
-한도는 전역 → 조직 → 팀 → 사용자 순으로 계층 적용된다. 아래는 전역 기본값(하드 상한)이고,
+한도는 전역, 조직, 팀, 사용자 순으로 계층 적용된다. 아래는 전역 기본값(하드 상한)이고,
 실제 값은 콘솔 정책 화면에서 조직·팀·사용자별로 덮어쓴다.
 
 ```yaml

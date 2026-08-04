@@ -18,7 +18,7 @@ func TestPolicyRowColumnNames(t *testing.T) {
 	want := []string{"scope", "id", "name", "max_gpu", "max_vram_gb", "max_volume_gib", "max_concurrent_sessions", "max_stopped_sessions"}
 	for _, col := range want {
 		if s.LookUpField(col) == nil {
-			t.Errorf("컬럼 %q 에 매핑되는 필드가 없다 — gorm:\"column:%s\" 태그 확인", col, col)
+			t.Errorf("컬럼 %q 에 매핑되는 필드가 없다. gorm:\"column:%s\" 태그를 확인하라", col, col)
 		}
 	}
 	// 기본 네이밍이 만들어내는 잘못된 이름이 남아 있지 않은지.

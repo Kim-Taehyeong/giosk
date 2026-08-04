@@ -19,7 +19,7 @@ const LEVEL_PILL = { info: 'primary', warning: 'cordon', critical: 'err' };
 const LEVEL_ICON = { info: Info, warning: AlertTriangle, critical: Megaphone };
 const blank = { level: 'info', title: '', body: '', active: true, pinned: false, targetOrgId: null, targetGroupId: null };
 
-// 타겟 표기 모드 — 저장은 targetOrgId/targetGroupId 로만. 둘 다 없으면 전역.
+// 타겟 표기 모드다. 저장은 targetOrgId 와 targetGroupId 로만 하며 둘 다 없으면 전역이다.
 const modeOf = (r) => (r.targetGroupId ? 'group' : r.targetOrgId ? 'org' : 'global');
 
 export default function Announcements() {
@@ -35,7 +35,7 @@ export default function Announcements() {
 
   useEffect(() => { getAllAnnouncements().then((r) => setRows(r.items || [])); }, []);
   useEffect(() => {
-    // 타겟 선택 후보 — group 관리자는 자기 그룹 고정이라 목록 불필요.
+    // 타겟 선택 후보다. group 관리자는 자기 그룹으로 고정이라 목록이 필요 없다.
     if (lvl === 'platform') getOrgs().then((r) => setOrgs(r.items || []));
     if (lvl === 'platform' || lvl === 'org') getGroups().then((r) => setGroups(r.items || []));
   }, [lvl]);
@@ -46,7 +46,7 @@ export default function Announcements() {
     { value: 'critical', label: t('announce.lvCritical') },
   ];
 
-  // 레벨별 타겟 모드 옵션 — platform=전역/조직/그룹, org=조직 전체/특정 그룹, group=자기 그룹 고정.
+  // 레벨별 타겟 모드 옵션이다. platform 은 전역·조직·그룹, org 는 조직 전체나 특정 그룹, group 은 자기 그룹 고정이다.
   const defaultMode = lvl === 'platform' ? 'global' : lvl === 'org' ? 'org' : 'group';
   const modeOpts = lvl === 'platform'
     ? [{ value: 'global', label: t('announce.tgGlobal') }, { value: 'org', label: t('announce.tgOrg') }, { value: 'group', label: t('announce.tgGroup') }]
@@ -57,7 +57,7 @@ export default function Announcements() {
   const openNew = () => setEdit({ ...blank, _mode: defaultMode });
   const openEdit = (r) => setEdit({ ...r, _mode: modeOf(r) });
 
-  // 목록 표기 — 저장된 targetOrgId/targetGroupId 로부터 사람이 읽을 라벨.
+  // 목록 표기다. 저장된 targetOrgId 와 targetGroupId 로부터 사람이 읽을 라벨을 만든다.
   const targetLabel = (r) => {
     const m = modeOf(r);
     if (m === 'global') return t('announce.tgGlobal');

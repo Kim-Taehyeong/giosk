@@ -17,7 +17,7 @@ spec:
       serviceAccountName: {{ include "giosk.fullname" . }}-api
       {{- include "giosk.controlPlaneScheduling" . | nindent 6 }}
       {{- if .Values.database.bundled }}
-      # 번들 MySQL 이 접속 가능해질 때까지 api 시작을 막는다(부팅 순서 보장 → CrashLoop 회피).
+      # 번들 MySQL 이 접속 가능해질 때까지 api 시작을 막는다(부팅 순서를 보장해 CrashLoop 을 피한다).
       initContainers:
         - name: wait-for-db
           image: busybox:1.36
@@ -55,7 +55,7 @@ spec:
               valueFrom:
                 secretKeyRef: { name: {{ include "giosk.fullname" . }}-secrets, key: smtp-password }
             {{- if .Values.gateway.enabled }}
-            # 게이트웨이 활성 시에만 주입 → API 가 토큰 URL 발급(비활성이면 gatewayOn()=false, 직접접속 폴백)
+            # 게이트웨이가 켜져 있을 때만 주입해 API 가 토큰 URL 을 발급한다(꺼져 있으면 gatewayOn()=false 라 직접접속으로 폴백)
             - name: GIOSK_GATEWAY_SECRET
               valueFrom:
                 secretKeyRef: { name: {{ include "giosk.fullname" . }}-secrets, key: gateway-secret }

@@ -1,7 +1,7 @@
 // Package metrics는 Prometheus(HTTP API)에서 대시보드용 지표를 조회한다.
 //
 // URL 이 비었거나 클러스터에 Prometheus 가 없으면 "미가용"으로 간주하고
-// (0, false) 를 반환한다 — 대시보드는 이를 0/빈 값으로 안전하게 표시한다.
+// (0, false) 를 반환한다. 대시보드는 이를 0 이나 빈 값으로 안전하게 표시한다.
 // GPU 지표는 DCGM exporter(dcgm-exporter)가 노출하는 메트릭을 전제로 한다.
 package metrics
 
@@ -40,7 +40,7 @@ func (c *Client) Scalar(ctx context.Context, query string) (float64, bool) {
 	return v[0].value, true
 }
 
-// VectorByLabel은 instant 쿼리 결과를 지정 라벨값→값 맵으로 반환한다(노드별 집계용).
+// VectorByLabel은 instant 쿼리 결과를 지정 라벨값 기준 값 맵으로 반환한다(노드별 집계용).
 func (c *Client) VectorByLabel(ctx context.Context, query, label string) (map[string]float64, bool) {
 	if !c.Enabled() {
 		return nil, false

@@ -42,12 +42,12 @@ func (s *Service) ListPresets(activeOnly bool) ([]Preset, error) {
 func (s *Service) SavePreset(p *Preset) error  { return s.repo.SavePreset(p) }
 func (s *Service) DeletePreset(id int64) error { return s.repo.DeletePreset(id) }
 
-// GpuTypeInfo — GPU 타입 + 노드 수 + 단가(전용/시간, 분할 GB·시간, 분할 코어%·시간).
+// GpuTypeInfo는 GPU 타입, 노드 수, 단가(전용 시간당, 분할 GB·시간, 분할 코어%·시간)를 담는다.
 // Timeslicing/Slots: 이 타입에 타임슬라이싱 노드가 있으면 true + 슬롯 수(사용자 화면의 슬롯 옵션 노출용).
 //
 // NodeCPU/NodeMemGB/NodeGPUs: 이 타입 후보 노드 중 "가장 작은" 노드의 사양.
 // CPU·메모리 최소 보장 = NodeCPU × (내 GPU 지분). 최소 노드 기준이라 어느 후보에 떨어져도 보장이 성립한다.
-// (requests 만 걸고 limits 는 안 걸어 여유 시 초과 사용 가능 → 큰 노드가 놀지 않는다.)
+// (requests 만 걸고 limits 는 안 걸어 여유가 있으면 초과 사용할 수 있어 큰 노드가 놀지 않는다.)
 type GpuTypeInfo struct {
 	Name         string `json:"name"`
 	Nodes        int    `json:"nodes"`
@@ -75,14 +75,14 @@ func (s *Service) GpuTypes(ctx context.Context) ([]GpuTypeInfo, error) {
 	for _, p := range prices {
 		pm[p.GpuType] = p
 	}
-	// 타임슬라이싱 노드(DB) × 라이브 노드의 GPU 타입(K8s 라벨) 조인 → 타입별 슬롯 제공 여부.
+	// 타임슬라이싱 노드(DB)와 라이브 노드의 GPU 타입(K8s 라벨)을 조인해 타입별 슬롯 제공 여부를 낸다.
 	// 동시에 타입별 "가장 작은 후보 노드"의 사양을 모은다(CPU·메모리 최소 보장 산출용).
 	tsNodes := s.repo.TimeslicingNodes()
 	tsByType := map[string]int{}
 	minByType := map[string]k8s.LiveNode{}
 	cudaByType := map[string]string{}    // 타입별 최소 CUDA 런타임(버전 비교). 노드가 이질적일 수 있어 별도 집계.
-	cudaMinByType := map[string]string{} // 물리 지원 최소(컴퓨트 능력) — 타입 공통.
-	cudaMaxByType := map[string]string{} // 지원 최대(드라이버) — 노드별 다르면 가장 낮은 값.
+	cudaMinByType := map[string]string{} // 물리 지원 최소(컴퓨트 능력). 타입 공통이다.
+	cudaMaxByType := map[string]string{} // 지원 최대(드라이버). 노드별로 다르면 가장 낮은 값을 쓴다.
 	if live, err := s.gpu.ListNodes(ctx); err == nil {
 		for _, n := range live {
 			if n.GpuType == "" || !n.Ready {

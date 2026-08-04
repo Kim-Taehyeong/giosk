@@ -135,7 +135,7 @@ func (s *Service) List(userID int64) (*ListRes, error) {
 	if err != nil {
 		return nil, err
 	}
-	// 볼륨별 사용량은 채우지 않는다 — 볼륨이 NFS 익스포트의 하위 디렉터리라
+	// 볼륨별 사용량은 채우지 않는다. 볼륨이 NFS 익스포트의 하위 디렉터리라
 	// kubelet 통계(kubelet_volume_stats_used_bytes)가 그 볼륨이 아니라 익스포트 전체 사용량을
 	// 돌려준다(실측: 50Gi PVC 가 capacity 97.87GiB). 예전엔 그 값을 볼륨 사용량으로 표시해
 	// "50/10 GB" 같은 거짓 수치가 나왔다. 실제 사용량은 NFS 하위 디렉터리 du 가 필요(미구현).
@@ -143,7 +143,7 @@ func (s *Service) List(userID int64) (*ListRes, error) {
 	return &ListRes{Owned: owned, Shared: shared, LocalHomes: s.localHomes(userID), Quota: Quota{AllocatedGB: alloc, TotalGB: s.quotaFor(userID)}}, nil
 }
 
-// StorageOverview — 관리자 스토리지 현황(노드 디스크 + NFS 실용량 + 사용자별 할당).
+// StorageOverview는 관리자 스토리지 현황(노드 디스크, NFS 실용량, 사용자별 할당).
 type StorageOverview struct {
 	Nodes []NodeDisk `json:"nodes"`
 	// NFS 백엔드의 실제 파일시스템 용량/사용량(GB). 메트릭 미연동 시 0.
@@ -201,7 +201,7 @@ func (s *Service) nfsCapacity(ctx context.Context) (totalGB, usedGB int) {
 	return gb(total), gb(used)
 }
 
-// nodeDisk는 노드별 루트 파일시스템 사용/총량(GB)을 반환한다(node-exporter→node 조인).
+// nodeDisk는 노드별 루트 파일시스템 사용량과 총량(GB)을 반환한다(node-exporter 를 node 로 조인).
 func (s *Service) nodeDisk(ctx context.Context) []NodeDisk {
 	out := []NodeDisk{}
 	if s.met == nil || !s.met.Enabled() {
@@ -222,7 +222,7 @@ func (s *Service) nodeDisk(ctx context.Context) []NodeDisk {
 }
 
 // Create는 쿼터 확인 후 볼륨 행 + PVC 를 만든다. groupID>0 이면 그 팀에 귀속(쿼터·과금이 그 팀 기준).
-// 소유는 항상 개인(userID) — 팀은 "용량·비용이 어느 팀에서 나가는지"만 정한다(세션 과금과 동일 관점).
+// 소유는 항상 개인(userID)이다. 팀은 용량과 비용이 어느 팀에서 나가는지만 정한다(세션 과금과 같은 관점).
 func (s *Service) Create(ctx context.Context, userID, groupID int64, req CreateReq) (*Volume, error) {
 	// 쿼터: 팀 귀속이면 그 팀 볼륨 합·그 팀 상한, 아니면 사용자 단위.
 	alloc := 0
@@ -259,7 +259,7 @@ func (s *Service) Create(ctx context.Context, userID, groupID int64, req CreateR
 	return v, nil
 }
 
-// ImportReq — 관리자 NFS 기존 볼륨 임포트 입력.
+// ImportReq는 관리자 NFS 기존 볼륨 임포트 입력.
 type ImportReq struct {
 	Name        string `json:"name" binding:"required"`
 	OwnerUserID *int64 `json:"ownerUserId"` // 개인 볼륨 소유자(그룹 볼륨이면 nil)
@@ -270,7 +270,7 @@ type ImportReq struct {
 }
 
 // AdminImport는 이미 데이터가 있는 기존 NFS 경로를 볼륨으로 매핑한다(정적 PV 바인딩).
-// 도입 환경 어댑션용 관리자 액션 — 쿼터/크레딧 검사는 건너뛴다(기존 데이터라 신규 할당이 아님).
+// 도입 환경 어댑션용 관리자 액션이라 쿼터와 크레딧 검사를 건너뛴다(기존 데이터라 신규 할당이 아니다).
 func (s *Service) AdminImport(ctx context.Context, req ImportReq) (*Volume, error) {
 	if req.OwnerUserID == nil && req.GroupID == nil {
 		return nil, errors.New("owner user or group required")
@@ -400,7 +400,7 @@ func (s *Service) RunStorageBiller(ctx context.Context, interval time.Duration) 
 
 func (s *Service) billStorageOnce(ctx context.Context) {
 	if s.price() <= 0 {
-		return // 단가 0(무료) — 이번 틱 과금 없음(런타임에 >0 로 바뀌면 다음 틱부터 과금)
+		return // 단가가 0(무료)이라 이번 틱은 과금하지 않는다(런타임에 0보다 커지면 다음 틱부터 과금)
 	}
 	vols, err := s.repo.ListBillable()
 	if err != nil {
@@ -425,7 +425,7 @@ func (s *Service) billStorageOnce(ctx context.Context) {
 		ref := fmt.Sprintf("vol-%d", v.ID)
 		ok, err := s.charger.Consume(*v.OwnerUserID, gidPtr(v.GroupID), due, ref)
 		if err != nil || !ok {
-			continue // 잔액 부족 → 유예(다음 틱 재시도; 삭제하지 않음)
+			continue // 잔액 부족이라 유예한다(다음 틱에 재시도하고 삭제하지 않는다)
 		}
 		_ = s.repo.SetBilled(v.ID, totalDue)
 	}

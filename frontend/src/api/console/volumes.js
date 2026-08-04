@@ -1,6 +1,6 @@
 import { apiGet, apiPost, apiPut, apiDelete } from '../client';
 
-// 볼륨 — 실 백엔드 연결. 백엔드 owned/shared/quota → 프론트 shape 보정.
+// 볼륨. 실 백엔드에 연결하며 백엔드 owned/shared/quota 를 프론트 shape 으로 보정한다.
 export const getVolumes = () =>
   apiGet('/volumes').then((d) => ({
     owned: (d.owned || []).map((v) => ({ ...v, perm: 'owner', sharedWith: v.sharedWith || [] })),

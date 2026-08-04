@@ -104,7 +104,7 @@ func (h *Handler) List(c *gin.Context) {
 		httpx.Internal(c, "이미지 조회 실패")
 		return
 	}
-	cached := h.repo.CachedNodesMap() // 이미지별 캐시 완료 노드 → 빠른 생성 배지
+	cached := h.repo.CachedNodesMap() // 이미지별 캐시 완료 노드. 빠른 생성 배지에 쓴다
 	for i := range items {
 		items[i].CachedNodes = cached[items[i].ID]
 	}
@@ -125,7 +125,7 @@ func (h *Handler) Save(c *gin.Context) {
 	httpx.OK(c, img)
 }
 
-// SetStatus는 publish(draft→active) 등 상태 전이.
+// SetStatus는 draft 에서 active 로 올리는 publish 같은 상태 전이를 처리한다.
 func (h *Handler) SetStatus(c *gin.Context) {
 	var req StatusReq
 	if err := c.ShouldBindJSON(&req); err != nil {

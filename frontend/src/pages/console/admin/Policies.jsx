@@ -17,12 +17,12 @@ import { useAuth } from '../../../context/AuthContext';
 import { activeLevelOf } from '../../../config/consoleRoles';
 
 
-// 범위별 저장 함수 — platform 은 /admin(무제한), 매니저는 /console(스코프+상위캡 강제).
+// 범위별 저장 함수다. platform 은 /admin(무제한)을, 매니저는 /console(스코프와 상위캡 강제)을 쓴다.
 const SETTER_ADMIN = { user: setUserLimits, group: setGroupLimits, org: setOrgLimits };
 const SETTER_SCOPED = { user: setUserLimitsScoped, group: setGroupLimitsScoped, org: setOrgLimitsScoped };
 const SCOPE_VARIANT = { org: 'primary', group: 'gpu', user: 'pause' };
 
-// 값 표기 — 미설정(null)은 "상속"이라 대시로. 전역 행은 항상 구체값.
+// 값 표기다. 미설정(null)은 상속이라 대시로 쓰고 전역 행은 항상 구체값을 쓴다.
 const val = (v, unit = '') => (v === null || v === undefined ? '—' : `${v}${unit}`);
 
 export default function Policies() {
@@ -48,7 +48,7 @@ export default function Policies() {
   const load = () => getPolicies().then((d) => { setRows(d.items); setGlobal(d.global); });
   useEffect(() => {
     load();
-    // 정책 대상 후보 — /console 은 스코프로 필터되므로 매니저는 자기 범위만 받는다.
+    // 정책 대상 후보다. /console 은 스코프로 필터되므로 매니저는 자기 범위만 받는다.
     Promise.all([getOrgs(), getGroups()]).then(([o, g]) => setTargets({
       org: (o.items || []).map((x) => ({ value: x.id, label: x.displayName })),
       group: (g.items || []).map((x) => ({ value: x.id, label: x.displayName })),
@@ -63,7 +63,7 @@ export default function Policies() {
   };
 
   const save = async () => {
-    // 전역은 대상이 없다(모든 사용자) — 폴백이라 빈 값을 허용하지 않는다. platform 전용.
+    // 전역은 대상이 없다(모든 사용자). 폴백이라 빈 값을 허용하지 않으며 platform 전용이다.
     if (edit.scope === 'global') {
       const l = edit.limits || {};
       if ([l.maxGpu, l.maxVramGb, l.maxVolumeGib, l.maxConcurrentSessions].some((v) => !v || v < 1)) {

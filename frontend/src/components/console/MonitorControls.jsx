@@ -8,7 +8,7 @@ const OPTS = [
   { value: 60000, label: '1분' }, { value: 120000, label: '2분' }, { value: 300000, label: '5분' },
 ];
 
-// 감시월 컨트롤 — 폴링 주기(테마 드롭다운) + 전체화면 토글(우측 상단). containerRef: 전체화면 대상 요소.
+// 감시월 컨트롤. 폴링 주기(테마 드롭다운)와 전체화면 토글(우측 상단)이다. containerRef 가 전체화면 대상 요소다.
 export default function MonitorControls({ intervalMs, setIntervalMs, containerRef }) {
   const [fs, setFs] = useState(false);
   const [spin, setSpin] = useState(false);

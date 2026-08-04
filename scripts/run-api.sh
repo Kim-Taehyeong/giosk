@@ -14,7 +14,7 @@ export GIOSK_PROMETHEUS_URL=http://localhost:9090
 export GIOSK_AGENT_TOKEN=agent-secret
 export GIOSK_DATASETS_ENABLED=true
 # 데이터셋 정규 NFS 경로(<base>/dataset/<name>).
-# 테스트베드: ganesha 프로비저너의 export 루트(/export)는 RO 의사루트라 임의 서브디렉터리 생성 불가 →
+# 테스트베드: ganesha 프로비저너의 export 루트(/export)는 RO 의사루트라 임의 서브디렉터리를 만들 수 없다.
 # RWX PVC(giosk-ds-root)를 하나 만들어 그 PV 의 NFS 경로를 베이스로 사용(쓰기 가능).
 # 운영(외부 NFS)에서는 GIOSK_DATASETS_NFS_SERVER/PATH 를 실제 export(예: nfs:/export)로 직접 지정하면 됨.
 kubectl create namespace giosk-grp-datasets >/dev/null 2>&1 || true

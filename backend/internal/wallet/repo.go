@@ -22,12 +22,12 @@ type Repository interface {
 	DrawGroupTx(groupID int64, amount int, actor *int64) (bool, error) // 그룹 풀 차감(부족하면 false)
 	SetGroupBudget(groupID int64, cap, alertPct int) error
 	SetDefaultMemberBudget(groupID int64, v int) error
-	RefillDue(plat PlatformRefill) (int, error) // 계층형 정기 크레딧 리필(조직→팀→개인). 구현: refill.go
+	RefillDue(plat PlatformRefill) (int, error) // 계층형 정기 크레딧 리필(조직, 팀, 개인 순). 구현은 refill.go
 	SetGroupRefill(groupID int64, recurring, intervalDays int, carryover bool) error
 	SetUserRefill(userID, groupID int64, recurring, intervalDays int, carryover bool) error
 	GroupRefillCap(groupID int64, platDefault int) int
 	UserRefillCap(groupID int64, platDefault int) int // 멤버십 지갑의 팀(group) 기준 리필 주기 상한
-	RefillNowUser(userID, groupID int64) (int, error) // 즉시 리필(멤버) — 정기 주기 무시하고 지금 적용
+	RefillNowUser(userID, groupID int64) (int, error) // 즉시 리필(멤버). 정기 주기를 무시하고 지금 적용한다
 	RefillNowGroup(groupID int64) (int, error)        // 즉시 리필(팀)
 }
 
@@ -108,7 +108,7 @@ func (r *gormRepo) UserTransactions(userID, groupID int64, limit int) ([]CreditT
 	return out, r.db.Where("user_id = ? AND group_id = ?", userID, groupID).Order("id DESC").Limit(limit).Find(&out).Error
 }
 
-// DailyConsumption은 최근 days일간 일자별 소비 합계(양수)를 오래된→최근 순으로 반환.
+// DailyConsumption은 최근 days일간 일자별 소비 합계(양수)를 오래된 것부터 최근 순으로 반환한다.
 // 소비/정산(amount<0)만 집계하며, 원장 전체를 일자별로 GROUP BY 한다(거래 limit 무관).
 //
 // 소비가 없던 날도 0으로 채워 반드시 days개를 돌려준다. 잔디 히트맵은 "칸 1개 = 하루,
@@ -185,7 +185,7 @@ func (r *gormRepo) ApplyGroupTx(groupID int64, txType string, amount int, actor 
 }
 
 // DrawGroupTx는 그룹 풀(balance)에서 amount 를 원자적으로 차감한다(부족하면 차감 없이 false).
-// 그룹→개인 하위 배분 시 그룹 풀 한도를 강제한다.
+// 그룹에서 개인으로 하위 배분할 때 그룹 풀 한도를 강제한다.
 func (r *gormRepo) DrawGroupTx(groupID int64, amount int, actor *int64) (bool, error) {
 	var ok bool
 	err := r.db.Transaction(func(tx *gorm.DB) error {

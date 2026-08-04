@@ -17,7 +17,7 @@ kind: ConfigMap
 metadata:
   name: {{ include "giosk.fullname" . }}-config
 data:
-  # values → GIOSK_* 환경변수 (backend/internal/config 와 1:1)
+  # values 를 GIOSK_* 환경변수로 옮긴다 (backend/internal/config 와 1:1)
   GIOSK_DEPLOYMENT_MODE: {{ .Values.deployment.mode | quote }}
   GIOSK_BILLING_MODE: {{ .Values.billing.mode | quote }}
   GIOSK_NS_PREFIX: {{ .Values.k8s.namespacePrefix | default "giosk-grp-" | quote }}
@@ -79,19 +79,19 @@ data:
   GIOSK_HOME_REAP_PCT: {{ .Values.quota.homeReapPct | default 88 | quote }}
   # 세션 웹(VSCode) 노출 모드: nodeport(기본) | loadbalancer(MetalLB)
   GIOSK_SESSION_EXPOSE: {{ .Values.session.expose | quote }}
-  # Prometheus(메트릭) — monitoring.enabled 면 in-cluster 서비스, 아니면 외부 URL.
+  # Prometheus(메트릭). monitoring.enabled 면 in-cluster 서비스를, 아니면 외부 URL 을 쓴다.
   GIOSK_PROMETHEUS_URL: {{ .Values.monitoring.prometheusURL | default (ternary (printf "http://kps-kube-prometheus-stack-prometheus.%s:9090" .Release.Namespace) "" .Values.monitoring.install) | quote }}
   # CORS 허용 오리진(콤마구분). 단일 오리진(nginx 프록시) 배포면 비워둬도 무방.
   GIOSK_CORS_ORIGINS: {{ .Values.api.corsOrigins | default "" | quote }}
   # 노드 GPU 종류 라벨. NVIDIA GPU Operator(GFD)·fake-gpu-operator 둘 다 nvidia.com/gpu.product 사용.
   GIOSK_GPU_TYPE_LABEL: {{ .Values.k8s.gpuTypeLabel | default "nvidia.com/gpu.product" | quote }}
-  # 노드 CUDA(드라이버) 버전 라벨. GFD 가 부여(nvidia.com/cuda.driver-version). 라벨 없으면 "—" 로 표기.
+  # 노드 CUDA(드라이버) 버전 라벨. GFD 가 부여한다(nvidia.com/cuda.driver-version). 라벨이 없으면 콘솔에 빈 값으로 표기한다.
   GIOSK_CUDA_LABEL: {{ .Values.k8s.cudaLabel | default "nvidia.com/cuda.driver-version" | quote }}
   # 이미지 빌드/세션 풀 레지스트리. registry.enabled=true 면 인클러스터 서비스, 아니면 registry.external.
   GIOSK_REGISTRY: {{ $registry | quote }}
   # cosign 서명키 Secret(빌드 ns). registry.cosign.enabled 면 빌드 후 서명(키 없으면 자동 생성).
   GIOSK_COSIGN_KEY_SECRET: {{ if .Values.registry.cosign.enabled }}{{ .Values.registry.cosign.keySecret | quote }}{{ else }}""{{ end }}
-  # 컨테이너 세션 sshd 사이드카 이미지. session.ssh.enabled(기본 on)면 image.sshd 를 쓴다 —
+  # 컨테이너 세션 sshd 사이드카 이미지. session.ssh.enabled(기본 on)면 image.sshd 를 쓴다.
   # 게이트웨이와 무관하게 "사용자 공개키로 직접 SSH"가 기본 경로이므로 gateway.enabled 블록 밖에 둔다.
   # gateway.sshdImage 는 예전 게이트웨이 전용 설정과의 하위호환 폴백.
   GIOSK_SESSION_SSHD_IMAGE: {{ if .Values.session.ssh.enabled }}{{ printf "%s:%s" .Values.image.sshd.repository .Values.image.sshd.tag | quote }}{{ else }}{{ .Values.gateway.sshdImage | default "" | quote }}{{ end }}
@@ -101,7 +101,7 @@ data:
   # DOMAIN 이 비면 config 기본값(gw.giosk.local)이 먹어 실제로 열리지 않는 링크가 나간다.
   GIOSK_GATEWAY_DOMAIN: {{ required "gateway.enabled=true 면 gateway.domain 필수(<iid>-<ch>.<domain> 와일드카드 DNS)" .Values.gateway.domain | quote }}
   GIOSK_GATEWAY_SCHEME: {{ .Values.gateway.scheme | default "https" | quote }}
-  # SSH 접속 호스트 — 미지정 시 게이트웨이 LB IP(MetalLB), 그것도 없으면 도메인.
+  # SSH 접속 호스트. 지정하지 않으면 게이트웨이 LB IP(MetalLB)를 쓰고, 그것도 없으면 도메인을 쓴다.
   GIOSK_GATEWAY_HOST: {{ .Values.gateway.host | default .Values.gateway.service.loadBalancerIP | default .Values.gateway.domain | quote }}
   GIOSK_GATEWAY_SSH_PORT: {{ .Values.gateway.sshPort | default 2222 | quote }}
   # 외부(VPN 밖) 접속용 SSH 점프 호스트. 지정 시 콘솔이 -J 붙은 명령도 함께 보여준다. 빈값=내부 명령만.

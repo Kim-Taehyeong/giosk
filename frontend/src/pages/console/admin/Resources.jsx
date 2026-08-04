@@ -36,7 +36,7 @@ function OfferingsTab({ creditMode, onGotoPricing, title }) {
   const load = () => getOfferings().then((d) => setRows(d.items));
   useEffect(() => { load(); getGpuTypes().then((d) => setGpuTypes(d.items)); }, []);
 
-  // 오퍼링은 공유(HAMi 분할) 전용 — mode 는 항상 fractional.
+  // 오퍼링은 공유(HAMi 분할) 전용이라 mode 가 항상 fractional 이다.
   const blank = { name: '', gpuType: '', vramMb: 8192, corePercent: 50, mode: 'fractional', pricePerHour: 120, isActive: true };
   const save = async () => {
     if (!edit.name || !edit.gpuType) { toast(t('res.needNameGpu', { defaultValue: '이름과 GPU 모델을 입력하세요.' })); return; }
@@ -171,7 +171,7 @@ function PricingTab() {
       () => setOffs((cur) => cur.map((x) => (x.id === o.id ? { ...x, price: num(x.draft), draft: String(num(x.draft)) } : x))));
   };
 
-  // GPU 단가로 오퍼링 단가 자동 채우기 — 오퍼링 = 그 GPU 전용단가 × 코어비율(%). 저장까지 수행.
+  // GPU 단가로 오퍼링 단가를 자동으로 채운다. 오퍼링 단가는 그 GPU 전용단가에 코어비율(%)을 곱한 값이며 저장까지 한다.
   const autofillOfferings = async () => {
     const gm = {}; gpus.forEach((g) => { gm[g.name] = num(g.hour); });
     let n = 0;

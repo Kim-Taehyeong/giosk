@@ -6,7 +6,7 @@ import { X } from 'lucide-react';
 // 포커스를 받을 수 있는 요소들(포커스 트랩 계산용).
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-// 테마 인지 모달. body 포털로 렌더 → 조상 요소의 transform/filter(스태킹 컨텍스트)에 갇히지 않고
+// 테마 인지 모달이다. body 포털로 렌더해 조상 요소의 transform/filter(스태킹 컨텍스트)에 갇히지 않고
 // position:fixed 백드롭이 화면 전체를 덮는다(오퍼링 카드처럼 변형된 조상 안에서도 정상).
 //
 // 접근성: role=dialog + aria-modal 로 보조기술에 "지금은 이 안이 전부"라고 알리고,

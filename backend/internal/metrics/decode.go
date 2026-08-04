@@ -39,7 +39,7 @@ func (c *Client) fetchVector(ctx context.Context, u string) ([]sample, bool) {
 	return out, true
 }
 
-// fetchVectorLabeled는 instant(vector) 결과를 metric[label]→value 맵으로 디코드한다.
+// fetchVectorLabeled는 instant(vector) 결과를 metric[label] 기준 값 맵으로 디코드한다.
 func (c *Client) fetchVectorLabeled(ctx context.Context, u, label string) (map[string]float64, bool) {
 	resp, ok := c.get(ctx, u)
 	if !ok {
@@ -109,7 +109,7 @@ func (c *Client) get(ctx context.Context, u string) (*promResp, bool) {
 }
 
 // scalarOf는 Prometheus 값을 파싱한다. 샘플 값은 문자열("0.5")이지만 range/instant 의
-// 타임스탬프(pair[0])는 JSON 숫자(float)로 온다 — 둘 다 받아야 한다. 문자열만 받으면
+// 타임스탬프(pair[0])는 JSON 숫자(float)로 오므로 둘 다 받아야 한다. 문자열만 받으면
 // matrix 타임스탬프가 전부 0 으로 파싱돼 range 결과가 한 점(t=0)으로 붕괴한다(노드·세션 이력 1점 버그).
 func scalarOf(v any) (float64, bool) {
 	switch x := v.(type) {

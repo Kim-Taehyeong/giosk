@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { activeScopeOf } from '../../config/consoleRoles';
 import { clickable } from '../../utils/a11y';
 
-// scopeKey — 백엔드 X-Console-Scope 형식("org:10"|"group:2").
+// scopeKey 는 백엔드 X-Console-Scope 형식이다(org:10 이나 group:2).
 const keyOf = (s) => `${s.level}:${s.level === 'org' ? s.orgId : s.groupId}`;
 
 // 멀티롤 컨텍스트 전환기. 사용자가 조직 관리자 + 그룹 관리자를 동시에 가질 때
@@ -35,7 +35,7 @@ export default function ScopeSwitcher({ ns }) {
     navigate('/console/admin/dashboard/ops'); // 새 스코프에 유효한 홈으로(현재 탭이 스코프 밖일 수 있음)
   };
 
-  // 스코프가 1개면 전환 필요 없음 — 기존 정적 라벨.
+  // 스코프가 하나면 전환할 필요가 없으니 기존 정적 라벨을 쓴다.
   if (scopes.length <= 1) {
     const s = current || scopes[0];
     return (

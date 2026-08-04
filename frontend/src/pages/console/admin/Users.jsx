@@ -18,7 +18,7 @@ import { getOrgs, getGroups } from '../../../api/console/governance';
 import { c, cU } from '../../../lib/credit';
 
 const roleVariant = { member: 'pause', admin: 'err' };
-// 멤버십(조직/팀) 역할 — 플랫폼 역할과 색을 구분해 둘을 헷갈리지 않게.
+// 멤버십(조직이나 팀) 역할이다. 플랫폼 역할과 색을 구분해 둘을 헷갈리지 않게 한다.
 const memberRoleVariant = { org_admin: 'gpu', project_admin: 'primary', member: 'pause' };
 const statusVariant = { approved: 'ok', pending: 'wait', suspended: 'err', rejected: 'err' };
 const ROLES = ['member', 'admin'];
@@ -50,7 +50,7 @@ export default function Users() {
   useEffect(() => {
     getOrgs().then((d) => setOrgs(d.items));
     getGroups().then((d) => setAllGroups(d.items));
-    // 대기 인원은 개수만 필요 → 1건만 받아 total 을 쓴다.
+    // 대기 인원은 개수만 필요하므로 1건만 받아 total 을 쓴다.
     getUsers({ status: 'pending', size: 1 }).then((r) => setPendingCount(r.total));
   }, []);
   // 입력마다 요청하지 않도록 300ms 디바운스.
@@ -67,7 +67,7 @@ export default function Users() {
   const groups = [...new Set(allGroups.map((g) => g.displayName).filter(Boolean))];
 
   const submitGrant = async () => {
-    // 백엔드 GrantReq({amount})를 기대 — 원시 숫자를 보내면 400. (그룹/조직 부여와 동일한 객체 형식)
+    // 백엔드가 GrantReq({amount})를 기대하므로 원시 숫자를 보내면 400 이다. (그룹이나 조직 부여와 같은 객체 형식이다)
     await grantUserCredit(grant.user.id, { amount: Number(grant.delta) });
     setGrant(null); toast(t('users.granted', { name: grant.user.name, n: grant.delta })); load();
   };
@@ -92,7 +92,7 @@ export default function Users() {
     ['김철수', 'kim', 'kim@giosk.io', 'member', 'AI센터', 'vision-lab', '이담당'],
   ];
 
-  // 업로드된 행 → 일괄 추가.
+  // 업로드된 행을 일괄 추가한다.
   const onBulkRows = async (data) => {
     const parsed = data
       .filter((r) => r[0] && r[1])
@@ -136,7 +136,7 @@ export default function Users() {
               : <span className="muted">—</span>) },
             { key: 'email', header: t('users.colEmail'), className: 'mono' },
             { key: 'role', header: t('users.colRole'), render: (r) => <Pill variant={roleVariant[r.role] || 'pause'}>{r.role}</Pill> },
-            // 조직/팀 역할은 플랫폼 역할과 별개(멤버십 역할) — 팀장·조직관리자는 여기에만 나타난다.
+            // 조직이나 팀 역할은 플랫폼 역할과 별개인 멤버십 역할이다. 팀장과 조직관리자는 여기에만 나타난다.
             { key: 'memberRole', header: t('users.colMemberRole'), render: (r) => (r.memberRole
               ? <Pill variant={memberRoleVariant[r.memberRole] || 'pause'}>{t(`roles.${r.memberRole}`)}</Pill>
               : <span className="muted">—</span>) },

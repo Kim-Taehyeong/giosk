@@ -17,7 +17,7 @@ type Repository interface {
 	OfferingCapacity() []RegionRow                     // 오퍼링별 정의(가용량은 서비스에서 보정)
 	UserVramTotalMB(userID int64) int                  // running 세션 VRAM 합(MB)
 	UserRunningGpuPods(userID int64) []string          // running GPU 세션 instance_id(VRAM 사용량 DCGM 쿼리용)
-	RunningByGpuType() map[string]int                  // gpu_type → running 세션 수
+	RunningByGpuType() map[string]int                  // gpu_type 별 running 세션 수
 	UserSessions(userID int64, limit int) []SessionRow // 최근 세션
 	MonthlyGpuHours(userID int64) int                  // 이번달 GPU 사용 시간(소비크레딧÷단가)
 	MonthConsumed() int                                // 이번달 전체 소비 크레딧(관리자)
@@ -46,7 +46,7 @@ type Repository interface {
 	ActiveUsersScoped(orgID, groupID int64, limit int) []ActiveUser
 }
 
-// SessionRow — 세션 카드 원천(대시보드 전용 프로젝션).
+// SessionRow는 세션 카드 원천(대시보드 전용 프로젝션).
 type SessionRow struct {
 	InstanceID   string
 	Name         string
@@ -61,16 +61,16 @@ type SessionRow struct {
 	MemGB        int
 	Phase        string
 	PricePerHour int
-	Channels     string // images.channels JSON(LEFT JOIN) — 접속 채널 도출
+	Channels     string // images.channels JSON(LEFT JOIN). 접속 채널을 여기서 도출한다
 }
 
-// NameCredit — top 그룹/사용자 잔액.
+// NameCredit은 top 그룹·사용자 잔액.
 type NameCredit struct {
 	Name   string `json:"name"`
 	Credit int    `json:"credit"`
 }
 
-// RegionRow — 오퍼링(자원군) 정의.
+// RegionRow는 오퍼링(자원군) 정의.
 type RegionRow struct {
 	Name    string
 	GpuType string
@@ -256,7 +256,7 @@ func (r *gormRepo) MonthConsumed() int {
 	return n
 }
 
-// BudgetRiskGroups는 풀이 소진된(잔여 ≤ 0) 활성 그룹 수 — 추가 배분이 필요한 그룹.
+// BudgetRiskGroups는 풀이 소진된(잔여 0 이하) 활성 그룹 수다. 추가 배분이 필요한 그룹을 뜻한다.
 // (예산 캡 모델 폐기 후, 계층형 풀 잔여 기준으로 재정의)
 func (r *gormRepo) BudgetRiskGroups() int {
 	var n int
@@ -272,7 +272,7 @@ func (r *gormRepo) CreditTrend(days int) []TrendPoint { return r.creditTrend(day
 
 // creditTrend는 전체/스코프 추이의 공통 구현이다.
 //
-// 핵심은 "날짜 스파인에 얹기" — GROUP BY 는 소비가 있었던 날만 돌려주므로, 그대로 넘기면
+// 핵심은 날짜 스파인에 얹는 것이다. GROUP BY 는 소비가 있었던 날만 돌려주므로 그대로 넘기면
 // 14일 차트에 점이 2개만 찍히고(값이 0인 날은 행 자체가 없다) 카테고리 축에서 균등 배치돼
 // 실제로는 열흘 떨어진 두 날이 붙어 보인다. 없는 날을 0으로 메워 축과 라벨을 일치시킨다.
 func (r *gormRepo) creditTrend(days int, extraWhere string, args []any) []TrendPoint {
@@ -301,7 +301,7 @@ func (r *gormRepo) creditTrend(days int, extraWhere string, args []any) []TrendP
 	keys := dayspine.Keys(r.dbToday(), days)
 	out := make([]TrendPoint, 0, len(keys))
 	for _, k := range keys {
-		// 표시는 짧게(MM/DD), 정렬·매칭은 ISO 키로 — 짧은 포맷을 키로 쓰면 연말에 순서가 뒤집힌다.
+		// 표시는 짧게(MM/DD) 하고 정렬과 매칭은 ISO 키로 한다. 짧은 포맷을 키로 쓰면 연말에 순서가 뒤집힌다.
 		out = append(out, TrendPoint{Date: k[5:7] + "/" + k[8:10], Amount: byDay[k]})
 	}
 	return out
@@ -407,7 +407,7 @@ func (r *gormRepo) RunningByGpuTypeScoped(orgID, groupID int64) map[string]int {
 	return r.groupCount2(`SELECT COALESCE(gpu_type,'') AS k, COUNT(*) AS n FROM sessions WHERE phase='running' AND gpu_mode<>'cpu' AND gpu_type<>'' AND `+cl+` GROUP BY gpu_type`, args)
 }
 
-// GpuHoursScoped는 이번달 스코프 내 GPU 사용시간(gpu_usage 원장 seconds→시간).
+// GpuHoursScoped는 이번달 스코프 안의 GPU 사용시간이다(gpu_usage 원장의 seconds 를 시간으로).
 func (r *gormRepo) GpuHoursScoped(orgID, groupID int64) int {
 	cl, args := userScopeClause("user_id", orgID, groupID)
 	var sec int

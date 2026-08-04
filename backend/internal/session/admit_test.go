@@ -35,11 +35,11 @@ func TestAdmit_검사와_예약_사이를_직렬화한다(t *testing.T) {
 	}
 	wg.Wait()
 	if maxInside > 1 {
-		t.Fatalf("임계구간에 동시에 %d 개가 들어왔다 — 같은 자리를 두 번 내주게 된다", maxInside)
+		t.Fatalf("임계구간에 동시에 %d 개가 들어왔다. 같은 자리를 두 번 내주게 된다", maxInside)
 	}
 }
 
-// 분산 잠금(DB)을 못 얻어도 세션 생성이 통째로 막히면 안 된다 — 프로세스 안 잠금으로 진행한다.
+// 분산 잠금(DB)을 못 얻어도 세션 생성이 통째로 막히면 안 된다. 프로세스 안 잠금으로 진행한다.
 func TestAdmit_분산잠금_실패해도_진행한다(t *testing.T) {
 	s := (&Service{}).WithAdmissionLock(func(context.Context) (func(), error) {
 		return nil, errors.New("db down")
@@ -64,6 +64,6 @@ func TestAdmit_실패해도_잠금을_해제한다(t *testing.T) {
 		t.Fatalf("관문 오류가 그대로 전달되지 않았다: %v", err)
 	}
 	if released != 1 {
-		t.Fatalf("잠금 해제 %d 회 — 실패 경로에서 새어 나갔다", released)
+		t.Fatalf("잠금 해제 %d 회. 실패 경로에서 새어 나갔다", released)
 	}
 }

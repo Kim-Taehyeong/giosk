@@ -1,8 +1,8 @@
 import { apiGet, apiPost } from '../client';
 
-const TREND_DAYS = 210; // 잔디 고정 구간(30주) — 빈 날 포함 항상 동일한 격자
+const TREND_DAYS = 210; // 잔디 고정 구간(30주). 빈 날을 포함해 항상 같은 격자를 만든다
 
-// 'YYYY-MM-DD'(또는 'YYYY-MM-DDTHH:...' 타임스탬프) → 로컬 자정 Date.
+// YYYY-MM-DD 나 타임스탬프 문자열을 로컬 자정 Date 로 바꾼다.
 // 앞 10자만 취해 new Date(str)의 UTC 파싱 TZ 밀림을 피한다.
 function parseDay(s) {
   const [y, m, d] = String(s).slice(0, 10).split('-').map(Number);
@@ -10,8 +10,8 @@ function parseDay(s) {
   return new Date(y, m - 1, d);
 }
 
-// 일자별 소비 Map(key=로컬 자정 ms → 소비 합계). 소스는 백엔드 일자별 집계
-// (d.trend = [{day:'YYYY-MM-DD', amount}], 소비 있는 날만)뿐 — 폴백 없음.
+// 일자별 소비 Map(key 는 로컬 자정 ms, 값은 소비 합계)이다. 소스는 백엔드 일자별 집계
+// (d.trend = [{day:YYYY-MM-DD, amount}], 소비가 있는 날만) 하나뿐이고 폴백이 없다.
 function dailyMap(d) {
   const byDay = new Map();
   for (const p of d.trend || []) {
@@ -42,7 +42,7 @@ function buildByMonth(byDay) {
   return byMonth;
 }
 
-// 개인 지갑 — 실 백엔드. 라이브 지표(burn/eta/bySession)는 아직 미산출 → 기본값 보정.
+// 개인 지갑. 실 백엔드다. 라이브 지표(burn/eta/bySession)는 아직 산출하지 않아 기본값으로 보정한다.
 // trend(잔디)·byMonth(달력)는 백엔드 일자별 집계(d.trend), 없으면 history에서 파생.
 export const getWallet = () =>
   apiGet('/me/wallet').then((d) => {
@@ -61,6 +61,6 @@ export const getWallet = () =>
     };
   });
 
-// 개인 충전 요청 → 본인(user) 대상. 그룹 관리자가 승인.
+// 개인 충전 요청은 본인(user)을 대상으로 하고 그룹 관리자가 승인한다.
 export const requestTopup = (form) =>
   apiPost('/me/topup-requests', { targetType: 'user', targetId: 0, amount: Number(form.amount), reason: form.reason });

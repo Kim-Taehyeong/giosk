@@ -18,7 +18,7 @@ func (f fakeRepo) SetLimits(Level, int64, Limits) error { return nil }
 func (f fakeRepo) ListPolicies() ([]PolicyRow, error)   { return nil, nil }
 func (f fakeRepo) ListPoliciesScoped(int64, int64) ([]PolicyRow, error) { return nil, nil }
 
-// fakeHier는 사용자 → 대표 그룹/조직 매핑.
+// fakeHier는 사용자별 대표 그룹·조직 매핑.
 type fakeHier struct {
 	group  int64
 	org    int64

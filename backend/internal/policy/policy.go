@@ -1,7 +1,7 @@
 // Package policy는 하드 리소스 제한(크레딧과 무관한 절대 상한)을 계층 규칙으로 해석한다.
 //
 // 정준 모델(설계 문서): 하드 정책 = 1차(절대 벽, 모든 과금 모드 공통). 크레딧 정책 = 2차(크레딧 모드만).
-// 해석은 바텀업 오버라이드: 개인 → 그룹 → 조직 → 전역. 각 레벨의 값이 지정(non-nil)돼 있으면
+// 해석은 바텀업 오버라이드다. 개인, 그룹, 조직, 전역 순으로 보며 각 레벨의 값이 지정(non-nil)돼 있으면
 // 가장 가까운 것을 채택하고, 없으면 상위로 폴백한다. 전역(config.Quota)이 최종 폴백이라 결과는 항상 구체값.
 package policy
 
@@ -34,10 +34,10 @@ const (
 	LevelOrg   Level = "org"
 )
 
-// PolicyRow는 "정책" 화면의 한 줄 — 어떤 범위(scope)의 누구에게 어떤 상한이 걸려 있는지.
+// PolicyRow는 "정책" 화면의 한 줄이다. 어떤 범위(scope)의 누구에게 어떤 상한이 걸려 있는지를 담는다.
 // 전 범위를 한 목록으로 보여주기 위해 users/groups/organizations 를 UNION 해서 만든다.
 // PolicyRow는 정책 목록의 한 행이다.
-// gorm:"column:" 태그 필수 — 기본 네이밍은 MaxVolumeGiB 를 max_volume_gi_b 로 바꿔 버려
+// gorm:"column:" 태그가 반드시 필요하다. 기본 네이밍은 MaxVolumeGiB 를 max_volume_gi_b 로 바꿔 버려
 // 실제 컬럼 max_volume_gib 와 어긋나고, 값이 조용히 nil 로 떨어진다(저장은 됐는데 안 보임).
 type PolicyRow struct {
 	Scope                 Level  `json:"scope" gorm:"column:scope"` // user | group | org
@@ -56,7 +56,7 @@ type Repository interface {
 	UserLimits(userID int64) (Limits, error)
 	GroupLimits(groupID int64) (Limits, error)
 	OrgLimits(orgID int64) (Limits, error)
-	SetLimits(level Level, id int64, l Limits) error              // nil 필드 = NULL(그 레벨 미지정 → 상위 폴백)
+	SetLimits(level Level, id int64, l Limits) error              // nil 필드는 NULL 이다(그 레벨 미지정이라 상위로 폴백)
 	ListPolicies() ([]PolicyRow, error)                           // 상한이 하나라도 설정된 전 범위 목록
 	ListPoliciesScoped(orgID, groupID int64) ([]PolicyRow, error) // 스코프 내(org/group)만
 }
@@ -78,10 +78,10 @@ func (r *Resolver) ResolveGroupByID(groupID int64) Resolved {
 type Resolver struct {
 	repo     Repository
 	hier     Hierarchy
-	globalFn func() Resolved // 전역 폴백(설치 env + 런타임 오버라이드) — 호출 시점 값을 읽는다
+	globalFn func() Resolved // 전역 폴백(설치 env 와 런타임 오버라이드). 호출 시점 값을 읽는다
 }
 
-// Global은 현재 전역 상한을 반환한다(호출 시점 기준 — 런타임 편집이 바로 반영된다).
+// Global은 현재 전역 상한을 반환한다(호출 시점 기준이라 런타임 편집이 바로 반영된다).
 func (r *Resolver) Global() Resolved {
 	if r.globalFn == nil {
 		return Resolved{}
@@ -94,9 +94,9 @@ func NewResolver(repo Repository, hier Hierarchy, globalFn func() Resolved) *Res
 	return &Resolver{repo: repo, hier: hier, globalFn: globalFn}
 }
 
-// Resolve는 개인→그룹→조직→전역 순으로 각 키의 첫 non-nil 값을 채택해 구체 상한을 만든다.
+// Resolve는 개인, 그룹, 조직, 전역 순으로 각 키의 첫 non-nil 값을 채택해 구체 상한을 만든다.
 func (r *Resolver) Resolve(userID int64) Resolved {
-	// 상위→하위 순으로 레이어를 쌓고(전역이 바닥), 하위가 있으면 덮어쓴다 → 결과적으로 하위 우선.
+	// 상위부터 하위 순으로 레이어를 쌓고(전역이 바닥) 하위가 있으면 덮어써서 결과적으로 하위가 우선한다.
 	layers := []Limits{r.globalAsLimits()}
 	if orgID, ok := r.hier.OrgOfUser(userID); ok {
 		if l, err := r.repo.OrgLimits(orgID); err == nil {

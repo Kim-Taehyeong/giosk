@@ -1,4 +1,4 @@
-// 백엔드 한국어 에러 문자열 → errors 네임스페이스 slug (자동 생성). translateError 가 역참조.
+// 백엔드 한국어 에러 문자열을 errors 네임스페이스 slug 로 옮긴다(자동 생성). translateError 가 역참조한다.
 export const KO_TO_SLUG = {
   "GPU 타입 수집 실패": "e001",
   "acceptsJoin 필요": "e002",

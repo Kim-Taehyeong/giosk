@@ -19,8 +19,8 @@ import { cU } from '../../../lib/credit';
 const CONN_ICON = { vscode: Code2, jupyter: NotebookPen, ssh: TerminalSquare, terminal: TerminalSquare };
 const CONN_LABEL = { vscode: 'VSCode', jupyter: 'Jupyter', ssh: 'SSH', terminal: 'SSH' };
 
-// connChips는 세션 채널 목록을 버튼용으로 정규화한다 — 웹터미널(terminal)과 SSH(ssh)는 접속 모달의
-// 통합 SSH 탭 하나로 다루므로 terminal→ssh 로 접고 중복을 없앤다(SSH 칩이 두 개로 뜨는 것 방지).
+// connChips는 세션 채널 목록을 버튼용으로 정규화한다. 웹터미널(terminal)과 SSH(ssh)는 접속 모달의
+// 통합 SSH 탭 하나로 다루므로 terminal 을 ssh 로 접어 중복을 없앤다(SSH 칩이 두 개로 뜨는 걸 막는다).
 function connChips(conn) {
   return [...new Set((conn || []).map((c) => { const k = c.toLowerCase(); return k === 'terminal' ? 'ssh' : k; }))];
 }
@@ -32,34 +32,34 @@ export default function Sessions() {
   const dynamicMode = config.billing.mode === 'dynamic';
   // 기본 9열(상태·이름·종류·오퍼링·노드·사용률·실행시간·접속·작업) + 모드별 1열
   // (credit=크레딧 / dynamic=남은시간 / free=없음).
-  // 상세로 가는 화살표 열은 없앴다 — 행 전체가 클릭이고 키보드로도 열리므로 열 하나를 더 쓸 이유가 없다.
+  // 상세로 가는 화살표 열은 없앴다. 행 전체가 클릭이고 키보드로도 열리므로 열을 하나 더 쓸 이유가 없다.
   const colCount = 9 + ((creditMode || dynamicMode) ? 1 : 0);
   const [rows, setRows] = useState(null);
   const [conn, setConn] = useState(null);
-  const [connTab, setConnTab] = useState(null); // 클릭한 채널(모달 초기 탭) — 안 넘기면 항상 VSCode 로 열린다
-  const [reconf, setReconf] = useState(null); // 자원 변경(GPU 붙이기) 대상 세션 — 중단 상태에서만
+  const [connTab, setConnTab] = useState(null); // 클릭한 채널(모달 초기 탭). 안 넘기면 항상 VSCode 로 열린다
+  const [reconf, setReconf] = useState(null); // 자원 변경(GPU 붙이기) 대상 세션. 중단 상태에서만 연다
   const navigate = useNavigate();
   const { toast } = useToast();
   const confirm = useConfirm();
 
-  // 임대/연장은 선착순(Dynamic) 모드 전용 개념 — 크레딧 모드에선 노출하지 않음.
+  // 임대와 연장은 선착순(Dynamic) 모드 전용 개념이라 크레딧 모드에선 노출하지 않는다.
   const lease = config.lease || { extensionHours: 0, maxExtensions: 0 };
-  // 4초 폴링 — 데이터가 실제로 바뀐 경우에만 setRows 한다. 매 틱마다 새 배열로 갱신하면
+  // 4초 폴링이지만 데이터가 실제로 바뀐 경우에만 setRows 한다. 매 틱마다 새 배열로 갱신하면
   // 테이블 전체가 리렌더되며 "폴링처럼 깜박"인다(usePoll 과 같은 시그니처 비교로 방지).
   const lastSig = useRef('');
   const [now, setNow] = useState(() => Date.now());
   const load = () => getMySessionsWithUsage().then((d) => {
-    setNow(Date.now()); // 남은 임대시간 기준시각 — 렌더 중 Date.now() 를 부르면 순수하지 않다
+    setNow(Date.now()); // 남은 임대시간 기준시각. 렌더 중에 Date.now() 를 부르면 순수하지 않다
     const sig = (() => { try { return JSON.stringify(d); } catch { return null; } })();
     if (sig === null || sig !== lastSig.current) { lastSig.current = sig; setRows(d); }
   });
-  // 마운트 시 1회 + 4초마다 폴링(프로비저닝→실행 등 상태 자동 갱신).
+  // 마운트할 때 한 번 부르고 4초마다 폴링한다(프로비저닝에서 실행으로 넘어가는 상태를 자동 갱신).
   useEffect(() => {
     load();
     const id = setInterval(load, 4000);
     return () => clearInterval(id);
   }, []);
-  // 정지·재시작·삭제 공통. 실패도 반드시 말해준다 — 가용성 관문이 재시작을 거절할 수 있는데
+  // 정지, 재시작, 삭제 공통이다. 실패도 반드시 말해준다. 가용성 관문이 재시작을 거절할 수 있는데
   // (자리 없으면 대기 없이 거절) 조용히 삼키면 사용자에겐 "버튼이 안 먹는다"로 보인다.
   // 진행 중인 행 동작(연타 방지). 서버도 CAS 로 중복 시작을 막지만, 버튼이 눌리는 족족 요청이
   // 나가면 두 번째는 "이미 시작 중"이라는 실패 토스트로 돌아와 사용자에겐 오작동처럼 보인다.
@@ -76,8 +76,8 @@ export default function Sessions() {
     setPending((p) => { const n = { ...p }; delete n[id]; return n; });
     load();
   };
-  // 임대 연장 — 백엔드가 정책(maxExtensions) 내에서 연장 횟수를 +1(영속). 성공 시 재조회.
-  // 연장 시간은 사용자가 고르는 값이 아니라 정책값(lease.extensionHours)이다 — 백엔드 Extend 는
+  // 임대 연장. 백엔드가 정책(maxExtensions) 안에서 연장 횟수를 하나 올린다. 성공하면 재조회한다.
+  // 연장 시간은 사용자가 고르는 값이 아니라 정책값(lease.extensionHours)이다. 백엔드 Extend 는
   // 시간 인자를 받지 않고 "maxLeaseHours + 연장횟수 × extensionHours" 로 만료를 계산한다.
   // (예전엔 시간 선택 모달이 있었지만 고른 값이 어디에도 쓰이지 않아 사용자를 오해시켰다.)
   const doExtend = async (r) => {
@@ -110,7 +110,7 @@ export default function Sessions() {
     if (s === 'terminated') return <Pill variant="pause" dot>{t('session.terminated')}</Pill>;
     return <Pill variant="pause" dot>{s}</Pill>;
   };
-  // 중단 세션 홈 회수 안내 — 상태 pill 아래에 작게. 실제 삭제는 노드 디스크가 찰 때만
+  // 중단 세션 홈 회수 안내는 상태 pill 아래에 작게 둔다. 실제 삭제는 노드 디스크가 찰 때만
   // 일어나므로 "삭제 예정"이 아니라 "회수 대상"으로 적는다(title 에 조건 전문).
   const reclaimPill = (r) => {
     const { state, days } = reclaimInfo(r, config);
@@ -125,9 +125,9 @@ export default function Sessions() {
     );
   };
 
-  // 행 작업 — 예전엔 이 열에 접속 칩만 있어서 중단된 세션은 목록에서 아무것도 할 수 없었다
+  // 행 작업. 예전엔 이 열에 접속 칩만 있어서 중단된 세션은 목록에서 아무것도 할 수 없었다
   // (상세로 들어가야만 재시작·삭제 가능). 중단 세션은 홈 디스크를 계속 물고 있으므로,
-  // 정리하는 길이 목록에 바로 있어야 한다 — 그 결정은 유지한다.
+  // 정리하는 길이 목록에 바로 있어야 한다. 그 결정은 유지한다.
   //
   // 다만 노출 무게는 다르게 준다. 행마다 "지금 할 일" 하나만 고스트 버튼으로 내놓고
   // (실행 중=정지, 중단=재시작), 되돌릴 수 없는 삭제는 케밥 메뉴 뒤로 보낸다.
@@ -137,7 +137,7 @@ export default function Sessions() {
     const stop = () => act(stopSession, r.id, t('session.stopped'));
     const start = () => act(startSession, r.id, t('session.restarted'));
     const del = async () => {
-      // 상세 페이지와 같은 문구·같은 확인 절차 — 삭제는 홈 데이터까지 지운다(중단은 보존).
+      // 상세 페이지와 같은 문구에 같은 확인 절차를 쓴다. 삭제는 홈 데이터까지 지운다(중단은 보존한다).
       if (!(await confirm({ title: t('session.delete'), message: t('confirmDelete'), confirmText: t('session.delete') }))) return;
       act(deleteSession, r.id, t('session.deleted'));
     };
@@ -172,9 +172,9 @@ export default function Sessions() {
     return <Pill variant="gpu">{t('session.shared')}</Pill>;
   };
 
-  // 사용률 — 자세히 보기를 열지 않아도 목록에서 바로 보이게 한다.
+  // 사용률은 자세히 보기를 열지 않아도 목록에서 바로 보이게 한다.
   // CPU/RAM 은 cgroup 기반이라 항상 잴 수 있고, GPU 는 공유 방식에 따라 못 재는 경우가 있다
-  // (measureRows 참조) → 못 재는 건 0% 막대가 아니라 사유를 적는다.
+  // (measureRows 참조) 못 재는 건 0% 막대가 아니라 사유를 적는다.
   const usageCell = (r) => {
     if (r.status !== 'running') return <span className="muted">—</span>;
     const rows2 = measureRows(r);

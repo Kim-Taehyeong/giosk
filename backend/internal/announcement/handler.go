@@ -26,7 +26,7 @@ func NewHandler(repo Repository, scope MemberScope, oog authz.OrgOfGroupReader) 
 	return &Handler{repo: repo, scope: scope, oog: oog}
 }
 
-// List는 활성 공지 — 전역 + 로그인 사용자의 조직/그룹 타겟만.
+// List는 활성 공지를 준다. 전역과 로그인 사용자의 조직·그룹 타겟만 포함한다.
 func (h *Handler) List(c *gin.Context) {
 	var orgID, groupID int64
 	if u := auth.CurrentUser(c); u != nil && h.scope != nil {
@@ -183,7 +183,7 @@ func scopeIDs(c *gin.Context) (orgID, groupID int64) {
 	return authz.CurrentScope(c).EffectiveIDs()
 }
 
-// Register는 공지 라우트 — 사용자 목록(authed) + 플랫폼 CRUD(/admin) + 스코프 CRUD(/console).
+// Register는 공지 라우트를 등록한다. 사용자 목록(authed), 플랫폼 CRUD(/admin), 스코프 CRUD(/console).
 func Register(authed gin.IRouter, admin gin.IRouter, mgmt gin.IRouter, h *Handler) {
 	authed.GET("/announcements", h.List)
 
@@ -193,7 +193,7 @@ func Register(authed gin.IRouter, admin gin.IRouter, mgmt gin.IRouter, h *Handle
 	admin.POST("/announcements/:id/toggle", h.Toggle)
 	admin.DELETE("/announcements/:id", h.Delete)
 
-	// 매니저 트리 — 스코프 강제(org/group). platform 도 RequireManager 통과라 여기로 통일 가능.
+	// 매니저 트리는 스코프를 강제한다(org 나 group). platform 도 RequireManager 를 통과하므로 여기로 통일할 수 있다.
 	mgmt.GET("/announcements", h.AdminListScoped)
 	mgmt.POST("/announcements", h.Create)
 	mgmt.PUT("/announcements/:id", h.Update)

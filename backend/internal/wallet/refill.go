@@ -58,7 +58,7 @@ func (r *gormRepo) RefillNowGroup(groupID int64) (int, error) {
 
 // 계층형 정기 크레딧 리필 엔진.
 //
-// 캐스케이드(플랫폼→조직→팀→개인)로, 각 풀은 자기 주기(effInterval)마다 recurring_credit 만큼 리필된다.
+// 플랫폼에서 조직, 팀, 개인으로 캐스케이드되며 각 풀은 자기 주기(effInterval)마다 recurring_credit 만큼 리필된다.
 // 이월(carryover)이 켜지면 미사용분이 누적되고, 꺼지면 주기마다 recurring 으로 리셋된다.
 // 상위가 이월불가면 그 상위가 리셋되는 순간(= cycle_started_at 이 갱신되는 순간) 하위 이월분도 전액 소멸한다.
 //
@@ -142,7 +142,7 @@ func (r *gormRepo) RefillDue(plat PlatformRefill) (int, error) {
 	var n int
 	now := time.Now()
 	err := r.db.Transaction(func(tx *gorm.DB) error {
-		// 0) 플랫폼 주기 앵커 — 도래 시 전진(이 순간이 조직 이월분 소멸 경계).
+		// 0) 플랫폼 주기 앵커. 도래하면 전진하며, 이 순간이 조직 이월분 소멸 경계다.
 		var platCycle *time.Time
 		{
 			var row struct{ PlatformCycleStartedAt *time.Time }
@@ -154,7 +154,7 @@ func (r *gormRepo) RefillDue(plat PlatformRefill) (int, error) {
 			}
 		}
 
-		// 1) 조직 — 상위=플랫폼.
+		// 1) 조직. 상위는 플랫폼이다.
 		type orgRow struct {
 			ID           int64
 			Recurring    int
@@ -190,7 +190,7 @@ func (r *gormRepo) RefillDue(plat PlatformRefill) (int, error) {
 			n++
 		}
 
-		// 2) 팀(그룹) — 상위=조직, 플랫폼.
+		// 2) 팀(그룹). 상위는 조직과 플랫폼이다.
 		type grpRow struct {
 			GroupID      int64
 			OrgID        int64
@@ -234,7 +234,7 @@ func (r *gormRepo) RefillDue(plat PlatformRefill) (int, error) {
 			n++
 		}
 
-		// 3) 개인 — 상위=팀, 조직, 플랫폼.
+		// 3) 개인. 상위는 팀, 조직, 플랫폼이다.
 		type usrRow struct {
 			UserID       int64
 			GroupID      int64

@@ -13,7 +13,7 @@ type gormRepo struct{ db *gorm.DB }
 
 func NewRepository(db *gorm.DB) Repository { return &gormRepo{db: db} }
 
-// limitRow는 nullable 제한 컬럼을 그대로 받는다(미지정=NULL→nil).
+// limitRow는 nullable 제한 컬럼을 그대로 받는다(미지정이면 NULL 이라 nil 이 된다).
 type limitRow struct {
 	MaxGpu                *int `gorm:"column:max_gpu"`
 	MaxVramGB             *int `gorm:"column:max_vram_gb"`

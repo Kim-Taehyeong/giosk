@@ -91,7 +91,7 @@ export default function Select({ value, onChange, options = [], placeholder, wid
     menuRef.current?.querySelector(`#${CSS.escape(domId)}-opt-${active}`)?.scrollIntoView({ block: 'nearest' });
   }, [active, open, domId]);
 
-  // 검색어가 바뀌면 커서를 첫 결과로 되돌린다(이펙트가 아니라 입력 시점에 — 연쇄 렌더 방지).
+  // 검색어가 바뀌면 커서를 첫 결과로 되돌린다(이펙트가 아니라 입력 시점에 해서 연쇄 렌더를 막는다).
   const onSearch = (e) => { setQ(e.target.value); setActive(0); };
 
   // disabled 로 바뀌면 열린 메뉴를 닫는다.
@@ -180,7 +180,7 @@ export default function Select({ value, onChange, options = [], placeholder, wid
                   style={{
                     display: 'flex', alignItems: 'center', gap: 9, padding: '10px 12px', borderRadius: 'var(--r-control)', cursor: 'pointer',
                     fontSize: fs, fontWeight: on ? 700 : 500,
-                    // 선택됨(체크)과 커서 위치(호버/방향키)는 다른 상태다 — 커서는 배경만 바뀐다.
+                    // 선택됨(체크)과 커서 위치(호버나 방향키)는 다른 상태다. 커서는 배경만 바뀐다.
                     background: on ? 'var(--primary-soft)' : cursor ? 'var(--surface-2)' : 'transparent',
                     color: on ? 'var(--primary)' : 'var(--text)',
                     boxShadow: cursor && !on ? 'inset 0 0 0 1px var(--border)' : 'none',
@@ -197,7 +197,7 @@ export default function Select({ value, onChange, options = [], placeholder, wid
             </div>
           );
         })(),
-        // 전체화면(감시월)에선 body 포털이 화면 밖이라 안 보인다 → 전체화면 요소 안으로 붙인다.
+        // 전체화면(감시월)에선 body 포털이 화면 밖이라 보이지 않으므로 전체화면 요소 안으로 붙인다.
         (typeof document !== 'undefined' && document.fullscreenElement) || document.body,
       )}
     </div>

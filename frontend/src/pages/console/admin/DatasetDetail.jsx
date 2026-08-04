@@ -30,14 +30,14 @@ export default function DatasetDetail() {
   const load = () => getDatasets().then((d) => { const f = (d.global || []).find((x) => x.id === did); if (!f) setNotFound(true); else setDs(f); });
   useEffect(() => { load(); getAdminNodes().then(setNodes).catch(() => {}); /* eslint-disable-next-line */ }, [did]);
   // 캐시 진행상황 3초 폴링.
-  // 진행 중(로딩/캐싱)이면 촘촘히(1.2s), 아니면 느슨히(4s) 폴링 — 진행률이 부드럽게 갱신되게.
+  // 진행 중(로딩이나 캐싱)이면 촘촘히(1.2s), 아니면 느슨히(4s) 폴링해 진행률이 부드럽게 갱신되게 한다.
   const busy = ds && (ds.loadStatus === 'loading' || (ds.caches || []).some((c) => c.status === 'caching'));
   useEffect(() => { const t = setInterval(load, busy ? 1200 : 4000); return () => clearInterval(t); /* eslint-disable-next-line */ }, [did, busy]);
 
   if (notFound) return <div className="card">{t('datasets.notFound', { defaultValue: '데이터셋을 찾을 수 없습니다.' })}</div>;
   if (!ds) return <Spinner pad label={t('datasets.loading', { defaultValue: '…' })} />;
 
-  // 낙관적 토글 — 클릭 즉시 UI 반영(caching pill/해제) 후 백그라운드로 요청. job 생성 대기로 클릭이 굼떠 보이지 않게.
+  // 낙관적 토글이다. 클릭 즉시 UI 에 반영하고(caching pill 이나 해제) 백그라운드로 요청한다. job 생성을 기다리느라 클릭이 굼떠 보이지 않게 한다.
   const toggleNode = (node) => {
     const already = cacheObjOf(node);
     setDs((d) => {

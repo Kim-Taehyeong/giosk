@@ -25,7 +25,7 @@ export default function Datasets() {
   const [form, setForm] = useState({ name: '', sizeClass: 'Small', url: '' });
 
   const load = () => getDatasets().then((d) => setData({ global: d.global, requests: [...(d.requests || [])] }));
-  // 5초 폴링 — 적재 상태(다운로드중→완료) 라이브 갱신.
+  // 5초 폴링으로 적재 상태(다운로드 중에서 완료까지)를 라이브 갱신한다.
   useEffect(() => { load(); const id = setInterval(load, 5000); return () => clearInterval(id); }, []);
 
   const submit = async () => {

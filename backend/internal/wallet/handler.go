@@ -19,7 +19,7 @@ func NewHandler(svc *Service) *Handler { return &Handler{svc: svc} }
 
 // ── 사용자 ──────────────────────────────
 func (h *Handler) MyWallet(c *gin.Context) {
-	// 활성 스코프(팀) 기준 지갑 — 프론트가 X-Console-Scope: group:N 을 보낸다. 팀 아니면 0(대표 팀).
+	// 활성 스코프(팀) 기준 지갑이다. 프론트가 X-Console-Scope: group:N 을 보낸다. 팀이 아니면 0(대표 팀)이다.
 	w, err := h.svc.MyWallet(auth.CurrentUser(c).ID, scopeGroup(c))
 	if err != nil {
 		httpx.Internal(c, "지갑 조회 실패")
@@ -64,7 +64,7 @@ func (h *Handler) SetDefaultMemberBudget(c *gin.Context) {
 	httpx.OK(c, gin.H{"ok": true})
 }
 
-// ── 최고관리자(super) grant — 예외 부여 ───────
+// ── 최고관리자(super) grant, 예외 부여 ───────
 // 그룹/개인에 부여하면 무결성을 위해 상위 풀(조직·그룹)에도 자동 가산된다.
 func (h *Handler) GrantUser(c *gin.Context) {
 	var req GrantReq
@@ -73,7 +73,7 @@ func (h *Handler) GrantUser(c *gin.Context) {
 		return
 	}
 	actor := auth.CurrentUser(c).ID
-	// super grant 대상 팀: 요청 스코프(group:N)면 그 팀, 아니면 대표 팀(0→resolve). gid(c)=대상 사용자.
+	// super grant 대상 팀은 요청 스코프(group:N)면 그 팀, 아니면 대표 팀(0 이면 resolve)이다. gid(c)가 대상 사용자다.
 	if err := h.svc.AllocateUser(gid(c), scopeGroup(c), req.Amount, true, req.Reason, &actor); err != nil {
 		httpx.Internal(c, "크레딧 부여 실패")
 		return
@@ -82,7 +82,7 @@ func (h *Handler) GrantUser(c *gin.Context) {
 }
 
 // GrantGroup은 그룹 풀에 크레딧을 부여한다. 레벨에 따라 회계가 다르다:
-//   - 최고관리자(platform): 예외 부여 — 상위 조직 풀에도 동일 금액 자동 가산(무결성).
+//   - 최고관리자(platform)의 예외 부여는 상위 조직 풀에도 같은 금액을 자동 가산한다(무결성).
 //   - 조직관리자(org): 자기 조직 풀에서 차감해 그룹 풀에 가산(실 이체; 부족 시 400).
 func (h *Handler) GrantGroup(c *gin.Context) {
 	var req GrantReq
@@ -103,7 +103,7 @@ func (h *Handler) GrantGroup(c *gin.Context) {
 	httpx.OK(c, gin.H{"ok": true})
 }
 
-// ── 그룹 담당자(project_admin) 멤버 배분 — 그룹 풀에서 차감 ──
+// ── 그룹 담당자(project_admin) 멤버 배분, 그룹 풀에서 차감 ──
 // 그룹 :id 풀에서 amount 만큼 차감하여 멤버(userId) 개인 지갑에 배분한다.
 func (h *Handler) AllocateMember(c *gin.Context) {
 	var req MemberAllocReq

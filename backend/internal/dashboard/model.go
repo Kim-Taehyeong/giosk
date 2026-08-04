@@ -6,21 +6,21 @@ import (
 	"giosk/internal/alertlog"
 )
 
-// ActiveUser — 현재 실행 세션을 가진 사용자(운영 대시보드 '사용 중 유저').
+// ActiveUser는 현재 실행 세션을 가진 사용자(운영 대시보드의 "사용 중 유저").
 type ActiveUser struct {
 	Name     string `json:"name"`
 	Sessions int    `json:"sessions"`
 	GpuType  string `json:"gpuType"` // 대표 GPU 모델(여러 개면 하나)
 }
 
-// SessionStats — 세션 상태 분해(감시 대시보드 공통). 실행/유휴/중단 비율.
+// SessionStats는 세션 상태 분해(감시 대시보드 공통). 실행·유휴·중단 비율이다.
 type SessionStats struct {
 	Running      int            `json:"running"`
 	Idle         int            `json:"idle"`         // running 이지만 저사용(GPU util<5%)
 	Provisioning int            `json:"provisioning"` // 준비 중
 	Stopped      int            `json:"stopped"`      // 정지(유휴리퍼/수동/만료)
 	ByMode       map[string]int `json:"byMode"`       // shared/exclusive/cpu running 수
-	ByGpuType    map[string]int `json:"byGpuType"`    // gpu_type → running 수
+	ByGpuType    map[string]int `json:"byGpuType"`    // gpu_type 별 running 수
 }
 
 // ── 사용자 대시보드 ───────────────────────────
@@ -30,7 +30,7 @@ type UserDashboard struct {
 	Sessions []SessionCard `json:"sessions"`
 }
 
-// SessionCard — 대시보드 최근 세션 카드.
+// SessionCard는 대시보드 최근 세션 카드.
 type SessionCard struct {
 	ID     string   `json:"id"`
 	Name   string   `json:"name"`
@@ -53,7 +53,7 @@ type UserKPIs struct {
 	Burn           int `json:"burn"`
 }
 
-// Region — 자원군별 가용량(드롭다운/가용 표시).
+// Region은 자원군별 가용량(드롭다운과 가용 표시용).
 type Region struct {
 	Name  string `json:"name"`
 	Free  int    `json:"free"`
@@ -69,7 +69,7 @@ type AdminDashboard struct {
 	AlertFeed    []alertlog.Event `json:"alertFeed"`   // 발화 경고 이력(시간순, 감시월 통합 피드)
 	TopGroups    []NameCredit     `json:"topGroups"`
 	TopUsers     []NameCredit     `json:"topUsers"`
-	GpuTrend7d   []TrendPoint     `json:"gpuTrend7d"`  // 폴백(Prometheus range) — 스냅샷 없을 때
+	GpuTrend7d   []TrendPoint     `json:"gpuTrend7d"`  // 스냅샷이 없을 때 쓰는 폴백(Prometheus range)
 	Snapshots    []Snapshot       `json:"snapshots"`   // 최근 24h 인프라 스냅샷(우리 DB, 감시 트렌드)
 	SessionStats SessionStats     `json:"sessionStats"`
 	ActiveUsers  []ActiveUser     `json:"activeUsers"` // 현재 실행 세션 보유 사용자
@@ -77,7 +77,7 @@ type AdminDashboard struct {
 }
 
 // MetricsStatus는 대시보드 지표의 출처가 실제로 살아 있는지 알려준다.
-// 둘 다 꺼진 배포에서 GPU 사용률 0% 를 그대로 보여주면 "GPU 가 노는 중"으로 오해된다 →
+// 둘 다 꺼진 배포에서 GPU 사용률 0% 를 그대로 보여주면 "GPU 가 노는 중"으로 오해되므로
 // 프론트가 값 대신 "모니터링 미설치" 안내를 띄우도록 상태를 함께 내려준다.
 type MetricsStatus struct {
 	Prometheus bool `json:"prometheus"` // Prometheus 연동(URL 설정 + 응답)
@@ -101,7 +101,7 @@ type AdminKPIs struct {
 	BudgetRisk     int `json:"budgetRisk"`
 }
 
-// TrendPoint — 추이 1점(creditTrend=amount, gpuTrend=util 둘 다 수용).
+// TrendPoint는 추이 1점이다(creditTrend 는 amount, gpuTrend 는 util 을 담는다).
 type TrendPoint struct {
 	Date   string `json:"date"`
 	Util   int    `json:"util,omitempty"`
@@ -115,10 +115,10 @@ type AdminAlert struct {
 	Age    string `json:"age"`
 }
 
-// ── 운영 대시보드(사용·거버넌스) — 레벨 스코프 ────────────────
+// ── 운영 대시보드(사용·거버넌스). 레벨 스코프를 따른다 ────────────
 // 인프라(GPU/노드)는 기존 Admin() 재사용(platform 전용). 운영은 스코프로 필터해 전 관리 레벨이 본다.
 type OpsDashboard struct {
-	BillingMode  string           `json:"billingMode"` // credit | dynamic | free — 프론트 위젯 게이팅
+	BillingMode  string           `json:"billingMode"` // credit, dynamic, free. 프론트 위젯 게이팅에 쓴다
 	KPIs         OpsKPIs          `json:"kpis"`
 	SessionStats SessionStats     `json:"sessionStats"` // 전 모드 공통(실행/유휴/중단·모드별)
 	GpuHours     int              `json:"gpuHours"`     // 이번달 GPU 사용시간(전 모드 공통)
@@ -135,7 +135,7 @@ type OpsKPIs struct {
 	BudgetRisk     int `json:"budgetRisk"`  // 풀 소진 그룹 수(스코프 내, credit 모드만)
 }
 
-// Snapshot은 metric_snapshots 한 행 — 인프라 시계열 샘플.
+// Snapshot은 metric_snapshots 한 행(인프라 시계열 샘플).
 type Snapshot struct {
 	ID              int64     `json:"-" gorm:"column:id"`
 	TS              time.Time `json:"ts" gorm:"column:ts"`

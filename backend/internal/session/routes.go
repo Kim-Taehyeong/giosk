@@ -13,7 +13,7 @@ func RegisterUser(authed gin.IRouter, h *Handler) {
 	authed.POST("/instances/:id/extend", h.Extend)
 	authed.GET("/instances/:id/connection", h.Connection)
 	authed.POST("/instances/:id/access", h.Access)
-	// 벌크는 /instances 하위에 둘 수 없다 — gin 은 같은 자리의 정적 세그먼트(metrics)와
+	// 벌크는 /instances 하위에 둘 수 없다. gin 은 같은 자리의 정적 세그먼트(metrics)와
 	// 와일드카드(:id)를 함께 등록하면 패닉한다.
 	authed.GET("/metrics/sessions", h.MyUsage)
 	authed.GET("/instances/:id/metrics", h.Usage)

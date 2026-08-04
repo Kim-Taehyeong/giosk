@@ -39,7 +39,7 @@ type gormRepo struct{ db *gorm.DB }
 
 func NewRepository(db *gorm.DB) Repository { return &gormRepo{db: db} }
 
-// ByGroup — 그룹별 소비/예산. 기간(r) 미지정=memberships.consumed(전체), 지정 시 원장 consume(기간).
+// ByGroup은 그룹별 소비와 예산을 준다. 기간(r)을 안 주면 memberships.consumed 전체, 주면 원장 consume 을 기간으로 본다.
 func (r *gormRepo) ByGroup(rng Range) []GroupRow {
 	q, args := groupRowsQuery("", nil, rng)
 	var out []GroupRow
@@ -82,7 +82,7 @@ func groupRowsQuery(where string, whereArgs []any, rng Range) (string, []any) {
 	return q, out
 }
 
-// ByUser — (사용자×팀) 단위 소비/세션/GPU시간. 크레딧이 팀 지갑에서 차감되므로, 다중 소속 사용자는
+// ByUser는 (사용자와 팀) 단위 소비, 세션, GPU시간을 준다. 크레딧이 팀 지갑에서 차감되므로 다중 소속 사용자는
 // 팀마다 한 행씩(각 행 숫자는 그 팀에서 쓴 만큼만). 기간(r) 지정 시 그 기간 발생분만.
 func (r *gormRepo) ByUser(rng Range) []UserRow {
 	q, args := userRowsQuery("WHERE m.status = 'active'", nil, rng)
@@ -118,7 +118,7 @@ func userRowsQuery(where string, whereArgs []any, rng Range) (string, []any) {
 		LEFT JOIN organizations o ON o.id = g.org_id
 		` + where + `
 		ORDER BY consumed DESC, u.username`
-	// 인자 순서 = SQL 등장 순서: sessions range → gpu range → consumed range → WHERE 스코프.
+	// 인자 순서는 SQL 등장 순서와 같다: sessions range, gpu range, consumed range, WHERE 스코프.
 	out := []any{}
 	out = append(out, sA...)
 	out = append(out, gA...)
@@ -127,7 +127,7 @@ func userRowsQuery(where string, whereArgs []any, rng Range) (string, []any) {
 	return q, out
 }
 
-// ByOrg — 조직별 그룹/사용자 수 + 소비(산하 그룹 consume 합) + 풀.
+// ByOrg는 조직별 그룹·사용자 수, 소비(산하 그룹 consume 합), 풀을 준다.
 func (r *gormRepo) ByOrg() []OrgRow {
 	var out []OrgRow
 	r.db.Raw(`
@@ -144,7 +144,7 @@ func (r *gormRepo) ByOrg() []OrgRow {
 	return out
 }
 
-// ByGroupScoped — 그룹 범위 필터. group=자기 그룹, org=산하 그룹. 기간(r) 지원.
+// ByGroupScoped는 그룹 범위 필터다. group 은 자기 그룹, org 는 산하 그룹을 본다. 기간(r)을 지원한다.
 func (r *gormRepo) ByGroupScoped(orgID, groupID int64, rng Range) []GroupRow {
 	if orgID <= 0 && groupID <= 0 {
 		return r.ByGroup(rng)
@@ -162,7 +162,7 @@ func (r *gormRepo) ByGroupScoped(orgID, groupID int64, rng Range) []GroupRow {
 	return out
 }
 
-// ByUserScoped — 스코프(팀/조직) 범위의 (사용자×팀) 소비. 각 행은 그 팀에서 쓴 만큼만 집계.
+// ByUserScoped는 스코프(팀이나 조직) 범위의 (사용자와 팀) 소비다. 각 행은 그 팀에서 쓴 만큼만 집계한다.
 // group 스코프면 그 팀의 멤버 1행씩, org 스코프면 산하 팀별로 한 행씩. 기간(r) 지원.
 func (r *gormRepo) ByUserScoped(orgID, groupID int64, rng Range) []UserRow {
 	if orgID <= 0 && groupID <= 0 {
@@ -180,7 +180,7 @@ func (r *gormRepo) ByUserScoped(orgID, groupID int64, rng Range) []UserRow {
 	return out
 }
 
-// UserOneScoped — 단일 사용자의 세션 수·GPU시간·소비를 스코프 범위로만 집계한다.
+// UserOneScoped는 단일 사용자의 세션 수, GPU시간, 소비를 스코프 범위로만 집계한다.
 // groupID>0 이면 그 팀에서의 사용만, orgID>0 이면 그 조직 산하 사용만, 둘 다 0 이면 전역.
 // ByUserScoped 는 "어떤 사용자가 나오는지"만 걸렀고 per-user 집계는 전역이라, 팀 관점 사용자 상세엔
 // 이 메서드로 서브쿼리 자체에 스코프를 걸어야 "내 팀에서 쓴 만큼"만 나온다.
@@ -225,7 +225,7 @@ func (r *gormRepo) UserOneScoped(userID, orgID, groupID int64) *UserRow {
 	return &row
 }
 
-// ByOrgScoped — 조직 범위 필터. org=자기 조직, group=부모 조직(읽기용).
+// ByOrgScoped는 조직 범위 필터다. org 는 자기 조직, group 은 부모 조직을 읽는다.
 func (r *gormRepo) ByOrgScoped(orgID, groupID int64) []OrgRow {
 	if orgID <= 0 && groupID <= 0 {
 		return r.ByOrg()

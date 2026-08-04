@@ -2,7 +2,7 @@ package image
 
 import "github.com/gin-gonic/gin"
 
-// RegisterUser는 인증 사용자용(세션 마법사 이미지 카탈로그 — active).
+// RegisterUser는 인증 사용자용이다(세션 마법사 이미지 카탈로그이므로 active 만).
 func RegisterUser(authed gin.IRouter, h *Handler) {
 	authed.GET("/images", h.List)
 }
@@ -10,7 +10,7 @@ func RegisterUser(authed gin.IRouter, h *Handler) {
 // RegisterAdmin은 플랫폼 관리자 이미지 빌드/관리.
 func RegisterAdmin(admin gin.IRouter, h *Handler) {
 	admin.GET("/images", h.List)
-	admin.POST("/images", h.Build)                  // 가이드형 빌드(베이스+패키지→Kaniko)
+	admin.POST("/images", h.Build)                  // 가이드형 빌드(베이스와 패키지를 받아 Kaniko 로)
 	admin.POST("/images/external", h.RegisterExternal) // 외부 이미지 등록(빌드 없음, 기본 경로)
 	admin.PUT("/images/:id", h.Save)             // 메타 수정
 	admin.POST("/images/:id/rebuild", h.Rebuild) // 재빌드(태그 +1)

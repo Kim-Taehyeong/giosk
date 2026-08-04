@@ -30,7 +30,7 @@ func NewProxy(cfg Config) *Proxy {
 	return &Proxy{cfg: cfg, nonce: newNonceCache(), now: func() time.Time { return time.Now().UTC() }, dial: d.DialContext}
 }
 
-// ServeHTTP는 요청을 처리한다: ①?access=<토큰> 교환 → 쿠키 발급·리다이렉트, ②쿠키 검증 → 대상 세션으로 프록시.
+// ServeHTTP는 요청을 처리한다. ?access=<토큰> 이면 교환해 쿠키를 발급하고 리다이렉트하며, 아니면 쿠키를 검증해 대상 세션으로 프록시한다.
 func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// ws 업그레이드만 로깅한다(정적 자원 GET 은 스팸이라 제외). 접속 문제 진단의 관심사는
 	// WebSocket 이고, 거절은 아래에서 사유와 함께 별도로 남긴다.
@@ -43,7 +43,7 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// ① access 토큰 교환(1회) — 쿠키 세팅 후 URL 에서 토큰 제거하며 "/" 로 리다이렉트.
+	// access 토큰 교환(1회). 쿠키를 세팅한 뒤 URL 에서 토큰을 지우고 "/" 로 리다이렉트한다.
 	if tok := r.URL.Query().Get("access"); tok != "" {
 		p.exchange(w, r, sub, tok)
 		return
@@ -89,13 +89,13 @@ func (p *Proxy) exchange(w http.ResponseWriter, r *http.Request, sub, tok string
 		return
 	}
 
-	// 백엔드(code-server/jupyter) 인증을 서버측에서 프라임 → 브라우저에 그 인증 쿠키를 전달
+	// 백엔드(code-server 나 jupyter) 인증을 서버측에서 프라임해 브라우저에 그 인증 쿠키를 전달한다
 	// (사용자에게 원본 비밀 미노출). jupyter 는 Authorization 헤더 주입으로 처리하므로 쿠키 불필요.
 	for _, c := range p.primeCookies(claims) {
 		http.SetCookie(w, c)
 	}
 
-	// 라우팅 쿠키(gw_sess) — 이후 요청의 대상 해석용. 비밀 포함, HttpOnly.
+	// 라우팅 쿠키(gw_sess)로 이후 요청의 대상을 해석한다. 비밀을 담으므로 HttpOnly 다.
 	cookieClaims := *claims
 	cookieClaims.Typ = TypCookie
 	cookieClaims.Jti = ""
@@ -122,10 +122,10 @@ func (p *Proxy) reverseProxy(claims *Claims) *httputil.ReverseProxy {
 	base := rp.Director
 	rp.Director = func(req *http.Request) {
 		base(req)
-		// Host 헤더는 원본(외부 서브도메인)을 그대로 둔다 — code-server·jupyter 는 WebSocket
+		// Host 헤더는 원본(외부 서브도메인)을 그대로 둔다. code-server 와 jupyter 는 WebSocket
 		// 업그레이드 때 Origin 을 Host 와 대조하는 CSRF 검사를 한다. Host 를 내부 서비스 주소로
 		// 덮으면 브라우저가 보낸 Origin(외부 호스트)과 불일치해 백엔드가 403 을 반환하고, 브라우저는
-		// 이를 ws 1006 으로 본다(HTTP 자원은 Origin 이 없어 통과 → 페이지만 뜨고 ws 만 죽는 증상).
+		// 이를 ws 1006 으로 본다(HTTP 자원은 Origin 이 없어 통과하므로 페이지만 뜨고 ws 만 죽는 증상이 난다).
 		// 업스트림 접속은 req.URL.Host(target)로 다이얼하므로 Host 헤더를 바꿀 필요가 없다
 		// (표준 nginx `proxy_set_header Host $host` 와 동일).
 		injectRequestAuth(claims, req) // jupyter: Authorization 헤더 주입

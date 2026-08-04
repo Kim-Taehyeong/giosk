@@ -83,7 +83,7 @@ export default function Orgs() {
             ] : []),
             { key: 'status', header: t('orgs.colStatus'), render: (r) => <Pill variant="ok" dot>{r.status}</Pill> },
             { key: 'act', header: t('orgs.colAct'), className: 'flex', render: () => (
-              // 관리·삭제 모두 행을 눌러 상세에서 — 리스트에선 실수 방지를 위해 위험 작업을 두지 않는다.
+              // 관리도 삭제도 행을 눌러 상세에서 한다. 리스트에선 실수 방지를 위해 위험 작업을 두지 않는다.
               <ChevronRight size={15} style={{ color: 'var(--muted)', alignSelf: 'center' }} />
             ) },
           ]}

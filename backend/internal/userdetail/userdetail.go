@@ -1,6 +1,6 @@
 // Package userdetail은 관리자 "사용자 360" 상세를 한 번에 모아 준다.
 // 각 도메인(볼륨/세션/데이터셋/가입요청/지갑/사용량)의 기존 userID-키 서비스 메서드를
-// 클로저로 주입받아(모듈 직접 import 없음 → 순환 참조 없음) 합쳐 반환한다.
+// 클로저로 주입받아(모듈을 직접 import 하지 않아 순환 참조가 없다) 합쳐 반환한다.
 package userdetail
 
 import (
@@ -17,7 +17,7 @@ import (
 // 개별 함수가 nil 이면 해당 섹션은 생략(응답에서 null).
 // 스코프 인지 프로바이더는 (orgID, groupID)를 받는다: 매니저(팀/조직) 상세면 그 범위만, 전역(플랫폼)이면 0,0.
 type Providers struct {
-	User     func(id int64) (any, error)                               // 기본 프로필(없으면 nil,nil → 404)
+	User     func(id int64) (any, error)                               // 기본 프로필. 없으면 nil,nil 을 주고 404 가 된다
 	Wallet   func(id, groupID int64) (any, error)                      // 지갑(그룹 스코프면 그 팀 지갑)
 	Volumes  func(id int64) (any, error)                               // 소유/공유 볼륨
 	Sessions func(ctx context.Context, id, groupID int64) (any, error) // 세션 목록(그룹 스코프면 그 팀 세션만)
@@ -45,7 +45,7 @@ func RegisterScoped(mgmt gin.IRouter, h *Handler) {
 // Detail은 플랫폼 관리자용(스코프 무관).
 func (h *Handler) Detail(c *gin.Context) { h.serve(c, false) }
 
-// DetailScoped은 매니저용 — 대상 사용자가 내 스코프(조직/그룹)에 속할 때만.
+// DetailScoped은 매니저용이다. 대상 사용자가 내 스코프(조직이나 그룹)에 속할 때만 준다.
 func (h *Handler) DetailScoped(c *gin.Context) { h.serve(c, true) }
 
 func (h *Handler) serve(c *gin.Context, scoped bool) {
@@ -88,7 +88,7 @@ func (h *Handler) serve(c *gin.Context, scoped bool) {
 	}
 
 	out := gin.H{"user": u}
-	// 섹션별 조회 실패는 치명적이지 않다 — 해당 섹션만 비우고 나머지는 채운다.
+	// 섹션별 조회 실패는 치명적이지 않다. 해당 섹션만 비우고 나머지는 채운다.
 	if h.p.Wallet != nil {
 		if v, e := h.p.Wallet(id, scopeGroup); e == nil {
 			out["wallet"] = v

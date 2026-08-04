@@ -69,10 +69,10 @@ func (c *Config) checkPhysicalNodes() error {
 
 // 공유 영속 home(sharedHome) 활성 시 home 은 사용자의 여러 노드 세션이 공유하므로
 // RWX·노드독립 스토리지클래스여야 한다. 노드 로컬 클래스(local-path 등)면 설치 자체를 거부한다
-// (런타임에 PV 노드고정→스케줄 실패로 터지는 대신 설치시 차단). RWX 보장 못 하는 빈 값도 거부.
+// 런타임에 PV 가 노드에 고정돼 스케줄이 터지는 대신 설치 시점에 막는다. RWX 를 보장 못 하는 빈 값도 거부한다.
 func (c *Config) checkSharedHome() error {
 	if !c.Storage.SharedHome {
-		return nil // 공유 home 미사용 → 영속 PVC 안 만들고 세션 emptyDir 로컬 임시만(스토리지 제약 없음)
+		return nil // 공유 home 을 안 쓰면 영속 PVC 를 만들지 않고 세션은 emptyDir 로컬 임시만 쓴다(스토리지 제약 없음)
 	}
 	sc := c.Storage.PersistenceClass
 	if sc == "" {
@@ -85,7 +85,7 @@ func (c *Config) checkSharedHome() error {
 }
 
 // 접속 게이트웨이 설정 검증.
-// 주의: sshd 사이드카(SessionSSHDImage)는 게이트웨이와 무관하게 켤 수 있다 — 사용자가 등록한
+// 주의: sshd 사이드카(SessionSSHDImage)는 게이트웨이와 무관하게 켤 수 있다. 사용자가 등록한
 // 공개키로 직접 SSH(LB/NodePort) 하는 것이 기본 경로이고, 게이트웨이는 그 위에 얹는 추가 경로다.
 // 따라서 "sshd 를 켜면 게이트웨이 비밀이 필수"라는 제약은 두지 않는다.
 func (c *Config) checkGateway() error {

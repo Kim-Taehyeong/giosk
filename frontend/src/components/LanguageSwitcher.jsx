@@ -9,7 +9,7 @@ import { LANGUAGES, langMeta, flagCC } from '../i18n/languages';
 const FLAG_URLS = import.meta.glob('/node_modules/flag-icons/flags/4x3/*.svg', { query: '?url', import: 'default', eager: true });
 const flagUrl = (cc) => FLAG_URLS[`/node_modules/flag-icons/flags/4x3/${cc}.svg`];
 
-// SVG 국기 — emoji 와 달리 모든 OS 에서 동일하게 렌더된다. 대응 국가코드가 없으면 지구본으로 폴백.
+// SVG 국기를 쓴다. emoji 와 달리 모든 OS 에서 같게 렌더된다. 대응 국가코드가 없으면 지구본으로 폴백한다.
 function Flag({ flag, size = 20 }) {
   const cc = flagCC(flag);
   const url = cc && flagUrl(cc);
@@ -20,7 +20,7 @@ function Flag({ flag, size = 20 }) {
   );
 }
 
-// 언어 선택 드롭다운 — SVG 국기 + 자국어명 검색 목록. 앱 CSS 변수로 라이트/다크 테마 대응.
+// 언어 선택 드롭다운이다. SVG 국기와 자국어명 검색 목록을 쓰고, 앱 CSS 변수로 라이트와 다크 테마에 대응한다.
 export default function LanguageSwitcher({ align = 'right' }) {
   const { i18n } = useTranslation();
   const [open, setOpen] = useState(false);

@@ -1,5 +1,5 @@
 {{- if and .Values.physicalNodes.enabled .Values.physicalNodes.nodeAgent.enabled -}}
-# 물리노드 전용 DaemonSet — giosk.io/physical=true 노드에만 배치.
+# 물리노드 전용 DaemonSet. giosk.io/physical=true 노드에만 배치한다.
 # 계정/SSH/NFS 마운트 reconcile (hostPath + 권한 필요).
 apiVersion: apps/v1
 kind: DaemonSet

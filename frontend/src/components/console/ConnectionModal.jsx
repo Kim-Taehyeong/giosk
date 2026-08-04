@@ -10,7 +10,7 @@ import SshKeyForm from './SshKeyForm';
 const TABS = [
   { key: 'vscode', label: 'VSCode', icon: Code2 },
   { key: 'jupyter', label: 'Jupyter', icon: NotebookPen },
-  // SSH 탭 하나로 통합 — 네이티브 SSH(복붙 명령)와 웹 터미널("웹으로 연결하기")을 같은 탭에 넣는다.
+  // SSH 탭 하나로 통합했다. 네이티브 SSH(복붙 명령)와 웹 터미널(웹으로 연결하기)을 같은 탭에 넣는다.
   // 세션이 제공하는 채널이 ssh(사이드카)든 terminal(웹터미널)이든 이 탭 하나로 다룬다.
   { key: 'ssh', label: 'SSH', icon: TerminalSquare },
 ];
@@ -62,7 +62,7 @@ function CodeRow({ text }) {
 }
 
 // ExpiryHint는 접속 링크 유효시간을 초 단위로 실시간 카운트다운한다(발급 후 짧게만 유효).
-// onRegenerate: 있으면 옆에 "재생성" 버튼 — 만료됐거나 곧 만료될 때 새 토큰/링크를 발급받는다.
+// onRegenerate: 있으면 옆에 재생성 버튼을 둔다. 만료됐거나 곧 만료될 때 새 토큰과 링크를 발급받는다.
 function ExpiryHint({ expiresAt, t, onRegenerate, regenerating }) {
   const target = expiresAt ? new Date(expiresAt).getTime() : 0;
   const [left, setLeft] = useState(() => Math.max(0, Math.round((target - Date.now()) / 1000)));
@@ -100,8 +100,8 @@ function ExpiryHint({ expiresAt, t, onRegenerate, regenerating }) {
   );
 }
 
-// WebPane은 웹 채널(VSCode/Jupyter) 접속 패널 — 게이트웨이 토큰 URL(원본 비밀 미노출) + 열기 버튼.
-// 게이트웨이 비활성 배포에선 URL 이 직접접속(NodePort/LB)이고 비밀번호가 따라온다 → 그때만 비밀번호를 보여준다.
+// WebPane은 웹 채널(VSCode, Jupyter) 접속 패널이다. 게이트웨이 토큰 URL(원본 비밀을 노출하지 않는다)과 열기 버튼을 둔다.
+// 게이트웨이를 안 쓰는 배포에선 URL 이 직접접속(NodePort 나 LB)이고 비밀번호가 따라오므로, 그때만 비밀번호를 보여준다.
 function WebPane({ info, urlLabel, openLabel, expiresAt, t, onRegenerate, regenerating }) {
   const tokenized = !!info.url && info.url.includes('access=');
   return (
@@ -121,10 +121,10 @@ function WebPane({ info, urlLabel, openLabel, expiresAt, t, onRegenerate, regene
   );
 }
 
-// SSHPane은 SSH 접속 패널 — 두 가지 경로: (1) 프록시(게이트웨이) 한 점 접속(어디서든),
+// SSHPane은 SSH 접속 패널이다. 경로가 두 가지다. (1) 프록시(게이트웨이) 한 점 접속(어디서든),
 // (2) 사내망 직접 접속(192 대역, 사무실 네트워크 안일 때 게이트웨이 우회). 물리 세션만 직접 경로 제공.
 function SSHPane({ info, expiresAt, t, onRegenerate, regenerating, onWebConnect, hasKey }) {
-  // 키 미등록이면 복붙 명령을 줘도 로그인이 거부된다 → 여기서 바로 등록/생성할 수 있게 한다(막다른 길 방지).
+  // 키를 등록하지 않았으면 복붙 명령을 줘도 로그인이 거부되므로, 여기서 바로 등록하거나 생성할 수 있게 한다(막다른 길 방지).
   // 등록하면 실행 중인 세션에도 즉시 반영된다(sshd 가 접속마다 authorized_keys 를 다시 읽음).
   const keySetup = hasKey ? null : (
     <div className="mt" style={{ padding: 12, borderRadius: 10, background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
@@ -133,7 +133,7 @@ function SSHPane({ info, expiresAt, t, onRegenerate, regenerating, onWebConnect,
       <div className="mt"><SshKeyForm /></div>
     </div>
   );
-  // 웹으로 연결하기 — 브라우저 터미널(키/명령 불요). 복붙 SSH 위에 우선 제공.
+  // 웹으로 연결하기는 브라우저 터미널이라 키나 명령이 필요 없다. 복붙 SSH 보다 위에 둔다.
   const webBtn = onWebConnect ? (
     <div className="mt">
       <button type="button" className="btn primary" onClick={onWebConnect}>
@@ -174,7 +174,7 @@ function SSHPane({ info, expiresAt, t, onRegenerate, regenerating, onWebConnect,
   );
 }
 
-// 웹터미널 실행 패널 — 새 창(전체화면)으로 브라우저 터미널을 연다(SSH 키·명령 불요).
+// 웹터미널 실행 패널. 새 창(전체화면)으로 브라우저 터미널을 연다(SSH 키나 명령이 필요 없다).
 function TerminalLaunchPane({ onOpen, t }) {
   return (
     <div className="tabpane active">
@@ -187,14 +187,14 @@ function TerminalLaunchPane({ onOpen, t }) {
 }
 
 // availOf는 세션이 제공하는 접속 채널을 소문자로 반환하되, 웹터미널(terminal)을 통합 SSH 탭으로
-// 접어 넣기 위해 terminal→ssh 로 정규화하고 중복을 제거한다. conn 이 없으면 기본 3종을 가정한다.
+// 접어 넣기 위해 terminal 을 ssh 로 정규화하고 중복을 없앤다. conn 이 없으면 기본 3종을 가정한다.
 function availOf(session) {
   const raw = session.conn?.length ? session.conn.map((c) => c.toLowerCase()) : ['vscode', 'jupyter', 'ssh'];
   return [...new Set(raw.map((c) => (c === 'terminal' ? 'ssh' : c)))];
 }
 
-// 세션 접속 모달 — 게이트웨이 단기 토큰 URL(VSCode/Jupyter)·복붙 SSH 제공.
-// 접속 링크는 발급 시점부터 짧게만 유효(게이트웨이가 원본 비밀을 대신 주입 → 사용자에게 비밀 미노출).
+// 세션 접속 모달. 게이트웨이 단기 토큰 URL(VSCode, Jupyter)과 복붙 SSH 를 제공한다.
+// 접속 링크는 발급 시점부터 짧게만 유효하다. 게이트웨이가 원본 비밀을 대신 주입하므로 사용자에게 비밀이 노출되지 않는다.
 export default function ConnectionModal({ session, onClose, initialTab }) {
   const { t } = useTranslation('consoleUser');
   const { toast } = useToast();
@@ -204,13 +204,13 @@ export default function ConnectionModal({ session, onClose, initialTab }) {
   const [tab, setTab] = useState('vscode');
   const [regenerating, setRegenerating] = useState(false);
 
-  // 웹 터미널은 새 창(전체화면)으로 연다 — 모달 안 임베드보다 넓고, 세션 접속 옵션(복붙 SSH)과 공존.
+  // 웹 터미널은 새 창(전체화면)으로 연다. 모달 안에 임베드하는 것보다 넓고 복붙 SSH 와도 공존한다.
   const openTerminal = () => window.open(`/terminal/${session.id}`, `giosk-term-${session.id}`, 'width=940,height=640');
 
   useEffect(() => {
     if (!session) return;
     // 세션이 제공하는 연결 방식 중 첫 탭 선택(호출부가 initialTab 을 주면 그 채널을 우선).
-    // terminal(웹터미널)·ssh(사이드카/물리) 는 통합 SSH 탭 하나로 다루므로 terminal→ssh 로 정규화한다.
+    // terminal(웹터미널)과 ssh(사이드카나 물리)는 통합 SSH 탭 하나로 다루므로 terminal 을 ssh 로 정규화한다.
     const avail = availOf(session);
     const wanted = initialTab === 'terminal' ? 'ssh' : initialTab;
     const want = wanted && avail.includes(wanted) ? wanted : null;
@@ -223,11 +223,11 @@ export default function ConnectionModal({ session, onClose, initialTab }) {
       .catch((e) => { if (!stale) setErr(e?.message || t('conn.loadFail')); }); // 실패 시 로딩 문구가 영영 남지 않게
     return () => { stale = true; };
     // 세션 id(와 초기 탭)로만 재조회한다. 부모(세션 목록)가 4초 폴링으로 리렌더될 때 session 객체
-    // 참조나 t 함수 identity 가 바뀌어도 재조회하지 않게 — 안 그러면 모달이 계속 리로드된다.
+    // 참조나 t 함수 identity 가 바뀌어도 재조회하지 않게 한다. 안 그러면 모달이 계속 리로드된다.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.id, initialTab]);
 
-  // 재생성 — 새 단기 토큰/링크를 발급받는다(만료됐거나 다시 붙을 때).
+  // 재생성은 새 단기 토큰과 링크를 발급받는다(만료됐거나 다시 붙을 때).
   const regenerate = async () => {
     if (!session) return;
     setRegenerating(true);

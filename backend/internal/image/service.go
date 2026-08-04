@@ -30,7 +30,7 @@ type Builder interface {
 	BuildLogs(ctx context.Context, ns, jobName string, tail int64) string
 }
 
-// Service는 image 빌드 파이프라인(가이드 입력→Dockerfile 생성→Kaniko Job→상태 리컨실).
+// Service는 image 빌드 파이프라인이다. 가이드 입력으로 Dockerfile 을 만들고 Kaniko Job 을 띄운 뒤 상태를 리컨실한다.
 type Service struct {
 	repo      Repository
 	builder   Builder
@@ -93,7 +93,7 @@ func (s *Service) Rebuild(ctx context.Context, id int64) error {
 	return s.launch(ctx, img)
 }
 
-// RegisterExternal은 외부 이미지를 빌드 없이 등록한다(항상 가용 — 레지스트리 불요).
+// RegisterExternal은 외부 이미지를 빌드 없이 등록한다(레지스트리가 없어도 항상 쓸 수 있다).
 // Name 에 원본 ref 를 접두 없이 저장하므로 세션 Pod 이 그 origin 에서 직접 pull 한다.
 // Dockerfile="" 라 재빌드는 자동 차단(Rebuild 의 기존 가드). 상태는 바로 active(빌드/스캔 파이프라인 없음, seed 선례).
 func (s *Service) RegisterExternal(req ExternalReq) error {
@@ -109,11 +109,11 @@ func (s *Service) RegisterExternal(req ExternalReq) error {
 		req.Channels = norm
 	}
 	img := &Image{
-		Name:        name, // 레지스트리 접두 없음 — 원본에서 직접 pull
+		Name:        name, // 레지스트리 접두가 없다. 원본에서 직접 pull 한다
 		Tag:         tag,
 		BaseImage:   req.Ref, // 표시용(빌드 이미지의 base 자리와 동일 위치)
 		Description: strings.TrimSpace(req.Desc),
-		Dockerfile:  "", // 외부 → 재빌드 불가
+		Dockerfile:  "", // 외부 이미지라 재빌드할 수 없다
 		Channels:    req.Channels,
 		GPU:         req.GPU,
 		ScanStatus:  "pass", // 외부는 스캔 파이프라인 없음(seed 와 동일)
@@ -171,12 +171,12 @@ func sanitizePortName(s string) string {
 }
 
 // splitRef는 이미지 ref 를 name/tag 로 나눈다. 레지스트리 host:port 의 콜론과 구분하려고
-// 마지막 "/" 뒤에서만 태그 콜론을 찾는다(예: registry:5000/img:1 → name=registry:5000/img, tag=1).
+// 마지막 "/" 뒤에서만 태그 콜론을 찾는다. registry:5000/img:1 이면 name=registry:5000/img, tag=1 이다.
 // 태그가 없으면 latest.
 func splitRef(ref string) (name, tag string) {
 	slash := strings.LastIndex(ref, "/")
 	colon := strings.LastIndex(ref, ":")
-	if colon > slash { // 콜론이 마지막 경로 세그먼트 안 → 태그
+	if colon > slash { // 콜론이 마지막 경로 세그먼트 안에 있으면 태그다
 		return ref[:colon], ref[colon+1:]
 	}
 	return ref, "latest"
@@ -236,7 +236,7 @@ func (s *Service) UncacheNode(ctx context.Context, imageID int64, node string) e
 // CacheList는 이미지의 노드별 캐시 상태를 반환한다.
 func (s *Service) CacheList(imageID int64) []NodeCache { return s.repo.CacheByImage(imageID) }
 
-// ImageLogs는 빌드/스캔 Job 파드 로그를 반환한다(실패 진단용). scan→build 순으로 시도.
+// ImageLogs는 빌드나 스캔 Job 파드 로그를 반환한다(실패 진단용). scan 을 먼저, 그다음 build 를 시도한다.
 func (s *Service) ImageLogs(ctx context.Context, imageID int64) string {
 	if s.builder == nil {
 		return ""
@@ -277,26 +277,26 @@ func (s *Service) reconcileOnce(ctx context.Context) {
 			if err != nil || st == k8s.BuildRunning {
 				continue
 			}
-			if st == k8s.BuildFailed { // HIGH/CRITICAL 취약점 → 등록하되 high 플래그(미서명). Job 은 로그 조회 위해 보존.
+			if st == k8s.BuildFailed { // HIGH/CRITICAL 취약점이 있으면 등록은 하되 high 플래그를 세운다(미서명). Job 은 로그 조회를 위해 남긴다.
 				_ = s.repo.SetBuildResult(img.ID, StatusDraft, "high")
-				log.Printf("[image] scan %s → HIGH", img.Name)
+				log.Printf("[image] scan %s: HIGH", img.Name)
 				continue
 			}
 			_ = s.builder.DeleteBuildJob(ctx, s.buildNS, scanJob(img.ID)) // 통과 시에만 정리
-			if s.cosignKey != "" {                                        // 스캔 통과 + 서명키 설정 → 서명 준비 단계(키 보장 후 서명)
+			if s.cosignKey != "" {                                        // 스캔을 통과했고 서명키가 있으면 서명 준비 단계로 간다
 				_ = s.repo.SetScanStatus(img.ID, "signpending")
 			} else {
 				_ = s.repo.SetBuildResult(img.ID, StatusDraft, "pass")
-				log.Printf("[image] scan %s → pass (서명 생략)", img.Name)
+				log.Printf("[image] scan %s: pass (서명 생략)", img.Name)
 			}
 
-		case "signpending": // 서명키 보장(없으면 in-cluster 자동 생성) → 준비되면 서명 Job 기동
+		case "signpending": // 서명키를 보장하고(없으면 in-cluster 자동 생성) 준비되면 서명 Job 을 띄운다
 			ready, err := s.builder.EnsureCosignKey(ctx, s.buildNS, s.cosignKey)
 			if err != nil {
 				log.Printf("[image] cosign 키 보장 실패 %s: %v", s.cosignKey, err)
 				continue
 			}
-			if !ready { // 키 생성 Job 진행 중 — 다음 주기 재시도
+			if !ready { // 키 생성 Job 이 진행 중이라 다음 주기에 다시 시도한다
 				continue
 			}
 			_ = s.builder.RunSignJob(ctx, s.buildNS, signJob(img.ID), ref, s.cosignKey, s.registry)
@@ -312,22 +312,22 @@ func (s *Service) reconcileOnce(ctx context.Context) {
 				_ = s.repo.SetSigned(img.ID, true)
 			}
 			_ = s.repo.SetBuildResult(img.ID, StatusDraft, "pass")
-			log.Printf("[image] sign %s 완료(%s) → draft", img.Name, st)
+			log.Printf("[image] sign %s 완료(%s): draft", img.Name, st)
 
 		default: // 빌드 단계(scan_status=="building")
 			st, err := s.builder.BuildJobStatus(ctx, s.buildNS, fmt.Sprintf("build-%d", img.ID))
 			if err != nil || st == k8s.BuildRunning {
 				continue
 			}
-			if st == k8s.BuildFailed { // 빌드 실패 → Job 보존(로그 조회용)
+			if st == k8s.BuildFailed { // 빌드가 실패하면 Job 을 남긴다(로그 조회용)
 				_ = s.repo.SetBuildResult(img.ID, StatusFailed, "fail")
 				log.Printf("[image] build %s 실패", img.Name)
 				continue
 			}
 			_ = s.builder.DeleteBuildJob(ctx, s.buildNS, fmt.Sprintf("build-%d", img.ID)) // 성공 시에만 정리
-			_ = s.builder.RunScanJob(ctx, s.buildNS, scanJob(img.ID), ref, s.registry)    // 빌드 성공 → trivy 스캔
+			_ = s.builder.RunScanJob(ctx, s.buildNS, scanJob(img.ID), ref, s.registry)    // 빌드 성공이면 trivy 스캔
 			_ = s.repo.SetScanStatus(img.ID, "scanning")
-			log.Printf("[image] build %s 완료 → 스캔", img.Name)
+			log.Printf("[image] build %s 완료, 스캔 시작", img.Name)
 		}
 	}
 }
@@ -348,7 +348,7 @@ func (s *Service) reconcileCache(ctx context.Context) {
 	}
 }
 
-// genDockerfile은 베이스 + apt/pip 패키지로 Dockerfile 을 생성한다(로컬 COPY 없음 → ConfigMap 컨텍스트로 충분).
+// genDockerfile은 베이스와 apt/pip 패키지로 Dockerfile 을 생성한다(로컬 COPY 가 없어 ConfigMap 컨텍스트로 충분하다).
 func genDockerfile(base, apt, pip string) string {
 	var b strings.Builder
 	b.WriteString("FROM " + base + "\n")

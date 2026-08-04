@@ -15,8 +15,8 @@ import { getInfraDashboard } from '../../../api/console/dashboard';
 
 const hhmm = (ts) => { const d = new Date(ts); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
 
-// 인프라 대시보드(클러스터 하드웨어) — 최고관리자 전용. 감시월: 폴링 주기 선택 + 전체화면.
-// downsample은 시계열을 최대 target 포인트로 버킷 평균한다(촘촘한 원시 샘플 → 부드러운 선).
+// 인프라 대시보드(클러스터 하드웨어)는 최고관리자 전용이다. 감시월에서 폴링 주기 선택과 전체화면을 쓴다.
+// downsample은 시계열을 최대 target 포인트로 버킷 평균한다(촘촘한 원시 샘플을 부드러운 선으로).
 const avg = (xs) => (xs.length ? Math.round(xs.reduce((a, b) => a + (b || 0), 0) / xs.length) : 0);
 function downsample(arr, target) {
   if (arr.length <= target) return arr;
@@ -42,7 +42,7 @@ export default function InfraDashboard() {
   const users = d.activeUsers || [];
 
   const allSnaps = d.snapshots || [];
-  // 선택 범위로 자르고(최근 rangeH 시간) 최대 60포인트로 버킷 평균 → 촘촘함 완화.
+  // 선택 범위로 자르고(최근 rangeH 시간) 최대 60포인트로 버킷 평균해 촘촘함을 완화한다.
   const nowMs = Date.now();
   const snaps = downsample(allSnaps.filter((s) => nowMs - new Date(s.ts).getTime() <= rangeH * 3600e3), 60);
   const trendLabels = snaps.length ? snaps.map((s) => hhmm(s.ts)) : (d.gpuTrend7d || []).map((x) => x.date);
@@ -50,7 +50,7 @@ export default function InfraDashboard() {
   const vramVals = snaps.length ? snaps.map((s) => s.vramUsedPct) : [];
   const RANGES = [6, 12, 24];
   const byType = Object.entries(ss.byGpuType || {}).map(([label, value]) => ({ label: label.replace(/^NVIDIA-/, ''), value }));
-  // 지표 스택이 없으면 GPU 사용률·VRAM·온도는 "0" 이 아니라 "—" 로 두고 안내를 띄운다
+  // 지표 스택이 없으면 GPU 사용률, VRAM, 온도는 0 이 아니라 빈 값으로 두고 안내를 띄운다
   // (0% 를 그대로 보여주면 GPU 가 놀고 있는 것으로 오해된다).
   const mon = d.metrics || { prometheus: false, dcgm: false };
   const gpuMetricsOn = mon.dcgm;

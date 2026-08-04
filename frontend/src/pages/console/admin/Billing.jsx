@@ -10,7 +10,7 @@ import { downloadCsv } from '../../../utils/csv';
 import { cU } from '../../../lib/credit';
 import { tabbable } from '../../../utils/a11y';
 
-// 기간 프리셋 → {from,to} (YYYY-MM-DD; to 는 배타). 'all'=전체.
+// 기간 프리셋을 {from,to} 로 바꾼다(YYYY-MM-DD 이며 to 는 배타). all 은 전체다.
 function periodRange(key) {
   const now = new Date();
   const ymd = (dt) => dt.toISOString().slice(0, 10);

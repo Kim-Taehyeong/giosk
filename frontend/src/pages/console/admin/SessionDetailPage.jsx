@@ -54,7 +54,7 @@ export default function SessionDetailPage() {
   const loadLogs = () => { setLogsBusy(true); getAdminSessionLogs(id).then(setLogs).catch(() => setLogs('')).finally(() => setLogsBusy(false)); };
   const loadDesc = () => getAdminSessionDescribe(id).then(setDesc).catch(() => setDesc(null));
   useEffect(() => { setS(null); setErr(false); setLogs(null); setDesc(null); load(); getAdminSessionAudit(id).then(setAudit).catch(() => {}); loadDesc(); /* eslint-disable-next-line */ }, [id]);
-  const physical = s?.env === 'ssh'; // 물리 노드 대여(파드 없음 → k8s 로그/describe 없음)
+  const physical = s?.env === 'ssh'; // 물리 노드 대여라 파드가 없고 k8s 로그나 describe 도 없다
   // running 이면 describe 도 주기 갱신(이벤트/재시작 실시간). 물리는 파드가 없어 스킵.
   useEffect(() => { if (s?.status !== 'running' || physical) return undefined; const t = setInterval(loadDesc, 10000); return () => clearInterval(t); /* eslint-disable-next-line */ }, [s?.status, physical]);
   // 실행 중이면 5초 폴링(실행시간/크레딧 갱신).

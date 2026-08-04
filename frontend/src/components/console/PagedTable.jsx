@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import DataTable from './DataTable';
 
-// 클라이언트 페이지네이션 래퍼 — 긴 목록(크레딧 내역·감사 로그 등)을 잘라서 보여준다.
+// 클라이언트 페이지네이션 래퍼다. 긴 목록(크레딧 내역이나 감사 로그 등)을 잘라서 보여준다.
 // DataTable 와 동일한 props(rows/columns/rowKey/onRowClick)를 받고 pageSize 만 추가.
 export default function PagedTable({ rows = [], pageSize = 10, ...rest }) {
   const { t } = useTranslation('consoleAdmin');

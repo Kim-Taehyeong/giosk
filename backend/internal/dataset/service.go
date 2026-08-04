@@ -16,8 +16,8 @@ import (
 	"giosk/internal/metrics"
 )
 
-// remoteSize는 URL 의 콘텐츠 크기(바이트)를 best-effort 로 측정한다(HEAD→실패 시 ranged GET).
-// 측정 불가/오류면 0(표시는 "—"). 등록 응답 지연 방지를 위해 5초 타임아웃.
+// remoteSize는 URL 의 콘텐츠 크기(바이트)를 best-effort 로 측정한다(HEAD 가 안 되면 ranged GET).
+// 측정 불가나 오류면 0 을 준다(화면에는 미표시). 등록 응답이 늦어지지 않게 5초 타임아웃을 건다.
 func remoteSize(url string) int64 {
 	if url == "" {
 		return 0
@@ -31,7 +31,7 @@ func remoteSize(url string) int64 {
 			}
 		}
 	}
-	// HEAD 미지원 서버 대비: 1바이트 범위 요청 → Content-Range 의 전체 크기 파싱.
+	// HEAD 미지원 서버 대비로 1바이트 범위를 요청해 Content-Range 에서 전체 크기를 읽는다.
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return 0
@@ -72,7 +72,7 @@ type Service struct {
 	storageClass string // 데이터셋 PVC 스토리지클래스(폴백 동적 PVC용)
 	namespace    string // 데이터셋 PVC 네임스페이스(예: <prefix>datasets)
 	nfsServer    string // 데이터셋 정규 NFS 서버(설정 시 정규경로 모드)
-	nfsBase      string // 데이터셋 정규 NFS 베이스(예: /export) — 데이터는 <base>/dataset/<name>
+	nfsBase      string // 데이터셋 정규 NFS 베이스(예: /export). 데이터는 <base>/dataset/<name> 에 둔다
 	cacheHost    string // 노드 로컬 캐시 루트(hostPath, 예: /dataset-cache)
 	nfsMount     string // API 파드에 데이터셋 NFS 가 마운트된 로컬 경로(파일 업로드 직접 기록). 빈값=업로드 비활성.
 	met          *metrics.Client // 다운로드 진행률(다운로드 Pod 수신 바이트) 조회용
@@ -100,7 +100,7 @@ func (s *Service) UploadEnabled() bool { return s.canonical() && s.nfsMount != "
 func (s *Service) CacheHostPath() string { return s.cacheHost }
 
 // DatasetCachePlacement는 세션 마운트 판정용으로 datasetID별 (cached 노드 목록, 노드로컬 경로)를 반환한다.
-// 캐시 비활성(cacheHost 빈값)이면 빈 맵 → 세션은 전부 NFS 마운트. session.DatasetCacheReader 구현.
+// 캐시가 꺼져 있으면(cacheHost 빈값) 빈 맵을 주고 세션은 전부 NFS 로 마운트한다. session.DatasetCacheReader 구현.
 func (s *Service) DatasetCachePlacement(ids []int64) (map[int64][]string, map[int64]string) {
 	if s.cacheHost == "" || len(ids) == 0 {
 		return nil, nil
@@ -121,7 +121,7 @@ func (s *Service) DatasetCachePlacement(ids []int64) (map[int64][]string, map[in
 // canonical은 정규 NFS 경로 모드 여부(서버+베이스 설정 시).
 func (s *Service) canonical() bool { return s.prov != nil && s.nfsServer != "" && s.nfsBase != "" }
 
-// pvcSizeGi는 PVC 용량(GiB) 산정 — 명시 GB 없으면 측정 바이트에서 올림 + 여유 1Gi.
+// pvcSizeGi는 PVC 용량(GiB)을 산정한다. 명시 GB 가 없으면 측정 바이트를 올림하고 1Gi 를 더한다.
 func pvcSizeGi(d *Dataset) int {
 	if d.SizeGB >= 1 {
 		return d.SizeGB
@@ -198,7 +198,7 @@ func (s *Service) reconcileOnce(ctx context.Context) {
 			log.Printf("[dataset] ds %d 적재 실패", d.ID)
 			continue
 		}
-		// 성공 → 정규경로에 정적 NFS PVC 바인딩 + ready.
+		// 성공하면 정규경로에 정적 NFS PVC 를 바인딩하고 ready 로 바꾼다.
 		pvc := fmt.Sprintf("ds-%d", d.ID)
 		err = s.prov.EnsureSharedNFSPVC(ctx, k8s.SharedNFSSpec{
 			Namespace: s.namespace, Name: pvc,
@@ -217,13 +217,13 @@ func (s *Service) reconcileOnce(ctx context.Context) {
 			}
 		}
 		if sz := parseExtracted(logs); sz > 0 {
-			_ = s.repo.SetSize(d.ID, sz) // 아카이브 추정 → 실제 해제 크기로 교정(용량 뻥튀기 해소)
+			_ = s.repo.SetSize(d.ID, sz) // 아카이브 추정치를 실제 해제 크기로 교정한다(용량 뻥튀기 해소)
 		}
 		_ = s.repo.SetLoadStatus(d.ID, "ready")
 		_ = s.prov.DeleteBuildJob(ctx, s.namespace, job)
-		log.Printf("[dataset] ds %d 적재 완료 → /dataset/%s", d.ID, d.Name)
+		log.Printf("[dataset] ds %d 적재 완료: /dataset/%s", d.ID, d.Name)
 	}
-	// 노드 로컬 캐시 복사 Job 폴링 → cached/failed 전이.
+	// 노드 로컬 캐시 복사 Job 을 폴링해 cached 나 failed 로 전이시킨다.
 	for _, c := range s.repo.ListCaching() {
 		job := fmt.Sprintf("dc-%d-%s", c.DatasetID, c.Node)
 		st, err := s.prov.BuildJobStatus(ctx, s.namespace, job)
@@ -319,7 +319,7 @@ func (s *Service) loadProgress(ctx context.Context, id int64, total int64) (phas
 		return "download", 0, 0, 0
 	}
 	toks := strings.Fields(logs)
-	// 해제 단계 — EXPROGRESS <ex> <total> 로 판정(로그 tail 밖으로 EXTOTAL 이 밀려나도 견고).
+	// 해제 단계는 EXPROGRESS <ex> <total> 로 판정한다(로그 tail 밖으로 EXTOTAL 이 밀려나도 견고하다).
 	if strings.Contains(logs, "EXTRACT DONE") {
 		return "extract", 99, 0, 0
 	}
@@ -383,7 +383,7 @@ func (s *Service) cacheProgress(ctx context.Context, id int64, node string) (pha
 	if strings.Contains(logs, "EXTRACT") || strings.Contains(logs, "EXTOTAL") {
 		return "extract", 0
 	}
-	// 복사 단계 — "PROGRESS <cur> <total>".
+	// 복사 단계는 "PROGRESS <cur> <total>".
 	var cur, total int64
 	for i := 0; i+2 < len(toks); i++ {
 		if toks[i] != "PROGRESS" {
@@ -410,7 +410,7 @@ func (s *Service) Register(userID int64, req RegisterReq) error {
 	if scope == "" {
 		scope = ScopePersonal
 	}
-	if s.repo.NameTaken(req.Name) { // 정규경로 /dataset/<name> 충돌 방지 — 이름 유일
+	if s.repo.NameTaken(req.Name) { // 정규경로 /dataset/<name> 충돌을 막으려면 이름이 유일해야 한다
 		return ErrNameTaken
 	}
 	// 등록은 즉시 끝내고(용량 측정으로 막지 않음), URL 용량은 백그라운드로 측정해 채운다(프론트는 "측정 중" 표시).
@@ -431,7 +431,7 @@ func (s *Service) Register(userID int64, req RegisterReq) error {
 	return nil
 }
 
-// ErrUploadDisabled — NFS 마운트 미설정 등으로 파일 업로드 불가.
+// ErrUploadDisabled는 NFS 마운트 미설정 등으로 파일 업로드가 불가한 경우.
 var ErrUploadDisabled = fmt.Errorf("upload disabled")
 
 
@@ -457,7 +457,7 @@ func (s *Service) InboxTarget() string {
 	return fmt.Sprintf("%s:%s/dataset-inbox/", s.nfsServer, strings.TrimRight(s.nfsBase, "/"))
 }
 
-// InboxFile — 인박스에 올라온 아카이브 1개.
+// InboxFile은 인박스에 올라온 아카이브 1개.
 type InboxFile struct {
 	Name  string `json:"name"`
 	Bytes int64  `json:"bytes"`
@@ -470,7 +470,7 @@ func (s *Service) InboxList() ([]InboxFile, error) {
 	}
 	dir := s.inboxDir()
 	_ = os.MkdirAll(dir, 0o777) // 최초 조회 시 생성해 안내 경로가 실재하게
-	_ = os.Chmod(dir, 0o777)    // umask 로 0755 가 되면 SCP 하는 외부 계정이 못 쓴다 → 강제로 world-writable
+	_ = os.Chmod(dir, 0o777)    // umask 로 0755 가 되면 SCP 하는 외부 계정이 못 쓰므로 world-writable 로 강제한다
 	ents, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, err
@@ -489,7 +489,7 @@ func (s *Service) InboxList() ([]InboxFile, error) {
 	return out, nil
 }
 
-// RegisterNFS는 인박스의 파일을 데이터셋으로 등록한다 — dataset/<name>/ 로 이동 후 해제 Job.
+// RegisterNFS는 인박스의 파일을 데이터셋으로 등록한다. dataset/<name>/ 로 옮긴 뒤 해제 Job 을 띄운다.
 func (s *Service) RegisterNFS(ctx context.Context, userID int64, name, scope, ownerName, filename, sizeClass string) error {
 	if !s.UploadEnabled() {
 		return ErrUploadDisabled
@@ -660,7 +660,7 @@ func (s *Service) Approve(ctx context.Context, reqID, reviewer int64, ownerName 
 		SourceURL: req.SourceURL, Status: status, LoadStatus: "ready",
 	}
 	if s.canonical() {
-		// 정규경로 모드: NFS <base>/dataset/<name> 로 먼저 적재(loading) → 리컨실러가 완료 시 PVC 바인딩+ready.
+		// 정규경로 모드에서는 NFS <base>/dataset/<name> 로 먼저 적재하고(loading), 리컨실러가 완료 시 PVC 를 바인딩하고 ready 로 바꾼다.
 		d.LoadStatus = "loading"
 		if err := s.repo.CreateDataset(d); err != nil {
 			return err
@@ -685,14 +685,14 @@ func (s *Service) Reject(reqID, reviewer int64) error {
 
 // ToggleCache는 노드 로컬 캐시를 토글한다.
 //   - 이미 행 있으면 해제: 행 삭제 + 노드 로컬 디렉터리 정리 Job(best-effort).
-//   - 없으면 캐시 시작: status=caching 기록 + NFS→노드 로컬(hostPath) 복사 Job. 리컨실러가 cached/failed 로 전이.
+//   - 없으면 캐시를 시작한다. status=caching 을 기록하고 NFS 에서 노드 로컬(hostPath)로 복사 Job 을 띄운다. 리컨실러가 cached 나 failed 로 전이시킨다.
 func (s *Service) ToggleCache(ctx context.Context, datasetID int64, node string) error {
 	d, err := s.repo.Get(datasetID)
 	if err != nil {
 		return err
 	}
 	jobBase := fmt.Sprintf("dc-%d-%s", datasetID, node)
-	// 등록중(loading) 데이터셋은 캐시할 수 없다 — NFS 해제가 끝나야 노드로 복사 가능.
+	// 등록 중(loading)인 데이터셋은 캐시할 수 없다. NFS 해제가 끝나야 노드로 복사할 수 있다.
 	// 단 이미 캐시 행이 있으면(해제/취소) 통과시킨다.
 	if _, exists := s.repo.CacheStatus(datasetID, node); !exists && d.LoadStatus != "ready" {
 		return fmt.Errorf("등록이 완료된 뒤에 캐시할 수 있습니다(현재 %s)", d.LoadStatus)

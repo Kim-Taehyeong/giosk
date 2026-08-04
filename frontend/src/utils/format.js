@@ -1,4 +1,4 @@
-// 초 → 남은 시간 문자열(ETA). 0/미측정이면 '—'. 예: "45s", "3:12", "1:02:30".
+// 초를 남은 시간 문자열(ETA)로 바꾼다. 0 이거나 측정 불가면 빈 값을 준다. 예를 들어 45s, 3:12, 1:02:30 이다.
 export function formatEta(sec) {
   const n = Math.round(Number(sec) || 0);
   if (n <= 0) return '—';
@@ -10,7 +10,7 @@ export function formatEta(sec) {
   return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
 }
 
-// 바이트 → 사람이 읽기 좋은 크기 문자열. 0/미측정이면 '—'.
+// 바이트를 사람이 읽기 좋은 크기 문자열로 바꾼다. 0 이거나 측정 불가면 빈 값을 준다.
 export function formatBytes(bytes) {
   const n = Number(bytes) || 0;
   if (n <= 0) return '—';

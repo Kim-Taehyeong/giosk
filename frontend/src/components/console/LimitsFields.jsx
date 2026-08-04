@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 // LimitsFields는 하드 리소스 제한(GPU·VRAM·볼륨·동시세션) 4개 입력을 렌더한다.
-// 값이 null/빈값이면 "상속"(상위 계층으로 폴백) 의미 — placeholder 로 안내.
+// 값이 null 이거나 비면 상속(상위 계층으로 폴백)을 뜻하므로 placeholder 로 안내한다.
 // value: { maxGpu, maxVramGb, maxVolumeGib, maxConcurrentSessions } (각 항목 number|null)
 export default function LimitsFields({ value, onChange }) {
   const { t } = useTranslation('consoleAdmin');

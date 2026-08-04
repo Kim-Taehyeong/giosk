@@ -12,10 +12,10 @@ const (
 	TxAdminGrant = "admin_grant"
 )
 
-// UserWallet은 user_wallets 테이블 매핑. 지갑은 멤버십(유저×팀) 단위 — PK=(user_id, group_id).
+// UserWallet은 user_wallets 테이블 매핑이다. 지갑은 멤버십(유저와 팀) 단위라 PK 가 (user_id, group_id)다.
 type UserWallet struct {
 	UserID             int64      `gorm:"primaryKey;column:user_id" json:"-"`
-	GroupID            int64      `gorm:"primaryKey;column:group_id" json:"groupId"` // 팀(그룹) id — 지갑이 귀속된 팀
+	GroupID            int64      `gorm:"primaryKey;column:group_id" json:"groupId"` // 지갑이 귀속된 팀(그룹) id
 	Balance            int        `gorm:"column:balance" json:"balance"`
 	Reserved           int        `gorm:"column:reserved" json:"reserved"`
 	MonthlyCap         int        `gorm:"column:monthly_cap" json:"cap"`
@@ -45,7 +45,7 @@ type GroupWallet struct {
 
 func (GroupWallet) TableName() string { return "group_wallets" }
 
-// CreditTx — 개인 거래 내역.
+// CreditTx는 개인 거래 내역.
 type CreditTx struct {
 	ID           int64     `gorm:"primaryKey" json:"-"`
 	Type         string    `gorm:"column:type" json:"type"`
@@ -57,24 +57,24 @@ type CreditTx struct {
 
 func (CreditTx) TableName() string { return "credit_transactions" }
 
-// DailyPoint — 일자별 소비 합계(양수). 잔디/달력 추이용.
+// DailyPoint는 일자별 소비 합계(양수). 잔디와 달력 추이용이다.
 type DailyPoint struct {
 	Day    string `gorm:"column:day" json:"day"` // YYYY-MM-DD
 	Amount int    `gorm:"column:amount" json:"amount"`
 }
 
-// SessionSpend — 세션별 소비 합계(원장 ref 기준).
+// SessionSpend는 세션별 소비 합계(원장 ref 기준).
 type SessionSpend struct {
 	Ref    string `gorm:"column:ref" json:"ref"`
 	Name   string `gorm:"column:name" json:"name"`
 	Credit int    `gorm:"column:credit" json:"credit"`
 }
 
-// MyWalletRes — /me/wallet 응답.
+// MyWalletRes는 /me/wallet 응답.
 type MyWalletRes struct {
 	UserWallet
 	History   []CreditTx     `json:"history"`
-	Trend     []DailyPoint   `json:"trend"`     // 일자별 소비 합계(오래된→최근)
+	Trend     []DailyPoint   `json:"trend"`     // 일자별 소비 합계(오래된 것부터 최근 순)
 	BySession []SessionSpend `json:"bySession"` // 세션별 소비 합계(많은 순)
 }
 

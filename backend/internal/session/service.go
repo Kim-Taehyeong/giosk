@@ -25,7 +25,7 @@ const idleCPUThreshold = 0.05
 const idleGPUThreshold = 5.0
 
 // idleGPUPowerW는 전용/물리 GPU 세션의 "연산 중" 판정 전력(W). DCGM util 이 오보고(0)돼도 이 이상
-// 전력을 쓰면 실제 연산 중으로 보고 유휴로 죽이지 않는다. 유휴 4090 ~25W, 실부하 130W+ → 60W 로 넉넉히.
+// 전력을 쓰면 실제 연산 중으로 보고 유휴로 죽이지 않는다. 유휴 4090 이 약 25W, 실부하가 130W 이상이라 60W 로 넉넉히 잡았다.
 const idleGPUPowerW = 60.0
 
 // AuditReader는 세션 대상 감사 로그 조회/기록(audit.Repository 가 구현).
@@ -71,13 +71,13 @@ type Provisioner interface {
 	DeleteSessionService(ctx context.Context, ns, name string) error
 	SessionServiceAccess(ctx context.Context, ns, name, mode string) (k8s.SvcAccess, error)
 	FirstNodeIP(ctx context.Context) string
-	NodeIP(ctx context.Context, node string) string                                                  // 노드 이름→InternalIP(클러스터 DNS 에 노드명 없음 → SSH/웹터미널 IP 필요)
+	NodeIP(ctx context.Context, node string) string                                                  // 노드 이름으로 InternalIP 조회(클러스터 DNS 에 노드명이 없어 SSH·웹터미널에 IP 가 필요하다)
 	ListNodes(ctx context.Context) ([]k8s.LiveNode, error)                                           // 데이터셋 캐시 노드↔GPU타입 매칭용
 	ExecTerminal(ctx context.Context, ns, pod, container string, cmd []string, tio k8s.ExecIO) error // 웹터미널(컨테이너 exec)
 }
 
 // DatasetCacheReader는 데이터셋 노드 로컬 캐시 배치를 조회한다(dataset.Service 구현).
-// datasetID → (캐시 완료 노드 목록, 노드 로컬 경로). 빈 맵이면 캐시 비활성 → 전부 NFS 마운트.
+// datasetID 별 (캐시 완료 노드 목록, 노드 로컬 경로). 빈 맵이면 캐시 비활성이라 전부 NFS 로 마운트한다.
 type DatasetCacheReader interface {
 	DatasetCachePlacement(ids []int64) (cachedNodes map[int64][]string, hostPaths map[int64]string)
 }
@@ -104,9 +104,9 @@ type Service struct {
 	// 생성·재시작 두 경로가 같은 함수를 타야 규칙이 화면마다 갈리지 않는다.
 	canPlaceFn func(ctx context.Context, p PlaceSpec) bool
 
-	// admitMu·admitLock은 "관문 통과 → 예약 기록"을 한 번에 하나만 지나게 한다.
+	// admitMu·admitLock은 "관문 통과 후 예약 기록"을 한 번에 하나만 지나게 한다.
 	// 이 구간을 열어두면 동시에 들어온 요청들이 모두 같은 여유를 보고 통과해(TOCTOU)
-	// 뒤에 온 세션이 Pending 으로 매달린다 — 대기열을 두지 않는 제품에서 가장 나쁜 상태다.
+	// 뒤에 온 세션이 Pending 으로 매달린다. 대기열을 두지 않는 제품에서 가장 나쁜 상태다.
 	// admitMu 는 프로세스 안, admitLock 은 replica 를 넘는 잠금(주입 없으면 프로세스 안까지만).
 	admitMu   sync.Mutex
 	admitLock func(ctx context.Context) (release func(), err error)
@@ -120,7 +120,7 @@ type Service struct {
 	sharedHome    bool   // 영속 home(~/nfs) 사용. false 면 세션은 emptyDir 로컬 임시만(RWX 불필요).
 	maxStopped    int    // 사용자당 중단(대기) 세션 상한(0=무제한). 중단 세션은 로컬 홈 PVC 를 물고 있어 방치 시 노드 디스크 잠식.
 
-	// 중단 세션의 홈 PVC 회수 — 개수 상한(maxStopped)이 "새로 못 만들게" 막는 벽이라면,
+	// 중단 세션의 홈 PVC 회수. 개수 상한(maxStopped)이 "새로 못 만들게" 막는 벽이라면,
 	// 아래 둘은 "이미 쌓인 것"을 가격과 회수로 푸는 축이다.
 	storagePrice func() int // 스토리지 GiB·월 단가(런타임 라이브 read). nil/0 이면 중단 세션 과금 없음.
 	// 홈 회수(T1) 조건: (방치 일수, 노드 디스크 사용률 임계%). 유휴 타임아웃과 마찬가지로
@@ -131,12 +131,12 @@ type Service struct {
 
 	datasetCache DatasetCacheReader // 데이터셋 노드 로컬 캐시 배치 조회(nil=항상 NFS)
 
-	dynamicLease  bool // 선착순(dynamic) 모드 — 임대 연장 허용
+	dynamicLease  bool // 선착순(dynamic) 모드에서 임대 연장 허용
 	maxExtensions int  // 임대 연장 최대 횟수
 	leaseMaxHours int  // 1회 기본 임대 시간(시간)
 	leaseExtHours int  // 연장 1회당 추가 시간(시간)
 
-	// 접속 게이트웨이(단기 토큰 발급) — 설정 시 웹/SSH 접속을 게이트웨이 단일 접점으로 라우팅.
+	// 접속 게이트웨이(단기 토큰 발급). 설정하면 웹·SSH 접속을 게이트웨이 단일 접점으로 라우팅한다.
 	gatewaySecret  []byte // API↔게이트웨이 공유 토큰키(GIOSK_GATEWAY_SECRET). 빈값=게이트웨이 비활성(직접 접속 폴백).
 	gatewayScheme  string // 게이트웨이 웹 URL 스킴(https|http)
 	gatewayHostArg string // SSH 접속 호스트(빈값=gateway 도메인)
@@ -158,7 +158,7 @@ func (s *Service) WithGatewaySSHKey(pemKey []byte) *Service {
 // 게이트웨이 SSH 는 MetalLB LB IP(사내망)로 열리므로, VPN 밖 사용자에겐 -J 점프 명령을 함께 준다.
 func (s *Service) WithGatewayProxyJump(jump string) *Service { s.gatewayJump = jump; return s }
 
-// WithSurge는 동적/서지 가격(가용성↓→단가↑)을 설정한다. dynamic=false면 정적 단가.
+// WithSurge는 동적/서지 가격(가용성이 낮을수록 단가 상승)을 설정한다. dynamic=false면 정적 단가.
 // WithCapacityGate는 가용성 관문을 주입한다. 미주입이면 게이트 미적용(기존 동작).
 func (s *Service) WithCapacityGate(fn func(ctx context.Context, p PlaceSpec) bool) *Service {
 	s.canPlaceFn = fn
@@ -172,8 +172,8 @@ func (s *Service) WithAdmissionLock(fn func(ctx context.Context) (func(), error)
 	return s
 }
 
-// admit은 "검사 → 예약"을 상호배제 구간에서 실행한다. fn 안에서 관문(상한·크레딧·가용성)을 통과시키고
-// 반드시 예약까지(=세션 행 기록/phase 전이) 마쳐야 한다 — 그래야 다음 요청이 이 자리를 다시 보지 않는다.
+// admit은 검사와 예약을 상호배제 구간에서 실행한다. fn 안에서 관문(상한·크레딧·가용성)을 통과시키고
+// 반드시 예약까지(=세션 행 기록·phase 전이) 마쳐야 다음 요청이 이 자리를 다시 보지 않는다.
 // Pod 생성·PVC 대기 같은 느린 작업은 fn 밖에서 한다(잠금을 오래 쥐면 전체가 직렬화된다).
 func (s *Service) admit(ctx context.Context, fn func() error) error {
 	s.admitMu.Lock()
@@ -183,7 +183,7 @@ func (s *Service) admit(ctx context.Context, fn func() error) error {
 		if err == nil {
 			defer release()
 		} else {
-			// 분산 잠금을 못 얻어도 진행한다 — 프로세스 안 뮤텍스는 이미 쥐었고, 잠금 배관 문제로
+			// 분산 잠금을 못 얻어도 진행한다. 프로세스 안 뮤텍스는 이미 쥐었고, 잠금 배관 문제로
 			// 세션 생성을 통째로 막는 편이 더 나쁘다. 다만 조용히 넘어가지는 않는다.
 			log.Printf("[session] admission lock unavailable, falling back to in-process lock: %v", err)
 		}
@@ -255,7 +255,7 @@ func (s *Service) containerSSH() bool { return s.sshdImage != "" }
 // SyncUserKeys는 사용자가 SSH 공개키를 등록/교체/삭제했을 때, 그 사용자의 활성 컨테이너 세션이
 // 있는 네임스페이스마다 authorized_keys Secret 을 갱신한다. sshd 는 접속마다 파일을 다시 읽으므로
 // 실행 중인 세션도 재시작 없이 새 키로 붙고, 지운 키는 즉시 막힌다.
-// auth.KeySyncer 구현 — 클러스터 미가용/세션 없음은 정상(무동작).
+// auth.KeySyncer 구현. 클러스터 미가용이나 세션 없음은 정상이라 아무것도 하지 않는다.
 func (s *Service) SyncUserKeys(ctx context.Context, userID int64) error {
 	if !s.containerSSH() {
 		return nil
@@ -300,7 +300,7 @@ func (s *Service) svcPorts(channels []k8s.WebChannelSpec) []k8s.SvcPort {
 	return ports
 }
 
-// WithLocalHome은 물리노드 로컬 Home 특수 볼륨(컨테이너 선택→hostPath+노드핀)을 설정한다.
+// WithLocalHome은 물리노드 로컬 Home 특수 볼륨(컨테이너가 고르면 hostPath + 노드핀)을 설정한다.
 func (s *Service) WithLocalHome(on bool, hostPath string) *Service {
 	s.localHomeOn, s.localHomeHost = on, hostPath
 	return s
@@ -353,8 +353,8 @@ func (s *Service) WithLimits(r *policy.Resolver) *Service { s.limits = r; return
 // checkHardLimits는 계층 해석된 하드 상한(GPU 개수·VRAM·동시 세션)을 강제한다(모든 과금 모드 공통).
 // 0 = 무제한. 크레딧 검사(checkAffordable)보다 먼저 호출되는 절대 벽.
 func (s *Service) checkHardLimits(userID int64, sess *Session) error {
-	// 중단(대기) 세션 상한 — 각 중단 세션이 로컬 홈 PVC(노드 디스크)를 점유하므로 무한정 쌓이면 안 된다.
-	// 초과 시 새 세션 생성을 막아 기존 중단 세션 삭제를 유도한다. (물리 SSH 는 로컬 PVC 없음 → 제외)
+	// 중단(대기) 세션 상한. 각 중단 세션이 로컬 홈 PVC(노드 디스크)를 점유하므로 무한정 쌓이면 안 된다.
+	// 초과하면 새 세션 생성을 막아 기존 중단 세션 삭제를 유도한다. 물리 SSH 는 로컬 PVC 가 없어 제외한다.
 	// 리졸버가 없으면 전역 config 값(s.maxStopped)으로 폴백.
 	if s.limits == nil {
 		if s.maxStopped > 0 && sess.Env != "ssh" && s.repo.CountStopped(userID) >= s.maxStopped {
@@ -363,7 +363,7 @@ func (s *Service) checkHardLimits(userID int64, sess *Session) error {
 		return nil
 	}
 	lim := s.limits.Resolve(userID)
-	// 중단 상한은 계층 해석값(개인→그룹→조직→전역). 전역 폴백은 globalQuota(=cfg.Quota.MaxStoppedSessions).
+	// 중단 상한은 계층 해석값(개인, 그룹, 조직, 전역 순). 전역 폴백은 globalQuota(=cfg.Quota.MaxStoppedSessions).
 	if lim.MaxStoppedSessions > 0 && sess.Env != "ssh" && s.repo.CountStopped(userID) >= lim.MaxStoppedSessions {
 		return ErrStoppedLimit
 	}
@@ -373,7 +373,7 @@ func (s *Service) checkHardLimits(userID int64, sess *Session) error {
 	return s.checkResourceLimits(userID, sess)
 }
 
-// checkResourceLimits는 사양 자체의 상한(GPU 개수·VRAM)만 본다 — 세션 수(동시·중단) 상한은 제외.
+// checkResourceLimits는 사양 자체의 상한(GPU 개수·VRAM)만 본다. 세션 수(동시·중단) 상한은 제외.
 // 중단 세션 재구성은 세션 수를 늘리지 않으므로 개수 상한을 다시 물으면 안 된다(이미 세어진 세션).
 func (s *Service) checkResourceLimits(userID int64, sess *Session) error {
 	if s.limits == nil {
@@ -430,7 +430,7 @@ func (s *Service) WithLocalClass(sc string) *Service {
 func (s *Service) WithMaxStopped(n int) *Service { s.maxStopped = n; return s }
 
 // WithStoragePrice는 중단 세션 홈 스토리지 과금 단가(GiB·월)를 라이브 getter 로 주입한다.
-// 볼륨 과금과 같은 단가를 쓴다 — 사용자 입장에서 "디스크는 어디에 두든 같은 값"이어야 하므로.
+// 볼륨 과금과 같은 단가를 쓴다. 사용자 입장에서 "디스크는 어디에 두든 같은 값"이어야 하므로.
 func (s *Service) WithStoragePrice(f func() int) *Service { s.storagePrice = f; return s }
 
 // WithMemBurst는 메모리 limit 배수를 설정한다(1 이하=상한 없음).
@@ -464,8 +464,8 @@ const homeSizeGiB = 10 // 세션 홈(/home/work) 영속 용량 기본값
 // Create는 스펙을 확정하고 Pod 를 프로비저닝한 뒤 세션을 기록한다.
 func (s *Service) Create(ctx context.Context, userID int64, username string, req CreateReq) (*Session, error) {
 	// 동시 세션 상한은 checkHardLimits(정책 계층 해석)에서만 강제한다.
-	// billing.credit.maxConcurrentSessions 는 폐기 — 동시세션은 정책(quota)으로 일원화.
-	// 요청이 팀을 지정하면(활성 스코프) 활성 멤버십을 먼저 검증한다(SSH·컨테이너 공통) —
+	// billing.credit.maxConcurrentSessions 는 폐기했다. 동시세션은 정책(quota)으로 일원화.
+	// 요청이 팀을 지정하면(활성 스코프) 활성 멤버십을 먼저 검증한다(SSH·컨테이너 공통).
 	// 임의 팀에 붙어 남의 크레딧을 소모하는 것 차단.
 	if req.GroupID != nil && !s.repo.IsGroupMember(userID, *req.GroupID) {
 		return nil, ErrMustJoinTeam
@@ -477,7 +477,7 @@ func (s *Service) Create(ctx context.Context, userID int64, username string, req
 	if err != nil {
 		return nil, err
 	}
-	// 팀 없는 세션 금지 — 세션은 항상 팀 컨텍스트에서(크레딧이 팀 지갑에 귀속). GroupID 미지정이면
+	// 팀 없는 세션은 금지다. 세션은 항상 팀 컨텍스트에서 만든다(크레딧이 팀 지갑에 귀속). GroupID 미지정이면
 	// 사용자의 대표 팀으로 채운다. 크레딧 모드에서 소속 팀이 전혀 없으면 거부(차감할 팀 지갑 없음).
 	if sess.GroupID == nil && s.limits != nil {
 		if _, gid := s.limits.HierOfUser(userID); gid > 0 {
@@ -493,16 +493,16 @@ func (s *Service) Create(ctx context.Context, userID int64, username string, req
 	}
 	// 관문 통과와 예약(세션 행 기록)은 한 덩어리로 처리한다. 예전에는 Pod 를 다 만든 뒤에야 행을 남겨,
 	// 그 사이에 들어온 요청이 같은 자리를 또 승인받고 뒤에 온 세션이 Pending 으로 매달렸다.
-	// 이제 행이 곧 예약이다 — 이 시점부터 다른 요청의 가용성 계산에 즉시 반영된다.
+	// 이제 행이 곧 예약이다. 이 시점부터 다른 요청의 가용성 계산에 즉시 반영된다.
 	if err := s.admit(ctx, func() error {
 		if err := s.checkHardLimits(userID, sess); err != nil {
 			return err // 1차: 하드 정책(크레딧 무관 절대 벽)
 		}
 		if err := s.checkAffordable(userID, gidOf(sess), sess.PricePerHour); err != nil {
-			return err // 2차: 크레딧 모드 잔액 부족 → 생성 거부
+			return err // 2차: 크레딧 모드 잔액 부족이면 생성 거부
 		}
 		if err := s.checkCapacity(ctx, sess); err != nil {
-			return err // 3차: 지금 들어갈 자리 — 없으면 대기시키지 않고 거절
+			return err // 3차: 지금 들어갈 자리가 있는지. 없으면 대기시키지 않고 거절한다
 		}
 		return s.repo.Create(sess) // 예약 확정
 	}); err != nil {
@@ -512,7 +512,7 @@ func (s *Service) Create(ctx context.Context, userID int64, username string, req
 	mounts := s.resolveMounts(ctx, ns, userID, req)
 	// 통합 home 모델: home(/home/work)은 항상 노드 로컬(임시). 기본 emptyDir,
 	// 로컬 Home 선택 시 그 물리노드 디스크(hostPath, 노드핀). 개인 영속 저장소는 ~/nfs(NFS PVC)로 별도 마운트.
-	// → 어디서나 일관: home=로컬(임시), ~/nfs=영속. (컨테이너·물리 SSH 동일 규칙)
+	// 어디서나 일관된 규칙이다: home 은 로컬(임시), ~/nfs 는 영속. 컨테이너와 물리 SSH 가 같다.
 	var requireNode string
 	if req.Node != "" {
 		requireNode = req.Node // 사용자가 데이터셋 노드 picker 에서 고른 실행 노드 = 하드 핀(자동 배치 대신)
@@ -522,7 +522,7 @@ func (s *Service) Create(ctx context.Context, userID int64, username string, req
 		if err != nil {
 			return nil, s.rollback(ctx, sess, err)
 		}
-		mounts = append(mounts, lh) // 물리노드 로컬 디스크 home → /home/work (노드핀, 노드 디스크에 영속)
+		mounts = append(mounts, lh) // 물리노드 로컬 디스크 home 을 /home/work 로(노드핀, 노드 디스크에 영속)
 		requireNode = req.LocalHomeNode
 	} else {
 		// 세션 전용 영속 홈: 중단해도 데이터 유지, 삭제 시 함께 제거. (예전 emptyDir=중단 시 유실이었음)
@@ -532,8 +532,8 @@ func (s *Service) Create(ctx context.Context, userID int64, username string, req
 		}
 		mounts = append(mounts, k8s.VolMountSpec{PVCName: homePVC, MountPath: homeMount})
 	}
-	// 개인 영속 NFS 저장소 → ~/nfs (세션이 사라져도 유지; 노드 무관 이식성).
-	// sharedHome=false 면 영속 home 미사용 → ~/nfs 마운트 생략(세션은 emptyDir 로컬 임시만).
+	// 개인 영속 NFS 저장소를 ~/nfs 로 붙인다(세션이 사라져도 유지되고 노드에 묶이지 않는다).
+	// sharedHome=false 면 영속 home 을 쓰지 않으므로 ~/nfs 마운트를 생략한다(세션은 emptyDir 로컬 임시만).
 	if s.sharedHome {
 		persistPVC, err := s.ensureHome(ctx, ns, userID)
 		if err != nil {
@@ -553,7 +553,7 @@ func (s *Service) Create(ctx context.Context, userID int64, username string, req
 		dsCached, dsHostPath = s.datasetCache.DatasetCachePlacement(req.Datasets)
 	}
 	mounts = append(mounts, s.resolveDatasets(ctx, ns, req.Datasets, dsTarget, dsCached, dsHostPath)...)
-	// 이미지 캐시 노드를 소프트 선호(빠른 시작). nodeSelector(GPU 타입) 안에서만 효과 → 타입 일치 캐시노드 우선.
+	// 이미지 캐시 노드를 소프트 선호(빠른 시작). nodeSelector(GPU 타입) 안에서만 효과가 있어 타입이 맞는 캐시노드를 우선한다.
 	var preferNodes []string
 	if req.ImageID != 0 {
 		preferNodes = s.repo.CachedNodes(req.ImageID)
@@ -593,7 +593,7 @@ func (s *Service) createSSH(ctx context.Context, userID int64, username string, 
 		UserID:     userID, GroupID: req.GroupID, Name: orDefault(req.Name, "ssh-session"),
 		Env: "ssh", Node: req.Node, GpuMode: "exclusive",
 		GpuType: gpuType, GpuCount: gpuCount,
-		Phase:     PhaseRunning, // 임대 즉시 사용 가능(node-agent reconcile ~10s) → 과금 대상
+		Phase:     PhaseRunning, // 임대는 즉시 사용 가능하므로(node-agent reconcile 약 10초) 바로 과금 대상
 		StartedAt: &now,
 	}
 	sess.PricePerHour = s.priceOf(ctx, sess) // 노드 대여 단가(=GPU타입 단가×노드 GPU수)
@@ -604,7 +604,7 @@ func (s *Service) createSSH(ctx context.Context, userID int64, username string, 
 			return err // 1차: 하드 정책(노드 GPU수가 상한 초과면 임대 거부)
 		}
 		if err := s.checkAffordable(userID, gidOf(sess), sess.PricePerHour); err != nil {
-			return err // 2차: 크레딧 모드 잔액 부족 → 물리 임대 거부
+			return err // 2차: 크레딧 모드 잔액 부족이면 물리 임대 거부
 		}
 		if err := s.leaser.CreateLeaseFor(ctx, req.Node, userID, sess.InstanceID); err != nil {
 			return err
@@ -646,7 +646,7 @@ const homePVCPrefix = "sh-"
 func sessionHomePVC(instanceID string) string { return homePVCPrefix + instanceID }
 
 // ensureSessionHome은 세션 전용 영속 홈(/home/work) PVC 를 멱등 생성한다.
-// 중단(Stop)해도 유지 → 재개 시 그대로 복원, 삭제(Delete) 시 함께 제거 = "중단은 보존, 삭제는 제거".
+// 중단(Stop)해도 유지되고 재개하면 그대로 복원된다. 삭제(Delete)할 때만 함께 제거한다.
 // 로컬 스토리지클래스(local-path, RWO·WFFC): 노드 로컬 디스크라 빠르다(홈 I/O 를 NFS 로 보내면 느림).
 // WFFC 라 Pod 스케줄 시점에 그 노드에 바인딩되고, 이후 PV 노드 어피니티가 재시작을 같은 노드로 되돌린다.
 func (s *Service) ensureSessionHome(ctx context.Context, ns, instanceID string) (string, error) {
@@ -664,7 +664,7 @@ func (s *Service) ensureSessionHome(ctx context.Context, ns, instanceID string) 
 // 하이브리드(물리)면 NFS 기반 RWX, 컨테이너면 설정 스토리지클래스 RWO.
 func (s *Service) ensureHome(ctx context.Context, ns string, userID int64) (string, error) {
 	name := fmt.Sprintf("home-%d", userID)
-	// 영속 home(~/nfs)은 사용자의 모든 세션이 공유하는 노드 무관 저장소 → 항상 RWX.
+	// 영속 home(~/nfs)은 사용자의 모든 세션이 공유하는 노드 무관 저장소라 항상 RWX 다.
 	// (RWO/local-path 면 PV 가 노드에 고정돼, 다른 GPU 타입 노드의 세션이 "volume node affinity conflict"로
 	//  스케줄 불가하거나 동시 세션이 multi-attach 로 막힌다. NFS 등 RWX 스토리지클래스 필요.)
 	err := s.prov.CreatePVC(ctx, k8s.PVCSpec{
@@ -678,9 +678,9 @@ func (s *Service) ensureHome(ctx context.Context, ns string, userID int64) (stri
 }
 
 // resolveLocalHome은 로컬 Home 특수 볼륨 선택을 검증하고 hostPath 홈 마운트(/home/work)로 변환한다.
-//   - 물리 비활성/미설정 → ErrLocalHomeUnavailable
-//   - 사용자가 그 노드를 대여한 적 없으면 → ErrLocalHomeForbidden(난립 방지·보안)
-//   - 노드가 Ready 아니면 → ErrLocalHomeUnavailable(가용성 판단)
+//   - 물리 비활성이거나 미설정이면 ErrLocalHomeUnavailable
+//   - 사용자가 그 노드를 대여한 적 없으면 ErrLocalHomeForbidden(난립 방지·보안)
+//   - 노드가 Ready 아니면 ErrLocalHomeUnavailable(가용성 판단)
 func (s *Service) resolveLocalHome(ctx context.Context, userID int64, username, node string) (k8s.VolMountSpec, error) {
 	if !s.localHomeOn || s.localHomeHost == "" {
 		return k8s.VolMountSpec{}, ErrLocalHomeUnavailable
@@ -736,23 +736,23 @@ func (s *Service) resolveMounts(ctx context.Context, ns string, userID int64, re
 
 // mountFor는 볼륨 1건을 세션 ns PVC 마운트로 해석한다.
 //   - 권한: volume_shares 기반 서버 판정(소유=rw, 공유=ro/rw). 권한 없으면 생략.
-//   - 같은 ns(내 볼륨): 존재하는 PVC 만 마운트(없으면 생략 → "무한 준비중" 방지).
+//   - 같은 ns(내 볼륨): 존재하는 PVC 만 마운트한다. 없으면 생략해서 "무한 준비중"을 막는다.
 //   - 다른 ns(공유 볼륨): NFS 백엔드를 같은 경로로 세션 ns 에 정적 복제 후 마운트(전용 스토리지면 불가).
 func (s *Service) mountFor(ctx context.Context, ns string, userID, volID int64, mountPath string) (k8s.VolMountSpec, bool) {
 	acc, ok := s.repo.VolumeAccess(volID, userID)
 	if !ok || acc.PVCName == "" {
-		log.Printf("[session] 볼륨 %d 접근권한 없음(user %d) — 마운트 생략", volID, userID)
+		log.Printf("[session] 볼륨 %d 접근권한 없음(user %d): 마운트 생략", volID, userID)
 		return k8s.VolMountSpec{}, false
 	}
 	ro := acc.Perm == "ro"
 	pvc := acc.PVCName
 	switch {
-	case acc.PVCNamespace == ns: // 내 볼륨 — 그대로 사용
+	case acc.PVCNamespace == ns: // 내 볼륨은 그대로 사용
 		if _, err := s.prov.PVCPhase(ctx, ns, pvc); err != nil {
-			log.Printf("[session] 볼륨 %d: PVC %s/%s 없음(%v) — 마운트 생략", volID, ns, pvc, err)
+			log.Printf("[session] 볼륨 %d: PVC %s/%s 없음(%v), 마운트 생략", volID, ns, pvc, err)
 			return k8s.VolMountSpec{}, false
 		}
-	default: // 공유 볼륨(다른 ns) — NFS 경로를 세션 ns 에 정적 복제
+	default: // 공유 볼륨(다른 ns)은 NFS 경로를 세션 ns 에 정적 복제
 		server, path, isNFS := s.prov.PVCBackingNFS(ctx, acc.PVCNamespace, acc.PVCName)
 		if !isNFS {
 			log.Printf("[session] 공유 볼륨 %d 는 NFS 백엔드가 아니라 마운트 불가(전용 스토리지)", volID)
@@ -785,7 +785,7 @@ func (s *Service) pickDatasetNode(ctx context.Context, ids []int64, gpuType, gpu
 	typeNodes := s.nodesOfType(ctx, gpuType, gpuMode) // 후보를 GPU 타입 일치 노드로 제한
 	// 사용자가 노드를 직접 고르지 않은 경우, 데이터셋 캐시 노드로 "하드핀"하면 그 노드가 만석일 때
 	// 다른 빈 노드가 있어도 영구 Pending 이 된다. 그러니 GPU 여유가 있는 캐시 노드만 후보로 삼고,
-	// 여유 있는 캐시 노드가 없으면 핀하지 않는다("" → 데이터셋은 NFS, 스케줄러가 빈 노드로 배치).
+	// 여유 있는 캐시 노드가 없으면 핀하지 않는다(빈 값이면 데이터셋은 NFS 로 읽고 스케줄러가 알아서 배치).
 	freeGpu := s.freeGpuByNode(ctx)
 	need := 1
 	if gpuMode == "exclusive" {
@@ -799,7 +799,7 @@ func (s *Service) pickDatasetNode(ctx context.Context, ids []int64, gpuType, gpu
 				continue
 			}
 			if freeGpu != nil && freeGpu[n] < need {
-				continue // 캐시돼 있어도 GPU 여유 없음 → 핀 후보 제외(만석 노드에 핀 금지)
+				continue // 캐시돼 있어도 GPU 여유가 없으면 핀 후보에서 뺀다(만석 노드에 핀 금지)
 			}
 			score[n]++
 			if score[n] > bestN {
@@ -808,7 +808,7 @@ func (s *Service) pickDatasetNode(ctx context.Context, ids []int64, gpuType, gpu
 		}
 	}
 	if bestN == 0 {
-		return "", nil, nil // 여유 있는 캐시 노드 없음 → 핀 없이 NFS(빈 노드로 스케줄)
+		return "", nil, nil // 여유 있는 캐시 노드가 없으니 핀 없이 NFS 로(빈 노드로 스케줄)
 	}
 	return best, cached, hostPaths
 }
@@ -841,9 +841,9 @@ func (s *Service) freeGpuByNode(ctx context.Context) map[string]int {
 // nodesOfType는 GPU 타입이 일치하는(또는 CPU면 전체) Ready 노드 집합을 반환한다(미가용 시 nil=제한없음).
 // gpuShareOf는 세션이 차지하는 "노드 대비 GPU 지분"(0~1)을 반환한다.
 //
-//	전용 N개      → N / 노드GPU수
-//	분할(코어 c%) → (c/100) / 노드GPU수
-//	타임셰어 슬롯 → (1/슬롯수) / 노드GPU수
+//	전용 N개      : N / 노드GPU수
+//	분할(코어 c%) : (c/100) / 노드GPU수
+//	타임셰어 슬롯 : (1/슬롯수) / 노드GPU수
 //
 // 이 지분만큼 CPU·메모리를 최소 보장한다("GPU 1/N 사면 CPU도 1/N").
 func gpuShareOf(sess *Session, nodeGPUs, slots int) float64 {
@@ -860,11 +860,11 @@ func gpuShareOf(sess *Session, nodeGPUs, slots int) float64 {
 }
 
 // applyGuarantee는 GPU 지분에 비례한 CPU·메모리 최소 보장을 세션에 채운다(Pod requests 로 나감).
-// 기준은 그 GPU 타입의 "가장 작은 후보 노드" — 그래야 어느 후보에 떨어져도 보장이 성립한다.
+// 기준은 그 GPU 타입의 "가장 작은 후보 노드"다. 그래야 어느 후보에 떨어져도 보장이 성립한다.
 // limits 는 걸지 않으므로 여유가 있으면 이 값을 넘겨 쓸 수 있다(최소 보장이지 상한이 아님).
 func (s *Service) applyGuarantee(ctx context.Context, sess *Session) {
 	if sess.GpuMode == "cpu" || sess.GpuType == "" {
-		return // CPU 단일 모드는 별도 정책(요청 안 걸음) — GPU 지분 개념이 없다
+		return // CPU 단일 모드는 별도 정책이라 요청을 걸지 않는다(GPU 지분 개념이 없다)
 	}
 	n, ok := s.minNodeOf(ctx, sess.GpuType)
 	if !ok || n.CPUCores <= 0 {
@@ -875,15 +875,15 @@ func (s *Service) applyGuarantee(ctx context.Context, sess *Session) {
 	if share <= 0 {
 		return
 	}
-	// 정책: "최소만 보장(request), 상한 없음(limit 미설정 → 자유 버스트/경쟁)".
+	// 정책: 최소만 보장(request)하고 상한은 두지 않는다(limit 미설정이면 자유 버스트·경쟁).
 	// request 는 GPU 지분에 비례하되 requestFactor(0.5)를 곱해 보수적으로 잡는다. 이유:
 	//   한 노드의 세션 GPU 지분 합은 설계상 ≤ 1(공유=나눠가짐, 전용=독점) 이므로,
 	//   노드 위 CPU/Mem request 총합 = 0.5 × 노드 × Σ(share) ≤ 노드의 50%.
-	//   → 항상 ≥50% 헤드룸이 남아 "CPU/Mem 부족으로 스케줄 실패(영구 Pending)"가 원천 차단된다.
-	//   전용(share=1)도 노드의 50%만 요청 → 반드시 배치되고, limit 이 없어 노드 전체까지 버스트한다.
+	//   항상 50% 이상 헤드룸이 남아 "CPU/Mem 부족으로 스케줄 실패(영구 Pending)"가 원천 차단된다.
+	//   전용(share=1)도 노드의 50%만 요청하므로 반드시 배치되고, limit 이 없어 노드 전체까지 버스트한다.
 	// "limit만" 방식은 금물: request 없이 limit 만 주면 k8s 가 request=limit 으로 자동 설정해 다시 100% 요청이 된다.
 	const requestFactor = 0.5
-	// share 상한 1.0 — 요청 GPU 수가 노드 GPU 수를 초과해 share>1 이 되어도(그런 세션은 어차피
+	// share 상한은 1.0 이다. 요청 GPU 수가 노드 GPU 수를 초과해 share>1 이 되어도(그런 세션은 어차피
 	// "한 노드에 그만큼의 GPU가 없어" GPU 부족으로 스케줄 불가) CPU/Mem request 가 노드 용량을
 	// 넘어 폭주하지 않게 막는다. 이로써 request 총합은 언제나 ≤ 노드의 50% 로 유지된다.
 	effShare := share
@@ -978,7 +978,7 @@ func (s *Service) resolveDatasets(ctx context.Context, ns string, datasetIDs []i
 	for _, id := range datasetIDs {
 		ds, ok := s.repo.DatasetMount(id)
 		if !ok {
-			log.Printf("[session] 데이터셋 %d 미프로비저닝(PVC 없음) — 마운트 생략", id)
+			log.Printf("[session] 데이터셋 %d 미프로비저닝(PVC 없음): 마운트 생략", id)
 			continue
 		}
 		safe := mountSafe(ds.Name)
@@ -1020,7 +1020,7 @@ func containsStr(ss []string, v string) bool {
 	return false
 }
 
-// mountSafe는 데이터셋 이름을 마운트 경로 세그먼트로 정규화한다(공백/슬래시 → '-').
+// mountSafe는 데이터셋 이름을 마운트 경로 세그먼트로 정규화한다(공백과 슬래시를 '-' 로).
 func mountSafe(name string) string {
 	out := make([]rune, 0, len(name))
 	for _, r := range name {
@@ -1036,7 +1036,7 @@ func mountSafe(name string) string {
 	return string(out)
 }
 
-// buildSession은 요청 + (오퍼링) → 세션 엔티티로 스펙을 확정한다.
+// buildSession은 요청과 오퍼링을 받아 세션 엔티티로 스펙을 확정한다.
 func (s *Service) buildSession(ctx context.Context, userID int64, req CreateReq) (*Session, error) {
 	sess := &Session{
 		InstanceID:  idgen.Token("ses-", 5), // K8s Pod 이름용 RFC1123(하이픈)
@@ -1060,7 +1060,7 @@ func (s *Service) buildSession(ctx context.Context, userID int64, req CreateReq)
 			return nil, err
 		}
 	}
-	// 분할(VRAM/코어%)은 shared 모드 전용 값 — 전용/CPU 세션엔 남기지 않는다(스펙 표기 혼동 방지).
+	// 분할(VRAM/코어%)은 shared 모드 전용 값이라 전용·CPU 세션엔 남기지 않는다(스펙 표기 혼동 방지).
 	if sess.GpuMode != "shared" {
 		sess.VramMB, sess.CorePercent = 0, 0
 	}
@@ -1085,7 +1085,7 @@ const (
 	jupyterPort = 8888 // jupyter 기본 포트
 )
 
-// webChannelsFor는 이미지 channels 설정 → 활성 웹 채널 목록으로 변환한다.
+// webChannelsFor는 이미지 channels 설정을 활성 웹 채널 목록으로 변환한다.
 // 시크릿(비밀번호=PASSWORD, 토큰=JUPYTER_TOKEN)은 세션 1개당 동일 값(WebPassword)을 재사용.
 // channels 미설정 이미지는 하위호환으로 code-server(vscode)로 간주한다.
 func webChannelsFor(ch ImageChannels, secret string) []k8s.WebChannelSpec {
@@ -1096,7 +1096,7 @@ func webChannelsFor(ch ImageChannels, secret string) []k8s.WebChannelSpec {
 	if ch.Jupyter {
 		out = append(out, k8s.WebChannelSpec{Name: "jupyter", Port: jupyterPort, EnvKey: "JUPYTER_TOKEN", Secret: secret})
 	}
-	// 커스텀 웹 포트 — 시크릿/env 없이 포트포워딩만(제네릭 앱). EnvKey="" → channelEnv 가 주입 생략.
+	// 커스텀 웹 포트는 시크릿이나 env 없이 포트포워딩만 한다(제네릭 앱). EnvKey 가 비면 channelEnv 가 주입을 생략한다.
 	if ch.Web != nil && ch.Web.Port > 0 {
 		name := ch.Web.Name
 		if name == "" {
@@ -1146,10 +1146,10 @@ func (s *Service) priceOf(ctx context.Context, sess *Session) int {
 			// 커스텀 분할(HAMi): VRAM(GB)×GB단가 + 코어(%)×코어단가.
 			base = (sess.VramMB/1024)*perGB + sess.CorePercent*perCore
 		case "timeslice":
-			// 타임슬라이싱 슬롯 = GPU 1개를 N분할한 몫 → 전용단가 ÷ 슬롯수(실 점유량 비례).
+			// 타임슬라이싱 슬롯은 GPU 1개를 N분할한 몫이라 전용단가를 슬롯수로 나눈다(실 점유량 비례).
 			base = perHour / max1(s.timesliceSplitFor(ctx, sess.GpuType))
 		case "cpu":
-			// CPU 단일 모드(데이터 다운로드·전처리 등) — 단일 단가(시간당). CPU/메모리 세부 단가는 두지 않는다:
+			// CPU 단일 모드(데이터 다운로드·전처리 등)는 단일 단가(시간당)를 쓴다. CPU/메모리 세부 단가는 두지 않는다:
 			// GPU 세션의 CPU·메모리는 GPU 지분에 번들되고, CPU 전용은 이 한 값으로만 과금(단가 체계 단순화).
 			base, _, _ = s.repo.GpuTypePricing("cpu")
 		}
@@ -1210,7 +1210,7 @@ func (s *Service) provision(ctx context.Context, ns string, sess *Session, image
 	if err := s.prov.EnsureNamespace(ctx, ns); err != nil {
 		return err
 	}
-	// 컨테이너 SSH 가 켜져 있으면 사용자 공개키 Secret 을 먼저 준비한다(키 미등록이면 빈 파일 →
+	// 컨테이너 SSH 가 켜져 있으면 사용자 공개키 Secret 을 먼저 준비한다(키를 등록하지 않았으면 빈 파일이라
 	// 세션은 정상 기동하고, 나중에 등록하면 Secret 갱신만으로 이 세션에도 바로 반영된다).
 	if s.containerSSH() {
 		if err := s.prov.UpsertUserKeys(ctx, ns, sess.UserID, s.repo.UserSSHKey(sess.UserID)); err != nil {
@@ -1243,9 +1243,9 @@ func (s *Service) provision(ctx context.Context, ns string, sess *Session, image
 		CPUCores:     sess.CPUCores,
 		MemGB:        sess.MemGB,
 		EphemeralGiB: s.ephemeralGiB(sess.UserID), // 정책 해석값(0=매퍼 기본 캡). 노드 디스크 DoS 방지.
-		MemBurst:     s.memBurst,                  // 메모리 limit 배수 — 노드 RAM 고갈로 남의 세션이 축출되는 것 차단
+		MemBurst:     s.memBurst,                  // 메모리 limit 배수. 노드 RAM 고갈로 남의 세션이 축출되는 것을 막는다
 		Labels:       sess.labels(),
-		UID:          s.uidBase + int(sess.UserID), // 안정 UID(물리 SSH 와 동일 공식) → NFS 권한 일관
+		UID:          s.uidBase + int(sess.UserID), // 안정 UID(물리 SSH 와 같은 공식)라 NFS 권한이 일관된다
 		HomePVC:      homePVC,
 		Volumes:      mounts,
 		WebChannels:  channels,     // 이미지 channels 기반(vscode/jupyter)
@@ -1259,7 +1259,7 @@ func (s *Service) provision(ctx context.Context, ns string, sess *Session, image
 	}); err != nil {
 		return err
 	}
-	// 세션 Service — 게이트웨이 활성 시 모든 채널 포트(+sshd 22)를 ClusterIP 로 노출(라우팅용).
+	// 세션 Service. 게이트웨이가 켜져 있으면 모든 채널 포트(+sshd 22)를 ClusterIP 로 노출한다(라우팅용).
 	return s.prov.EnsureSessionService(ctx, k8s.SvcSpec{
 		Namespace: ns, Name: sess.InstanceID, Ports: s.svcPorts(channels), Mode: s.exposeMode(), Internal: s.gatewayOn(),
 	})
@@ -1274,7 +1274,7 @@ func (s *Service) scratchHostOf(userID int64) string {
 }
 
 // exposeMode는 세션 노출 모드를 반환한다. loadbalancer(MetalLB) 만 별도로 인정하고,
-// 그 외(빈값·이전의 portforward 등)는 모두 nodeport 로 수렴한다 — 게이트웨이·인그레스 없이 바로 접속.
+// 그 외(빈값이나 예전 portforward 등)는 모두 nodeport 로 수렴한다. 게이트웨이·인그레스 없이 바로 접속한다.
 func (s *Service) exposeMode() string {
 	if s.expose == k8s.ExposeLoadBalancer {
 		return k8s.ExposeLoadBalancer
@@ -1323,10 +1323,10 @@ func (s *Service) fillChannels(sess *Session) {
 	for _, ch := range s.sessionChannels(sess.ImageID, "") {
 		sess.Channels = append(sess.Channels, ch.Name)
 	}
-	// 웹터미널(API 호스팅 exec) — 컨테이너 세션엔 항상 노출(사이드카/게이트웨이 불요, k8s exec 만).
-	// 프론트에서 "SSH" 버튼 → 브라우저 xterm 으로 바로 접속. (물리 세션은 아래 ssh 탭에서 웹연결 제공.)
+	// 웹터미널(API 호스팅 exec)은 컨테이너 세션에 항상 노출한다(사이드카·게이트웨이 없이 k8s exec 만 쓴다).
+	// 프론트에서 "SSH" 버튼을 누르면 브라우저 xterm 으로 바로 접속한다. (물리 세션은 아래 ssh 탭에서 웹연결을 제공한다.)
 	sess.Channels = append(sess.Channels, "terminal")
-	// 컨테이너 sshd 사이드카가 있으면 네이티브 SSH 탭을 노출한다 — 게이트웨이는 필요 없다.
+	// 컨테이너 sshd 사이드카가 있으면 네이티브 SSH 탭을 노출한다. 게이트웨이는 필요 없다.
 	// 직접 접속(LB IP:22 또는 노드IP:NodePort)이 기본 경로이고, 게이트웨이는 그 위에 얹는 추가 경로.
 	if s.containerSSH() {
 		sess.Channels = append(sess.Channels, "ssh")
@@ -1338,7 +1338,7 @@ func (s *Service) refreshLive(ctx context.Context, sess *Session) {
 		return
 	}
 	if sess.Env == "ssh" {
-		// 물리(SSH) 세션은 Pod 가 없다 — 임대 활성 = running 으로 간주.
+		// 물리(SSH) 세션은 Pod 가 없으므로 임대가 활성이면 running 으로 본다.
 		if sess.Phase == PhaseProvisioning {
 			_ = s.repo.SetPhase(sess.InstanceID, PhaseRunning)
 			sess.Phase = PhaseRunning
@@ -1362,7 +1362,7 @@ func (s *Service) Connection(ctx context.Context, instanceID string, userID int6
 		return nil, err
 	}
 	if sess.Env == "ssh" {
-		// 물리노드 임대 — 노드 IP 로 직접 SSH(노드 이름은 클러스터/외부 DNS 에 없어 lookup 실패).
+		// 물리노드 임대는 노드 IP 로 직접 SSH 한다(노드 이름은 클러스터·외부 DNS 에 없어 lookup 이 실패한다).
 		return &Connection{
 			SSH: map[string]string{"cmd": fmt.Sprintf("ssh %s@%s", s.usernameOf(userID), s.prov.NodeIP(ctx, sess.Node))},
 		}, nil
@@ -1380,7 +1380,7 @@ func (s *Service) Connection(ctx context.Context, instanceID string, userID int6
 			conn.Web = acc
 		}
 	}
-	// 컨테이너 SSH — 게이트웨이 없이도 항상 제공(사용자가 등록한 공개키로 인증).
+	// 컨테이너 SSH 는 게이트웨이 없이도 항상 제공한다(사용자가 등록한 공개키로 인증).
 	if s.containerSSH() {
 		if acc := s.containerSSHAccess(ctx, sess); acc != nil {
 			conn.SSH = acc
@@ -1391,7 +1391,7 @@ func (s *Service) Connection(ctx context.Context, instanceID string, userID int6
 
 // containerSSHAccess는 컨테이너 세션의 "직접 SSH" 접속 정보를 만든다(게이트웨이 불요).
 // 노출 모드를 따라 MetalLB 가 있으면 LB IP 의 22 번으로, 없으면 노드 IP 의 NodePort 로 붙는다.
-// 주소가 아직 없으면(LB IP 할당 대기 등) nil — 프론트는 웹 터미널 경로를 계속 제공한다.
+// 주소가 아직 없으면(LB IP 할당 대기 등) nil 을 준다. 프론트는 웹 터미널 경로를 계속 제공한다.
 // 로그인 계정은 sshd 사이드카가 세션 UID 로 만드는 work 이며, 인증은 사용자 등록 공개키뿐이다.
 func (s *Service) containerSSHAccess(ctx context.Context, sess *Session) map[string]string {
 	acc, err := s.prov.SessionServiceAccess(ctx, s.namespaceOf(sess), sess.InstanceID, s.exposeMode())
@@ -1422,7 +1422,7 @@ func (s *Service) channelAccess(ctx context.Context, sess *Session, ch k8s.WebCh
 	case "vscode":
 		m["password"] = ch.Secret // code-server 비밀번호
 	default:
-		// 커스텀 웹 채널 — 시크릿 없음. 비번/토큰 미설정.
+		// 커스텀 웹 채널은 시크릿이 없다. 비번·토큰도 설정하지 않는다.
 	}
 	mode := s.exposeMode()
 	if primary {
@@ -1441,7 +1441,7 @@ func (s *Service) channelAccess(ctx context.Context, sess *Session, ch k8s.WebCh
 		}
 	}
 	// URL 을 못 만든 경우(NodePort 대기·보조 채널)에만 폴백. 게이트웨이가 실제로 켜져 있을 때만
-	// 서브도메인 URL 을 쓴다 — gateway.enabled=false 여도 GatewayDomain 기본값(gw.giosk.local)이
+	// 서브도메인 URL 을 쓴다. gateway.enabled=false 여도 GatewayDomain 기본값(gw.giosk.local)이
 	// 남아있으므로 s.gateway!="" 로 판단하면 안 되고 gatewayOn() 으로 판단해야 죽은 링크가 안 나간다.
 	if m["url"] == "" {
 		if s.gatewayOn() {
@@ -1457,7 +1457,7 @@ func (s *Service) channelAccess(ctx context.Context, sess *Session, ch k8s.WebCh
 // ── 접속 게이트웨이(단기 토큰) ──────────────────────
 
 const (
-	webAccessTTL = 3 * time.Minute // 웹 access 토큰 수명(클릭→쿠키 교환까지 짧게)
+	webAccessTTL = 3 * time.Minute // 웹 access 토큰 수명(클릭에서 쿠키 교환까지만 짧게)
 	sshAccessTTL = 5 * time.Minute // SSH 토큰 수명(복붙 지연 여유)
 )
 
@@ -1488,7 +1488,7 @@ func (s *Service) Access(ctx context.Context, instanceID string, userID int64) (
 		return nil, err
 	}
 	info := &AccessInfo{ExpiresAt: s.now().Add(webAccessTTL)}
-	if sess.Env == "ssh" { // 물리노드 임대 — SSH 만. 노드 이름은 DNS 미해석 → IP 로 접속.
+	if sess.Env == "ssh" { // 물리노드 임대는 SSH 만 준다. 노드 이름은 DNS 로 안 풀려서 IP 로 접속한다.
 		info.SSH = s.sshAccess(sess.InstanceID, userID, "", s.prov.NodeIP(ctx, sess.Node), gateway.TgtPhysical, s.usernameOf(userID))
 		info.ExpiresAt = s.now().Add(sshAccessTTL)
 		return info, nil
@@ -1504,7 +1504,7 @@ func (s *Service) Access(ctx context.Context, instanceID string, userID int64) (
 			info.Web = m
 		}
 	}
-	if s.gatewayOn() && s.containerSSH() { // 컨테이너 sshd 사이드카 → SSH 탭
+	if s.gatewayOn() && s.containerSSH() { // 컨테이너 sshd 사이드카가 있으면 SSH 탭
 		info.SSH = s.sshAccess(sess.InstanceID, userID, s.namespaceOf(sess), "", gateway.TgtContainer, "work")
 	}
 	return info, nil
@@ -1531,7 +1531,7 @@ func (s *Service) webAccess(ctx context.Context, sess *Session, ch k8s.WebChanne
 
 // sshAccess는 SSH 접속(복붙 한 줄) 정보를 만든다. 게이트웨이 활성 시 username=1회 토큰,
 // 아니면 물리 노드로의 직접 SSH 로 폴백한다.
-// 토큰은 jti 단일사용(게이트웨이 nonce) — ssh/sftp 각각에 별도 토큰을 발급한다(같은 토큰이면 두 번째가 거부됨).
+// 토큰은 jti 단일사용(게이트웨이 nonce)이라 ssh 와 sftp 에 각각 별도 토큰을 발급한다(같은 토큰이면 두 번째가 거부된다).
 func (s *Service) sshAccess(instanceID string, userID int64, ns, node, tgt, user string) map[string]string {
 	if !s.gatewayOn() {
 		if tgt == gateway.TgtPhysical {
@@ -1556,14 +1556,14 @@ func (s *Service) sshAccess(instanceID string, userID int64, ns, node, tgt, user
 		return nil
 	}
 	host, port := s.gatewayHost(), s.gatewaySSHPort
-	// 프록시(게이트웨이) 접속 — 어디서든 게이트웨이 한 점으로. 토큰은 최초 인증 1회만 소비되고,
-	// 접속이 성립하면 게이트웨이가 스트림을 계속 프록시한다(중간 재검증·주기 검사 없음 → 세션 유지).
+	// 프록시(게이트웨이) 접속은 어디서든 한 점으로 모은다. 토큰은 최초 인증 1회만 소비되고,
+	// 접속이 성립하면 게이트웨이가 스트림을 계속 프록시한다(중간 재검증이나 주기 검사가 없어 세션이 유지된다).
 	m := map[string]string{
 		"cmd":  fmt.Sprintf("ssh -p %d %s@%s", port, sshTok, host),
 		"user": user,
 		"host": host,
 	}
-	// 사내망 직접 접속(192 대역) — 사무실 네트워크 안이면 게이트웨이를 거치지 않고 노드에 바로 붙는다.
+	// 사내망 직접 접속(192 대역). 사무실 네트워크 안이면 게이트웨이를 거치지 않고 노드에 바로 붙는다.
 	// 물리(SSH) 세션만: 대상이 곧 노드다. 컨테이너는 노드로 직접 붙으면 컨테이너가 아니라 노드에
 	// 닿으므로 직접 경로를 제공하지 않는다(프록시만).
 	if tgt == gateway.TgtPhysical && node != "" {
@@ -1632,7 +1632,7 @@ func (s *Service) AdminStop(ctx context.Context, instanceID string) error {
 	return s.stopSession(ctx, sess)
 }
 
-// stopSession은 세션 중단 공통 절차(정산→Pod/Service 정리 또는 노드 반납→stopped).
+// stopSession은 세션 중단 공통 절차다. 정산한 뒤 Pod/Service 를 정리하거나 노드를 반납하고 stopped 로 넘긴다.
 func (s *Service) stopSession(ctx context.Context, sess *Session) error {
 	s.settle(ctx, sess, true) // 중단 전 사용분 최종 정산
 	if sess.Env == "ssh" {
@@ -1645,7 +1645,7 @@ func (s *Service) stopSession(ctx context.Context, sess *Session) error {
 		return err
 	}
 	_ = s.prov.DeleteSessionService(ctx, s.namespaceOf(sess), sess.InstanceID)
-	// 중단 구간 시작 — 여기서부터 홈 PVC 는 GPU 과금 없이 노드 디스크만 점유한다.
+	// 중단 구간 시작. 여기서부터 홈 PVC 는 GPU 과금 없이 노드 디스크만 점유한다.
 	// 스토리지 과금과 회수(T1) 방치기간이 모두 이 시각을 기준으로 센다.
 	_ = s.repo.MarkStopped(sess.InstanceID, s.now())
 	return s.repo.SetPhase(sess.InstanceID, PhaseStopped)
@@ -1684,7 +1684,7 @@ func (s *Service) Start(ctx context.Context, instanceID string, userID int64) er
 		return err
 	}
 	// 재시작도 생성과 같은 관문을 탄다. 예전에는 여기에 검사가 없어, 자리가 없어도 Pod 가 Pending 으로
-	// 매달려 "보이지 않는 대기열"이 됐다 — 신규 생성은 막히는데 중단 세션을 가진 사람만 줄을 설 수 있어
+	// 매달려 "보이지 않는 대기열"이 됐다. 신규 생성은 막히는데 중단 세션을 가진 사람만 줄을 설 수 있어
 	// 중단 세션이 사실상 대기표가 되는 역효과가 있었다.
 	//
 	// 판정은 이 세션이 묶인 노드 기준이다. 홈(/home/work)이 노드 로컬이라 재개는 그 노드에서만 되므로,
@@ -1693,11 +1693,11 @@ func (s *Service) Start(ctx context.Context, instanceID string, userID int64) er
 	if err := s.admit(ctx, func() error {
 		if err := s.checkCapacityOn(ctx, sess, sess.Node); err != nil {
 			if sess.Node != "" && s.checkCapacity(ctx, sess) == nil {
-				return ErrNodePinned // 클러스터엔 자리가 있는데 이 노드만 막힌 경우 — 사용자가 할 일이 다르다
+				return ErrNodePinned // 클러스터엔 자리가 있는데 이 노드만 막힌 경우다. 사용자가 할 일이 다르다
 			}
 			return err
 		}
-		// 예약 확정 — stopped 일 때만 성공하는 조건부 전이라 연타·동시 요청이 같은 세션을 두 번 띄우지 못한다.
+		// 예약 확정. stopped 일 때만 성공하는 조건부 전이라 연타나 동시 요청이 같은 세션을 두 번 띄우지 못한다.
 		ok, err := s.repo.ClaimForStart(instanceID)
 		if err != nil {
 			return err
@@ -1709,7 +1709,7 @@ func (s *Service) Start(ctx context.Context, instanceID string, userID int64) er
 	}); err != nil {
 		return err
 	}
-	// 여기서부터 실패하면 예약(phase)을 중단 상태로 되돌린다 — 안 그러면 뜨지도 않은 세션이 자리를 문다.
+	// 여기서부터 실패하면 예약(phase)을 중단 상태로 되돌린다. 안 그러면 뜨지도 않은 세션이 자리를 문다.
 	resume := func(err error) error {
 		_ = s.repo.SetPhase(instanceID, PhaseStopped)
 		return err
@@ -1739,7 +1739,7 @@ func (s *Service) Start(ctx context.Context, instanceID string, userID int64) er
 	if err := s.provision(ctx, ns, sess, imageRef, "", mounts, preferNodes, dsNode); err != nil {
 		return resume(err)
 	}
-	// 중단 구간 종료 — 마지막 델타까지 스토리지 정산한 뒤 시작점을 비운다.
+	// 중단 구간 종료. 마지막 델타까지 스토리지를 정산한 뒤 시작점을 비운다.
 	// ResetBilling 은 billed_credits 만 0으로 되돌리므로 스토리지 누적(storage_billed_credits)은 보존된다.
 	s.settleStorage(ctx, sess)
 	_ = s.repo.ClearStopped(instanceID, 0)
@@ -1747,13 +1747,13 @@ func (s *Service) Start(ctx context.Context, instanceID string, userID int64) er
 	return nil                                   // phase 는 관문에서 이미 provisioning 으로 예약됐다
 }
 
-// Reconfigure는 중단된 컨테이너 세션의 계산자원을 바꾼다(CPU로 데이터 준비 → GPU 붙여 학습, 그 반대도).
-// 홈(/home/work)·볼륨·데이터셋은 그대로 두고 "다음에 어떤 자원으로 뜰지"만 갱신한다 —
+// Reconfigure는 중단된 컨테이너 세션의 계산자원을 바꾼다. CPU로 데이터를 준비하고 GPU를 붙여 학습하는 흐름(반대도)이다.
+// 홈(/home/work)·볼륨·데이터셋은 그대로 두고 "다음에 어떤 자원으로 뜰지"만 갱신한다.
 // 세션을 새로 만들면 준비해 둔 데이터를 다시 옮겨야 하므로, 자원만 갈아끼우는 길을 준다.
 //
 // 실행 중에는 불가하다(ErrNotStopped): GPU 자원은 Pod 스펙에 박히고 k8s 는 이를 in-place 로 못 바꾼다.
-// 생성과 같은 관문(하드 상한 → 크레딧 → 가용성)을 다시 통과해야 하며, 가용성은 클러스터 전체가 아니라
-// 이 세션이 묶인 노드 기준으로 묻는다 — 홈 PVC(local-path)가 그 노드에 바인딩돼 있어 다른 노드로는
+// 생성과 같은 관문(하드 상한, 크레딧, 가용성)을 다시 통과해야 하며, 가용성은 클러스터 전체가 아니라
+// 이 세션이 묶인 노드 기준으로 묻는다. 홈 PVC(local-path)가 그 노드에 바인딩돼 있어 다른 노드로는
 // 뜰 수 없기 때문이다(전체 기준으로 통과시키면 재개가 영구 Pending 이 된다).
 func (s *Service) Reconfigure(ctx context.Context, instanceID string, userID int64, req ReconfigureReq) (*Session, error) {
 	sess, err := s.repo.Get(instanceID, userID)
@@ -1761,7 +1761,7 @@ func (s *Service) Reconfigure(ctx context.Context, instanceID string, userID int
 		return nil, err
 	}
 	if sess.Env == "ssh" {
-		return nil, ErrReconfigureUnavailable // 물리 임대는 노드 통째 대여 — 바꿀 사양이 없다
+		return nil, ErrReconfigureUnavailable // 물리 임대는 노드를 통째로 빌려주는 것이라 바꿀 사양이 없다
 	}
 	if sess.Phase != PhaseStopped {
 		return nil, ErrNotStopped
@@ -1778,7 +1778,7 @@ func (s *Service) Reconfigure(ctx context.Context, instanceID string, userID int
 	}
 	if err := s.checkCapacityOn(ctx, next, sess.Node); err != nil {
 		// 노드 기준으로만 막혔다면 원인은 "자리 없음"이 아니라 "홈이 이 노드에 묶여 있음"이다.
-		// 둘은 사용자가 할 일이 다르다(기다린다 vs 새 세션으로 옮긴다) → 오류를 갈라 알려준다.
+		// 둘은 사용자가 할 일이 다르므로(기다린다 vs 새 세션으로 옮긴다) 오류를 갈라 알려준다.
 		if sess.Node != "" && s.checkCapacity(ctx, next) == nil {
 			return nil, ErrNodePinned
 		}
@@ -1790,7 +1790,7 @@ func (s *Service) Reconfigure(ctx context.Context, instanceID string, userID int
 	s.recordAct(userID, "session_reconfigure", instanceID)
 	if req.Start {
 		if err := s.Start(ctx, instanceID, userID); err != nil {
-			return next, err // 사양은 이미 저장됨 — 사용자는 재시작만 다시 누르면 된다
+			return next, err // 사양은 이미 저장됐다. 사용자는 재시작만 다시 누르면 된다
 		}
 	}
 	return next, nil
@@ -1820,7 +1820,7 @@ func (s *Service) nextSpec(ctx context.Context, sess *Session, req ReconfigureRe
 			return nil, err
 		}
 	}
-	// 이하 정규화는 buildSession 과 동일 — 화면에 표기되는 사양과 실제 Pod 스펙이 갈라지지 않게.
+	// 이하 정규화는 buildSession 과 같다. 화면에 표기되는 사양과 실제 Pod 스펙이 갈라지지 않게 한다.
 	if next.GpuMode != "shared" {
 		next.VramMB, next.CorePercent = 0, 0
 		next.OfferingID = nil // 오퍼링은 분할 전용 개념(전용/CPU 로 가면 남겨두지 않는다)
@@ -1894,10 +1894,10 @@ func (s *Service) cleanupSharedMounts(ctx context.Context, ns string, userID, se
 	for _, m := range s.repo.SessionVolumeMounts(sessionID) {
 		acc, ok := s.repo.VolumeAccess(m.VolID, userID)
 		if !ok || acc.PVCNamespace == ns {
-			continue // 내 볼륨이거나 접근권 없음 — 정적 복제본 없음
+			continue // 내 볼륨이거나 접근권이 없다. 정적 복제본도 없다
 		}
 		if s.repo.ActiveSessionsWithVolume(userID, m.VolID, instanceID) > 0 {
-			continue // 다른 활성 세션이 같은 공유 볼륨 사용 중 — 유지
+			continue // 다른 활성 세션이 같은 공유 볼륨을 쓰는 중이라 유지한다
 		}
 		if err := s.prov.DeleteSharedNFSPVC(ctx, ns, fmt.Sprintf("shared-%d", m.VolID)); err != nil {
 			log.Printf("[session] 공유 마운트 정리 실패 vol %d: %v", m.VolID, err)
@@ -1962,7 +1962,7 @@ func (s *Service) AdminDelete(ctx context.Context, instanceID string) error {
 // AdminGet은 단일 세션의 관제용 상세 행(소유자 id 포함).
 func (s *Service) AdminGet(instanceID string) (*AdminRow, error) { return s.repo.AdminOne(instanceID) }
 
-// AdminAudit은 세션 감사 로그(소유자 검증 없이 — 관제용).
+// AdminAudit은 세션 감사 로그를 반환한다(관제용이라 소유자 검증을 하지 않는다).
 func (s *Service) AdminAudit(instanceID string) ([]audit.Log, error) {
 	if s.audit == nil {
 		return []audit.Log{}, nil
@@ -2016,7 +2016,7 @@ func (s *Service) billStoppedStorageOnce(ctx context.Context) {
 	for i := range rows {
 		sess := &rows[i]
 		if sess.StoppedSince == nil {
-			// 이 기능 도입 전에 중단됐던 세션 — 소급 과금 없이 지금부터 구간을 연다.
+			// 이 기능 도입 전에 중단됐던 세션이다. 소급 과금 없이 지금부터 구간을 연다.
 			_ = s.repo.MarkStopped(sess.InstanceID, now)
 			continue
 		}
@@ -2026,7 +2026,7 @@ func (s *Service) billStoppedStorageOnce(ctx context.Context) {
 
 // settleStorage는 세션의 미정산 중단 스토리지 사용분을 차감한다.
 // 세션 과금(settle)과 동일한 델타 회계: 누적 총액(내림) − 이미 청구액.
-// 잔액 부족이면 유예한다 — 누적 시간(stopped_seconds)만 전진하고 청구액은 그대로라,
+// 잔액이 부족하면 유예한다. 누적 시간(stopped_seconds)만 전진하고 청구액은 그대로라,
 // 밀린 만큼이 다음 틱에 자동으로 다시 청구된다. 잔액 부족으로 홈을 지우는 일은 없다(회수는 T1 의 몫).
 func (s *Service) settleStorage(ctx context.Context, sess *Session) {
 	if sess.StoppedSince == nil {
@@ -2058,8 +2058,8 @@ func (s *Service) settleStorage(ctx context.Context, sess *Session) {
 
 // storageDueOf는 누적 중단 시간에 대한 총 청구액(크레딧, 내림)을 구한다.
 // 이 값에서 이미 청구한 액수를 뺀 것이 이번 틱의 차감분이라, 내림에서 잘린 소수가
-// 다음 틱으로 이월된다(매 틱 내림 → 영구 손실, 이 방식 → 손실 없음).
-// int64 로 계산 — 장기 방치(수천만 초) × 단가에서 32비트 폭을 넘길 수 있다.
+// 다음 틱으로 이월된다(매 틱 내림하면 영구 손실이지만 이 방식은 손실이 없다).
+// int64 로 계산한다. 장기 방치(수천만 초)에 단가를 곱하면 32비트를 넘길 수 있다.
 func storageDueOf(stoppedSeconds, priceGiBMonth int) int {
 	if stoppedSeconds <= 0 || priceGiBMonth <= 0 {
 		return 0
@@ -2086,7 +2086,7 @@ func (s *Service) settle(ctx context.Context, sess *Session, final bool) {
 	if due <= 0 {
 		return
 	}
-	gid := int64(0) // 세션이 뜬 팀 지갑에서 차감(팀 없는 세션은 금지 → 항상 팀). 0이면 wallet 이 대표 팀으로.
+	gid := int64(0) // 세션이 뜬 팀 지갑에서 차감한다(팀 없는 세션은 금지라 항상 팀이 있다). 0이면 wallet 이 대표 팀으로 잡는다.
 	if sess.GroupID != nil {
 		gid = *sess.GroupID
 	}
@@ -2095,7 +2095,7 @@ func (s *Service) settle(ctx context.Context, sess *Session, final bool) {
 		return
 	}
 	if !ok {
-		// 잔액 부족 — 가능한 만큼은 못 받았으니 세션 중단(과금 보호).
+		// 잔액 부족이다. 가능한 만큼은 못 받았으니 세션을 중단한다(과금 보호).
 		if !final {
 			s.stopForBilling(ctx, sess)
 		}
@@ -2103,7 +2103,7 @@ func (s *Service) settle(ctx context.Context, sess *Session, final bool) {
 	}
 	sess.BilledCredits = totalDue
 	_ = s.repo.SetBilled(sess.InstanceID, totalDue)
-	// 사용시간 원장 적립 — 이번 틱에 과금된 크레딧이 나타내는 시간(초). 세션 삭제와 무관하게 누적 보존.
+	// 사용시간 원장 적립. 이번 틱에 과금된 크레딧이 나타내는 시간(초)이다. 세션 삭제와 무관하게 누적 보존한다.
 	if secs := int(float64(due) / float64(sess.PricePerHour) * 3600.0); secs > 0 {
 		_ = s.repo.RecordGpuUsage(sess.UserID, gid, sess.InstanceID, secs, sess.GpuCount)
 	}
@@ -2169,7 +2169,7 @@ func (s *Service) reapIdleOnce(ctx context.Context, windowMin int) {
 	}
 }
 
-// CountIdleRunning은 running 세션 중 유휴(저사용)인 개수를 센다 — 대시보드 스냅샷/통계용.
+// CountIdleRunning은 running 세션 중 유휴(저사용)인 개수를 센다. 대시보드 스냅샷·통계용이다.
 // isIdle 과 동일 판정(GPU util<5% / CPU rate<0.05). 메트릭 미가용이면 0(판정 불가).
 func (s *Service) CountIdleRunning(ctx context.Context) int {
 	if s.met == nil || !s.met.Enabled() {
@@ -2179,7 +2179,7 @@ func (s *Service) CountIdleRunning(ctx context.Context) int {
 	if err != nil {
 		return 0
 	}
-	const window = 5 // 분 — 유휴 판정 이동평균 창(리퍼 창과 별개, 스냅샷 순간 판정용)
+	const window = 5 // 분. 유휴 판정 이동평균 창(리퍼 창과 별개로 스냅샷 순간 판정용)
 	idle := 0
 	for i := range rows {
 		sess := rows[i]
@@ -2194,8 +2194,8 @@ func (s *Service) CountIdleRunning(ctx context.Context) int {
 //   - GPU 세션(exclusive/shared): GPU 사용률(DCGM)이 idleGPUThreshold% 미만이면 유휴.
 //   - CPU 세션(cpu): CPU rate 가 idleCPUThreshold 코어 미만이면 유휴.
 //
-// ok=false 면 판정 불가(메트릭 없음) → 보수적으로 정지하지 않는다.
-// 물리(SSH) 세션은 GpuMode="exclusive" 라 아래 전용 분기(노드 GPU 사용률)로 흐른다 — 노드를 통째
+// ok=false 면 판정 불가(메트릭 없음)라 보수적으로 정지하지 않는다.
+// 물리(SSH) 세션은 GpuMode="exclusive" 라 아래 전용 분기(노드 GPU 사용률)로 흐른다. 노드를 통째
 // 점유하므로 노드 GPU 사용률이 곧 임대 사용량이고, 유휴면 회수해 다른 세션이 들어오게 한다.
 func (s *Service) isIdle(ctx context.Context, sess *Session, windowMin int) (idle, ok bool) {
 	if sess.GpuMode == "cpu" {
@@ -2203,9 +2203,9 @@ func (s *Service) isIdle(ctx context.Context, sess *Session, windowMin int) (idl
 		// 유휴 리퍼는 희소 자원인 GPU 세션만 회수한다.
 		return false, false
 	}
-	// GPU 대여 세션 — 윈도 평균 GPU 사용률로만 판정(CPU 무시).
+	// GPU 대여 세션은 윈도 평균 GPU 사용률로만 판정한다(CPU 는 무시).
 	// 분할(HAMi)은 DCGM 이 Pod 단위로 보고하지 않는다(vGPUmonitor 의 hami_* / exported_pod 라벨).
-	// 예전엔 분할 세션도 DCGM 을 봐서 항상 빈 결과 → ok=false → 유휴로 판정된 적이 없어 리퍼가 무력했다.
+	// 예전엔 분할 세션도 DCGM 을 봐서 항상 빈 결과가 나왔고, ok=false 라 유휴로 판정된 적이 없어 리퍼가 무력했다.
 	if sess.GpuMode == "shared" {
 		q := fmt.Sprintf(`avg(avg_over_time(hami_container_device_utilization_ratio{exported_pod=%q}[%dm]))`, sess.InstanceID, windowMin)
 		if v, got := s.met.Scalar(ctx, q); got {
@@ -2221,23 +2221,23 @@ func (s *Service) isIdle(ctx context.Context, sess *Session, windowMin int) (idl
 	if sess.GpuMode == "timeslice" {
 		return false, false // 타임슬라이싱은 컨테이너별 GPU 계측 지점이 없어 유휴 판정 불가
 	}
-	// 전용(exclusive/mig) — 노드 GPU 가 곧 세션 사용량. HAMi 가 클러스터 전체 device-plugin 이라 DCGM 의
-	// pod 매핑이 불가(워크로드 pod 라벨 없음) → 예전엔 by-pod 쿼리가 항상 빈 결과라 전용 세션이 유휴로
-	// 판정된 적이 없었다(미종료 버그). 세션이 놓인 노드로 귀속한다(dcgm-exporter pod→node = kube_pod_info).
+	// 전용(exclusive/mig)은 노드 GPU 가 곧 세션 사용량이다. HAMi 가 클러스터 전체 device-plugin 이라 DCGM 의
+	// pod 매핑이 불가능해(워크로드 pod 라벨이 없다) 예전엔 by-pod 쿼리가 항상 빈 결과였고 전용 세션이 유휴로
+	// 판정된 적이 없었다(미종료 버그). 세션이 놓인 노드로 귀속한다(dcgm-exporter 의 pod 을 node 로 옮기는 건 kube_pod_info).
 	q := fmt.Sprintf(`avg(avg_over_time(DCGM_FI_DEV_GPU_UTIL[%dm]) * on(pod,namespace) group_left(node) kube_pod_info{node=%q})`, windowMin, sess.Node)
 	v, got := s.met.Scalar(ctx, q)
 	if !got {
-		return false, false // GPU 메트릭 미가용 → 정지하지 않음(보수적)
+		return false, false // GPU 메트릭이 없으면 정지하지 않는다(보수적)
 	}
 	if v >= idleGPUThreshold {
 		return false, true // 사용 중
 	}
 	// util 이 낮게 나와도 유휴로 단정하지 않는다. 컨슈머 GeForce+최신 드라이버에선 DCGM 이 util(%)을
 	// 종종 0 으로 오보고하지만(전력·클럭은 정상), 이를 그대로 믿으면 100% 학습 중인 세션이 유휴로 죽는다.
-	// 전력을 보조 신호로: GPU 가 유의미한 전력을 쓰면 실제 연산 중 → 유휴 아님. (유휴 4090 ~25W, 부하 >130W)
+	// 전력을 보조 신호로 쓴다. GPU 가 유의미한 전력을 쓰면 실제 연산 중이라 유휴가 아니다. (유휴 4090 약 25W, 부하 130W 이상)
 	pq := fmt.Sprintf(`avg(avg_over_time(DCGM_FI_DEV_POWER_USAGE[%dm]) * on(pod,namespace) group_left(node) kube_pod_info{node=%q})`, windowMin, sess.Node)
 	if p, ok := s.met.Scalar(ctx, pq); ok && p >= idleGPUPowerW {
-		return false, true // 전력 사용 중 → util 오보고 방어(유휴 아님)
+		return false, true // 전력을 쓰는 중이라 util 오보고를 방어한다(유휴 아님)
 	}
 	return true, true
 }
@@ -2268,13 +2268,13 @@ func (s *Service) RunPhaseReconciler(ctx context.Context, interval time.Duration
 }
 
 // unschedulableGrace는 "스케줄 안 됨"을 실패로 볼 때까지 기다리는 시간.
-// 짧은 미스케줄은 정상이다(PVC 바인딩·이미지 풀·노드 재기동 중) — 그 창은 봐주고,
+// 짧은 미스케줄은 정상이다(PVC 바인딩, 이미지 풀, 노드 재기동 중). 그 창은 봐주고,
 // 그보다 오래 매달리면 대기열이 되므로 정리한다.
 const unschedulableGrace = 3 * time.Minute
 
 // reapUnschedulable은 노드를 못 잡고 매달린 세션을 중단시킨다.
 //
-// 관문(CanPlace)이 있어도 완벽하진 않다 — CPU/메모리·볼륨 노드 어피니티·taint 처럼 관문이 보지 않는
+// 관문(CanPlace)이 있어도 완벽하지는 않다. CPU/메모리, 볼륨 노드 어피니티, taint 처럼 관문이 보지 않는
 // 이유로도 스케줄은 실패할 수 있다. 그때 Pod 를 그대로 두면 사용자에겐 "준비 중"으로만 보이는
 // 무기한 대기가 된다(이 제품이 두지 않기로 한 바로 그 상태). 차라리 중단시켜 사유를 남기고,
 // 사용자가 다시 시도하거나 다른 자원을 고르게 한다. 자리는 즉시 남에게 돌아간다.
@@ -2288,17 +2288,17 @@ func (s *Service) reapUnschedulable(ctx context.Context, sess *Session) {
 	}
 	st, err := s.prov.PodStatus(ctx, s.namespaceOf(sess), sess.InstanceID)
 	if errors.Is(err, k8s.ErrNotFound) {
-		// Pod 가 없는데 준비 중으로 남은 세션 — 외부에서 지워졌거나 생성이 중간에 끊긴 경우다.
+		// Pod 가 없는데 준비 중으로 남은 세션이다. 외부에서 지워졌거나 생성이 중간에 끊긴 경우다.
 		// 이 상태로 두면 아무것도 뜨지 않은 세션이 영원히 남의 자리를 문다(유령 예약).
 		s.autoStop(ctx, sess, "session_orphaned",
-			fmt.Sprintf("[scheduler] stopped %s — pod missing for %s", sess.InstanceID, unschedulableGrace))
+			fmt.Sprintf("[scheduler] stopped %s: pod missing for %s", sess.InstanceID, unschedulableGrace))
 		return
 	}
 	if err != nil || st == nil || !st.Unschedulable {
 		return
 	}
 	s.autoStop(ctx, sess, "session_unschedulable",
-		fmt.Sprintf("[scheduler] stopped %s — unschedulable for %s: %s", sess.InstanceID, unschedulableGrace, st.Reason))
+		fmt.Sprintf("[scheduler] stopped %s: unschedulable for %s: %s", sess.InstanceID, unschedulableGrace, st.Reason))
 }
 
 // idleStop은 유휴 세션을 정지한다(자동 정지 공통 경로 사용).

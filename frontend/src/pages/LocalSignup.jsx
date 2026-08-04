@@ -58,7 +58,7 @@ const LocalSignup = () => {
       setErrorMessage(t('auth.localSignup.errorTerms'));
       return;
     }
-    // 그룹 가입 필수 — 조직/그룹 목록이 있으면 반드시 그룹을 선택해야 함
+    // 그룹 가입은 필수다. 조직이나 그룹 목록이 있으면 반드시 그룹을 골라야 한다
     if (orgs.length > 0 && !form.groupId) {
       setErrorMessage(t('auth.localSignup.errorGroup'));
       return;
@@ -66,7 +66,7 @@ const LocalSignup = () => {
 
     setIsLoading(true);
     try {
-      // 단일 이름은 lastName 에 담아 전송(표시는 CONCAT(last_name, first_name) → 동일하게 노출).
+      // 단일 이름은 lastName 에 담아 보낸다(표시는 CONCAT(last_name, first_name) 이라 같게 나온다).
       const { name, ...rest } = form;
       await localSignup({ ...rest, lastName: name, firstName: '', groupId: form.groupId ? Number(form.groupId) : null });
       navigate('/signup-pending', { replace: true });

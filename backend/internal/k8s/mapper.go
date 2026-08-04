@@ -9,25 +9,25 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// GPU 확장 리소스 이름 — 전용=nvidia.com/gpu, 분할(HAMi)=gpumem/gpucores.
+// GPU 확장 리소스 이름. 전용은 nvidia.com/gpu, 분할(HAMi)은 gpumem 과 gpucores 다.
 const (
 	resGPU      = "nvidia.com/gpu"
 	resGPUMem   = "nvidia.com/gpumem"
 	resGPUCores = "nvidia.com/gpucores"
 
-	GpuModeShared    = "shared"    // HAMi 분할(VRAM/코어) — 메모리 격리 있음
+	GpuModeShared    = "shared"    // HAMi 분할(VRAM·코어). 메모리 격리가 있다
 	GpuModeExclusive = "exclusive" // GPU 카드 통째
-	GpuModeTimeslice = "timeslice" // 타임슬라이싱 슬롯(GPU 1개를 N분할) — 메모리 격리 없음
+	GpuModeTimeslice = "timeslice" // 타임슬라이싱 슬롯(GPU 1개를 N분할). 메모리 격리가 없다
 	GpuModeCPU       = "cpu"
 )
 
 // ShareModeLabel은 노드의 공유 전략 라벨. 타임슬라이싱 노드는 GPU 를 N슬롯으로 광고하므로
-// 전용 요청(nvidia.com/gpu:N)이 그 노드에 떨어지면 통 GPU 대신 슬롯을 받는다 → 라벨로 배치를 가른다.
+// 전용 요청(nvidia.com/gpu:N)이 그 노드에 떨어지면 통 GPU 대신 슬롯을 받으므로 라벨로 배치를 가른다.
 const ShareModeLabel = "giosk.io/share-mode"
 const shareTimeslicing = "timeslicing"
 const shareHami = "hami" // HAMi 분할 노드 라벨값(node.ShareHami 와 동일). 전용 배치에서 배제용.
 
-// buildPod은 SessionSpec → corev1.Pod 로 변환한다(노드셀렉터 + GPU 리소스 매핑).
+// buildPod은 SessionSpec 을 corev1.Pod 로 변환한다(노드셀렉터와 GPU 리소스 매핑).
 func buildPod(s SessionSpec, gpuTypeLabel string) *corev1.Pod {
 	vols, mounts := podVolumes(s)
 	spec := corev1.PodSpec{
@@ -51,17 +51,17 @@ func buildPod(s SessionSpec, gpuTypeLabel string) *corev1.Pod {
 			Ports:        channelPorts(s.WebChannels),
 		}},
 	}
-	// 안정 UID 로 실행 → NFS 볼륨 파일 소유가 물리 SSH(useradd -u UID)와 일관.
-	// fsGroup: 마운트 볼륨(emptyDir home·PVC)을 이 그룹 소유+그룹쓰기로 → 비-root 프로세스가 쓰기 가능.
+	// 안정 UID 로 실행하면 NFS 볼륨 파일 소유가 물리 SSH(useradd -u UID)와 일관된다.
+	// fsGroup 은 마운트 볼륨(emptyDir home, PVC)을 이 그룹 소유에 그룹쓰기로 만들어 비-root 프로세스가 쓸 수 있게 한다.
 	if s.UID > 0 {
 		uid := int64(s.UID)
 		spec.SecurityContext = &corev1.PodSecurityContext{RunAsUser: &uid, RunAsGroup: &uid, FSGroup: &uid}
 	}
-	// 컨테이너 SSH 사이드카 — 게이트웨이 SSH 프록시가 <iid>.<ns>.svc:22 로 도달.
+	// 컨테이너 SSH 사이드카. 게이트웨이 SSH 프록시가 <iid>.<ns>.svc:22 로 도달한다.
 	// 홈(/home/work)을 공유하고 게이트웨이 공개키만 신뢰한다. root 로 실행(22 바인드·useradd)하되
 	// 로그인 계정 work 은 세션 UID 로 생성해 파일 소유를 세션 컨테이너와 일치시킨다.
 	if s.SSHDImage != "" && s.UID > 0 {
-		// 사용자 공개키 Secret 은 Optional — 아직 키를 등록하지 않은 사용자도 세션은 떠야 하고,
+		// 사용자 공개키 Secret 은 Optional 이다. 아직 키를 등록하지 않은 사용자도 세션은 떠야 하고,
 		// 나중에 등록하면 Secret 이 생기면서 sshd 가 다음 접속부터 그 키를 신뢰한다.
 		if s.UserKeysSecret != "" {
 			optional := true
@@ -75,7 +75,7 @@ func buildPod(s SessionSpec, gpuTypeLabel string) *corev1.Pod {
 		}
 		spec.Containers = append(spec.Containers, sshdSidecar(s, mounts))
 	}
-	// scratch(hostPath)는 kubelet 이 root 로 생성 → FSGroup 미적용이라 비-root 세션이 못 쓴다.
+	// scratch(hostPath)는 kubelet 이 root 로 만들어 FSGroup 이 적용되지 않으므로 비-root 세션이 못 쓴다.
 	// initContainer(root)로 계정 폴더를 세션 UID 소유로 chown(이미지 재사용, 추가 풀 없음).
 	if s.ScratchHost != "" && s.UID > 0 {
 		root := int64(0)
@@ -100,7 +100,7 @@ func sshdSidecar(s SessionSpec, homeMounts []corev1.VolumeMount) corev1.Containe
 	root := int64(0)
 	user := "work"
 	// 홈 트리(/home/work 및 그 하위: ~/nfs·~/scratch·데이터셋 등)를 세션 컨테이너와 동일하게 마운트한다.
-	// → SSH 로 보는 파일 = VSCode/Jupyter 로 보는 파일. 볼륨 '이름'은 상황마다 다르므로(공유홈=home,
+	// 그래야 SSH 로 보는 파일과 VSCode/Jupyter 로 보는 파일이 같다. 볼륨 이름은 상황마다 다르므로(공유홈=home,
 	//   임시홈=vol-0) 이름이 아니라 마운트 '경로'로 고른다. serviceaccount 토큰 등은 제외.
 	var mounts []corev1.VolumeMount
 	for _, m := range homeMounts {
@@ -108,15 +108,15 @@ func sshdSidecar(s SessionSpec, homeMounts []corev1.VolumeMount) corev1.Containe
 			mounts = append(mounts, m)
 		}
 	}
-	// 사용자 등록 공개키(Secret) — read-only 마운트. sshd_config 의 AuthorizedKeysFile 두 번째 경로.
+	// 사용자 등록 공개키(Secret)를 read-only 로 마운트한다. sshd_config 의 AuthorizedKeysFile 두 번째 경로다.
 	if s.UserKeysSecret != "" {
 		mounts = append(mounts, corev1.VolumeMount{Name: userKeysVolume, MountPath: userKeysMount, ReadOnly: true})
 	}
 	return corev1.Container{
 		Name:  "sshd",
 		Image: s.SSHDImage,
-		// 사이드카 이미지는 노드에 미리 배급(ctr import)되는 운영 이미지 → 태그가 latest 여도 당겨오지 않는다.
-		// (기본 정책이면 :latest = Always → 레지스트리에 없어 ImagePullBackOff.)
+		// 사이드카 이미지는 노드에 미리 배급(ctr import)되는 운영 이미지라 태그가 latest 여도 당겨오지 않는다.
+		// (기본 정책이면 :latest 가 Always 라 레지스트리에 없어 ImagePullBackOff 가 난다.)
 		ImagePullPolicy: corev1.PullIfNotPresent,
 		SecurityContext: &corev1.SecurityContext{RunAsUser: &root}, // root: 22 바인드·계정 생성(파드 UID 컨텍스트 오버라이드)
 		Env: []corev1.EnvVar{
@@ -191,7 +191,7 @@ func podVolumes(s SessionSpec) ([]corev1.Volume, []corev1.VolumeMount) {
 		})
 		mounts = append(mounts, corev1.VolumeMount{Name: name, MountPath: path, ReadOnly: ro})
 	}
-	// /dev/shm — 쿠버네티스 기본은 64MB tmpfs 라, PyTorch DataLoader(num_workers>0)가 공유메모리로
+	// /dev/shm 은 쿠버네티스 기본이 64MB tmpfs 라, PyTorch DataLoader(num_workers>0)가 공유메모리로
 	// 텐서를 주고받다 꽉 차면 "Bus error / out of shared memory" 로 워커가 죽는다. Memory emptyDir 로
 	// 넉넉히 준다. 사용량은 컨테이너 메모리 한도에 산입되므로, shm 단독 OOM 을 막게 메모리의 절반으로 캡한다.
 	shmGi := s.MemGB / 2
@@ -211,12 +211,12 @@ func podVolumes(s SessionSpec) ([]corev1.Volume, []corev1.VolumeMount) {
 	}
 	for i, v := range s.Volumes {
 		name := fmt.Sprintf("vol-%d", i)
-		if v.EmptyDir { // 임시 워크스페이스 — emptyDir(파드 소멸 시 소멸)
+		if v.EmptyDir { // 임시 워크스페이스는 emptyDir(파드가 사라지면 함께 사라진다)
 			vols = append(vols, corev1.Volume{Name: name, VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}}})
 			mounts = append(mounts, corev1.VolumeMount{Name: name, MountPath: v.MountPath})
 			continue
 		}
-		if v.HostPath != "" { // 노드 로컬 캐시(hostPath) 마운트 — RequireNode 로 해당 노드에 핀됨
+		if v.HostPath != "" { // 노드 로컬 캐시(hostPath) 마운트. RequireNode 로 해당 노드에 핀된다
 			hp := corev1.HostPathDirectoryOrCreate
 			vols = append(vols, corev1.Volume{Name: name, VolumeSource: corev1.VolumeSource{HostPath: &corev1.HostPathVolumeSource{Path: v.HostPath, Type: &hp}}})
 			mounts = append(mounts, corev1.VolumeMount{Name: name, MountPath: v.MountPath, ReadOnly: v.ReadOnly})
@@ -224,7 +224,7 @@ func podVolumes(s SessionSpec) ([]corev1.Volume, []corev1.VolumeMount) {
 		}
 		add(name, v.PVCName, v.MountPath, v.ReadOnly)
 	}
-	// 노드로컬 스크래치 — 계정 폴더만 hostPath 로 마운트(RWX 본인 폴더만; 없으면 생성). 언제든 삭제 가능.
+	// 노드로컬 스크래치는 계정 폴더만 hostPath 로 마운트한다(본인 폴더만 RWX, 없으면 생성). 언제든 삭제될 수 있다.
 	if s.ScratchHost != "" {
 		hp := corev1.HostPathDirectoryOrCreate
 		vols = append(vols, corev1.Volume{
@@ -246,10 +246,10 @@ func nodeSelector(s SessionSpec, gpuTypeLabel string) map[string]string {
 
 // shareModeReqs는 공유 전략에 맞는 노드로 배치를 가르는 affinity 조건이다.
 //   - timeslice : 타임슬라이싱 노드에만(슬롯이 그 노드에만 광고됨).
-//   - exclusive : 분할(HAMi)·타임슬라이싱 노드 배제 — 통 카드를 받아야 하므로.
-//     (NotIn 은 라벨 없는 노드도 매칭 → 무라벨 노드는 전용으로 계속 동작.)
+//   - exclusive : 분할(HAMi)·타임슬라이싱 노드를 배제한다. 통 카드를 받아야 하므로.
+//     (NotIn 은 라벨 없는 노드도 매칭하므로 무라벨 노드는 전용으로 계속 동작한다.)
 //   - shared(HAMi) : HAMi 노드에만. HAMi 가 클러스터 전체에 설치되면 exclusive 노드도 gpumem/gpucores
-//     를 광고해 무제약이면 공유 세션이 전용 노드에 떨어진다(전용 가용성이 잘못 까임) → In{hami} 로 강제.
+//     를 광고해 무제약이면 공유 세션이 전용 노드에 떨어져 전용 가용성이 잘못 깎인다. In{hami} 로 강제한다.
 func shareModeReqs(s SessionSpec) []corev1.NodeSelectorRequirement {
 	switch s.GpuMode {
 	case GpuModeTimeslice:
@@ -318,14 +318,14 @@ func gpuLimits(s SessionSpec) corev1.ResourceList {
 			limits[resGPUCores] = *resource.NewQuantity(int64(s.CorePercent), resource.DecimalSI)
 		}
 	}
-	// ephemeral-storage 상한 — 이 limit 의 강제 수단은 kubelet 의 "eviction"(초과 시 세션 파드 강제 종료)이다.
+	// ephemeral-storage 상한. 이 limit 의 강제 수단은 kubelet 의 "eviction"(초과 시 세션 파드 강제 종료)이다.
 	// 기본으로 걸면 임시 디스크를 넘긴 사용자의 세션이 갑자기 죽는 위험이 있어, 정책(MaxEphemeralGiB)이
 	// 명시로 값을 준 경우(>0)에만 건다. 0(무제한)=미설정이면 걸지 않는다(다른 하드리밋과 동일: 0=무제한).
 	if s.EphemeralGiB > 0 {
 		limits[corev1.ResourceEphemeralStorage] = resource.MustParse(fmt.Sprintf("%dGi", s.EphemeralGiB))
 	}
 	// 메모리 상한 = request × MemBurst. CPU 와 달리 메모리는 압축 불가라 limit 이 없으면
-	// 한 세션이 노드 RAM 을 다 먹고 kubelet 이 "다른 사용자의" 파드를 축출한다 —
+	// 한 세션이 노드 RAM 을 다 먹으면 kubelet 이 "다른 사용자의" 파드를 축출한다.
 	// 버스트의 대가를 남이 치르는 구조. 배수를 주어 버스트는 살리되 연쇄는 끊는다.
 	// (CPU 는 압축 가능해 경합 시 느려질 뿐이므로 지금처럼 limit 없이 둔다.)
 	if s.MemGB > 0 && s.MemBurst > 1 {

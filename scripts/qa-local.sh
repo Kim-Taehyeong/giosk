@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# 로컬 검수 베드 — MySQL(도커) + API(호스트) + 프론트(Vite).
+# 로컬 검수 베드다. MySQL(도커)과 API(호스트), 프론트(Vite)를 띄운다.
 #
-# 왜: 실 랩 배포는 tar→scp→이미지 빌드→9노드 배급→rollout 으로 5~10분이 걸린다.
+# 왜: 실 랩 배포는 tar 로 묶어 scp 하고 이미지를 빌드해 9노드에 배급한 뒤 rollout 까지 5~10분이 걸린다.
 #     화면·API 수준의 기능(정책·역할·멤버·피커 등)은 k8s 가 필요 없어 여기서 30초면 확인된다.
 #     k8s 가 실제로 필요한 것(세션 스케줄·GPU·hostPath·DaemonSet)만 랩에서 검증한다.
 #
@@ -24,7 +24,7 @@ fi
 
 docker info >/dev/null 2>&1 || { echo "✗ Docker 를 먼저 실행하세요." >&2; exit 1; }
 
-# 1) MySQL — 있으면 재사용(데이터 보존), 없으면 생성.
+# 1) MySQL 은 있으면 재사용하고(데이터 보존) 없으면 만든다.
 if docker ps -a --format '{{.Names}}' | grep -qx "$DB"; then
   docker start "$DB" >/dev/null
 else
@@ -40,7 +40,7 @@ for _ in $(seq 1 40); do
 done
 echo ' ready'
 
-# 2) API — 기존 프로세스 정리 후 기동. k8s 미연결이라 세션/노드 기능은 degrade(정상).
+# 2) API 는 기존 프로세스를 정리한 뒤 기동한다. k8s 에 연결하지 않으므로 세션과 노드 기능은 degrade 된다(정상).
 pkill -f 'cmd/api' 2>/dev/null || true
 cd "$ROOT/backend"
 GIOSK_DB_HOST=127.0.0.1 GIOSK_DB_USER=giosk GIOSK_DB_PASS=giosk GIOSK_DB_NAME=giosk \
@@ -54,7 +54,7 @@ for _ in $(seq 1 45); do
 done
 echo ' ready'
 
-# 3) admin 비밀번호 고정 — 부트스트랩 값이 환경마다 달라 검수 때 매번 막힌다.
+# 3) admin 비밀번호를 고정한다. 부트스트랩 값이 환경마다 달라 검수 때 매번 막힌다.
 #    bcrypt("giosk123", cost 10).
 docker exec -i "$DB" mysql -ugiosk -pgiosk giosk >/dev/null 2>&1 <<'SQL'
 UPDATE users SET password_hash='$2a$10$5FW6JMAgFIt51aIQUfw.4udnglaCZgmnyB9cE7Cm3/bKAMVHWCHSW',

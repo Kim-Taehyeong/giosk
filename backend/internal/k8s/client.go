@@ -1,4 +1,4 @@
-// Package k8s는 client-go 래퍼다. in-cluster → kubeconfig 순으로 접속하며,
+// Package k8s는 client-go 래퍼다. in-cluster 를 먼저 시도하고 안 되면 kubeconfig 로 붙으며,
 // 클러스터 미가용 시 nil Client 를 반환해(에러 아님) 상위에서 503 처리하게 한다.
 package k8s
 
@@ -44,8 +44,8 @@ func (c *Client) physLabel() string {
 	return "giosk.io/physical"
 }
 
-// New는 in-cluster → kubeconfig 순으로 접속을 시도한다.
-// 실패하면 (nil, nil) — 클러스터 없이 비-K8s 기능은 계속 동작.
+// New는 in-cluster 를 먼저 시도하고 안 되면 kubeconfig 로 접속한다.
+// 실패하면 (nil, nil)을 준다. 클러스터 없이도 비-K8s 기능은 계속 동작해야 한다.
 func New(kubeconfig, gpuTypeLabel string) (*Client, error) {
 	cfg, err := restConfig(kubeconfig)
 	if err != nil {

@@ -57,9 +57,9 @@ func defaultRules(scope string) []Rule {
 		// 엔진이 실제 평가하는 메트릭(gpu_util/gpu_temp/node_down/disk_usage)만 기본값으로 제공.
 		return []Rule{
 			{Metric: "node_down", Op: "gte", Value: 1, Channel: "email", Enabled: true},
-			// 정리 DaemonSet 의 Home 임계(92%)보다 낮게 — 파일이 지워지기 전에 먼저 알린다.
+			// 정리 DaemonSet 의 Home 임계(92%)보다 낮게 잡아 파일이 지워지기 전에 먼저 알린다.
 			{Metric: "disk_usage", Op: "gte", Value: 85, Channel: "email", Enabled: true},
-			// 볼륨(PVC)이 꽉 차기 전에 — 쓰기 실패/세션 중단 예방.
+			// 볼륨(PVC)이 꽉 차기 전에 알려 쓰기 실패나 세션 중단을 예방한다.
 			{Metric: "volume_usage", Op: "gte", Value: 85, Channel: "email", Enabled: true},
 			// 클러스터 GPU 가 거의 소진되면 증설/대기열 신호.
 			{Metric: "capacity", Op: "gte", Value: 85, Channel: "webhook", Enabled: false},

@@ -1,6 +1,6 @@
 import { apiGet, apiPost, apiPatch, apiDelete } from '../client';
 
-// 데이터셋 — 실 백엔드. 사용자(/datasets)와 관리자(/admin/dataset-requests)를 합쳐
+// 데이터셋. 실 백엔드다. 사용자(/datasets)와 관리자(/admin/dataset-requests)를 합쳐
 // 한 응답으로 제공(관리자만 전체 pending, 일반 사용자는 본인 pending).
 export const getDatasets = async () => {
   const d = await apiGet('/datasets');
@@ -32,10 +32,10 @@ export const deleteDataset = (id) => apiDelete(`/datasets/${id}`);
 export const getDatasetInbox = () => apiGet('/admin/datasets/inbox');
 // 인박스 파일을 데이터셋으로 등록(등록 후 인박스에서 제거 + 자동 해제).
 export const registerDatasetNFS = ({ name, filename, scope, sizeClass }) => apiPost('/admin/datasets/register-nfs', { name, filename, scope: scope || 'global', sizeClass: sizeClass || '' });
-// URL(wget)로 등록 — 서버가 직접 다운로드.
+// URL(wget)로 등록하면 서버가 직접 내려받는다.
 export const registerDatasetURL = ({ name, url, scope, sizeClass }) => apiPost('/admin/datasets/register-url', { name, url, scope: scope || 'global', sizeClass: sizeClass || '' });
 
-// 노드 로컬 캐시 토글(관리자) — 없으면 캐시 시작(NFS→노드 로컬 복사), 있으면 해제.
+// 노드 로컬 캐시 토글(관리자). 없으면 캐시를 시작하고(NFS 에서 노드 로컬로 복사) 있으면 해제한다.
 export const toggleDatasetCache = (id, node) => apiPost(`/admin/datasets/${id}/cache`, { node });
 export const updateDatasetDescription = (id, description) => apiPatch(`/admin/datasets/${id}`, { description });
 // 설명 + 크기 클래스 함께 저장(상세 편집).

@@ -44,26 +44,26 @@ type Request struct {
 
 func (Request) TableName() string { return "dataset_requests" }
 
-// GlobalItem — 전역 레지스트리 표시(노드 로컬 캐시 상태 포함).
+// GlobalItem은 전역 레지스트리 표시(노드 로컬 캐시 상태 포함).
 type GlobalItem struct {
 	Dataset
 	Nodes    []string       `gorm:"-" json:"nodes"`    // 캐시 완료(cached) 노드 이름(노드별 매칭/개수)
-	Caches   []DatasetCache `gorm:"-" json:"caches"`   // 노드별 캐시 상태(caching/cached/failed) — 토글/진행 표시
+	Caches   []DatasetCache `gorm:"-" json:"caches"`   // 노드별 캐시 상태(caching/cached/failed). 토글과 진행 표시에 쓴다
 	Progress   int    `gorm:"-" json:"progress"`   // 현재 단계 진행률 %(loading 일 때만)
-	Phase      string `gorm:"-" json:"phase"`      // download|extract (loading 세부 단계) — 프론트 라벨용
+	Phase      string `gorm:"-" json:"phase"`      // download 나 extract (loading 세부 단계). 프론트 라벨용
 	EtaSec     int    `gorm:"-" json:"etaSec"`     // 예상 남은 시간(초). 속도 미측정이면 0
 	Downloaded int64  `gorm:"-" json:"downloaded"` // 현재까지 받은 바이트(loading)
 }
 
-// DatasetCache — 노드 로컬 캐시 1건(노드 + 상태 + 진행률).
+// DatasetCache는 노드 로컬 캐시 1건(노드, 상태, 진행률).
 type DatasetCache struct {
 	Node     string `json:"node"`
 	Status   string `json:"status"`   // caching|cached|failed
 	Progress int    `json:"progress"` // 현재 단계 진행률 %(caching 일 때만)
-	Phase    string `json:"phase"`    // copy|extract (캐시 세부 단계) — 프론트 라벨용
+	Phase    string `json:"phase"`    // copy 나 extract (캐시 세부 단계). 프론트 라벨용
 }
 
-// ListRes — /datasets 응답.
+// ListRes는 /datasets 응답.
 type ListRes struct {
 	Global []GlobalItem `json:"global"`
 	Mine   []Dataset    `json:"mine"`
@@ -78,7 +78,7 @@ const (
 	StatusPrivate = "private"
 )
 
-// RegisterReq — 등록 신청.
+// RegisterReq는 등록 신청.
 type RegisterReq struct {
 	Name        string `json:"name" binding:"required"`
 	SizeClass   string `json:"sizeClass"`
@@ -88,7 +88,7 @@ type RegisterReq struct {
 	TargetScope string `json:"targetScope"` // global | personal
 }
 
-// CacheReq — 노드 캐시 배치 토글.
+// CacheReq는 노드 캐시 배치 토글.
 type CacheReq struct {
 	Node string `json:"node" binding:"required"`
 }

@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { userNavGroups } from '../../config/userNav';
 import { adminNavGroups } from '../../config/adminNav';
 
-// 사이드바 네비게이션의 아이콘을 경로 → 아이콘으로 평탄화.
+// 사이드바 네비게이션의 아이콘을 경로별 아이콘 맵으로 평탄화한다.
 const NAV_ICONS = [...userNavGroups, ...adminNavGroups]
   .flatMap((g) => g.items)
   .reduce((acc, it) => { acc[it.path.split('/')[0]] = it.icon; return acc; }, {});

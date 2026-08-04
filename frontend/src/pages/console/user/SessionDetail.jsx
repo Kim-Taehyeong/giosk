@@ -35,7 +35,7 @@ export default function UserSessionDetail() {
   const [r, setR] = useState(null);
   const [notFound, setNotFound] = useState(false);
   const [conn, setConn] = useState(false);
-  const [reconf, setReconf] = useState(false); // 자원 변경(GPU 붙이기/떼기) 모달 — 중단 상태에서만
+  const [reconf, setReconf] = useState(false); // 자원 변경(GPU 붙이기와 떼기) 모달. 중단 상태에서만 연다
   const [busy, setBusy] = useState(false); // 정지/재시작 진행 중(연타 방지)
   const [activity, setActivity] = useState([]);
 
@@ -44,7 +44,7 @@ export default function UserSessionDetail() {
     if (!found) setNotFound(true); else setR(found);
   }).catch(() => setNotFound(true));
   useEffect(() => { load(); getSessionAudit(id).then(setActivity).catch(() => {}); /* eslint-disable-next-line */ }, [id]);
-  // 종료 상태가 아니면 폴링해 준비중→실행 전이를 라이브로 반영(준비중엔 더 촘촘히).
+  // 종료 상태가 아니면 폴링해 준비중에서 실행으로 넘어가는 전이를 라이브로 반영한다(준비중엔 더 촘촘히).
   useEffect(() => {
     const terminal = ['stopped', 'failed', 'terminated', 'deleted', 'error'].includes(r?.status);
     if (!r || terminal) return undefined;
@@ -56,7 +56,7 @@ export default function UserSessionDetail() {
   if (notFound) return <div className="card">{t('sdetail.notFound', { defaultValue: '세션을 찾을 수 없습니다.' })}</div>;
   if (!r) return <Spinner pad label={t('sdetail.loading', { defaultValue: '…' })} />;
 
-  // 정지/재시작 — 실패를 반드시 말해준다. 재시작은 관문에서 거절될 수 있고(자리 없음·노드 고정),
+  // 정지와 재시작은 실패를 반드시 말해준다. 재시작은 관문에서 거절될 수 있고(자리 없음이나 노드 고정),
   // 조용히 삼키면 사용자에겐 "버튼이 안 먹는다"로 보인다. 연타는 서버 CAS 전에 여기서 먼저 막는다.
   const act = async (fn, msg) => {
     if (busy) return;

@@ -134,7 +134,7 @@ func (h *Handler) AddMember(c *gin.Context) {
 	httpx.OK(c, gin.H{"ok": true})
 }
 
-// MoveMember — 사용자를 이 그룹에서 다른 그룹으로 옮긴다(관리자).
+// MoveMember는 사용자를 이 그룹에서 다른 그룹으로 옮긴다(관리자).
 func (h *Handler) MoveMember(c *gin.Context) {
 	var req MoveMemberReq
 	if err := c.ShouldBindJSON(&req); err != nil {

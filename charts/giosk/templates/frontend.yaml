@@ -14,7 +14,7 @@ data:
       ''      close;
     }
     {{- if $tls }}
-    # HTTP → HTTPS 리다이렉트
+    # HTTP 를 HTTPS 로 리다이렉트
     server {
       listen 80;
       server_name {{ $host }};
@@ -91,7 +91,7 @@ spec:
     metadata:
       labels: { app: giosk-frontend }
       annotations:
-        # nginx 설정(포트·TLS)에 의존 → 변경 시 롤링 재시작 유도
+        # nginx 설정(포트와 TLS)에 의존하므로 바뀌면 롤링 재시작을 유도한다
         checksum/nginx: {{ printf "%s:%v:%s" (include "giosk.fullname" .) .Values.api.service.port $tls | sha256sum }}
     spec:
       containers:

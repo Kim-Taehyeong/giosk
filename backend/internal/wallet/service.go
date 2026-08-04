@@ -78,14 +78,14 @@ func (s *Service) platDefault() int {
 	return 30
 }
 
-// RefillSpec은 팀/개인 정기 리필 설정 요청(주기는 상위보다 길 수 없다 — 서비스에서 클램프).
+// RefillSpec은 팀이나 개인의 정기 리필 설정 요청이다(주기는 상위보다 길 수 없어 서비스에서 클램프한다).
 type RefillSpec struct {
 	Recurring    int  `json:"recurring"`
 	IntervalDays int  `json:"interval"`
 	Carryover    bool `json:"carryover"`
 }
 
-// SetGroupRefillVals는 원시값으로 팀 리필을 설정한다(group.Service 시더용 — RefillSpec import 회피).
+// SetGroupRefillVals는 원시값으로 팀 리필을 설정한다(group.Service 시더용이라 RefillSpec import 를 피한다).
 func (s *Service) SetGroupRefillVals(groupID int64, recurring, intervalDays int, carryover bool) error {
 	return s.SetGroupRefill(groupID, RefillSpec{Recurring: recurring, IntervalDays: intervalDays, Carryover: carryover})
 }
@@ -119,7 +119,7 @@ func (s *Service) RefillNowGroup(groupID int64) (int, error) {
 }
 
 // nextRefill은 마지막 리필(cycle)과 실효 주기(effInterval)로 다음 리필 예정 시각을 계산한다.
-// recurring<=0(정기 없음) 또는 주기<=0 이면 nil. cycle 이 없으면(아직 한 번도 안 됨) 이미 도래 → now.
+// recurring 이 0 이하(정기 없음)거나 주기가 0 이하면 nil 이다. cycle 이 없으면(아직 한 번도 안 됨) 이미 도래한 것으로 보고 now 를 준다.
 func nextRefill(recurring, effIntervalDays int, cycle *time.Time) *time.Time {
 	if recurring <= 0 || effIntervalDays <= 0 {
 		return nil
@@ -133,7 +133,7 @@ func nextRefill(recurring, effIntervalDays int, cycle *time.Time) *time.Time {
 }
 
 // resolveGroup은 정산/조회에 쓸 팀을 정한다: 명시된 groupID 우선, 없으면 사용자의 대표 팀(pool).
-// 팀 없는 세션은 금지하므로 세션 정산 경로엔 항상 실제 팀이 온다 — 이 폴백은 groupID 미전달 방어용.
+// 팀 없는 세션은 금지하므로 세션 정산 경로엔 항상 실제 팀이 온다. 이 폴백은 groupID 미전달 방어용이다.
 func (s *Service) resolveGroup(userID, groupID int64) int64 {
 	if groupID > 0 {
 		return groupID
@@ -237,8 +237,8 @@ func (s *Service) CreditGroup(groupID int64, amount int, actor *int64) error {
 	return err
 }
 
-// AllocateGroup은 조직→그룹 하위 배분이다(계층형).
-//   - super(최고관리자): 예외 부여 — 그룹에 가산하고 무결성을 위해 조직 풀에도 자동 가산(조직 150·그룹 50).
+// AllocateGroup은 조직에서 그룹으로 하는 하위 배분이다(계층형).
+//   - super(최고관리자)의 예외 부여는 그룹에 가산하고 무결성을 위해 조직 풀에도 자동 가산한다(조직 150, 그룹 50).
 //   - 일반(조직 담당자): 조직 풀에서 amount 차감 후 그룹에 가산(잔여 부족이면 ErrInsufficientPool).
 func (s *Service) AllocateGroup(groupID int64, amount int, super bool, actor *int64) error {
 	if amount <= 0 {
@@ -263,8 +263,8 @@ func (s *Service) AllocateGroup(groupID int64, amount int, super bool, actor *in
 	return err
 }
 
-// AllocateUser은 그룹→개인 하위 배분이다(계층형).
-//   - super(최고관리자): 예외 부여 — 개인에 가산하고 무결성을 위해 그룹·조직 풀에도 자동 가산.
+// AllocateUser은 그룹에서 개인으로 하는 하위 배분이다(계층형).
+//   - super(최고관리자)의 예외 부여는 개인에 가산하고 무결성을 위해 그룹과 조직 풀에도 자동 가산한다.
 //   - 일반(그룹 담당자): 사용자의 그룹 풀에서 amount 차감 후 개인에 가산(부족이면 ErrInsufficientGroupPool).
 func (s *Service) AllocateUser(userID, groupID int64, amount int, super bool, desc string, actor *int64) error {
 	if amount <= 0 {

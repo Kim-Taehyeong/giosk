@@ -6,9 +6,9 @@ import (
 )
 
 // 중단 스토리지 과금은 "누적 총액 − 이미 청구액" 델타 회계다. 매 틱 내림하면 소수가 영구 손실되는데
-// 이 방식은 다음 틱으로 이월된다 — 소액 단가(GiB·월 몇 크레딧)에서 특히 중요하다.
+// 이 방식은 다음 틱으로 이월된다. 소액 단가(GiB·월 몇 크레딧)에서 특히 중요하다.
 func TestStorageDueOf_델타누적에서_내림손실이_이월된다(t *testing.T) {
-	const price = 3 // 크레딧 / GiB·월 → 홈 10GiB = 월 30 크레딧
+	const price = 3 // 크레딧 / GiB·월. 홈 10GiB 이면 월 30 크레딧
 
 	if got := storageDueOf(secondsPerMonth, price); got != homeSizeGiB*price {
 		t.Fatalf("한 달 방치 = %d 크레딧이어야 하는데 %d", homeSizeGiB*price, got)
@@ -37,12 +37,12 @@ func TestStorageDueOf_델타누적에서_내림손실이_이월된다(t *testing
 func TestStorageDueOf_장기방치_오버플로없음(t *testing.T) {
 	const tenYears = 10 * 365 * 24 * 3600
 	if got := storageDueOf(tenYears, 1000); got <= 0 {
-		t.Fatalf("10년치 청구액이 %d — 오버플로", got)
+		t.Fatalf("10년치 청구액이 %d 다. 오버플로", got)
 	}
 }
 
 // 회수 우선순위: 오래 방치할수록, 그리고 같은 사용자가 많이 물고 있을수록 먼저.
-// 방치기간만 보면 과독점이 남고, 점유량만 보면 정상 사용자가 매번 걸린다 → 곱으로 둘 다 반영.
+// 방치기간만 보면 과독점이 남고 점유량만 보면 정상 사용자가 매번 걸린다. 곱으로 둘 다 반영한다.
 func TestReapScore_방치기간과_과독점을_함께_반영한다(t *testing.T) {
 	now := time.Date(2026, 7, 28, 0, 0, 0, 0, time.UTC)
 	at := func(days int) *Session {
@@ -66,6 +66,6 @@ func TestReapScore_방치기간과_과독점을_함께_반영한다(t *testing.T
 
 	// occupancy 에 없는 사용자도 0 으로 죽지 않고 방치기간만으로 순위가 매겨져야 한다.
 	if reapScore(at(10), map[int64]int{}, now) <= 0 {
-		t.Fatal("occupancy 미기록 사용자의 점수가 0 이하 — 영원히 회수되지 않는다")
+		t.Fatal("occupancy 미기록 사용자의 점수가 0 이하다. 영원히 회수되지 않는다")
 	}
 }

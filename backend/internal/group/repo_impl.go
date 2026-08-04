@@ -36,12 +36,12 @@ func (r *gormRepo) Update(id int64, fields map[string]any) error {
 	return r.db.Table("`groups`").Where("id = ?", id).Updates(fields).Error
 }
 
-// Archive는 그룹을 소프트 삭제한다(status='archived' → 목록에서 제외, FK/이력 보존).
+// Archive는 그룹을 소프트 삭제한다(status=archived 로 바꿔 목록에서 빼고 FK 와 이력은 보존한다).
 func (r *gormRepo) Archive(id int64) error {
 	return r.db.Table("`groups`").Where("id = ?", id).Update("status", "archived").Error
 }
 
-// ActiveMemberCount는 그룹의 활성 멤버 수(삭제 가드용 — 멤버 있는 팀은 삭제 불가).
+// ActiveMemberCount는 그룹의 활성 멤버 수다(삭제 가드용이라 멤버가 있는 팀은 지울 수 없다).
 func (r *gormRepo) ActiveMemberCount(groupID int64) int {
 	var n int64
 	r.db.Raw(`SELECT COUNT(*) FROM memberships WHERE group_id = ? AND status = 'active'`, groupID).Scan(&n)
@@ -86,7 +86,7 @@ func (r *gormRepo) ListMembers(groupID int64) ([]Member, error) {
 }
 
 // ManagerRoleBadges은 주어진 사용자들의 전체 관리 역할(org_admin/project_admin)을 조회한다.
-// 멀티롤 배지용 — 한 사용자가 여러 그룹/조직에서 갖는 역할을 모두 보여주기 위함.
+// 멀티롤 배지용이다. 한 사용자가 여러 그룹이나 조직에서 갖는 역할을 모두 보여주기 위함이다.
 func (r *gormRepo) ManagerRoleBadges(userIDs []int64) (map[int64][]RoleBadge, error) {
 	out := make(map[int64][]RoleBadge)
 	if len(userIDs) == 0 {
@@ -129,7 +129,7 @@ func (r *gormRepo) RemoveMember(groupID, userID int64) error {
 // MoveMember는 사용자를 from 그룹에서 to 그룹으로 옮긴다(한 트랜잭션).
 // 원본 멤버십은 status='removed' 로 남겨 이력(consumed)을 보존하고, 대상 그룹에 활성 멤버십을 만든다.
 // budget 은 그룹 풀에 종속이라 따라가지 않는다(대상 그룹에서 다시 배정).
-// 다른 그룹의 멤버십은 건드리지 않는다 — 지정한 from 에서만 옮긴다.
+// 다른 그룹의 멤버십은 건드리지 않는다. 지정한 from 에서만 옮긴다.
 func (r *gormRepo) MoveMember(fromGroupID, toGroupID, userID int64, role string) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
 		res := tx.Exec(`UPDATE memberships SET status='removed' WHERE group_id=? AND user_id=? AND status='active'`,
@@ -138,7 +138,7 @@ func (r *gormRepo) MoveMember(fromGroupID, toGroupID, userID int64, role string)
 			return res.Error
 		}
 		if res.RowsAffected == 0 {
-			return ErrNotFound // from 그룹의 활성 멤버가 아님 — 이동할 대상이 없다.
+			return ErrNotFound // from 그룹의 활성 멤버가 아니라 이동할 대상이 없다.
 		}
 		return tx.Exec(`
 			INSERT INTO memberships (group_id, user_id, role, status) VALUES (?, ?, ?, 'active')
@@ -170,7 +170,7 @@ func (r *gormRepo) Usage(groupID int64) ([]UsageRow, error) {
 
 // UsageTrend는 그룹의 최근 days일 일자별 GPU 사용시간(시간) 추이(gpu_usage 원장).
 //
-// 사용이 없던 날도 0으로 채워 반드시 days개를 돌려준다 — GROUP BY 는 원장 행이 있는 날만
+// 사용이 없던 날도 0으로 채워 반드시 days개를 돌려준다. GROUP BY 는 원장 행이 있는 날만
 // 주므로, 그대로 넘기면 "최근 N일"이 아니라 "쓴 날들"이 되고 카테고리 축 차트에서
 // 열흘 떨어진 두 점이 바로 옆에 붙어 그려진다(x축이 거짓말을 한다).
 func (r *gormRepo) UsageTrend(groupID int64, days int) []UsageTrendPoint {
@@ -291,7 +291,7 @@ func (r *gormRepo) PrimaryMembership(userID int64) (*PrimaryMembership, error) {
 }
 
 // ManagerMemberships은 사용자의 모든 관리(org_admin/project_admin) 멤버십을 우선순위 순으로 반환한다.
-// PrimaryMembership 과 달리 LIMIT 1 이 없다 — 멀티롤(조직+그룹 동시 관리) 전환기용.
+// PrimaryMembership 과 달리 LIMIT 1 이 없다. 멀티롤(조직과 그룹을 동시에 관리) 전환기용이다.
 func (r *gormRepo) ManagerMemberships(userID int64) ([]PrimaryMembership, error) {
 	var out []PrimaryMembership
 	err := r.db.Raw(`

@@ -22,7 +22,7 @@ func TestDCGMPodSeries_CoversBothLabelLayouts(t *testing.T) {
 	}
 	// 결과 라벨이 pod 으로 정규화돼야 호출부의 by(pod) 집계가 두 배포에서 같게 동작한다.
 	if !strings.Contains(q, `label_replace(`) || !strings.Contains(q, `"pod", "$1", "exported_pod", "(.*)"`) {
-		t.Errorf("exported_pod → pod 정규화 없음: %s", q)
+		t.Errorf("exported_pod 를 pod 으로 정규화하지 않았다: %s", q)
 	}
 }
 

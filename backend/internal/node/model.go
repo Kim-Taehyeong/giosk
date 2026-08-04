@@ -41,11 +41,11 @@ const (
 	LeaseReleased = "released"
 )
 
-// 노드 GPU 공유 전략(share_mode) — 노드당 하나만 선택(상호 배타).
+// 노드 GPU 공유 전략(share_mode). 노드당 하나만 고를 수 있다(상호 배타).
 //   exclusive   : GPU 카드를 통째로 점유.
-//   hami        : HAMi 분할 — VRAM(GB)+코어(%) 단위, 메모리 격리 있음.
-//   timeslicing : NVIDIA device plugin 타임슬라이싱 — GPU 1개를 split_count 슬롯으로 광고.
-//                 메모리 격리 없음(한 파드 OOM 이 같은 GPU 의 다른 파드에 전파) → HAMi 미설치 노드용 대안.
+//   hami        : HAMi 분할. VRAM(GB)과 코어(%) 단위이며 메모리 격리가 있다.
+//   timeslicing : NVIDIA device plugin 타임슬라이싱. GPU 1개를 split_count 슬롯으로 광고한다.
+//                 메모리 격리가 없어 한 파드의 OOM 이 같은 GPU 의 다른 파드로 전파된다. HAMi 를 못 깐 노드용 대안이다.
 const (
 	ShareExclusive   = "exclusive"
 	ShareHami        = "hami"
@@ -106,7 +106,7 @@ type UserNodeView struct {
 	Cached         []CachedDataset `json:"cached"`
 }
 
-// CachedDataset — 노드 로컬 캐시 데이터셋(agent 보고 전까지 빈 목록).
+// CachedDataset은 노드 로컬 캐시 데이터셋(agent 가 보고하기 전에는 빈 목록).
 type CachedDataset struct {
 	Name      string `json:"name"`
 	SizeClass string `json:"sizeClass"`
@@ -128,7 +128,7 @@ type AgentLease struct {
 	LeaseID      int64           `gorm:"column:lease_id" json:"leaseId"`
 	UserID       int64           `gorm:"column:user_id" json:"-"` // UID 산출용(agent 전송 제외)
 	Username     string          `gorm:"column:username" json:"username"`
-	UID          int             `gorm:"-" json:"uid"` // 전역 안정 UID(uidBase+userID; 재사용 안 함) — useradd -u
+	UID          int             `gorm:"-" json:"uid"` // 전역 안정 UID(uidBase+userID, 재사용하지 않는다). useradd -u 에 쓴다
 	SSHPublicKey string          `gorm:"column:ssh_public_key" json:"sshPublicKey"`
 	NFSServer    string          `gorm:"-" json:"nfsServer"`
 	NFSPath      string          `gorm:"-" json:"nfsPath"`

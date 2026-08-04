@@ -24,7 +24,7 @@ function Item({ icon, label, hint, onClick }) {
   );
 }
 
-// 탑바 우측 사용자 메뉴 — 알림 센터·내 정보·언어·테마·로그아웃을 아바타 드롭다운으로 모음.
+// 탑바 우측 사용자 메뉴다. 알림 센터, 내 정보, 언어, 테마, 로그아웃을 아바타 드롭다운으로 모은다.
 export default function UserMenu({ ns }) {
   const { t } = useTranslation(ns);
   const { user, logout } = useAuth();

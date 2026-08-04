@@ -13,7 +13,7 @@ import (
 // 세션 홈(sh-*) 회수 파라미터.
 const (
 	// orphanGrace는 고아 판정 유예. 세션 생성은 홈 PVC 를 먼저 만들고 DB 행을 나중에 쓰므로
-	// (Create: ensureSessionHome → provision → repo.Create), 갓 만들어진 PVC 는 "행이 아직 없을 뿐"이다.
+	// (Create 는 ensureSessionHome, provision, repo.Create 순서다) 갓 만들어진 PVC 는 "행이 아직 없을 뿐"이다.
 	// 유예 없이 지우면 생성 중인 세션의 홈을 리퍼가 뺏어간다.
 	orphanGrace = time.Hour
 )
@@ -24,11 +24,11 @@ const (
 //	T1 방치 회수 : TTL 초과 중단 세션 삭제. 디스크가 임계를 넘은 노드에서만, 임계 아래로 내려갈 만큼만.
 //
 // T1 을 "TTL 지나면 무조건"이 아니라 압박 조건부로 둔 것은 scratch·로컬홈 정리 DaemonSet 과 같은
-// 계약이다 — 여유가 있으면 오래된 중단 세션도 그대로 둔다. 실제 정리 압력은 회수가 아니라
+// 계약이다. 여유가 있으면 오래된 중단 세션도 그대로 둔다. 실제 정리 압력은 회수가 아니라
 // 중단 스토리지 과금(settleStorage)이 먼저 만든다.
 //
 // 그 위(실행 중 세션의 홈, 면책 세션)는 자동으로 건드리지 않는다. 회수 가능한 후보를 다 써도
-// 임계를 못 넘기면 로그·감사로 남기고 멈춘다 — 거기서부터는 관리자 판단 영역이다.
+// 임계를 못 넘기면 로그·감사로 남기고 멈춘다. 거기서부터는 관리자 판단 영역이다.
 func (s *Service) RunHomeReaper(ctx context.Context, interval time.Duration) {
 	log.Printf("[home-reaper] started (interval=%s, ttl·임계=live)", interval)
 	t := time.NewTicker(interval)
@@ -53,7 +53,7 @@ func (s *Service) reapOrphanHomes(ctx context.Context) {
 	}
 	rows, err := s.repo.ListAll()
 	if err != nil {
-		return // 세션 목록을 못 읽으면 전부 고아로 보일 수 있다 — 아무것도 지우지 않는다
+		return // 세션 목록을 못 읽으면 전부 고아로 보일 수 있으니 아무것도 지우지 않는다
 	}
 	live := make(map[string]struct{}, len(rows))
 	for _, r := range rows {
@@ -77,7 +77,7 @@ func (s *Service) reapOrphanHomes(ctx context.Context) {
 }
 
 // reapStaleHomes(T1)는 디스크 압박 노드에서 방치된 중단 세션을 회수한다.
-// 조건(방치 일수·디스크 임계)은 매 틱 라이브 read — 관리자가 운영 중 바꾼 값이 바로 반영된다.
+// 조건(방치 일수·디스크 임계)은 매 틱 라이브로 읽는다. 관리자가 운영 중 바꾼 값이 바로 반영된다.
 func (s *Service) reapStaleHomes(ctx context.Context) {
 	if s.homeReap == nil {
 		return
@@ -88,7 +88,7 @@ func (s *Service) reapStaleHomes(ctx context.Context) {
 	}
 	need := s.pressuredNodes(ctx, thresholdPct)
 	if len(need) == 0 {
-		return // 여유 있음 — 방치 세션도 건드리지 않는다
+		return // 여유가 있으면 방치 세션도 건드리지 않는다
 	}
 	rows, err := s.repo.ListStopped()
 	if err != nil {
@@ -139,9 +139,9 @@ func (s *Service) reapStaleHomes(ctx context.Context) {
 			s.recordReap("session_home_reap", sess.InstanceID)
 		}
 		if freed < want {
-			// 자동으로 할 수 있는 건 여기까지 — 남은 압박은 실행 중 세션이나 면책 세션이 원인이다.
+			// 자동으로 할 수 있는 건 여기까지다. 남은 압박은 실행 중 세션이나 면책 세션이 원인이다.
 			// (디스크 사용률 알림 규칙 disk_usage 가 이미 관리자에게 울고 있는 상태)
-			log.Printf("[home-reaper] %s: %dGiB 필요, %dGiB 회수 — 자동 회수 한계, 관리자 개입 필요", node, want, freed)
+			log.Printf("[home-reaper] %s: %dGiB 필요, %dGiB 회수. 자동 회수 한계라 관리자 개입이 필요하다", node, want, freed)
 			s.recordReap("session_home_reap_insufficient", node)
 		}
 	}
@@ -198,13 +198,13 @@ func (s *Service) pressuredNodes(ctx context.Context, thresholdPct int) map[stri
 	for node, total := range size {
 		free, ok := avail[node]
 		if !ok || total <= 0 {
-			continue // 한쪽만 있으면 사용률을 못 구한다 — 100% 로 오판하지 않게 건너뛴다
+			continue // 한쪽만 있으면 사용률을 못 구한다. 100% 로 오판하지 않게 건너뛴다
 		}
 		used := total - free
 		if used/total*100 < float64(thresholdPct) {
 			continue
 		}
-		// 임계 아래로 내리는 데 필요한 바이트 → GiB 올림(홈 하나 단위로 지우므로 1GiB 미만도 1로).
+		// 임계 아래로 내리는 데 필요한 바이트를 GiB 로 올린다(홈 하나 단위로 지우므로 1GiB 미만도 1로).
 		if excess := used - total*float64(thresholdPct)/100; excess > 0 {
 			out[node] = int(excess/giB) + 1
 		}

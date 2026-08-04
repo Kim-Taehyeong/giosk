@@ -15,7 +15,7 @@ type Handler struct {
 	resolver *Resolver
 	// setGlobal 은 전역 상한을 런타임 저장소에 영속한다(nil = 전역 편집 불가).
 	setGlobal  func(Resolved) error
-	orgOfGroup authz.OrgOfGroupReader // 그룹→부모조직(스코프 검증용)
+	orgOfGroup authz.OrgOfGroupReader // 그룹에서 부모조직을 찾는다(스코프 검증용)
 }
 
 func NewHandler(repo Repository, resolver *Resolver) *Handler {
@@ -25,7 +25,7 @@ func NewHandler(repo Repository, resolver *Resolver) *Handler {
 // WithGlobalSetter는 전역 상한 런타임 편집을 활성화한다.
 func (h *Handler) WithGlobalSetter(fn func(Resolved) error) *Handler { h.setGlobal = fn; return h }
 
-// WithOrgOfGroup은 그룹→조직 해석기를 주입한다(스코프 정책 편집 인가에 필요).
+// WithOrgOfGroup은 그룹에서 조직을 찾는 해석기를 주입한다(스코프 정책 편집 인가에 필요하다).
 func (h *Handler) WithOrgOfGroup(r authz.OrgOfGroupReader) *Handler { h.orgOfGroup = r; return h }
 
 // limitsBody는 4개 하드 제한을 통째로 받는다. 각 필드 nil(JSON null/생략) = 이 레벨 미지정(상위 폴백).
@@ -83,7 +83,7 @@ func (h *Handler) SetScoped(level Level) gin.HandlerFunc {
 			httpx.Err(c, 403, "out_of_scope", "권한 범위를 벗어난 대상입니다")
 			return
 		}
-		// 상위 하드캡 초과 금지 — 상속 시 부모보다 큰 값을 둘 수 없다.
+		// 상위 하드캡을 넘을 수 없다. 상속할 때 부모보다 큰 값을 둘 수 없다.
 		if over := exceedsParent(body, parent); over != "" {
 			httpx.Err(c, 400, "exceeds_parent", "상위 제한("+over+")을 초과할 수 없습니다")
 			return
@@ -96,7 +96,7 @@ func (h *Handler) SetScoped(level Level) gin.HandlerFunc {
 	}
 }
 
-// ParentLimit은 대상의 상위 유효 상한(설정 가능한 최대치)을 반환한다 — 매니저 편집 UI 힌트용.
+// ParentLimit은 대상의 상위 유효 상한(설정 가능한 최대치)을 반환한다. 매니저 편집 UI 힌트용이다.
 func (h *Handler) ParentLimit(level Level) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := strconv.ParseInt(c.Param("id"), 10, 64)
@@ -186,7 +186,7 @@ func exceedsParent(b limitsBody, p Resolved) string {
 	return ""
 }
 
-// List는 "정책" 화면용 — 전역(설치 고정) + 상한이 설정된 모든 범위를 한 목록으로 반환한다.
+// List는 "정책" 화면용이다. 전역(설치 고정)과 상한이 설정된 모든 범위를 한 목록으로 반환한다.
 // 범위별 화면을 돌아다니지 않고 여기서 전부 보고 관리한다.
 func (h *Handler) List(c *gin.Context) {
 	rows, err := h.repo.ListPolicies()
@@ -244,7 +244,7 @@ func (h *Handler) ListScoped(c *gin.Context) {
 // 전역은 원래 설치 시 고정이었는데, 조직/그룹/개인 상한은 화면에서 바로 바꾸면서
 // 정작 모두에게 적용되는 전역만 Helm upgrade 를 해야 하는 게 이상했다.
 // 세션 생성 때 숫자 비교만 하는 값이라 인프라와 무관하고 재시작도 필요 없다.
-// 0 이하는 거부 — 전역은 폴백이라 "미지정"이 없다(비우면 상한이 사라져 버린다).
+// 0 이하는 거부한다. 전역은 폴백이라 "미지정"이 없고, 비우면 상한이 사라진다.
 func (h *Handler) SetGlobal(c *gin.Context) {
 	if h.setGlobal == nil {
 		httpx.Err(c, 501, "not_supported", "런타임 설정 저장소가 없습니다")

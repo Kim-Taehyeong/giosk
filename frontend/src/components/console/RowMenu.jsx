@@ -9,7 +9,7 @@ import { nextDropdownId, announceOpen, onDropdownOpen } from './dropdownBus';
 // 빨간 아이콘이 상태 배지보다 시끄러워진다. 한 겹 뒤로 보내되 목록을 떠나지 않게 한다.
 //
 // items: [{ key, label, icon, tone?: 'danger', onSelect, disabled? }]
-// 메뉴는 body 포털 + position:fixed — 표의 overflow-x:auto 에 잘리지 않게.
+// 메뉴는 body 포털에 position:fixed 로 띄운다. 표의 overflow-x:auto 에 잘리지 않게 하기 위해서다.
 export default function RowMenu({ items = [], label }) {
   const { t } = useTranslation('common');
   const [open, setOpen] = useState(false);

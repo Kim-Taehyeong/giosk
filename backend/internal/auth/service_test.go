@@ -65,7 +65,7 @@ func TestSignupThenLogin(t *testing.T) {
 	if err != nil {
 		t.Fatalf("signup: %v", err)
 	}
-	// 가입 직후엔 pending → 로그인 거부
+	// 가입 직후엔 pending 이라 로그인이 거부된다
 	if _, err := svc.Login("hong", "password1"); err != ErrPending {
 		t.Fatalf("pending 사용자는 ErrPending 이어야 함, got %v", err)
 	}

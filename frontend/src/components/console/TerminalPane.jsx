@@ -4,15 +4,15 @@ import { FitAddon } from '@xterm/addon-fit';
 import '@xterm/xterm/css/xterm.css';
 import { wsURL } from '../../api/client';
 
-// TerminalPane은 세션 웹터미널 — 브라우저 xterm ↔ API websocket(/instances/:id/terminal).
+// TerminalPane은 세션 웹터미널이다. 브라우저 xterm 과 API websocket(/instances/:id/terminal)을 잇는다.
 // 컨테이너 세션은 파드 exec, 물리 세션은 노드 SSH 로 백엔드가 브리지한다(사용자는 키/비번 불요).
-//   프로토콜: C→S '0'+입력 / '1'+"cols,rows"(리사이즈), S→C 원시 출력 바이트.
+//   프로토콜: 클라이언트는 0+입력 또는 1+"cols,rows"(리사이즈)를 보내고, 서버는 원시 출력 바이트를 보낸다.
 //
 // 검은 화면 방지 장치 3가지(터미널 안에서만 알리면 렌더가 실패했을 때 아무것도 안 보인다):
-//   ① 상태 바를 xterm 밖 일반 DOM 으로 그린다 — xterm 이 죽어도 상태·재시도가 보인다.
+//   1. 상태 바를 xterm 밖 일반 DOM 으로 그린다. xterm 이 죽어도 상태와 재시도가 보인다.
 //   ② 크기가 0 인 동안에는 fit() 하지 않는다(새 창은 열린 직후 0x0 일 수 있고, 0 에서 fit 하면
 //      cols/rows 가 NaN 이 되어 이후 출력이 화면에 그려지지 않는다).
-//   ③ dispose 는 한 틱 뒤에 — xterm 이 예약해 둔 스크롤 동기화 콜백이 먼저 흐르게 해서
+//   3. dispose 는 한 틱 뒤에 한다. xterm 이 예약해 둔 스크롤 동기화 콜백이 먼저 흐르게 해서
 //      "Cannot read properties of undefined (reading 'dimensions')" 미처리 예외로 트리가 날아가는 걸 막는다.
 export default function TerminalPane({ session, fill = false }) {
   const hostRef = useRef(null);
@@ -46,7 +46,7 @@ export default function TerminalPane({ session, fill = false }) {
     const ws = new WebSocket(wsURL(`/instances/${session.id}/terminal`));
     ws.binaryType = 'arraybuffer';
     // 서버(x/net/websocket)는 프레임을 []byte 로 받으므로 반드시 "바이너리" 프레임으로 보내야 한다.
-    // ws.send(string) 은 텍스트 프레임이라 서버 Receive 가 거부→연결이 즉시 끊긴다(context canceled).
+    // ws.send(string) 은 텍스트 프레임이라 서버 Receive 가 거부하고 연결이 즉시 끊긴다(context canceled).
     // 프레임 = [프리픽스 1바이트('0'입력/'1'리사이즈)] + [UTF-8 payload].
     const enc = new TextEncoder();
     const sendFrame = (prefix, payload) => {
@@ -58,7 +58,7 @@ export default function TerminalPane({ session, fill = false }) {
       ws.send(frame);
     };
     const sendResize = () => sendFrame('1', `${term.cols},${term.rows}`);
-    // 연결이 "CONNECTING"에서 멈춰 검은 화면만 나오는 것을 막는다 — 일정 시간 내 안 열리면 실패로 안내.
+    // 연결이 CONNECTING 에서 멈춰 검은 화면만 나오는 걸 막는다. 일정 시간 안에 안 열리면 실패로 안내한다.
     const connectTimer = setTimeout(() => {
       if (alive && !opened) {
         setStatus('error');

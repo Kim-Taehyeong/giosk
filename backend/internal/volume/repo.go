@@ -28,7 +28,7 @@ type Repository interface {
 	SetBilled(id int64, credits int) error
 }
 
-// UserAlloc — 사용자별 볼륨 할당 합계.
+// UserAlloc은 사용자별 볼륨 할당 합계.
 type UserAlloc struct {
 	UserID      int64  `gorm:"column:user_id"`
 	Name        string `gorm:"column:name"`
@@ -41,7 +41,7 @@ func NewRepository(db *gorm.DB) Repository { return &gormRepo{db: db} }
 
 func (r *gormRepo) Create(v *Volume) error { return r.db.Create(v).Error }
 
-// LeasedNodes는 사용자가 대여한 적 있는(이력 포함) 물리노드 목록을 반환한다 — 로컬 Home 볼륨 노출 대상.
+// LeasedNodes는 사용자가 대여한 적 있는(이력 포함) 물리노드 목록을 반환한다. 로컬 Home 볼륨 노출 대상이다.
 func (r *gormRepo) LeasedNodes(userID int64) []string {
 	var out []string
 	r.db.Raw(`SELECT DISTINCT node FROM node_leases WHERE user_id = ? AND node <> '' ORDER BY node`, userID).Scan(&out)
@@ -55,14 +55,14 @@ func (r *gormRepo) SetBound(id int64, pvcName, ns, status string) error {
 
 func (r *gormRepo) ListOwned(userID int64) ([]Volume, error) {
 	var out []Volume
-	// 귀속 팀 표시명(team_name)을 함께 — 볼륨의 쿼터·과금이 어느 팀에서 나가는지 보인다.
+	// 귀속 팀 표시명(team_name)을 함께 준다. 볼륨의 쿼터와 과금이 어느 팀에서 나가는지 보인다.
 	err := r.db.Raw(`SELECT v.*, COALESCE(g.display_name,'') AS team_name
 		FROM volumes v LEFT JOIN `+"`groups`"+` g ON g.id = v.group_id
 		WHERE v.owner_user_id = ? ORDER BY v.id`, userID).Scan(&out).Error
 	return out, err
 }
 
-// ListShared — 나에게 공유된 볼륨(직접 공유 + 내 활성 그룹 공유). 내가 소유한 건 제외.
+// ListShared는 나에게 공유된 볼륨(직접 공유와 내 활성 그룹 공유)을 준다. 내가 소유한 건 제외한다.
 func (r *gormRepo) ListShared(userID int64) ([]Volume, error) {
 	var out []Volume
 	err := r.db.Raw(`
@@ -127,7 +127,7 @@ func (r *gormRepo) AllocatedGiBInTeam(userID, groupID int64) (int, error) {
 }
 
 func (r *gormRepo) AddShare(volumeID int64, userID, groupID *int64, perm string) error {
-	// 같은 대상(사용자/그룹) 기존 공유는 제거 후 재생성 → 권한 변경·다운그레이드(rw→ro) 반영 + 중복 방지.
+	// 같은 대상(사용자나 그룹)의 기존 공유는 지우고 다시 만든다. 권한 변경과 다운그레이드(rw 에서 ro)가 반영되고 중복도 막힌다.
 	q := r.db.Where("volume_id = ?", volumeID)
 	switch {
 	case userID != nil:
@@ -142,7 +142,7 @@ func (r *gormRepo) AddShare(volumeID int64, userID, groupID *int64, perm string)
 }
 
 // UsersAllocated는 사용자별 볼륨 할당 합(GiB)을 내림차순으로 반환한다(과사용 식별용).
-// AdminVolume — 관리자 볼륨 목록 한 행(소유자·조직·그룹 포함).
+// AdminVolume은 관리자 볼륨 목록 한 행(소유자, 조직, 그룹 포함).
 type AdminVolume struct {
 	ID          int64  `gorm:"column:id" json:"id"`
 	Name        string `gorm:"column:name" json:"name"`

@@ -24,7 +24,7 @@ func TestLoad_Defaults(t *testing.T) {
 }
 
 func TestValidate_DatasetsRequireNFS(t *testing.T) {
-	// 데이터셋 사용 + external NFS인데 server/path 누락 → 에러
+	// 데이터셋을 쓰는데 external NFS 의 server 나 path 가 없으면 에러
 	_, err := Load(fakeEnv(map[string]string{
 		"GIOSK_DATASETS_ENABLED":  "true",
 		"GIOSK_DATASETS_NFS_MODE": "external",
@@ -50,14 +50,14 @@ func TestValidate_DatasetsExternalNFS_OK(t *testing.T) {
 }
 
 func TestValidate_PhysicalNodesNeedHybridAndNFS(t *testing.T) {
-	// 물리노드 on + container 모드 → 에러
+	// 물리노드를 켰는데 container 모드면 에러
 	if _, err := Load(fakeEnv(map[string]string{
 		"GIOSK_PHYSICAL_NODES_ENABLED": "true",
 		"GIOSK_DEPLOYMENT_MODE":        "container",
 	})); err == nil {
 		t.Fatal("물리노드는 hybrid를 요구해야 함")
 	}
-	// 물리노드 on + hybrid + 외부 NFS 누락 → 에러
+	// 물리노드를 켰고 hybrid 인데 외부 NFS 가 없으면 에러
 	if _, err := Load(fakeEnv(map[string]string{
 		"GIOSK_PHYSICAL_NODES_ENABLED": "true",
 		"GIOSK_DEPLOYMENT_MODE":        "hybrid",

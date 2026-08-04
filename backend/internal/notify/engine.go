@@ -21,19 +21,19 @@ type Mailer interface {
 // Engine은 관리자(전역) 알림 규칙을 주기적으로 평가해, 위반 시 채널(웹훅/이메일)로 발송한다.
 // 규칙/채널은 notify_rules·notify_channels(관리자 설정)에서 읽는다. 메트릭은 Prometheus(DCGM),
 // 노드 비가용 수는 주입된 함수로 평가한다. 같은 규칙은 cooldown 동안 재발송하지 않는다(스팸 방지).
-// Inbox는 사용자 인앱 알림 수신함(usernotify.Store)의 최소 계약 — 결합을 줄이려 인터페이스로 받는다.
+// Inbox는 사용자 인앱 알림 수신함(usernotify.Store)의 최소 계약이다. 결합을 줄이려 인터페이스로 받는다.
 type Inbox interface {
 	Record(userID int64, severity, metric string, value float64, threshold int, target string) error
 }
 
-// UserMetricFn은 사용자 규칙 지표 1개를 userID→값 맵으로 평가한다(미지원이면 ok=false).
+// UserMetricFn은 사용자 규칙 지표 1개를 userID 기준 값 맵으로 평가한다(미지원이면 ok=false).
 // credit_balance(잔액)·budget_pct(소모%)는 DB 로, volume_usage 등은 Prometheus 로 채운다.
 type UserMetricFn func(ctx context.Context, metric string) (map[int64]float64, bool)
 
 // SessionMetricFn은 세션 단위 지표(session_gpu/cpu/vram, %)를 특정 세션에서 평가한다(미가용이면 ok=false).
 type SessionMetricFn func(ctx context.Context, metric, instanceID string) (float64, bool)
 
-// TeamBalance는 한 사용자의 팀별 크레딧 잔액. Active=그 팀을 실제로 쓰는지(세션/소비 이력) — 안 쓰는 빈 팀 알림 억제용.
+// TeamBalance는 한 사용자의 팀별 크레딧 잔액이다. Active 는 그 팀을 실제로 쓰는지(세션이나 소비 이력)를 뜻하며, 안 쓰는 빈 팀의 알림을 억제한다.
 type TeamBalance struct {
 	GroupID int64
 	Name    string
@@ -41,7 +41,7 @@ type TeamBalance struct {
 	Active  bool
 }
 
-// CreditTeamsFn은 userID→팀별 잔액을 반환한다(크레딧이 팀 귀속이라 팀별로 평가·발화).
+// CreditTeamsFn은 userID 별 팀 잔액을 반환한다(크레딧이 팀에 귀속되므로 팀별로 평가하고 발화한다).
 type CreditTeamsFn func(ctx context.Context) map[int64][]TeamBalance
 
 // Engine은 관리자(전역) 알림 규칙을 주기적으로 평가해, 위반 시 채널(웹훅/이메일)로 발송한다.
@@ -73,7 +73,7 @@ func (e *Engine) WithCreditTeams(fn CreditTeamsFn) *Engine { e.creditTeams = fn;
 // WithRecorder는 발화 경고를 alert_events 에 이력으로 남기게 한다.
 func (e *Engine) WithRecorder(r *alertlog.Store) *Engine { e.recorder = r; return e }
 
-// WithUserAlerts는 사용자 규칙 평가를 켠다 — 위반 시 inbox 에 인앱 알림을 적재한다.
+// WithUserAlerts는 사용자 규칙 평가를 켠다. 위반하면 inbox 에 인앱 알림을 적재한다.
 func (e *Engine) WithUserAlerts(inbox Inbox, fn UserMetricFn) *Engine {
 	e.inbox, e.userMetric = inbox, fn
 	return e
@@ -117,13 +117,13 @@ func (e *Engine) tick(ctx context.Context) {
 		}
 		val, ok := e.evalMetric(ctx, r.Metric)
 		if !ok {
-			continue // 미지원 메트릭/메트릭 미가용 → 건너뜀
+			continue // 미지원 메트릭이거나 메트릭이 없으면 건너뛴다
 		}
 		if !breached(r.Op, val, float64(r.Value)) {
 			continue
 		}
 		if last, seen := e.lastFired[r.ID]; seen && time.Since(last) < e.cooldown {
-			continue // 쿨다운 중 — 반복 발송 억제
+			continue // 쿨다운 중이라 반복 발송을 억제한다
 		}
 		e.lastFired[r.ID] = time.Now()
 		e.deliver(ctx, r, cfg, val)
@@ -132,7 +132,7 @@ func (e *Engine) tick(ctx context.Context) {
 }
 
 // userTick은 활성 사용자 규칙을 평가해, 위반 시 그 사용자의 인앱 수신함에 알림을 적재한다.
-// 지표는 metric 별로 1회만 조회(userID→값)해 규칙이 많아도 쿼리가 폭증하지 않게 한다.
+// 지표는 metric 별로 한 번만 조회해서 규칙이 많아도 쿼리가 폭증하지 않게 한다.
 func (e *Engine) userTick(ctx context.Context) {
 	if e.inbox == nil || e.userMetric == nil {
 		return
@@ -142,7 +142,7 @@ func (e *Engine) userTick(ctx context.Context) {
 		return
 	}
 	e.creditTick(ctx, rules) // credit_balance 는 팀별로 따로 발화(팀 귀속)
-	// metric → (userID → 값) 캐시. 같은 지표를 여러 사용자가 걸어도 한 번만 평가한다.
+	// metric 별 (userID 기준 값) 캐시. 같은 지표를 여러 사용자가 걸어도 한 번만 평가한다.
 	cache := map[string]map[int64]float64{}
 	ok := map[string]bool{}
 	for _, r := range rules {
@@ -151,17 +151,17 @@ func (e *Engine) userTick(ctx context.Context) {
 		}
 		var val float64
 		if r.Target != "" {
-			// 세션 단위 규칙(session_gpu/cpu/vram) — 대상 세션에서 직접 평가.
+			// 세션 단위 규칙(session_gpu/cpu/vram)은 대상 세션에서 직접 평가한다.
 			if e.sessMetric == nil {
 				continue
 			}
 			v, good := e.sessMetric(ctx, r.Metric, r.Target)
 			if !good {
-				continue // 세션 없음/정지/측정불가 → 발화 안 함
+				continue // 세션이 없거나 정지했거나 측정 불가면 발화하지 않는다
 			}
 			val = v
 		} else {
-			// 사용자 전역 규칙(credit_balance 등) — 지표별 1회 평가 캐시.
+			// 사용자 전역 규칙(credit_balance 등)은 지표별로 한 번 평가해 캐시한다.
 			vals, seen := cache[r.Metric]
 			if !seen {
 				vals, ok[r.Metric] = e.userMetric(ctx, r.Metric)
@@ -183,7 +183,7 @@ func (e *Engine) userTick(ctx context.Context) {
 			continue
 		}
 		e.lastFired[r.ID] = time.Now()
-		// 표시 문자열 대신 metric+파라미터만 적재 → 프론트가 언어별로 렌더(i18n). target=대상 세션.
+		// 표시 문자열 대신 metric 과 파라미터만 적재해 프론트가 언어별로 렌더한다(i18n). target 은 대상 세션이다.
 		_ = e.inbox.Record(r.OwnerID, userSeverity(r.Metric), r.Metric, val, r.Value, r.Target)
 		log.Printf("[alert-engine] USER FIRE uid=%d %s%s %s %d (현재 %.0f)", r.OwnerID, r.Metric, targetLog(r.Target), opSymbol(r.Op), r.Value, val)
 	}
@@ -196,7 +196,7 @@ func targetLog(t string) string {
 	return "@" + t
 }
 
-// creditTick은 credit_balance 규칙을 팀별로 평가한다 — 크레딧이 팀 지갑에 귀속되므로 "어느 팀"의
+// creditTick은 credit_balance 규칙을 팀별로 평가한다. 크레딧이 팀 지갑에 귀속되므로 "어느 팀"의
 // 잔액이 낮은지 팀 이름과 함께 발화한다. 안 쓰는 빈 팀(세션/소비 이력 없음)은 억제해 스팸을 막는다.
 func (e *Engine) creditTick(ctx context.Context, rules []Rule) {
 	if e.inbox == nil || e.creditTeams == nil {
@@ -257,13 +257,13 @@ func userSeverity(metric string) string {
 }
 
 // evalMetric은 메트릭명을 실제 값으로 평가한다(지원: gpu_util/gpu_temp/node_down/disk_usage).
-// 그 외 메트릭(budget_pct/credit_balance/session_idle 등)은 미지원 → ok=false.
+// 그 외 메트릭(budget_pct, credit_balance, session_idle 등)은 지원하지 않으므로 ok=false 다.
 func (e *Engine) evalMetric(ctx context.Context, metric string) (float64, bool) {
 	switch metric {
 	case "disk_usage":
 		// 노드 로컬 디스크 최대 사용률(%). 로컬 Home·Scratch 가 노드 디스크를 채우면
 		// 정리 DaemonSet 이 오래된 파일을 지우기 시작하므로, 그 전에 관리자가 알도록 한다.
-		// 100% 도달 시 kubelet DiskPressure → 파드 축출이라 노드가 통째로 빠진다.
+		// 100% 에 닿으면 kubelet DiskPressure 로 파드가 축출돼 노드가 통째로 빠진다.
 		if e.met == nil {
 			return 0, false
 		}
@@ -280,14 +280,14 @@ func (e *Engine) evalMetric(ctx context.Context, metric string) (float64, bool) 
 		}
 		return e.met.Scalar(ctx, "max(DCGM_FI_DEV_GPU_TEMP)")
 	case "node_idle":
-		// 가장 한가한 노드의 평균 GPU 사용률(%). 임계 이하(lte)면 유휴 노드가 있다는 뜻 —
+		// 가장 한가한 노드의 평균 GPU 사용률(%). 임계 이하(lte)면 유휴 노드가 있다는 뜻이다.
 		// GPU 를 점유만 하고 놀리는 세션을 관리자가 회수하도록 유도.
 		if e.met == nil {
 			return 0, false
 		}
 		return e.met.Scalar(ctx, "min(avg by(Hostname)(DCGM_FI_DEV_GPU_UTIL))")
 	case "capacity":
-		// 사용 중(util>0)인 GPU 비율(%). 임계 이상(gte)이면 클러스터 여유가 부족 — 증설/대기열 신호.
+		// 사용 중(util>0)인 GPU 비율(%). 임계 이상(gte)이면 클러스터 여유가 부족하다는 증설·대기열 신호다.
 		if e.met == nil {
 			return 0, false
 		}

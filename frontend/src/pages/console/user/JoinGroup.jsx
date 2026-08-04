@@ -7,7 +7,7 @@ import { useToast } from '../../../components/console/Toast';
 import { getMembershipContext, requestJoinGroup, cancelJoinRequest } from '../../../api/console/membership';
 import { tabbable } from '../../../utils/a11y';
 
-// 그룹 가입 신청 — 전체 그룹(내 조직/타 조직)을 검색해 가입을 신청하고 신청 상태를 확인한다.
+// 그룹 가입 신청이다. 전체 그룹(내 조직과 타 조직)을 검색해 가입을 신청하고 신청 상태를 확인한다.
 export default function JoinGroup() {
   const { t } = useTranslation('consoleUser');
   const { toast } = useToast();

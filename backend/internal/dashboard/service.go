@@ -156,7 +156,7 @@ func (s *Service) Admin(ctx context.Context) AdminDashboard {
 	}
 }
 
-// metricsStatus는 지표 스택 설치 여부를 확인한다. DCGM 은 시리즈가 실제로 존재해야 true —
+// metricsStatus는 지표 스택 설치 여부를 확인한다. DCGM 은 시리즈가 실제로 존재해야 true 다.
 // Prometheus 만 있고 dcgm-exporter 가 없으면 GPU 지표는 영원히 0 이므로 구분해야 한다.
 func (s *Service) metricsStatus(ctx context.Context) MetricsStatus {
 	st := MetricsStatus{Prometheus: s.met.Enabled()}
@@ -222,7 +222,7 @@ func (s *Service) adminAlerts(ctx context.Context) []AdminAlert {
 }
 
 // userMaxSessions는 사용자 동시 세션 상한을 정책(계층 해석)에서 가져온다(0=무제한).
-// billing.credit.maxConcurrentSessions 는 폐기 — 정책(quota)으로 일원화.
+// billing.credit.maxConcurrentSessions 는 폐기했다. 정책(quota)으로 일원화한다.
 func (s *Service) userMaxSessions(userID int64) int {
 	if s.limits == nil {
 		return 0

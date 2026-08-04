@@ -14,7 +14,7 @@ import (
 func TestRefillScenario(t *testing.T) {
 	dsn := os.Getenv("GIOSK_TEST_DSN")
 	if dsn == "" {
-		t.Skip("GIOSK_TEST_DSN 미설정 — 스킵")
+		t.Skip("GIOSK_TEST_DSN 미설정이라 건너뛴다")
 	}
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -33,7 +33,7 @@ func TestRefillScenario(t *testing.T) {
 		return p
 	}
 
-	// A) 30일차 — 조직 주기 도래, 플랫폼 미도래 → 이월(누적): 500 + 1000 = 1500.
+	// A) 30일차: 조직 주기가 도래하고 플랫폼은 아직이라 이월된다. 500 + 1000 = 1500.
 	setup(30, 30, 500)
 	if _, err := r.RefillDue(PlatformRefill{IntervalDays: 60, Carryover: false}); err != nil {
 		t.Fatalf("refill A: %v", err)
@@ -42,7 +42,7 @@ func TestRefillScenario(t *testing.T) {
 		t.Errorf("이월 시나리오: pool=%d, want 1500", got)
 	}
 
-	// B) 60일차 — 플랫폼 경계(이월불가) 도래 → 하위 이월분 전액 소멸: 리셋 1000.
+	// B) 60일차: 플랫폼 경계(이월 불가)가 도래해 하위 이월분이 전액 소멸하고 1000 으로 리셋된다.
 	setup(60, 30, 500)
 	if _, err := r.RefillDue(PlatformRefill{IntervalDays: 60, Carryover: false}); err != nil {
 		t.Fatalf("refill B: %v", err)

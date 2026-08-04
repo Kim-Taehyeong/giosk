@@ -72,7 +72,7 @@ export default function Groups() {
             ] : []),
             { key: 'status', header: t('groups.colStatus'), render: (r) => <Pill variant="ok" dot>{r.status}</Pill> },
             { key: 'act', header: t('groups.colAct'), className: 'flex', render: () => (
-              // 관리·삭제 모두 행을 눌러 상세에서 — 리스트엔 위험 작업을 두지 않는다.
+              // 관리도 삭제도 행을 눌러 상세에서 한다. 리스트엔 위험 작업을 두지 않는다.
               <ChevronRight size={15} style={{ color: 'var(--muted)', alignSelf: 'center' }} />
             ) },
           ]}

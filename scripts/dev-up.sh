@@ -15,7 +15,7 @@ if ! kind get clusters | grep -qx "$CLUSTER"; then
 fi
 kubectl cluster-info --context "kind-$CLUSTER" >/dev/null
 
-# 2) 개발용 MySQL (호스트 :3306 노출 → 로컬 API 가 DSN 으로 접속)
+# 2) 개발용 MySQL (호스트 :3306 을 노출해 로컬 API 가 DSN 으로 접속한다)
 if ! docker ps --format '{{.Names}}' | grep -qx giosk-mysql; then
   echo "→ MySQL 컨테이너 기동"
   docker run -d --name giosk-mysql \

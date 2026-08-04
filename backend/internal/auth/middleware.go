@@ -15,7 +15,7 @@ func (h *Handler) RequireAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		key := bearer(c.GetHeader("Authorization"))
 		if key == "" {
-			// WebSocket(브라우저)은 Authorization 헤더를 못 붙인다 → 쿼리 파라미터 access_token 폴백.
+			// WebSocket(브라우저)은 Authorization 헤더를 못 붙이므로 쿼리 파라미터 access_token 으로 폴백한다.
 			// (웹터미널 /instances/:id/terminal 등 ws 라우트 전용. HTTP 요청은 계속 헤더 사용.)
 			key = strings.TrimSpace(c.Query("access_token"))
 		}

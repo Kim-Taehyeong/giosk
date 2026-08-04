@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-// Config는 게이트웨이 바이너리의 자체 설정(대형 API config 를 import 하지 않음 — 데이터 플레인 최소 의존).
+// Config는 게이트웨이 바이너리의 자체 설정이다. 대형 API config 를 import 하지 않아 데이터 플레인 의존을 최소로 둔다.
 type Config struct {
 	Domain       string // 접속 도메인(예: gw.dku.ac.kr). 서브도메인 = <iid>-<ch>.<Domain>
 	Secret       []byte // API 와 공유하는 토큰 대칭키(GIOSK_GATEWAY_SECRET)

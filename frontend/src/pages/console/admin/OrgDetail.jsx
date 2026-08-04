@@ -20,7 +20,7 @@ import { c, cU } from '../../../lib/credit';
 
 const roleVariant = { org_admin: 'gpu', project_admin: 'primary', member: 'pause' };
 
-// 정기 크레딧 카드 — 주기마다 조직 풀을 이 양으로 리필. 주기는 플랫폼 상한(maxInterval)을 넘을 수 없다.
+// 정기 크레딧 카드다. 주기마다 조직 풀을 이 양으로 리필하며 주기는 플랫폼 상한(maxInterval)을 넘을 수 없다.
 function RecurringCreditCard({ org, maxInterval, onSave, t }) {
   const [v, setV] = useState(String(org?.recurringCredit ?? 0));
   const [iv, setIv] = useState(String(org?.refillIntervalDays || maxInterval || 30));
@@ -64,7 +64,7 @@ export default function OrgDetail() {
   const [newGroup, setNewGroup] = useState(null); // { name, displayName, adminAccount }
   const [edit, setEdit] = useState(null);    // { displayName, defaultGroupBudget }
 
-  // 조직·그룹·사용자를 한 번에 로드 — 사용자 필터가 조직 표시명에 의존하므로 같은 스냅샷에서 뽑아야
+  // 조직, 그룹, 사용자를 한 번에 로드한다. 사용자 필터가 조직 표시명에 의존하므로 같은 스냅샷에서 뽑아야
   // 이름 수정 직후에도 어긋나지 않는다.
   const load = async () => {
     const [o, g] = await Promise.all([getOrgs(), getGroups()]);
@@ -83,7 +83,7 @@ export default function OrgDetail() {
     toast(t('orgs.granted', { name: org?.displayName, n: amount }));
     load();
   };
-  // 정기 크레딧 설정 — 주기마다 이 값으로 조직 풀을 리필. 주기/이월도 함께(주기는 플랫폼 상한).
+  // 정기 크레딧 설정이다. 주기마다 이 값으로 조직 풀을 리필하며 주기와 이월도 함께 정한다(주기는 플랫폼 상한을 따른다).
   const submitRecurring = async ({ recurring, interval, carryover }) => {
     await grantOrgCredit(oid, { amount: 0, recurring, interval, carryover });
     toast(t('odetail.recurringSaved', { defaultValue: '정기 크레딧을 설정했습니다.' }));
@@ -110,7 +110,7 @@ export default function OrgDetail() {
     await updateOrg(oid, { displayName: edit.displayName, defaultGroupBudget: Number(edit.defaultGroupBudget) || 0 });
     setEdit(null); toast(t('orgs.updated')); load();
   };
-  // 조직 삭제 — 리스트가 아니라 여기서만(실수 방지). 성공 시 조직 목록으로.
+  // 조직 삭제는 리스트가 아니라 여기서만 한다(실수 방지). 성공하면 조직 목록으로 간다.
   const removeOrg = async () => {
     if (!(await confirm({ title: t('orgs.deleteTitle'), message: t('orgs.deleteConfirm', { name: org?.displayName }), confirmText: t('common.delete') }))) return;
     try { await deleteOrg(oid); } catch (e) {
@@ -185,7 +185,7 @@ export default function OrgDetail() {
             { key: 'username', header: t('groups.colAccount'), className: 'mono' },
             { key: 'group', header: t('users.colGroup'), render: (r) => <Pill variant="primary">{r.group}</Pill> },
             { key: 'memberRole', header: t('odetail.memberRole'), render: (r) => {
-              // 멀티롤 — 이 사용자가 가진 모든 관리 역할을 배지로. 관리 역할이 없으면 소속 역할/대시.
+              // 멀티롤이다. 이 사용자가 가진 모든 관리 역할을 배지로 보여주고, 관리 역할이 없으면 소속 역할이나 대시를 쓴다.
               const badges = r.roles || [];
               if (badges.length === 0) {
                 return r.memberRole ? <Pill variant={roleVariant[r.memberRole] || 'pause'}>{t(`roles.${r.memberRole}`)}</Pill> : <span className="muted">—</span>;

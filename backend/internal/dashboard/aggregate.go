@@ -54,7 +54,7 @@ func gpuSpec(r SessionRow) string {
 	return base
 }
 
-// connOf는 이미지 channels JSON → 접속 채널 표시 라벨(물리=SSH, 미설정=VSCode 기본).
+// connOf는 이미지 channels JSON 을 접속 채널 표시 라벨로 바꾼다(물리는 SSH, 미설정이면 VSCode 기본).
 func connOf(r SessionRow) []string {
 	if r.Env == "ssh" {
 		return []string{"SSH"}
@@ -77,7 +77,7 @@ func connOf(r SessionRow) []string {
 	if len(out) == 0 {
 		out = append(out, "VSCode") // channels 미설정 이미지 = code-server 기본
 	}
-	// 웹터미널 — 모든 컨테이너 세션에 노출(API exec, 사이드카/게이트웨이 불요).
+	// 웹터미널은 모든 컨테이너 세션에 노출한다(API exec 이라 사이드카나 게이트웨이가 필요 없다).
 	// "terminal" 키를 그대로 내보내면 프론트 CONN_CH 가 SSH 버튼으로 표시하고 모달 터미널 탭을 연다.
 	out = append(out, "terminal")
 	return out
@@ -92,12 +92,12 @@ func (s *Service) userVRAM(ctx context.Context, userID int64) (int, int) {
 	usedGB := 0
 	if s.met.Enabled() {
 		if pods := s.repo.UserRunningGpuPods(userID); len(pods) > 0 {
-			// PromQL 라벨 정규식은 완전일치(앵커됨) → pod 가 목록 중 하나와 정확히 일치.
+			// PromQL 라벨 정규식은 앵커돼 완전일치라, pod 가 목록 중 하나와 정확히 일치해야 한다.
 			// 워크로드 Pod 라벨은 배포에 따라 pod/exported_pod 로 갈린다(metrics.DCGMPodSeries 참조).
 			// pod 만 보면 항상 빈 결과라 사용자 VRAM 이 늘 0 이었다.
 			q := fmt.Sprintf(`sum(%s)`, metrics.DCGMPodSeries("DCGM_FI_DEV_FB_USED", strings.Join(pods, "|")))
 			if v, ok := s.met.Scalar(ctx, q); ok {
-				usedGB = int(v/1024 + 0.5) // MiB → GB
+				usedGB = int(v/1024 + 0.5) // MiB 를 GB 로
 			}
 		}
 	}

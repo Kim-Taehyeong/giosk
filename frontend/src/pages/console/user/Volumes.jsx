@@ -12,7 +12,7 @@ import { useConfirm } from '../../../components/console/Confirm';
 import { getVolumes, createVolume, shareVolume, deleteVolume, changeVolumeTeam } from '../../../api/console/volumes';
 import { getShareTargets } from '../../../api/console/membership';
 
-// 용량 = 할당량. 사용량은 표시하지 않는다 — 볼륨이 NFS 익스포트의 하위 디렉터리라
+// 용량은 할당량이다. 사용량은 표시하지 않는다. 볼륨이 NFS 익스포트의 하위 디렉터리라
 // kubelet 통계가 그 볼륨이 아니라 익스포트 전체 사용량을 돌려주기 때문(10GB 볼륨이 "50/10 GB"로 보였다).
 const usageCell = (r) => (
   <div style={{ minWidth: 90, fontWeight: 600 }}>{r.capGb} GB</div>
@@ -44,7 +44,7 @@ export default function Volumes() {
   const quota = data.quota || { allocatedGb: 0, totalGb: 0 };
   const remainGb = Math.max(0, quota.totalGb - quota.allocatedGb);
   const overQuota = form.sizeGib > remainGb;
-  // 생성 후 예상 — 이 볼륨을 만들면 얼마가 쓰이고 얼마가 남는지 미리 보여준다.
+  // 생성 후 예상이다. 이 볼륨을 만들면 얼마가 쓰이고 얼마가 남는지 미리 보여준다.
   const wantGb = Math.max(0, form.sizeGib || 0);
   const afterAlloc = quota.allocatedGb + wantGb;
   const afterRemain = Math.max(0, remainGb - wantGb);
@@ -55,7 +55,7 @@ export default function Volumes() {
   const remove = async (id) => { if (!(await confirm({ title: t('volume.delete'), message: t('confirmDelete'), confirmText: t('volume.delete') }))) return; await deleteVolume(id); toast(t('volume.deleted')); load(); };
 
   const submitShare = async () => {
-    if (!share.value) { toast(t('volume.selectPh')); return; } // 대상 미선택 → 조용히 무동작 방지
+    if (!share.value) { toast(t('volume.selectPh')); return; } // 대상을 안 골랐을 때 조용히 아무 일도 안 하는 걸 막는다
     // 백엔드 ShareReq 는 {target, value, permission} 이다(value=username|groupId). 예전엔
     // {username|groupId, permission} 로 보내 매핑이 안 돼 공유가 조용히 실패했다.
     try {

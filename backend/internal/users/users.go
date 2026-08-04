@@ -22,7 +22,7 @@ type Summary struct {
 	GroupID  int64  `json:"groupId"`
 	Org      string `json:"org"`
 	// MemberRole 은 소속 그룹에서의 역할(org_admin|project_admin|billing_admin|member|guest).
-	// 플랫폼 역할(Role)과 별개 — 조직 관리자/팀장은 여기에만 나타난다.
+	// 플랫폼 역할(Role)과는 별개다. 조직 관리자와 팀장은 여기에만 나타난다.
 	MemberRole         string      `json:"memberRole"`
 	Roles              []RoleBadge `json:"roles" gorm:"-"` // 이 사용자가 가진 전체 관리 역할(멀티롤 배지). 서비스에서 채움.
 	Balance            int         `json:"balance"`            // user_wallets.balance(현재 잔여)
@@ -31,7 +31,7 @@ type Summary struct {
 	CreatedAt          time.Time   `json:"createdAt"`
 }
 
-// RoleBadge — 사용자가 가진 관리 역할 하나(멀티롤 표시용).
+// RoleBadge는 사용자가 가진 관리 역할 하나(멀티롤 표시용).
 type RoleBadge struct {
 	Role      string `json:"role"` // org_admin | project_admin
 	GroupID   int64  `json:"groupId"`
@@ -39,7 +39,7 @@ type RoleBadge struct {
 	OrgName   string `json:"orgName"`
 }
 
-// CreateReq — 관리자 사용자 생성.
+// CreateReq는 관리자 사용자 생성.
 type CreateReq struct {
 	Username  string `json:"username" binding:"required"`
 	Password  string `json:"password"`
@@ -60,7 +60,7 @@ type BulkReq struct {
 
 const defaultPassword = "giosk123" // 관리자 생성 시 비번 미지정 기본값(최초 로그인 후 변경 권장)
 
-// ListFilter — 사용자 목록 조회 조건(서버측 검색/페이징).
+// ListFilter는 사용자 목록 조회 조건(서버측 검색과 페이징).
 // 목록이 수천 명이 되면 전부 내려주고 브라우저가 거르는 방식은 못 버틴다(300명에 3.3초).
 type ListFilter struct {
 	Q       string // 이름/아이디/이메일 부분일치
@@ -74,7 +74,7 @@ type ListFilter struct {
 	Offset  int
 }
 
-// Repository — 영속성.
+// Repository는 영속성.
 type Repository interface {
 	List(f ListFilter) (items []Summary, total int, err error)
 	ByID(id int64) (*Summary, error)
@@ -163,7 +163,7 @@ func (r *repo) List(f ListFilter) ([]Summary, int, error) {
 	if err := r.db.Raw(q, args...).Scan(&out).Error; err != nil {
 		return nil, 0, err
 	}
-	r.attachRoleBadges(out) // 멀티롤 배지 — 각 사용자의 전체 관리 역할
+	r.attachRoleBadges(out) // 멀티롤 배지. 각 사용자의 전체 관리 역할을 붙인다
 	return out, int(total), nil
 }
 

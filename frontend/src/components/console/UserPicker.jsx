@@ -5,10 +5,10 @@ import { getOrgs, getGroups } from '../../api/console/governance';
 import Select from './Select';
 import { nextDropdownId, announceOpen, onDropdownOpen } from './dropdownBus';
 
-// UserPicker — 계정 선택기.
+// UserPicker는 계정 선택기.
 // 이름만으로는 동명이인을 구분할 수 없으므로 (1) 조직·그룹으로 후보를 좁히고
 // (2) 후보를 [이름 / 아이디 / 이메일 / 소속] 열로 나눠 보여준다. 아이디는 유일하므로 최종 식별자.
-// 선택하면 onChange(username) — 백엔드는 username/email 을 해석한다.
+// 선택하면 onChange(username) 를 부른다. 백엔드는 username 이나 email 을 해석한다.
 //  onPick(user): 선택된 사용자 객체 전체(예: id 로 저장하는 정책 화면). 자유 입력 시 null.
 //  filter(user): 후보 제한(예: 이미 멤버인 사용자 제외).
 const MAX_SHOWN = 8;
@@ -32,7 +32,7 @@ export default function UserPicker({ value, onChange, placeholder, onPick, filte
     if (openedId !== idRef.current) setOpen(false);
   }), []);
 
-  // 후보는 서버에서 좁혀 받는다 — 전체 목록을 내려받아 브라우저가 거르면 수천 명에서 못 버틴다.
+  // 후보는 서버에서 좁혀 받는다. 전체 목록을 내려받아 브라우저가 거르면 수천 명에서 못 버틴다.
   // 검색어/필터가 바뀔 때만, 300ms 디바운스로 요청한다.
   useEffect(() => {
     const id = setTimeout(() => {
@@ -43,7 +43,7 @@ export default function UserPicker({ value, onChange, placeholder, onPick, filte
     return () => clearTimeout(id);
   }, [q, org, group]);
   useEffect(() => { setQ(value || ''); }, [value]);
-  // 필터 후보 — 사용자 목록이 한 페이지뿐이라 거기서 못 뽑는다. 조직/그룹 목록에서 가져온다.
+  // 필터 후보다. 사용자 목록이 한 페이지뿐이라 거기서 못 뽑으므로 조직과 그룹 목록에서 가져온다.
   useEffect(() => {
     getOrgs().then((d) => setOrgs((d.items || []).map((o) => o.displayName))).catch(() => {});
     getGroups().then((d) => setAllGroups(d.items || [])).catch(() => {});
@@ -59,19 +59,19 @@ export default function UserPicker({ value, onChange, placeholder, onPick, filte
   const matches = narrowed.slice(0, MAX_SHOWN);
   const exact = narrowed.some((u) => u.username === q); // 아이디가 정확히 일치 = 선택 완료
 
-  // 후보가 더 있는지 — 서버가 30건만 보냈으므로 total 로 판단한다.
+  // 후보가 더 있는지는 서버가 30건만 보냈으므로 total 로 판단한다.
   // filter(예: 멤버 제외)가 걸려 있으면 서버는 제외 대상을 모르니 남은 정확한 수를 셀 수 없다
-  // → 수 대신 "검색으로 좁히라"고 안내한다(이름/아이디를 치면 그 사람이 상위로 온다).
+  // 수 대신 검색으로 좁히라고 안내한다(이름이나 아이디를 치면 그 사람이 상위로 온다).
   const hasMore = total > all.length || narrowed.length > MAX_SHOWN;
   const moreExactCount = !filter && total > MAX_SHOWN ? total - MAX_SHOWN : null;
 
-  // 좁힌 결과 안에서 이름이 겹치는 계정 — 동명이인은 아이디/소속을 강조해 오선택을 막는다.
+  // 좁힌 결과 안에서 이름이 겹치는 계정이다. 동명이인은 아이디와 소속을 강조해 오선택을 막는다.
   const dupNames = new Set(
     narrowed.map((u) => u.name).filter((n, i, a) => n && a.indexOf(n) !== i),
   );
 
   const pick = (u) => { setQ(u.username); onChange(u.username); onPick?.(u); setOpen(false); };
-  // 제안 목록을 펼칠 때도 알린다 — 열려 있던 다른 드롭다운이 닫히도록.
+  // 제안 목록을 펼칠 때도 알린다. 열려 있던 다른 드롭다운이 닫히도록.
   const openList = () => { announceOpen(idRef.current); setOpen(true); };
   const reset = (patch) => {
     // 필터를 바꾸면 목록을 다시 펼쳐 좁혀진 후보를 즉시 보여준다.

@@ -19,7 +19,7 @@ func UserKeysSecretName(userID int64) string { return fmt.Sprintf("giosk-sshkeys
 // UpsertUserKeys는 사용자 등록 공개키를 담은 Secret 을 만들거나 갱신한다.
 // sshd 사이드카가 이 Secret 을 read-only 로 마운트하고, sshd 는 접속마다 authorized_keys 를
 // 다시 읽으므로 여기서 갱신하면 "실행 중인 세션"에도 즉시 반영된다(재시작 불필요).
-// keys 가 비면 빈 파일을 쓴다 — 키를 지운 경우 즉시 로그인이 막혀야 하므로 Secret 을 남기되 비운다.
+// keys 가 비면 빈 파일을 쓴다. 키를 지운 경우 즉시 로그인이 막혀야 하므로 Secret 은 남기되 비운다.
 func (c *Client) UpsertUserKeys(ctx context.Context, ns string, userID int64, keys string) error {
 	if !c.Available() {
 		return ErrNoCluster

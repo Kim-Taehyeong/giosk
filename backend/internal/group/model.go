@@ -28,7 +28,7 @@ const (
 	RoleOrgAdmin     = "org_admin"
 )
 
-// Summary — 관리자 그룹 목록(집계 + 지갑 포함).
+// Summary는 관리자 그룹 목록(집계와 지갑 포함).
 type Summary struct {
 	Group
 	OrgName            string `json:"orgName"`
@@ -42,7 +42,7 @@ type Summary struct {
 	Consumed           int    `json:"consumed"`           // 멤버 누적 사용량 합(showback)
 }
 
-// Member — 그룹 멤버(memberships ⨝ users).
+// Member는 그룹 멤버(memberships 와 users 조인).
 type Member struct {
 	UserID          int64       `json:"userId"`
 	Username        string      `json:"username"`
@@ -54,10 +54,10 @@ type Member struct {
 	Balance         int         `json:"balance"`         // user_wallets.balance(배분된 잔여 크레딧)
 	RecurringCredit int         `json:"recurringCredit"` // 이 멤버의 정기 리필 금액(user_wallets.recurring_credit)
 	Consumed        int         `json:"consumed"`
-	Roles           []RoleBadge `json:"roles" gorm:"-"` // 이 사용자가 가진 전체 관리 역할(멀티롤 배지). gorm:"-" — 서비스에서 별도 채움(스캔 제외)
+	Roles           []RoleBadge `json:"roles" gorm:"-"` // 이 사용자가 가진 전체 관리 역할(멀티롤 배지). gorm:"-" 라 스캔에서 빼고 서비스에서 채운다
 }
 
-// RoleBadge — 사용자가 가진 관리 역할 하나(어느 조직/그룹의 무슨 관리자인지). 멀티롤 표시용.
+// RoleBadge는 사용자가 가진 관리 역할 하나다(어느 조직이나 그룹의 무슨 관리자인지). 멀티롤 표시용.
 type RoleBadge struct {
 	Role      string `json:"role"` // org_admin | project_admin
 	GroupID   int64  `json:"groupId"`
@@ -65,7 +65,7 @@ type RoleBadge struct {
 	OrgName   string `json:"orgName"`
 }
 
-// JoinRequest — 그룹 관리자 큐(가입 신청 ⨝ users).
+// JoinRequest는 그룹 관리자 큐(가입 신청과 users 조인).
 type JoinRequest struct {
 	ID          int64     `json:"id"`
 	UserID      int64     `json:"userId"`
@@ -76,7 +76,7 @@ type JoinRequest struct {
 	RequestedAt time.Time `json:"requestedAt"`
 }
 
-// PrimaryMembership — 사용자의 최고 권한 멤버십(콘솔 라우팅용).
+// PrimaryMembership은 사용자의 최고 권한 멤버십(콘솔 라우팅용).
 type PrimaryMembership struct {
 	Role      string `json:"role"`
 	GroupID   int64  `json:"groupId"`
@@ -85,7 +85,7 @@ type PrimaryMembership struct {
 	OrgName   string `json:"orgName"`
 }
 
-// GroupRef — 사용자 소속 그룹(스위처/컨텍스트).
+// GroupRef는 사용자 소속 그룹(스위처와 컨텍스트용).
 type GroupRef struct {
 	ID          int64  `json:"id"`
 	Name        string `json:"name"`
@@ -94,46 +94,46 @@ type GroupRef struct {
 	OrgName     string `json:"orgName"`
 }
 
-// DirItem — 가입 가능한 그룹 디렉터리.
+// DirItem은 가입 가능한 그룹 디렉터리.
 type DirItem struct {
 	GroupRef
 	Joined      bool `json:"joined"`
 	AcceptsJoin bool `json:"acceptsJoin"`
 }
 
-// ShareTargets — 볼륨 공유 대상(내 그룹 + 동료 사용자).
+// ShareTargets는 볼륨 공유 대상(내 그룹과 동료 사용자).
 type ShareTargets struct {
 	Users  []ShareUser `json:"users"`
 	Groups []GroupRef  `json:"groups"`
 }
 
-// ShareUser — 공유 대상 사용자(username 으로 공유).
+// ShareUser는 공유 대상 사용자(username 으로 공유한다).
 type ShareUser struct {
 	Username string `json:"username"`
 	Name     string `json:"name"`
 }
 
-// UsageRow — 그룹 사용량(멤버별 소모).
+// UsageRow는 그룹 사용량(멤버별 소모).
 type UsageRow struct {
 	Username string `json:"username"`
 	Name     string `json:"name"`
 	Credit   int    `json:"credit"`
 }
 
-// UsageTrendPoint — 그룹 일자별 GPU 사용시간(시간).
+// UsageTrendPoint는 그룹 일자별 GPU 사용시간(시간).
 type UsageTrendPoint struct {
 	Date  string `json:"date"`
 	Hours int    `json:"hours"`
 }
 
-// SessionUsage — 그룹 세션별 GPU 사용시간(gpu_usage 원장 기반; 세션 삭제돼도 누적 유지).
+// SessionUsage는 그룹 세션별 GPU 사용시간이다(gpu_usage 원장 기반이라 세션을 지워도 누적이 남는다).
 type SessionUsage struct {
 	Session  string `json:"session"`
 	User     string `json:"user"`
 	GpuHours int    `json:"gpuHours"`
 }
 
-// MyJoinRequest — 내 가입 신청 내역.
+// MyJoinRequest는 내 가입 신청 내역.
 type MyJoinRequest struct {
 	ID          int64     `json:"id"`
 	GroupID     int64     `json:"groupId"`
@@ -161,7 +161,7 @@ type AddMemberReq struct {
 	Role    string `json:"role"`
 }
 
-// MoveMemberReq — 그룹 이동(관리자). Role 이 비면 기존 역할 유지.
+// MoveMemberReq는 그룹 이동 요청(관리자). Role 이 비면 기존 역할을 유지한다.
 type MoveMemberReq struct {
 	ToGroupID int64  `json:"toGroupId" binding:"required"`
 	Role      string `json:"role"`

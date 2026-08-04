@@ -19,7 +19,7 @@ import { getGroups, getMembers, addMember, updateMember, grantGroupCredit, updat
 import RefillCard from '../../../components/console/RefillCard';
 import { c } from '../../../lib/credit';
 
-// 멤버십 역할 — 조직/팀 권한은 전부 여기서 정해진다(플랫폼 role=member|admin 과 별개).
+// 멤버십 역할이다. 조직과 팀 권한은 전부 여기서 정해진다(플랫폼 role=member|admin 과는 별개다).
 const ROLES = ['org_admin', 'project_admin', 'member'];
 
 export default function GroupDetail() {
@@ -48,7 +48,7 @@ export default function GroupDetail() {
   const loadWallet = () => { if (creditMode) getGroupWallet(gid).then(setWallet).catch(() => {}); };
   useEffect(() => { loadGroup(); loadMembers(); loadWallet(); }, [gid]); // eslint-disable-line
 
-  // 다음 리필일 표시(백엔드 nextRefillAt ISO). 없으면 —.
+  // 다음 리필일을 표시한다(백엔드 nextRefillAt ISO). 없으면 대시로 둔다.
   const fmtNext = (iso) => (iso ? new Date(iso).toLocaleDateString() : '—');
   // 팀 즉시 리필.
   const doGroupRefillNow = async () => {
@@ -90,19 +90,19 @@ export default function GroupDetail() {
     toast(t('groups.granted', { name: group?.displayName, n: amount }));
     loadGroup();
   };
-  // 팀 정기 리필 설정 — 주기는 조직 상한으로 백엔드가 클램프.
+  // 팀 정기 리필 설정이다. 주기는 조직 상한으로 백엔드가 클램프한다.
   const submitGroupRefill = async (spec) => {
     try { await setGroupRefill(gid, spec); toast(t('gdetail.refillSaved', { defaultValue: '정기 리필을 설정했습니다.' })); }
     catch { toast(t('gdetail.refillFail', { defaultValue: '설정 실패' })); }
     loadGroup(); loadWallet();
   };
 
-  // 그룹 설정(표시명·가입 수락) — 목록에 있던 걸 상세로 옮겼다(관리는 상세 한 곳에서).
+  // 그룹 설정(표시명과 가입 수락)이다. 목록에 있던 걸 상세로 옮겼다(관리는 상세 한 곳에서 한다).
   const saveEdit = async () => {
     await updateGroup(gid, { displayName: edit.displayName, acceptsJoin: edit.acceptsJoin });
     setEdit(null); toast(t('groups.updated')); loadGroup();
   };
-  // 그룹 삭제 — 리스트가 아니라 여기서만(실수 방지). 성공 시 그룹 목록으로.
+  // 그룹 삭제는 리스트가 아니라 여기서만 한다(실수 방지). 성공하면 그룹 목록으로 간다.
   const removeGroup = async () => {
     if (!(await confirm({ title: t('groups.deleteTitle'), message: t('groups.deleteConfirm', { name: group?.displayName }), confirmText: t('common.delete') }))) return;
     try { await deleteGroup(gid); } catch (e) {
@@ -165,7 +165,7 @@ export default function GroupDetail() {
           onRowClick={(r) => navigate(`/console/admin/users/${r.userId}`)}
           columns={[
             { key: 'name', header: t('groups.colMember'), render: (r) => {
-              // 멀티롤 배지 — 이 사용자가 '다른' 그룹/조직에서 갖는 관리 역할(이 그룹 역할은 아래 Select).
+              // 멀티롤 배지다. 이 사용자가 다른 그룹이나 조직에서 갖는 관리 역할을 보여준다(이 그룹 역할은 아래 Select 다).
               const others = (r.roles || []).filter((b) => b.groupId !== gid);
               return (
                 <div>

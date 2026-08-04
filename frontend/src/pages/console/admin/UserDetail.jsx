@@ -25,12 +25,12 @@ const roleVariant = { member: 'pause', admin: 'err' };
 const memberRoleVariant = { org_admin: 'gpu', project_admin: 'primary', member: 'pause' };
 const statusVariant = { approved: 'ok', pending: 'wait', suspended: 'err', rejected: 'err', running: 'run', stopped: 'pause', terminated: 'pause', failed: 'err', ready: 'ok', loading: 'wait' };
 const sessVariant = { running: 'run', provisioning: 'wait', stopped: 'pause', terminated: 'pause', failed: 'err' };
-// 세션 상태 → monitor.st* i18n 키(원문 영어 노출 방지).
+// 세션 상태를 monitor.st* i18n 키로 옮긴다(원문 영어가 노출되지 않게).
 const SESS_ST = { running: 'stRunning', provisioning: 'stProvisioning', paused: 'stPaused', stopped: 'stStopped', terminated: 'stTerminated', failed: 'stFailed', queued: 'stProvisioning' };
 
 const fmtDate = (s) => (s ? new Date(s).toLocaleString() : '—');
 
-// 섹션 카드 — 제목 + 개수 배지 + 테이블(비면 안내).
+// 섹션 카드다. 제목과 개수 배지, 테이블을 두고 비면 안내를 보여준다.
 function Section({ icon: Icon, title, count, empty, children }) {
   return (
     <div className="card mb">
@@ -70,7 +70,7 @@ export default function UserDetail() {
   if (!d) return <Spinner pad label={t('userDetail.loading', { defaultValue: '…' })} />;
 
   const u = d.user || {};
-  // 전체 소속(다중 조직/팀) — 백엔드 memberships. 각 소속은 동일한 형식으로 나열한다.
+  // 전체 소속(다중 조직과 팀)이다. 백엔드 memberships 를 각 소속마다 같은 형식으로 나열한다.
   const memberships = d.memberships || [];
   const setRole = async (groupId, role) => { await updateMember(groupId, u.id, { role }); toast(t('userDetail.roleSet')); load(); };
   const doMove = async () => {
@@ -83,14 +83,14 @@ export default function UserDetail() {
     if (!(await confirm({ title: t('userDetail.removeTitle'), message: t('userDetail.removeConfirm', { group: groupName }), confirmText: t('userDetail.remove'), danger: true }))) return;
     await removeMember(groupId, u.id); toast(t('userDetail.removed')); load();
   };
-  // 소속 추가 — 다른 조직/팀에도 참여시킨다(다중 소속). 조직 선택 시 그 조직의 팀만 후보.
+  // 소속 추가다. 다른 조직이나 팀에도 참여시킨다(다중 소속). 조직을 고르면 그 조직의 팀만 후보가 된다.
   const submitAdd = async () => {
     if (!addMem.groupId) { toast(t('userDetail.pickGroup', { defaultValue: '팀을 선택하세요' })); return; }
     try { await addMember(Number(addMem.groupId), { account: u.username, role: addMem.role || 'member' }); toast(t('userDetail.memberAdded', { defaultValue: '소속을 추가했습니다.' })); }
     catch (e) { toast(e?.message || t('userDetail.addFail', { defaultValue: '추가 실패' })); return; }
     setAddMem(null); load();
   };
-  // 크레딧 부여(플랫폼) — 잔액에 즉시 반영, 감사 로그 기록.
+  // 크레딧 부여(플랫폼)다. 잔액에 즉시 반영하고 감사 로그를 남긴다.
   const submitGrant = async () => {
     const amt = Number(grant.amount);
     if (!amt) { setGrant(null); return; }
@@ -107,7 +107,7 @@ export default function UserDetail() {
   const usage = d.usage || {};
   const volumes = (d.volumes?.owned) || [];
   const sessions = d.sessions || [];
-  // 데이터셋 "요청"만 — mine 은 승인된 소유 데이터셋과 대기중 요청을 함께 담는다(요청=pending).
+  // 데이터셋은 요청만 본다. mine 은 승인된 소유 데이터셋과 대기중 요청을 함께 담는다(요청이 pending 이다).
   const datasetReqs = (d.datasets?.mine || []).filter((x) => x.status === 'pending');
   const joinReqs = d.joinRequests || [];
 

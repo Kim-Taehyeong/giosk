@@ -21,7 +21,7 @@ type Note struct {
 	UserID   int64  `gorm:"column:user_id" json:"-"`
 	Severity string `gorm:"column:severity" json:"severity"`
 	Metric   string `gorm:"column:metric" json:"metric"`
-	// 신규 알림은 렌더된 문자열 대신 metric+파라미터만 저장 → 프론트가 현지화 렌더(i18n).
+	// 신규 알림은 렌더된 문자열 대신 metric 과 파라미터만 저장해 프론트가 현지화해 렌더한다(i18n).
 	// 구 알림은 title/body(한국어)가 남아 있어 프론트가 그대로 폴백 표시한다.
 	Value     float64    `gorm:"column:value" json:"value"`
 	Threshold int        `gorm:"column:threshold" json:"threshold"`

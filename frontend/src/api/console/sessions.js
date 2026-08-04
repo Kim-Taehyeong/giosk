@@ -1,6 +1,6 @@
 import { apiGet, apiPost, apiDelete } from '../client';
 
-// createdAt(ISO) → 경과 실행시간 문자열("2h 13m" / "13m" / "45s"). 없으면 '—'.
+// createdAt(ISO)을 경과 실행시간 문자열("2h 13m", "13m", "45s")로 바꾼다. 없으면 표기를 비운다.
 export function fmtRuntime(createdAt) {
   if (!createdAt) return '—';
   const start = new Date(createdAt).getTime();
@@ -15,11 +15,11 @@ export function fmtRuntime(createdAt) {
   return `${sec}s`;
 }
 
-// 백엔드 채널 키 → 표시 라벨(연결 탭/배지).
+// 백엔드 채널 키를 표시 라벨로 바꾼다(연결 탭과 배지).
 const CONN_LABEL = { vscode: 'VSCode', jupyter: 'Jupyter', ssh: 'SSH' };
 
-// 백엔드 Usage → 목록 행에 머지할 라이브 지표.
-// gpuUtil/vramUsedMb/cpuCores/memUsedMb 는 null 이 "측정 불가"다 — 0(안 쓰는 중)과 구분해 UI 에서 갈라 그린다.
+// 백엔드 Usage 를 목록 행에 머지할 라이브 지표로 바꾼다.
+// gpuUtil/vramUsedMb/cpuCores/memUsedMb 는 null 이 "측정 불가"다. 0(안 쓰는 중)과 구분해 UI 에서 갈라 그린다.
 // gpuSource=none 이면 gpuReason 이 사유(timeslice=타임슬라이싱은 카드 단위라 세션별 계측 불가 등).
 function adaptUsage(u) {
   const total = u.vramTotalMb || 0;
@@ -37,7 +37,7 @@ function adaptUsage(u) {
   };
 }
 
-// 백엔드 Session → 프론트 세션 목록 shape 으로 변환(라이브 지표는 metrics 에서 머지).
+// 백엔드 Session 을 프론트 세션 목록 shape 으로 변환한다(라이브 지표는 metrics 에서 머지).
 function adaptSession(s) {
   const gb = (s.vramMb || 0) / 1024;
   const ssh = s.env === 'ssh'; // 물리노드 임대 세션
@@ -68,7 +68,7 @@ function adaptSession(s) {
     conn: running ? ((s.channels && s.channels.length ? s.channels : (ssh ? ['ssh'] : ['vscode'])).map((c) => CONN_LABEL[c] || c)) : [],
     node: s.node || '—',
     gpuId: '',
-    // 지표는 /metrics/sessions 머지 전까지 "측정 불가"(null) — 0 으로 두면 유휴처럼 보인다.
+    // 지표는 /metrics/sessions 를 머지하기 전까지 "측정 불가"(null)다. 0 으로 두면 유휴처럼 보인다.
     cpuCores: null,
     cpuLimitCores: s.cpuCores || 0,
     memUsedMb: null,
@@ -82,8 +82,8 @@ function adaptSession(s) {
     autoStopIdleMin: 0,
     logs: [],
     extensionsUsed: s.extensionsUsed || 0,
-    // 원시 사양 — 중단 세션 자원 변경(GPU 붙이기) 모달이 현재 값에서 시작하기 위해 그대로 보존한다.
-    // (표시용 offering/node 는 '—' 같은 표기가 섞여 그대로 쓸 수 없다.)
+    // 원시 사양이다. 중단 세션 자원 변경(GPU 붙이기) 모달이 현재 값에서 시작하도록 그대로 보존한다.
+    // (표시용 offering 이나 node 는 빈 값 표기가 섞여 그대로 쓸 수 없다.)
     spec: {
       gpuMode: s.gpuMode || '',
       gpuType: s.gpuType || '',
@@ -100,10 +100,10 @@ function adaptSession(s) {
 // 세션 연결 정보(게이트웨이 URL/명령).
 export const getConnection = (id) => apiGet(`/instances/${id}/connection`);
 
-// 게이트웨이 단기 접속 토큰 발급(열 때마다 새로) — 토큰 포함 웹 URL·복붙 SSH 명령.
+// 게이트웨이 단기 접속 토큰을 열 때마다 새로 발급한다(토큰 포함 웹 URL 과 복붙 SSH 명령).
 export const getAccess = (id) => apiPost(`/instances/${id}/access`);
 
-// 세션 활동 기록(감사) — 해당 세션 대상 audit_logs.
+// 세션 활동 기록(감사). 해당 세션을 대상으로 한 audit_logs 다.
 export const getSessionAudit = (id) =>
   apiGet(`/instances/${id}/audit`).then((d) => (d.items || []).map((a) => ({
     ts: (a.createdAt || '').replace('T', ' ').slice(0, 19),
@@ -114,7 +114,7 @@ export const getSessionAudit = (id) =>
 
 export const getMySessions = () => apiGet('/instances').then((d) => (d.items || []).map(adaptSession));
 
-// 본인 running 세션 실사용 지표(id→지표). 세션 수와 무관하게 1회 호출.
+// 본인 running 세션 실사용 지표(id 별 지표). 세션 수와 무관하게 한 번만 호출한다.
 const usageMap = (d) => Object.fromEntries(Object.entries(d.items || {}).map(([id, u]) => [id, adaptUsage(u)]));
 export const getMySessionMetrics = () => apiGet('/metrics/sessions').then(usageMap);
 
@@ -139,7 +139,7 @@ export function accruedCredits(startedAt, pricePerHour) {
   return Math.floor(pricePerHour * hours);
 }
 
-// 백엔드 AdminRow → 관제 테이블 shape.
+// 백엔드 AdminRow 를 관제 테이블 shape 으로 바꾼다.
 function adaptAdminRow(r) {
   const offering = r.env === 'ssh' ? '물리 노드' : r.gpuMode === 'cpu' ? 'CPU' : (r.gpuType || '—');
   const running = r.status === 'running';
@@ -158,7 +158,7 @@ function adaptAdminRow(r) {
     credit,
     status: r.status,
     mode: r.env === 'ssh' ? 'ssh' : (r.gpuMode || 'shared'),
-    // 지표 머지 전 기본값 — null = 측정 불가.
+    // 지표를 머지하기 전 기본값이다. null 이 측정 불가를 뜻한다.
     cpuCores: null,
     cpuLimitCores: 0,
     memUsedMb: null,
@@ -184,7 +184,7 @@ export const forceTerminate = (id) => apiPost(`/admin/sessions/${id}/terminate`)
 export const adminStopSession = (id) => apiPost(`/admin/sessions/${id}/stop`);
 export const adminDeleteSession = (id) => apiDelete(`/admin/sessions/${id}`);
 
-// 단일 세션 관제 상세 — 원본 행(userId 포함) + adaptAdminRow 파생 + 실사용 지표 머지.
+// 단일 세션 관제 상세. 원본 행(userId 포함)에 adaptAdminRow 파생과 실사용 지표를 머지한다.
 export const getAdminSession = (id) =>
   Promise.all([
     apiGet(`/admin/sessions/${id}`),
@@ -194,13 +194,13 @@ export const getAdminSession = (id) =>
 // 세션 감사 로그(관제).
 export const getAdminSessionAudit = (id) => apiGet(`/admin/sessions/${id}/audit`).then((d) => d.items || []);
 
-// 세션 파드의 쿠버네티스 로그(tail) — 관제 상세.
+// 세션 파드의 쿠버네티스 로그(tail). 관제 상세용이다.
 export const getAdminSessionLogs = (id) => apiGet(`/admin/sessions/${id}/logs`).then((d) => d.logs || '');
 
-// 세션 파드 describe(상태·컨테이너·조건·이벤트/오류) — 관제 진단.
+// 세션 파드 describe(상태, 컨테이너, 조건, 이벤트와 오류). 관제 진단용이다.
 export const getAdminSessionDescribe = (id) => apiGet(`/admin/sessions/${id}/describe`).then((d) => d.describe || null);
 
-// 세션 사용률 이력(기본 24h) — Prometheus Range(DB 미저장). points[] + insights.
+// 세션 사용률 이력(기본 24h). Prometheus Range 라 DB 에 저장하지 않는다. points[] 와 insights 를 준다.
 export const getSessionHistory = (id, hours = 24) =>
   apiGet(`/instances/${id}/history?hours=${hours}`).then((d) => ({ points: d.points || [], insights: d.insights || {} }));
 export const getAdminSessionHistory = (id, hours = 24) =>

@@ -58,13 +58,13 @@ type Deps struct {
 	Alert           *alert.Handler
 	Notify          *notify.Handler
 	UserNotify      *usernotify.Handler
-	DatasetsEnabled bool // 설치 시 데이터셋 기능 on/off — off 면 데이터셋 라우트를 아예 등록하지 않는다(404)
+	DatasetsEnabled bool // 설치 시 데이터셋 기능 on/off. off 면 데이터셋 라우트를 아예 등록하지 않는다(404)
 	Policy          *policy.Handler
 	OrgReader       authz.OrgReader
 	AgentToken      string
 	GroupReader     authz.MembershipReader
 	ScopeReader     authz.ScopeReader      // 레벨 인식형 스코프 해석(group.Service)
-	OrgOfGroup      authz.OrgOfGroupReader // 그룹→부모 조직(org.Repository)
+	OrgOfGroup      authz.OrgOfGroupReader // 그룹에서 부모 조직을 찾는다(org.Repository)
 }
 
 // New는 미들웨어 + /api 라우트를 구성한 gin 엔진을 만든다.
@@ -79,7 +79,7 @@ func New(deps Deps) *gin.Engine {
 	return r
 }
 
-// registerPublic — 인증 불필요.
+// registerPublic은 인증이 필요 없는 라우트.
 func registerPublic(api gin.IRouter, deps Deps) {
 	auth.Register(api, deps.Auth) // auth 는 내부에서 공개/인증 라우트를 함께 등록
 	org.RegisterPublic(api, deps.Org)
@@ -87,7 +87,7 @@ func registerPublic(api gin.IRouter, deps Deps) {
 	node.RegisterAgent(api, deps.Node, deps.AgentToken) // node-agent 전용(토큰 인증)
 }
 
-// registerAuthed — 인증 필요(+ 관리자/그룹 범위).
+// registerAuthed는 인증이 필요한 라우트(관리자·그룹 범위 포함).
 func registerAuthed(api gin.IRouter, deps Deps) {
 	authed := api.Group("", deps.Auth.RequireAuth())
 	authed.Use(audit.Middleware(deps.AuditRepo)) // 변경 요청 자동 감사 기록
@@ -115,23 +115,23 @@ func registerAuthed(api gin.IRouter, deps Deps) {
 	wallet.RegisterGroupScoped(authed, deps.Wallet, projAdmin)
 	topup.RegisterGroupScoped(authed, deps.Topup, projAdmin)
 
-	// ── 단일 거버넌스 트리(/console) — 레벨 인식형 ─────────────────────
+	// ── 단일 거버넌스 트리(/console). 레벨 인식형이다 ─────────────────
 	// platform/org/group 관리자가 같은 프론트 콘솔에서 쓰는 스코프 인식 엔드포인트.
 	// /admin/* 은 마이그레이션 동안 병행 유지(플랫폼 기존 동작·팀원 브랜치 호환).
 	mgmt := authed.Group("/console", authz.RequireManager(deps.ScopeReader, deps.OrgOfGroup))
 	groupInScope := authz.RequireGroupInScope(deps.OrgOfGroup)
-	// 운영 대시보드(스코프) — 인프라 대시보드는 /admin/dashboard(platform) 재사용.
+	// 운영 대시보드(스코프). 인프라 대시보드는 /admin/dashboard(platform)를 재사용한다.
 	mgmt.GET("/dashboard/ops", deps.Dashboard.OpsScoped)
-	// 거버넌스 조회(스코프) — 정책/빌링/감사. 읽기만; 하드상한 부여 등 쓰기는 /admin(platform) 유지.
+	// 거버넌스 조회(스코프): 정책, 빌링, 감사. 읽기만이고 하드상한 부여 같은 쓰기는 /admin(platform)에 둔다.
 	mgmt.GET("/limits", deps.Policy.ListScoped)
-	// 스코프 정책 편집 — 매니저가 자기 범위 안에서 하드 제한 설정(상위 상한 초과 금지, 핸들러가 강제).
+	// 스코프 정책 편집. 매니저가 자기 범위 안에서 하드 제한을 설정한다(상위 상한 초과는 핸들러가 막는다).
 	mgmt.GET("/limits/user/:id", deps.Policy.Get(policy.LevelUser))
 	mgmt.GET("/limits/group/:id", deps.Policy.Get(policy.LevelGroup))
 	mgmt.GET("/limits/org/:id", deps.Policy.Get(policy.LevelOrg))
 	mgmt.PUT("/limits/user/:id", deps.Policy.SetScoped(policy.LevelUser))
 	mgmt.PUT("/limits/group/:id", deps.Policy.SetScoped(policy.LevelGroup))
 	mgmt.PUT("/limits/org/:id", deps.Policy.SetScoped(policy.LevelOrg))
-	// 설정 가능한 최대치(상위 유효 상한) — 매니저 편집 폼의 "최대 N" 힌트.
+	// 설정 가능한 최대치(상위 유효 상한). 매니저 편집 폼의 "최대 N" 힌트로 쓴다.
 	mgmt.GET("/limits/user/:id/parent", deps.Policy.ParentLimit(policy.LevelUser))
 	mgmt.GET("/limits/group/:id/parent", deps.Policy.ParentLimit(policy.LevelGroup))
 	mgmt.GET("/limits/org/:id/parent", deps.Policy.ParentLimit(policy.LevelOrg))
@@ -143,17 +143,17 @@ func registerAuthed(api gin.IRouter, deps Deps) {
 	mgmt.GET("/users", deps.Users.ListScoped)
 	userdetail.RegisterScoped(mgmt, deps.UserDetail) // 사용자 360 상세(스코프 검증)
 	deps.Volume.RegisterScoped(mgmt)                 // 볼륨 열람(스코프)
-	// 조직 쓰기 — 생성/삭제/풀부여는 플랫폼, 수정은 자기 조직.
+	// 조직 쓰기. 생성·삭제·풀부여는 플랫폼이 하고, 수정은 자기 조직만 할 수 있다.
 	mgmt.POST("/orgs", authz.RequirePlatform(), deps.Org.Create)
 	mgmt.PUT("/orgs/:id", authz.RequireOrgInScope(), deps.Org.Update)
 	mgmt.DELETE("/orgs/:id", authz.RequirePlatform(), deps.Org.Archive)
 	mgmt.POST("/orgs/:id/grant", authz.RequirePlatform(), deps.Org.Grant)
-	// 그룹 쓰기 — Create 는 핸들러가 스코프 강제(org→자기 조직, group→거부), 수정/삭제는 스코프 가드.
+	// 그룹 쓰기. Create 는 핸들러가 스코프를 강제하고(org 는 자기 조직, group 은 거부), 수정과 삭제는 스코프 가드가 막는다.
 	mgmt.POST("/groups", deps.Group.Create)
 	mgmt.PUT("/groups/:id", groupInScope, deps.Group.Update)
 	mgmt.DELETE("/groups/:id", groupInScope, deps.Group.Delete)
 	mgmt.PUT("/groups/:id/members/:userId/move", authz.RequirePlatform(), deps.Group.MoveMember)
-	// 멤버·그룹지갑 — 기존 그룹범위 라우트를 in-scope 게이트로 재사용(org admin 자식 그룹 관리 포함).
+	// 멤버와 그룹지갑. 기존 그룹범위 라우트를 in-scope 게이트로 재사용한다(org admin 의 자식 그룹 관리 포함).
 	group.RegisterGroupScoped(mgmt, deps.Group, groupInScope)
 	wallet.RegisterGroupScoped(mgmt, deps.Wallet, groupInScope)
 	mgmt.POST("/groups/:id/wallet/grant", groupInScope, deps.Wallet.GrantGroup)
@@ -187,8 +187,8 @@ func registerAuthed(api gin.IRouter, deps Deps) {
 // 배포 기본형(프론트 nginx 가 /api 를 같은 오리진으로 프록시)에서는 CORS 자체가
 // 발생하지 않으므로 불필요하지만, API 를 직접 호출하는 구성·개발을 위해 설정 가능.
 //
-//	미설정 → 로컬 개발 오리진(localhost:3000/5173)
-//	"*"    → 모든 오리진 허용(인증은 Authorization 헤더라 credentials 불필요)
+//	미설정이면 로컬 개발 오리진(localhost:3000/5173)
+//	"*" 이면 모든 오리진 허용(인증이 Authorization 헤더라 credentials 가 필요 없다)
 func corsMiddleware() gin.HandlerFunc {
 	cfg := cors.DefaultConfig()
 	cfg.AllowHeaders = []string{"Origin", "Content-Type", "Authorization"}
