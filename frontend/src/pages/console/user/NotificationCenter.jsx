@@ -38,11 +38,11 @@ export default function NotificationCenter() {
 
   // 가용 알림 대상이 될 수 있는 GPU 자원(실시간: 전용 타입 + 공유 오퍼링).
   const [gpuTargets, setGpuTargets] = useState([]);
-  // 세션 단위 알림 대상 — 내 세션 목록(활성 팀 기준). rule.target = 세션 instance_id.
+  // 세션 단위 알림 대상이다. 내 세션 목록(활성 팀 기준)이며 rule.target 이 세션 instance_id 다.
   const [mySessions, setMySessions] = useState([]);
   useEffect(() => { getMySessions().then(setMySessions).catch(() => {}); }, []);
 
-  // 가용성 알림(이전 '워크로드 알림') — GPU 자원/노드가 비면 알림.
+  // 가용성 알림(예전 워크로드 알림)이다. GPU 자원이나 노드가 비면 알려준다.
   const [avail, setAvail] = useState([]);
   const [nodes, setNodes] = useState([]);
   const [availModal, setAvailModal] = useState(false);
@@ -52,7 +52,7 @@ export default function NotificationCenter() {
   useEffect(() => {
     getUserNotify().then((cfg) => {
       const rs = (cfg.rules || []).filter((r) => creditMode || !CREDIT_METRICS.includes(r.metric));
-      // 기본 규칙은 미저장이라 id=0 → 고유 id 부여(중복 React key·updateRule 오작동 방지).
+      // 기본 규칙은 저장돼 있지 않아 id 가 0 이라 고유 id 를 부여한다(React key 중복과 updateRule 오작동 방지).
       setRules(rs.map((r, i) => ({ ...r, id: r.id || Date.now() + i })));
       setEmails(cfg.emails && cfg.emails.length ? cfg.emails : (user?.email ? [user.email] : []));
       setWebhooks(cfg.webhooks || []);
@@ -60,7 +60,7 @@ export default function NotificationCenter() {
     });
   }, [creditMode]); // eslint-disable-line
 
-  // 가용 GPU 대상 목록(드롭다운) — 실시간 가용 + 공유 오퍼링.
+  // 가용 GPU 대상 목록(드롭다운)이다. 실시간 가용량과 공유 오퍼링을 담는다.
   useEffect(() => {
     Promise.all([getAvailability(), getOfferings()]).then(([a, o]) => {
       const exclusive = (a.byType || []).map((x) => `${x.gpuType} (전용)`);
@@ -82,7 +82,7 @@ export default function NotificationCenter() {
     if (hybrid) getSshNodes().then(setNodes);
   }, [hybrid]);
 
-  // 받은 알림(인앱 수신함) — 알림 엔진이 규칙 위반 시 적재한 것.
+  // 받은 알림(인앱 수신함)이다. 알림 엔진이 규칙 위반 시 적재한 것이다.
   const [inbox, setInbox] = useState([]);
   const loadInbox = () => getInbox().then((d) => setInbox(d.items)).catch(() => {});
   useEffect(() => { loadInbox(); }, []);
@@ -127,9 +127,9 @@ export default function NotificationCenter() {
   const CHANNELS = [{ key: 'email', label: t('notify.chEmail') }, { key: 'webhook', label: t('notify.chWebhook') }];
 
   const metricUnit = (m) => METRICS.find((x) => x.key === m)?.unit || '';
-  // 세션 instance_id → 표시 이름(현재 내 세션 목록 기준). 없으면 id 그대로.
+  // 세션 instance_id 를 표시 이름으로 바꾼다(현재 내 세션 목록 기준). 없으면 id 를 그대로 쓴다.
   const sessName = (id) => mySessions.find((s) => s.id === id)?.name || id;
-  // 신규 규칙 기본값: 세션 GPU 유휴(≤10%) 알림 — 첫 세션 대상(있으면). 크레딧 모드 무관하게 세션 지표는 항상 가능.
+  // 신규 규칙 기본값은 세션 GPU 유휴(10% 이하) 알림이며 첫 세션을 대상으로 한다. 세션 지표는 과금 모드와 무관하게 항상 쓸 수 있다.
   const addRule = () => setRules([...rules, { id: Date.now(), metric: 'session_gpu', op: 'lte', value: 10, channel: 'email', on: true, target: mySessions[0]?.id || '' }]);
   // 지표를 세션↔전역으로 바꾸면 target 을 맞춰 초기화(세션 지표인데 target 없으면 첫 세션).
   const updateRule = (id, patch) => setRules(rules.map((r) => {

@@ -14,9 +14,9 @@ import (
 
 // WaitPVCsBound은 지정한 PVC 들이 스케줄 가능해질 때까지(또는 timeout) 기다린다.
 // Immediate 바인딩 PVC(NFS 등)는 생성 즉시 바인딩되지 않는데(비동기), hami-scheduler 는 unbound
-// immediate PVC 로 스케줄 실패 시 재큐잉하지 않아 Pod 가 영구 Pending 이 된다 → Pod 생성 전에 바인딩을 보장한다.
+// immediate PVC 는 스케줄 실패 시 재큐잉하지 않아 Pod 가 영구 Pending 이 되므로, Pod 생성 전에 바인딩을 보장한다.
 // 단, WaitForFirstConsumer(local-path 등) PVC 는 Pod 스케줄 시점에 바인딩되는 게 정상이므로 기다리지 않는다
-// (여기서 Bound 를 기다리면 영원히 Pending → 타임아웃). Pending+WFFC 는 "준비됨"으로 취급한다.
+// (여기서 Bound 를 기다리면 영원히 Pending 이라 타임아웃 난다). Pending 이면서 WFFC 면 "준비됨"으로 취급한다.
 func (c *Client) WaitPVCsBound(ctx context.Context, ns string, names []string, timeout time.Duration) {
 	if !c.Available() || len(names) == 0 {
 		return
@@ -35,7 +35,7 @@ func (c *Client) WaitPVCsBound(ctx context.Context, ns string, names []string, t
 				continue
 			}
 			if c.pvcIsWaitForFirstConsumer(ctx2, pvc) {
-				continue // WFFC: Pod 스케줄 시 바인딩 → 블로커 아님
+				continue // WFFC 는 Pod 가 스케줄될 때 바인딩되므로 블로커가 아니다
 			}
 			allReady = false
 			break
@@ -45,7 +45,7 @@ func (c *Client) WaitPVCsBound(ctx context.Context, ns string, names []string, t
 		}
 		select {
 		case <-ctx2.Done():
-			return // 타임아웃 — 그래도 Pod 생성 시도(최선)
+			return // 타임아웃이지만 그래도 Pod 생성은 시도한다(최선)
 		case <-time.After(500 * time.Millisecond):
 		}
 	}
@@ -67,7 +67,7 @@ func (c *Client) pvcIsWaitForFirstConsumer(ctx context.Context, pvc *corev1.Pers
 	return *sc.VolumeBindingMode == storagev1.VolumeBindingWaitForFirstConsumer
 }
 
-// SessionSpec은 세션 Pod 프로비저닝 입력(도메인 → k8s 변환 결과).
+// SessionSpec은 세션 Pod 프로비저닝 입력(도메인 모델을 k8s 로 변환한 결과).
 type SessionSpec struct {
 	Namespace    string
 	Name         string // = instance_id
@@ -82,25 +82,25 @@ type SessionSpec struct {
 	EphemeralGiB int // 컨테이너 쓰기레이어+emptyDir 상한(GiB). 0=기본 캡. 노드 루트디스크 무단점유(DoS) 방지.
 	MemBurst     int // 메모리 limit 배수(limit = MemGB × MemBurst). 0/1=상한 없음(무제한 버스트).
 	Labels       map[string]string
-	UID          int              // 안정 사용자 UID(uidBase+userID). 컨테이너를 이 UID 로 실행 → NFS 볼륨 파일 소유가 물리 SSH 와 일관.
+	UID          int              // 안정 사용자 UID(uidBase+userID). 컨테이너를 이 UID 로 실행해야 NFS 볼륨 파일 소유가 물리 SSH 와 일관된다.
 	HomePVC      string           // 홈 영속 PVC 이름(/home/work 마운트). 빈값이면 미마운트.
 	Volumes      []VolMountSpec   // 추가 볼륨 마운트(PVC 기반)
 	WebChannels  []WebChannelSpec // 활성 웹 채널(code-server/jupyter): 포트 + 인증 env
 	SSHDImage    string           // 컨테이너 SSH 사이드카 이미지(빈값=사이드카 없음). 직접 SSH·게이트웨이 프록시 공용.
 	SSHDPubKey   string           // 사이드카 sshd 가 신뢰할 게이트웨이 공개키(authorized_keys). 게이트웨이 off 면 빈값.
 	// 사용자 등록 공개키를 담은 Secret 이름(키: authorized_keys). 사이드카에 read-only 로 마운트되어
-	// sshd 가 접속마다 다시 읽는다 → 키 등록/교체가 실행 중 세션에도 즉시 반영. 빈값/미존재면 마운트 생략(Optional).
+	// sshd 가 접속마다 다시 읽으므로 키 등록이나 교체가 실행 중 세션에도 즉시 반영된다. 비었거나 없으면 마운트를 생략한다(Optional).
 	UserKeysSecret string
 	ScratchHost    string   // 노드로컬 스크래치 계정폴더(hostPath). 빈값이면 미마운트.
-	PreferNodes    []string // 이미지 캐시된 노드(소프트 선호) — 빠른 시작. nodeSelector(타입) 안에서만 효과.
-	RequireNode    string   // 하드 핀(required nodeAffinity hostname) — 데이터셋 노드 로컬 캐시 hostPath 마운트용.
+	PreferNodes    []string // 이미지가 캐시된 노드(소프트 선호). 빠른 시작용이며 nodeSelector(타입) 안에서만 효과가 있다.
+	RequireNode    string   // 하드 핀(required nodeAffinity hostname). 데이터셋 노드 로컬 캐시 hostPath 마운트에 쓴다.
 }
 
 // VolMountSpec은 세션 Pod 에 붙일 PVC 마운트 1건.
 type VolMountSpec struct {
 	PVCName   string
 	HostPath  string // 설정 시 PVC 대신 노드 로컬 hostPath 마운트(데이터셋 노드 캐시·로컬 Home). RequireNode 와 함께 사용.
-	EmptyDir  bool   // 설정 시 emptyDir(임시) 마운트 — 세션(파드) 소멸 시 데이터도 소멸. 임시 워크스페이스용.
+	EmptyDir  bool   // 설정하면 emptyDir(임시) 마운트다. 세션(파드)이 사라지면 데이터도 사라진다. 임시 워크스페이스용.
 	MountPath string
 	ReadOnly  bool
 }
@@ -199,7 +199,7 @@ type PodDescribe struct {
 	Events     []PodEvent       `json:"events"`
 }
 
-// ContainerState — 컨테이너 하나의 상태(대기/실행/종료 사유 포함 — 오류 진단용).
+// ContainerState는 컨테이너 하나의 상태(대기·실행·종료 사유 포함). 오류 진단용이다.
 type ContainerState struct {
 	Name         string `json:"name"`
 	Ready        bool   `json:"ready"`
@@ -218,7 +218,7 @@ type PodCondition struct {
 	Message string `json:"message,omitempty"`
 }
 
-// PodEvent — 파드에 연결된 k8s 이벤트(Warning=오류 진단의 핵심).
+// PodEvent는 파드에 연결된 k8s 이벤트(Warning 이 오류 진단의 핵심).
 type PodEvent struct {
 	Type    string `json:"type"` // Normal | Warning
 	Reason  string `json:"reason"`
@@ -261,7 +261,7 @@ func (c *Client) PodDescribe(ctx context.Context, ns, name string) (*PodDescribe
 	for _, cond := range p.Status.Conditions {
 		d.Conditions = append(d.Conditions, PodCondition{Type: string(cond.Type), Status: string(cond.Status), Reason: cond.Reason, Message: cond.Message})
 	}
-	// 이벤트 — 이 파드에 연결된 것만(오류=Warning 우선 진단).
+	// 이벤트는 이 파드에 연결된 것만 본다(오류 진단은 Warning 우선).
 	evs, err := c.cs.CoreV1().Events(ns).List(ctx, metav1.ListOptions{
 		FieldSelector: fmt.Sprintf("involvedObject.name=%s,involvedObject.kind=Pod", name),
 	})

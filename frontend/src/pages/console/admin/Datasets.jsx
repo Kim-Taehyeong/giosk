@@ -15,7 +15,7 @@ import { getDatasets, deleteDataset, approveDatasetRequest, rejectDatasetRequest
 import { getAdminNodes } from '../../../api/console/nodes';
 import { tabbable } from '../../../utils/a11y';
 
-// 사이즈 클래스 → Pill 변형.
+// 사이즈 클래스를 Pill 변형으로 바꾼다.
 export const sizeVariant = { Large: 'primary', Medium: 'gpu', Small: 'free' };
 
 export default function Datasets() {
@@ -27,7 +27,7 @@ export default function Datasets() {
   const [allNodes, setAllNodes] = useState([]);
   const [tab, setTab] = useState('registry');
   const [openId, setOpenId] = useState(null); // 노드 배치 펼친 데이터셋
-  // 데이터셋 등록 모달 — 방식 2가지: ① NFS 인박스(SCP 복사 후 선택) ② URL(wget).
+  // 데이터셋 등록 모달이다. 방식은 두 가지다. NFS 인박스(SCP 로 복사한 뒤 고른다)와 URL(wget).
   const [openReg, setOpenReg] = useState(false);
   const [regTab, setRegTab] = useState('nfs');
   const [reg, setReg] = useState({ name: '', scope: 'global', filename: '', url: '', sizeClass: 'Medium' });
@@ -36,7 +36,7 @@ export default function Datasets() {
   const loadInbox = () => getDatasetInbox().then((d) => setInbox({ scpTarget: d.scpTarget || '', files: d.files || [] })).catch(() => {});
 
   const load = () => getDatasets().then((d) => { setData({ global: d.global.map((x) => ({ ...x })), requests: [...d.requests] }); });
-  // 5초 폴링 — 적재 상태(다운로드중→완료) 라이브 갱신.
+  // 5초 폴링으로 적재 상태(다운로드 중에서 완료까지)를 라이브 갱신한다.
   // 진행 중(로딩/캐싱)이면 촘촘히(1.2s), 아니면 느슨히(5s) 폴링.
   const anyBusy = (data?.global || []).some((x) => x.loadStatus === 'loading' || (x.caches || []).some((c) => c.status === 'caching'));
   useEffect(() => { load(); }, []); // 최초
@@ -48,8 +48,8 @@ export default function Datasets() {
     if (!(await confirm({ title: t('datasets.delete'), message: t('confirmDelete'), confirmText: t('datasets.delete') }))) return;
     await deleteDataset(id); setData((d) => ({ ...d, global: d.global.filter((x) => x.id !== id) })); toast(t('datasets.removed'));
   };
-  // 노드 로컬 캐시 토글 — 백엔드가 NFS→노드 로컬 복사 Job 기동/해제. 이후 폴링으로 상태 갱신.
-  // 낙관적 토글 — 클릭 즉시 caching/해제 반영 후 백그라운드 요청(job 생성 대기 딜레이 제거).
+  // 노드 로컬 캐시 토글이다. 백엔드가 NFS 에서 노드 로컬로 복사하는 Job 을 띄우거나 해제한다. 이후 폴링으로 상태를 갱신한다.
+  // 낙관적 토글이라 클릭 즉시 caching 이나 해제를 반영하고 백그라운드로 요청한다(job 생성 대기 딜레이를 없앤다).
   const toggleNode = (dsId, node) => {
     setData((d) => ({ ...d, global: d.global.map((x) => {
       if (x.id !== dsId) return x;

@@ -23,5 +23,5 @@ export function clickable(fn, { role = 'button', label, pressed, disabled = fals
   };
 }
 
-// 탭 묶음용 — 선택 상태를 aria-pressed 로 알린다(role=tab 은 tablist/tabpanel 배선이 함께 필요해 과하다).
+// 탭 묶음용이다. 선택 상태를 aria-pressed 로 알린다(role=tab 은 tablist 와 tabpanel 배선이 함께 필요해 과하다).
 export const tabbable = (fn, active) => clickable(fn, { pressed: !!active });

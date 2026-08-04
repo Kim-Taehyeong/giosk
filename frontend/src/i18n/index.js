@@ -4,13 +4,13 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 import { SUPPORTED_CODES, RTL_LANGS } from './languages';
 
-// 로케일 지연 로딩 — src/locales/<lang>/<ns>.json 을 glob 으로 등록해두고, 실제로 쓰는 언어만 받아온다.
+// 로케일을 지연 로딩한다. src/locales/<lang>/<ns>.json 을 glob 으로 등록해두고 실제로 쓰는 언어만 받아온다.
 // (전부 eager 로 묶으면 40개 언어 × 4 네임스페이스가 첫 번들에 들어간다. 이 콘솔은 VPN·저대역폭에서
 //  열리는 일이 많아 그 비용이 그대로 첫 화면 지연이 된다.)
 // 번역 파일을 새로 추가하면 별도 배선 없이 자동 인식되는 성질은 그대로다.
 const modules = import.meta.glob('../locales/*/*.json');
 
-// path → { lng, ns } 색인
+// path 별 { lng, ns } 색인
 const index = {};
 for (const path of Object.keys(modules)) {
   const m = path.match(/\/locales\/([^/]+)\/([^/]+)\.json$/);
@@ -31,7 +31,7 @@ async function fetchLanguage(lng) {
 }
 
 // init 이후에 언어를 추가로 받아 넣는다.
-// (init 전에는 i18next 의 리소스 저장소가 없어 addResourceBundle 을 부를 수 없다 — 그래서 초기 언어는
+// (init 전에는 i18next 의 리소스 저장소가 없어 addResourceBundle 을 부를 수 없다. 그래서 초기 언어는
 //  아래에서 미리 받아 init 의 resources 로 넘긴다.)
 async function loadLanguage(lng) {
   if (!lng || loaded.has(lng) || !index[lng]) return;

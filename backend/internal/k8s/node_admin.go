@@ -11,7 +11,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-// SetNodeLabel은 노드 라벨을 설정/제거한다(value="" → 제거). merge patch 사용.
+// SetNodeLabel은 노드 라벨을 설정하거나 제거한다(value 가 비면 제거). merge patch 를 쓴다.
 func (c *Client) SetNodeLabel(ctx context.Context, node, key, value string) error {
 	if !c.Available() {
 		return ErrNoCluster
@@ -41,7 +41,7 @@ type LiveNode struct {
 	CudaVersion string `json:"cudaVersion"` // 노드 CUDA 툴킷(런타임) 버전(GFD 라벨). 라벨 없으면 빈 문자열.
 	CudaMin     string `json:"cudaMin"`     // 이 GPU가 물리적으로 지원하는 최소 CUDA 툴킷(컴퓨트 능력 기준).
 	CudaMax     string `json:"cudaMax"`     // 설치 드라이버가 지원하는 최대 CUDA 툴킷(드라이버 버전 기준).
-	GpuMemMB    int    `json:"gpuMemMb"`    // 물리 GPU 1장의 VRAM(MB) — GFD 라벨 nvidia.com/gpu.memory. HAMi 분할 가용 계산용.
+	GpuMemMB    int    `json:"gpuMemMb"`    // 물리 GPU 1장의 VRAM(MB). GFD 라벨 nvidia.com/gpu.memory 에서 읽으며 HAMi 분할 가용 계산에 쓴다.
 }
 
 // ListNodes는 전체 노드의 라이브 상태를 반환한다.
@@ -101,14 +101,14 @@ func toLiveNode(n *corev1.Node, gpuTypeLabel, physicalLabel, cudaLabel string) L
 func atoiLabel(v string) int { n, _ := strconv.Atoi(strings.TrimSpace(v)); return n }
 
 // computeMinCuda는 GPU 컴퓨트 능력(major.minor)으로 물리적으로 지원 가능한 최소 CUDA 툴킷을 돌려준다.
-// 아키텍처가 처음 지원된 CUDA 버전 기준(예: Turing 7.5→10.0, Ampere 8.0→11.0, Ada/Hopper→11.8, Blackwell→12.8).
+// 아키텍처가 처음 지원된 CUDA 버전 기준이다(Turing 7.5 는 10.0, Ampere 8.0 은 11.0, Ada/Hopper 는 11.8, Blackwell 은 12.8).
 func computeMinCuda(major, minor string) string {
 	mj, _ := strconv.Atoi(major)
 	if mj == 0 {
 		return ""
 	}
 	mn, _ := strconv.Atoi(minor)
-	k := mj*10 + mn // 7.5→75, 8.9→89, 12.0→120
+	k := mj*10 + mn // 7.5 는 75, 8.9 는 89, 12.0 은 120
 	switch {
 	case k >= 100:
 		return "12.8" // Blackwell

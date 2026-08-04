@@ -55,7 +55,7 @@ func (h *Handler) Config(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		"setupComplete":  true, // 모드는 설치 시 결정 → 첫 실행 위저드 불필요
+		"setupComplete":  true, // 모드는 설치 시 결정되므로 첫 실행 위저드가 필요 없다
 		"deploymentMode": cfg.Deployment.Mode,
 		"branding":       gin.H{"name": brandName, "accent": brandAccent, "subtitle": brandSubtitle, "icon": brandIcon, "iconUrl": brandIconUrl},
 		"billing": gin.H{
@@ -77,7 +77,7 @@ func (h *Handler) Config(c *gin.Context) {
 			},
 		},
 		"idle": gin.H{"timeoutMin": idleTimeout},
-		// 중단 세션 홈 회수 정책 — 유휴 정지와 같은 회수 축이라 함께 운영 중 조정한다.
+		// 중단 세션 홈 회수 정책이다. 유휴 정지와 같은 회수 축이라 함께 운영 중 조정한다.
 		// stoppedTtlDays=0 이면 자동 회수 없음(개수 상한·스토리지 과금만으로 억제).
 		"reclaim": gin.H{
 			"stoppedTtlDays": atoiOr(rt[KeyStoppedTTLDays], cfg.Quota.StoppedTTLDays),
@@ -105,7 +105,7 @@ func (h *Handler) Config(c *gin.Context) {
 	})
 }
 
-// UpdateReq는 운영 중 조정 가능한 항목만 받는다(무거운 항목은 무시 — 설치시 고정).
+// UpdateReq는 운영 중 조정 가능한 항목만 받는다(무거운 항목은 설치 시 고정이라 무시한다).
 type UpdateReq struct {
 	Idle *struct {
 		TimeoutMin *int `json:"timeoutMin"`
@@ -132,7 +132,7 @@ type UpdateReq struct {
 	Features map[string]bool `json:"features"`
 }
 
-// 프론트 features 키 → 런타임 저장소 키(설치시 고정 항목은 매핑 없음 → 무시).
+// 프론트 features 키를 런타임 저장소 키로 옮긴다(설치 시 고정 항목은 매핑이 없어 무시된다).
 var featureKeyMap = map[string]string{
 	"signupRequest":    KeySignupRequest,
 	"datasetRegister":  KeyDatasetRegister,

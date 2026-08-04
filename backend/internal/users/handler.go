@@ -16,9 +16,9 @@ type Handler struct{ repo Repository }
 func NewHandler(repo Repository) *Handler { return &Handler{repo: repo} }
 
 // List는 서버측 검색/필터/페이징으로 사용자 목록을 반환한다.
-// 예전엔 전체를 내려주고 브라우저가 걸렀다 — 300명에 3.3초로, 실사용 규모(수천 명)에선 못 쓴다.
+// 예전엔 전체를 내려주고 브라우저가 걸렀다. 300명에 3.3초라 실사용 규모(수천 명)에선 못 쓴다.
 //
-//	?q=&status=&group=&org=&page=1&size=50  → { items, total, page, size }
+//	?q=&status=&group=&org=&page=1&size=50  로 { items, total, page, size } 를 준다
 func (h *Handler) List(c *gin.Context) {
 	page := atoiDefault(c.Query("page"), 1)
 	if page < 1 {
@@ -65,7 +65,7 @@ func (h *Handler) ListScoped(c *gin.Context) {
 		Limit:  size,
 		Offset: (page - 1) * size,
 	}
-	// 스코프로 강제 — 클라이언트가 보낸 org/group 표시명 필터보다 우선(교차 조직 조회 차단).
+	// 스코프로 강제한다. 클라이언트가 보낸 org/group 표시명 필터보다 우선해 교차 조직 조회를 막는다.
 	s := authz.CurrentScope(c)
 	switch s.Level {
 	case "org":

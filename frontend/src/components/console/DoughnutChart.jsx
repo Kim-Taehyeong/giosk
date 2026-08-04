@@ -13,7 +13,7 @@ function resolveColor(c) {
   return c;
 }
 
-// Chart.js 도넛 — segments: [{label,value,color}]. center/sub: 가운데 텍스트.
+// Chart.js 도넛. segments 는 [{label,value,color}] 이고 center 와 sub 는 가운데 텍스트다.
 export default function DoughnutChart({ segments = [], center, sub, size = 160 }) {
   const total = segments.reduce((a, s) => a + (s.value || 0), 0);
   const { data, options } = useMemo(() => ({

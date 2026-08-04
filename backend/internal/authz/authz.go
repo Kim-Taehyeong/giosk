@@ -19,10 +19,10 @@ type MembershipReader interface {
 	RoleInGroup(userID, groupID int64) (string, bool)
 }
 
-// 그룹 역할 서열 — 높을수록 권한이 크다. 플랫폼 admin 은 비교 제외(무조건 통과).
+// 그룹 역할 서열이다. 높을수록 권한이 크다. 플랫폼 admin 은 비교에서 빼고 무조건 통과시킨다.
 //
 // 역할은 member(일반) / project_admin(팀장) / org_admin(조직 관리자) 3개뿐이다.
-// 과거의 billing_admin·guest 는 제거했다 — billing_admin 은 project_admin 과 등급이 같아
+// 과거의 billing_admin 과 guest 는 제거했다. billing_admin 은 project_admin 과 등급이 같아
 // 정산 담당에게 멤버 관리 권한까지 주고 있었고(이름과 다른 권한), guest 는 member 와
 // 구분하는 검사가 한 곳도 없었다. 맵에 없는 역할은 rank 0(권한 없음)으로 떨어지므로,
 // 남아 있는 옛 데이터는 관리 권한을 얻지 못한다(안전한 방향).
@@ -153,7 +153,7 @@ func RequireManager(sr ScopeReader, og OrgOfGroupReader) gin.HandlerFunc {
 		// 없으면 기본값=최우선 스코프(scopes[0], PrimaryScope 와 동일).
 		// 헤더는 UI 힌트일 뿐 권한 경계가 아니다(경계=보유 스코프 집합). 그래서 헤더가
 		// 낡았거나(이전 세션·다른 로그인) 이 사용자가 안 가진 스코프면 403 대신 기본 스코프로
-		// 폴백한다 — 안 그러면 stale 헤더 하나가 목록 전체(사용자·정책·빌링…)를 깨뜨린다.
+		// 폴백한다. 안 그러면 stale 헤더 하나가 목록 전체(사용자, 정책, 빌링)를 깨뜨린다.
 		chosen := scopes[0]
 		if sel := c.GetHeader("X-Console-Scope"); sel != "" {
 			if s, ok := matchScope(scopes, sel); ok {
@@ -165,7 +165,7 @@ func RequireManager(sr ScopeReader, og OrgOfGroupReader) gin.HandlerFunc {
 	}
 }
 
-// parseScopeSel은 "org:10" / "group:2" 를 소속 검증 없이 Scope 로 파싱한다(최고관리자 전용 — 전권이라
+// parseScopeSel은 "org:10" 이나 "group:2" 를 소속 검증 없이 Scope 로 파싱한다(최고관리자 전용이라 전권이고
 // 보유 집합 대조가 필요 없다). 형식 오류면 (zero, false). group 의 OrgID 는 호출측에서 보강.
 func parseScopeSel(sel string) (Scope, bool) {
 	i := strings.IndexByte(sel, ':')

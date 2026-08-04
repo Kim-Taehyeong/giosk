@@ -1,4 +1,4 @@
-// Command api는 Giosk API 서버 진입점이다. 얇게 유지: 설정→DB→마이그레이션→와이어링→실행.
+// Command api는 Giosk API 서버 진입점이다. 설정, DB, 마이그레이션, 와이어링, 실행 순서로 얇게 유지한다.
 package main
 
 import (
@@ -66,20 +66,20 @@ func main() {
 	groupSvc := group.NewService(group.NewRepository(db))
 	authSvc.WithEnricher(groupSvc) // /me·로그인 응답에 콘솔 라우팅 컨텍스트 주입
 
-	// K8s 클라이언트(미가용이면 nil — gpu-types 등은 빈 결과 반환).
+	// K8s 클라이언트. 미가용이면 nil 이고 gpu-types 같은 건 빈 결과를 준다.
 	kc, _ := k8s.New(cfg.K8s.Kubeconfig, cfg.K8s.GpuTypeLabel)
 	kc.WithPhysicalLabel(cfg.PhysicalNodes.Label) // 물리노드 식별 라벨(멀티 인스턴스 격리)
 	kc.WithCudaLabel(cfg.K8s.CudaLabel)           // 노드 CUDA(드라이버) 버전 라벨(GFD)
 	if kc.Available() {
 		log.Printf("k8s connected (gpu-type label=%s)", cfg.K8s.GpuTypeLabel)
 	} else {
-		log.Printf("k8s unavailable — cluster 기능은 빈 결과/503")
+		log.Printf("k8s unavailable: cluster 기능은 빈 결과나 503 을 준다")
 	}
 
 	resourceSvc := resource.NewService(resource.NewRepository(db), kc, resource.NewSessionCounter(db))
 	sessionSvc := session.NewService(session.NewRepository(db), kc,
 		cfg.K8s.NamespacePrefix, cfg.K8s.GatewayDomain, cfg.Storage.PersistenceClass)
-	authSvc.WithKeySync(sessionSvc) // SSH 공개키 등록/교체 → 실행 중 컨테이너 세션 authorized_keys 즉시 반영
+	authSvc.WithKeySync(sessionSvc) // SSH 공개키를 등록하거나 바꾸면 실행 중 컨테이너 세션의 authorized_keys 에 즉시 반영한다
 
 	orgRepo := org.NewRepository(db)
 	orgSvc := org.NewService(orgRepo).WithBootstrapper(groupSvc)              // 조직 생성 시 기본 그룹+org_admin 배정
@@ -87,7 +87,7 @@ func main() {
 	groupSvc.WithWallet(walletSvc)                                            // 팀 생성 시 초기 크레딧/리필 세팅(크레딧 모드)
 	topupSvc := topup.NewService(topup.NewRepository(db), crediter{wallet: walletSvc, orgRepo: orgRepo})
 	met := metrics.New(cfg.PrometheusURL)
-	// 스토리지 단일화: 볼륨은 NFS(RWX) 클래스로 프로비저닝 → 교차-ns 공유·물리노드 직접 마운트 일관.
+	// 스토리지 단일화: 볼륨은 NFS(RWX) 클래스로 프로비저닝해야 교차-ns 공유와 물리노드 직접 마운트가 일관된다.
 	volumeSvc := volume.NewService(volume.NewRepository(db), kc,
 		cfg.Storage.NFSClass, cfg.K8s.NamespacePrefix, cfg.Storage.VolumeQuotaGB)
 	volumeSvc.WithMetrics(met)
@@ -98,14 +98,14 @@ func main() {
 		WithUIDBase(cfg.PhysicalNodes.UIDBase).                                               // 전역 안정 UID 베이스(재사용 방지)
 		WithLocalHomeHost(cfg.Storage.PhysicalHomeHost).                                      // 물리 SSH 로컬 home 루트(/home/giosk)
 		WithFreeMode(cfg.IsFree()).                                                           // 자유 모드: 임대 영속·계정 재사용·동시접속
-		WithDevicePluginConfig(cfg.K8s.DevicePluginConfigNS, cfg.K8s.DevicePluginConfigName). // 타임셰어링 웹 설정 → device plugin 즉시 반영
+		WithDevicePluginConfig(cfg.K8s.DevicePluginConfigNS, cfg.K8s.DevicePluginConfigName). // 타임셰어링 웹 설정을 device plugin 에 즉시 반영
 		WithPhysicalLabel(cfg.PhysicalNodes.Label)                                            // 물리 임대 토글이 이 라벨을 k8s 노드에 적용
 	cfgStore := systemconfig.NewStore(db) // 런타임 설정(유휴·기능 토글·전역 상한) 저장소
 	platIntervalFn := func() int { return cfgStore.IntOr(systemconfig.KeyRechargeIntervalDays, 30) }
 	orgSvc.WithPlatformInterval(platIntervalFn)    // 조직 리필 주기 캡(플랫폼 기본)
 	walletSvc.WithPlatformInterval(platIntervalFn) // 팀/개인 리필 주기 캡 최상단
 
-	// 하드 정책(크레딧 무관 절대 상한) — 계층 해석: 개인→그룹→조직→전역.
+	// 하드 정책(크레딧과 무관한 절대 상한). 개인, 그룹, 조직, 전역 순으로 계층 해석한다.
 	// 전역은 설치 기본(config.Quota) 위에 런타임 오버라이드를 얹어 호출 시점마다 읽는다
 	// (정책 탭에서 바꾸면 재시작 없이 즉시 반영).
 	policyRepo := policy.NewRepository(db)
@@ -135,16 +135,16 @@ func main() {
 	sessionSvc.WithGatewaySSHKey([]byte(cfg.K8s.GatewaySSHKey))                       // 물리 세션 웹터미널 SSH 관리키(빈값=물리 웹터미널 비활성)
 	sessionSvc.WithScratch(cfg.Storage.ScratchEnabled, cfg.Storage.ScratchHostPath)   // 노드로컬 스크래치
 	sessionSvc.WithLocalHome(cfg.PhysicalNodes.Enabled, cfg.Storage.PhysicalHomeHost) // 로컬 Home 특수 볼륨(hostPath+노드핀)
-	sessionSvc.WithUIDBase(cfg.PhysicalNodes.UIDBase)                                 // 컨테이너 안정 UID(물리 SSH 와 동일) → NFS 권한 일관
+	sessionSvc.WithUIDBase(cfg.PhysicalNodes.UIDBase)                                 // 컨테이너 안정 UID(물리 SSH 와 같은 공식)라 NFS 권한이 일관된다
 	sessionSvc.WithSharedHome(cfg.Storage.SharedHome)                                 // 영속 home(~/nfs) 사용 여부(설치시 고정)
 	sessionSvc.WithLocalClass(cfg.Storage.LocalClass)                                 // 세션 전용 홈(/home/work) 로컬 스토리지클래스(속도 위해 노드로컬)
 	sessionSvc.WithMaxStopped(cfg.Quota.MaxStoppedSessions)                           // 중단(대기) 세션 상한(로컬 홈 PVC 누적 방지)
-	sessionSvc.WithMemBurst(cfg.Quota.MemBurst)                                       // 메모리 limit 배수(노드 RAM 고갈 → 남의 세션 축출 차단)
-	sessionSvc.WithHomeReap(func() (int, int) {                                       // 중단 세션 홈 회수(T1) — 운영 정책이라 라이브 read
+	sessionSvc.WithMemBurst(cfg.Quota.MemBurst)                                       // 메모리 limit 배수. 노드 RAM 고갈로 남의 세션이 축출되는 걸 막는다
+	sessionSvc.WithHomeReap(func() (int, int) {                                       // 중단 세션 홈 회수. 운영 정책이라 라이브로 읽는다
 		return cfgStore.IntOr(systemconfig.KeyStoppedTTLDays, cfg.Quota.StoppedTTLDays),
 			cfgStore.IntOr(systemconfig.KeyHomeReapPct, cfg.Quota.HomeReapPct)
 	})
-	// 가용성 관문 — 자리가 없으면 생성·재시작 모두 거절(대기열 없음).
+	// 가용성 관문. 자리가 없으면 생성과 재시작을 모두 거절한다(대기열 없음).
 	// 판정 소스는 세션 마법사가 보는 Availability 와 동일해야 화면과 API 가 갈라지지 않는다.
 	sessionSvc.WithCapacityGate(func(ctx context.Context, p session.PlaceSpec) bool {
 		return resourceSvc.CanPlace(ctx, resource.PlaceReq{
@@ -152,7 +152,7 @@ func main() {
 			VramMB: p.VramMB, CorePercent: p.CorePercent, Node: p.Node,
 		})
 	})
-	// 배치 잠금 — "관문 통과 → 예약"을 한 번에 하나만 지나게 한다(동시 요청이 같은 자리를 두 번 받는 것 차단).
+	// 배치 잠금. "관문 통과 후 예약"을 한 번에 하나만 지나게 해서 동시 요청이 같은 자리를 두 번 받는 걸 막는다.
 	// API replica 가 늘어나도 유효하도록 DB 이름잠금을 쓴다(프로세스 뮤텍스는 세션 서비스가 항상 함께 건다).
 	sessionSvc.WithAdmissionLock(func(ctx context.Context) (func(), error) {
 		return store.NamedLock(ctx, db, "giosk_session_admission", 10*time.Second)
@@ -169,18 +169,18 @@ func main() {
 	imageRepo := image.NewRepository(db)
 	imageSvc := image.NewService(imageRepo, kc, cfg.K8s.Registry, cfg.K8s.NamespacePrefix+"build"). // 이미지 빌드(Kaniko)
 													WithCosign(cfg.K8s.CosignKeySecret) // 빌드 후 trivy 스캔 + (키 있으면) cosign 서명
-	go imageSvc.RunReconciler(context.Background(), 15*time.Second) // 빌드 Job 상태 → DB
-	go sessionSvc.RunIdleReaper(context.Background(), func() int {  // 유휴 타임아웃은 운영 중 변경 가능 → 라이브 read
+	go imageSvc.RunReconciler(context.Background(), 15*time.Second) // 빌드 Job 상태를 DB 에 반영
+	go sessionSvc.RunIdleReaper(context.Background(), func() int {  // 유휴 타임아웃은 운영 중 바뀔 수 있어 라이브로 읽는다
 		return cfgStore.IntOr(systemconfig.KeyIdleTimeoutMin, cfg.IdleTimeoutMin)
 	})
-	go sessionSvc.RunPhaseReconciler(context.Background(), 30*time.Second)                     // 라이브 phase → DB(대시보드/관제 최신화)
+	go sessionSvc.RunPhaseReconciler(context.Background(), 30*time.Second)                     // 라이브 phase 를 DB 에 반영(대시보드·관제 최신화)
 	go dashboardSvc.RunSampler(context.Background(), time.Minute, sessionSvc.CountIdleRunning) // 인프라 메트릭 스냅샷(감시 시계열)
-	// 세션 홈 회수(T0 고아 + T1 방치). 과금 모드와 무관하게 돈다 —
+	// 세션 홈 회수(고아 정리와 방치 회수). 과금 모드와 무관하게 돈다.
 	// 무료 모드엔 스토리지 과금이라는 가격 압력이 없어 오히려 회수가 유일한 억제 수단이다.
 	go sessionSvc.RunHomeReaper(context.Background(), time.Hour)
 	if cfg.IsCredit() {
 		sessionSvc.WithCharger(walletSvc) // 크레딧 소비 회계
-		// 중단 세션이 물고 있는 홈 PVC 도 스토리지 단가로 과금 — 볼륨과 같은 단가를 쓴다
+		// 중단 세션이 물고 있는 홈 PVC 도 스토리지 단가로 과금한다. 볼륨과 같은 단가를 쓴다
 		// ("디스크는 어디에 두든 같은 값"). 방치를 정책이 아니라 가격으로 먼저 정리한다.
 		sessionSvc.WithStoragePrice(func() int {
 			return cfgStore.IntOr(systemconfig.KeyStoragePriceGiBMonth, cfg.Storage.PricePerGiBMonth)
@@ -190,7 +190,7 @@ func main() {
 			return cfgStore.IntOr(systemconfig.KeyStoragePriceGiBMonth, cfg.Storage.PricePerGiBMonth)
 		})
 		go volumeSvc.RunStorageBiller(context.Background(), time.Minute)
-		// 크레딧 정기 재충전(런타임 설정 라이브 read) — 매시 도래 지갑 리필.
+		// 크레딧 정기 재충전(런타임 설정을 라이브로 읽는다). 매시 도래한 지갑을 리필한다.
 		go walletSvc.RunCreditRecharge(context.Background(), time.Hour, func() wallet.RechargeCfg {
 			return wallet.RechargeCfg{
 				Enabled:      cfgStore.Get(systemconfig.KeyRechargeEnabled) == "true",
@@ -204,7 +204,7 @@ func main() {
 		go sessionSvc.RunLeaseReaper(context.Background(), time.Minute)                                                                       // 임대 만료 자동 정지
 	}
 
-	// 알림 엔진 — 관리자 규칙(gpu_util/gpu_temp/node_down)을 평가해 위반 시 웹훅·이메일 발송.
+	// 알림 엔진. 관리자 규칙(gpu_util/gpu_temp/node_down)을 평가해 위반하면 웹훅이나 이메일로 보낸다.
 	notifyRepo := notify.NewRepository(db)
 	var mailer notify.Mailer
 	if cfg.SMTPEnabled() {
@@ -223,12 +223,12 @@ func main() {
 		}
 		return down, true
 	}
-	alertStore := alertlog.New(db) // 발화 경고 이력(감시월 통합 피드) — notify 적재, dashboard 조회
+	alertStore := alertlog.New(db) // 발화 경고 이력(감시월 통합 피드). notify 가 적재하고 dashboard 가 조회한다
 	dashboardSvc.WithAlertStore(alertStore)
 
 	// 사용자 인앱 알림 수신함 + 사용자 규칙 평가기(userMetric).
 	// credit_balance(잔액)는 DB(user_wallets)로 바로 평가한다. 나머지 사용자 지표는
-	// 실측(Prometheus/PVC 매핑)이 필요해 여기선 미지원(ok=false → 발화 안 함) — 오탐을 만들지 않는다.
+	// 실측(Prometheus, PVC 매핑)이 필요해 여기선 지원하지 않는다(ok=false 라 발화하지 않는다). 오탐을 만들지 않기 위해서다.
 	inboxStore := usernotify.New(db)
 	userMetric := func(ctx context.Context, metric string) (map[int64]float64, bool) {
 		switch metric {
@@ -252,8 +252,8 @@ func main() {
 			return nil, false
 		}
 	}
-	// credit_balance 를 팀별로 평가 — 크레딧이 팀 지갑에 귀속되므로 "어느 팀" 잔액이 낮은지 발화한다.
-	// Active=그 팀에 활성 세션이 있거나 소비 이력이 있으면 true(안 쓰는 빈 팀은 알림 억제 → 스팸 방지).
+	// credit_balance 는 팀별로 평가한다. 크레딧이 팀 지갑에 귀속되므로 어느 팀 잔액이 낮은지를 발화한다.
+	// Active 는 그 팀에 활성 세션이 있거나 소비 이력이 있으면 true 다. 안 쓰는 빈 팀은 알림을 억제해 스팸을 막는다.
 	creditTeams := func(ctx context.Context) map[int64][]notify.TeamBalance {
 		var rows []struct {
 			UserID  int64
@@ -284,7 +284,7 @@ func main() {
 		WithCreditTeams(creditTeams).                // 팀별 크레딧 알림
 		Run(context.Background(), time.Minute)
 
-	// 데이터셋 — 정규 NFS 경로(<base>/dataset/<name>) 적재 + 리컨실러(다운로드 완료 시 PVC 바인딩).
+	// 데이터셋. 정규 NFS 경로(<base>/dataset/<name>)에 적재하고, 리컨실러가 다운로드 완료 시 PVC 를 바인딩한다.
 	datasetSvc := dataset.NewService(dataset.NewRepository(db)).
 		WithStorage(kc, cfg.Storage.NFSClass, cfg.K8s.NamespacePrefix+"datasets",
 									cfg.Storage.Datasets.NFS.Server, cfg.Storage.Datasets.NFS.Path, cfg.Storage.DatasetCacheHost).
@@ -311,7 +311,7 @@ func main() {
 		return out
 	})
 
-	// 사용자 360 상세 — 각 도메인의 기존 userID-키 서비스를 클로저로 모아 한 응답으로.
+	// 사용자 360 상세. 각 도메인의 기존 userID 키 서비스를 클로저로 모아 한 응답으로 만든다.
 	usersRepo := users.NewRepository(db)
 	billingRepo := billing.NewRepository(db)
 	userDetailH := userdetail.NewHandler(userdetail.Providers{
@@ -327,11 +327,11 @@ func main() {
 		Sessions: func(ctx context.Context, id, groupID int64) (any, error) { return sessionSvc.List(ctx, id, groupID) },
 		Datasets: func(ctx context.Context, id int64) (any, error) { return datasetSvc.List(ctx, id) },
 		JoinReqs: func(id int64) (any, error) { return groupSvc.MyJoinRequests(id) },
-		Usage: func(id, orgID, groupID int64) any { // 대상 사용자 사용량 — 스코프(팀/조직) 범위만 집계
+		Usage: func(id, orgID, groupID int64) any { // 대상 사용자 사용량. 스코프(팀·조직) 범위만 집계한다
 			return billingRepo.UserOneScoped(id, orgID, groupID)
 		},
 		UserHier: limitResolver.HierOfUser, // 매니저 스코프 검증(대상의 조직/그룹)
-		Members: func(id int64) (any, error) { // 전체 소속(조직/팀/역할) — 다중 소속 평면 나열
+		Members: func(id int64) (any, error) { // 전체 소속(조직, 팀, 역할). 다중 소속을 평면으로 나열한다
 			type mrow struct {
 				Role      string `json:"role"`
 				GroupID   int64  `json:"groupId"`
@@ -372,15 +372,15 @@ func main() {
 		UserNotify:      usernotify.NewHandler(inboxStore),
 		DatasetsEnabled: cfg.Storage.Datasets.Enabled, // off 면 데이터셋 라우트 미등록(404)
 		Policy: policy.NewHandler(policyRepo, limitResolver).
-			WithOrgOfGroup(orgRepo). // 스코프 정책 편집 인가(그룹→조직)
-			// 전역 상한 런타임 편집 — 런타임 저장소에 영속(설치 env 는 기본값으로 남는다).
+			WithOrgOfGroup(orgRepo). // 스코프 정책 편집 인가(그룹에서 조직을 찾는다)
+			// 전역 상한 런타임 편집. 런타임 저장소에 영속하며 설치 env 는 기본값으로 남는다.
 			WithGlobalSetter(func(g policy.Resolved) error {
 				for k, v := range map[string]int{
 					systemconfig.KeyQuotaMaxGpu:      g.MaxGpu,
 					systemconfig.KeyQuotaMaxVramGB:   g.MaxVramGB,
 					systemconfig.KeyQuotaMaxVolGiB:   g.MaxVolumeGiB,
 					systemconfig.KeyQuotaMaxSessions: g.MaxConcurrentSessions,
-					// 0 도 유효한 설정이다(중단 상한·임시 디스크는 0=무제한) → 그대로 저장한다.
+					// 0 도 유효한 설정이므로(중단 상한과 임시 디스크는 0 이 무제한) 그대로 저장한다.
 					systemconfig.KeyQuotaMaxStopped:   g.MaxStoppedSessions,
 					systemconfig.KeyQuotaMaxEphemeral: g.MaxEphemeralGiB,
 				} {

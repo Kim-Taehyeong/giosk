@@ -19,10 +19,10 @@ type Repository interface {
 	CacheDelete(imageID int64, node string) error
 	CacheByImage(imageID int64) []NodeCache // 이미지의 노드별 캐시 상태
 	CachePulling() []NodeCache              // status=pulling (리컨실 대상, ImageID 포함)
-	CachedNodesMap() map[int64][]string     // image_id → 캐시 완료(cached) 노드 목록(빠른 생성 배지)
+	CachedNodesMap() map[int64][]string     // image_id 별 캐시 완료(cached) 노드 목록(빠른 생성 배지)
 }
 
-// NodeCache — 이미지 노드 캐시 1건.
+// NodeCache는 이미지 노드 캐시 1건.
 type NodeCache struct {
 	ImageID int64  `gorm:"column:image_id" json:"-"`
 	Node    string `gorm:"column:node" json:"node"`
@@ -97,7 +97,7 @@ func (r *gormRepo) CachePulling() []NodeCache {
 	return out
 }
 
-// CachedNodesMap은 캐시 완료(cached) 상태의 image_id → 노드 목록을 반환한다(빠른 생성 배지).
+// CachedNodesMap은 캐시 완료(cached) 상태의 image_id 별 노드 목록을 반환한다(빠른 생성 배지).
 func (r *gormRepo) CachedNodesMap() map[int64][]string {
 	var rows []NodeCache
 	r.db.Raw(`SELECT image_id, node, status FROM image_node_cache WHERE status = 'cached' ORDER BY node`).Scan(&rows)

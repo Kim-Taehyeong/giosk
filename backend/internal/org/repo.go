@@ -184,7 +184,7 @@ func (r *gormRepo) IsOrgAdmin(userID, orgID int64) bool {
 }
 
 // publicGroups는 가입 화면에서 고를 수 있는 그룹만 반환한다.
-// accepts_join=false 인 그룹(조직 생성 시 만들어지는 '일반' = 조직 관리자 전용)은 제외 —
+// accepts_join=false 인 그룹(조직 생성 시 만들어지는 일반 그룹으로 조직 관리자 전용)은 제외한다.
 // 로그인 후 가입 신청 경로(RequestJoin)와 같은 규칙을 쓴다(예전엔 여기서만 안 걸러 '일반'이 노출됐다).
 func (r *gormRepo) publicGroups(orgID int64) ([]PublicGroup, error) {
 	var groups []PublicGroup

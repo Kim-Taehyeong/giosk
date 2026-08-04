@@ -93,7 +93,7 @@ func (h *Handler) Usage(c *gin.Context) {
 	httpx.OK(c, u)
 }
 
-// MyUsage는 본인 running 세션 전체의 실사용 지표를 id→Usage 맵으로 반환한다(목록 폴링용).
+// MyUsage는 본인 running 세션 전체의 실사용 지표를 id 별 Usage 맵으로 반환한다(목록 폴링용).
 // 세션마다 호출하지 않도록 벌크로 둔다(/instances/:id/metrics 와 라우트가 겹치지 않게 경로 분리).
 func (h *Handler) MyUsage(c *gin.Context) {
 	items, err := h.svc.MyUsage(c.Request.Context(), uid(c))
@@ -159,7 +159,7 @@ func (h *Handler) Delete(c *gin.Context) {
 	httpx.OK(c, gin.H{"ok": true})
 }
 
-// act는 (ctx, id, uid)→error 형태 동작의 공통 래퍼.
+// act는 (ctx, id, uid) 를 받아 error 를 내는 동작의 공통 래퍼.
 func (h *Handler) act(c *gin.Context, fn func(context.Context, string, int64) error, msg string) {
 	if err := fn(c.Request.Context(), c.Param("id"), uid(c)); err != nil {
 		h.writeErr(c, err, msg)
@@ -208,7 +208,7 @@ func (h *Handler) writeErr(c *gin.Context, err error, msg string) {
 		httpx.Err(c, 503, "k8s_unavailable", "클러스터를 사용할 수 없습니다")
 	default:
 		// 알려지지 않은 에러(주로 프로비저닝: PVC/네임스페이스/스케줄)는 500 으로 나가되,
-		// 원시 에러를 반드시 서버 로그에 남긴다 — 안 그러면 클라이언트엔 "실패"만 뜨고 원인이 사라진다.
+		// 원시 에러를 반드시 서버 로그에 남긴다. 안 그러면 클라이언트엔 "실패"만 뜨고 원인이 사라진다.
 		log.Printf("[session] %s: %v", msg, err)
 		httpx.Internal(c, msg)
 	}
@@ -224,7 +224,7 @@ func (h *Handler) AdminList(c *gin.Context) {
 	httpx.OK(c, gin.H{"items": items})
 }
 
-// AdminUsage는 running 세션 전체의 실사용 지표를 id→Usage 맵으로 반환한다(관제 폴링용).
+// AdminUsage는 running 세션 전체의 실사용 지표를 id 별 Usage 맵으로 반환한다(관제 폴링용).
 func (h *Handler) AdminUsage(c *gin.Context) {
 	items, err := h.svc.AdminUsage(c.Request.Context())
 	if err != nil {
@@ -242,7 +242,7 @@ func (h *Handler) AdminTerminate(c *gin.Context) {
 	httpx.OK(c, gin.H{"ok": true})
 }
 
-// AdminStop은 세션을 중단(stopped)한다 — 종료와 달리 재시작 가능.
+// AdminStop은 세션을 중단(stopped)한다. 종료와 달리 재시작할 수 있다.
 func (h *Handler) AdminStop(c *gin.Context) {
 	if err := h.svc.AdminStop(c.Request.Context(), c.Param("id")); err != nil {
 		h.writeErr(c, err, "세션 중단 실패")

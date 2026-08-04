@@ -9,7 +9,7 @@ import (
 // 만료(exp)까지만 보관하고 주기적으로 청소한다. 다중 레플리카로 확장 시 공유 저장소 필요.
 type nonceCache struct {
 	mu   sync.Mutex
-	seen map[string]int64 // jti → exp(unix)
+	seen map[string]int64 // jti 별 exp(unix)
 }
 
 func newNonceCache() *nonceCache {
@@ -41,7 +41,7 @@ func (n *nonceCache) use(jti string, exp int64, now time.Time) bool {
 	return true
 }
 
-// used는 jti 가 이미 소비됐는지만 조회한다(소비하지 않음 — 읽기 전용).
+// used는 jti 가 이미 소비됐는지만 조회한다(소비하지 않는 읽기 전용).
 // 인증 콜백은 이걸로 사전 차단만 하고, 실제 소비는 핸드셰이크 성공 후 use 로 1회 한다
 // (publickey 2단계 콜백이 질의 단계에서 nonce 를 먹어버리는 것을 피하기 위함).
 func (n *nonceCache) used(jti string, now time.Time) bool {

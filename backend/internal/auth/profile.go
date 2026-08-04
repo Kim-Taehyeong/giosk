@@ -12,7 +12,7 @@ type ProfileScope struct {
 }
 
 // ProfileExtra는 콘솔 라우팅에 필요한 멤버십 컨텍스트(프론트 consoleRoles 기준).
-// MembershipRole/ConsoleLevel/OrgID/GroupID 는 기본(최우선) 스코프 — 하위 호환.
+// MembershipRole, ConsoleLevel, OrgID, GroupID 는 기본(최우선) 스코프이며 하위 호환을 위해 남긴다.
 // Scopes 는 사용자가 동시에 가진 모든 관리 스코프(멀티롤 전환기).
 type ProfileExtra struct {
 	MembershipRole string         `json:"membershipRole,omitempty"` // org_admin | group_admin | member
@@ -36,7 +36,7 @@ func userView(u *User, e ProfileExtra) gin.H {
 		"firstName": u.FirstName, "lastName": u.LastName,
 		"role": u.Role, "status": u.Status,
 	}
-	// SSH 공개키는 비밀이 아니다 — 내정보/접속 화면이 "등록됨/미등록"을 판단하고 그대로 보여준다.
+	// SSH 공개키는 비밀이 아니다. 내정보와 접속 화면이 등록 여부를 판단하고 그대로 보여준다.
 	addIf(v, "sshPublicKey", u.SSHPublicKey)
 	if u.Role == RoleAdmin {
 		v["consoleLevel"] = "platform"

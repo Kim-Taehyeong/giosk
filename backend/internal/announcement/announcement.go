@@ -34,7 +34,7 @@ type Req struct {
 	TargetGroupID *int64 `json:"targetGroupId"`
 }
 
-// Repository — 영속성 계약.
+// Repository는 영속성 계약.
 type Repository interface {
 	ListActive() ([]Announcement, error)
 	ListActiveFor(orgID, groupID int64) ([]Announcement, error) // 사용자 노출: 전역 + 내 조직/그룹 타겟
@@ -56,7 +56,7 @@ func (r *repo) ListActive() ([]Announcement, error) {
 	return out, r.db.Where("active = ?", true).Order("pinned DESC, id DESC").Find(&out).Error
 }
 
-// ListActiveFor는 사용자에게 보일 활성 공지 — 전역(타겟 없음) + 내 조직/그룹 타겟.
+// ListActiveFor는 사용자에게 보일 활성 공지를 준다. 전역(타겟 없음)과 내 조직·그룹 타겟이다.
 func (r *repo) ListActiveFor(orgID, groupID int64) ([]Announcement, error) {
 	var out []Announcement
 	q := r.db.Where("active = ?", true).
@@ -69,7 +69,7 @@ func (r *repo) ListAll() ([]Announcement, error) {
 	return out, r.db.Order("id DESC").Find(&out).Error
 }
 
-// ListAllScoped는 관리자 목록을 스코프로 좁힌다 — org=자기 조직 타겟 또는 산하 그룹 타겟, group=자기 그룹 타겟.
+// ListAllScoped는 관리자 목록을 스코프로 좁힌다. org 는 자기 조직 타겟이나 산하 그룹 타겟, group 은 자기 그룹 타겟만 본다.
 func (r *repo) ListAllScoped(orgID, groupID int64) ([]Announcement, error) {
 	var out []Announcement
 	q := r.db.Model(&Announcement{})

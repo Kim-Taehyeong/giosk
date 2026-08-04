@@ -1,13 +1,13 @@
-// Package config는 설치 시점 설정(Helm values → 환경변수)을 타입 안전한 Config로 로드한다.
+// Package config는 설치 시점 설정(Helm values 에서 온 환경변수)을 타입 안전한 Config로 로드한다.
 //
-// 단방향 주입: Helm values → ConfigMap/Secret → 환경변수 → 이 패키지.
-// "하드코딩 금지" 원칙의 단일 출처 — 기본값도 여기 상수 한 곳에만 둔다.
+// 주입은 단방향이다: Helm values, ConfigMap/Secret, 환경변수, 그리고 이 패키지.
+// "하드코딩 금지" 원칙의 단일 출처다. 기본값도 여기 상수 한 곳에만 둔다.
 // 런타임 토글(features 등)은 system_config 테이블에서 별도로 읽는다(이 패키지는 설치 고정값).
 package config
 
 import "fmt"
 
-// 모드 enum — 설계 문서 §1.3 의 2축.
+// 모드 enum. 설계 문서 1.3 의 2축이다.
 const (
 	DeploymentContainer = "container"
 	DeploymentHybrid    = "hybrid"
@@ -39,7 +39,7 @@ type Config struct {
 	SMTP           SMTP   // 알림 이메일 발송(빈 Host면 이메일 채널 비활성)
 }
 
-// SMTP — 알림 이메일 발송 설정(Helm smtp.*). Host 비면 이메일 발송 생략(웹훅만).
+// SMTP는 알림 이메일 발송 설정(Helm smtp.*). Host 가 비면 이메일을 보내지 않고 웹훅만 쓴다.
 type SMTP struct {
 	Host     string
 	Port     int
@@ -51,7 +51,7 @@ type SMTP struct {
 // SMTPEnabled는 이메일 발송 가능 여부(Host 설정 시).
 func (c *Config) SMTPEnabled() bool { return c.SMTP.Host != "" }
 
-// Features — 런타임 기능 토글 초기값(설치 시 주입; 이후 운영 변경은 별도).
+// Features는 런타임 기능 토글 초기값(설치 시 주입하며 이후 운영 변경은 별도다).
 type Features struct {
 	SignupRequest    bool
 	DatasetRegister  bool
@@ -60,7 +60,7 @@ type Features struct {
 	CreditRequest    bool
 }
 
-// Quota — 플랫폼 전역 상한.
+// Quota는 플랫폼 전역 상한.
 type Quota struct {
 	MaxGpuCount           int
 	MaxVramGB             int
@@ -69,15 +69,15 @@ type Quota struct {
 	VolumeQuotaGB         int
 	MaxEphemeralGiB       int // 세션 임시 디스크(ephemeral-storage) 전역 상한(GiB)
 	MemBurst              int // 메모리 limit 배수(limit = GPU 지분 비례 보장 × 배수). 1 이하=상한 없음.
-	// 홈 회수(T1) 초기값 — 유휴 타임아웃과 같은 운영 정책이라 런타임 설정(systemconfig)이 우선한다.
+	// 홈 회수 초기값. 유휴 타임아웃과 같은 운영 정책이라 런타임 설정(systemconfig)이 우선한다.
 	// 여기 값은 관리자가 아직 저장한 적 없을 때의 폴백일 뿐.
 	StoppedTTLDays int // 중단 세션이 홈 회수 후보가 되기까지의 방치 일수(0=회수 비활성)
-	HomeReapPct    int // 노드 루트 디스크 사용률 임계(%) — 이 이상인 노드에서만 T1 회수를 집행
+	HomeReapPct    int // 노드 루트 디스크 사용률 임계(%). 이 이상인 노드에서만 방치 회수를 집행한다
 }
 
-// K8s — 클러스터 연동 설정. GPU 타입은 노드 라벨에서 수집(운영=GFD 라벨, 개발=fake 라벨).
+// K8s는 클러스터 연동 설정. GPU 타입은 노드 라벨에서 수집한다(운영은 GFD 라벨, 개발은 fake 라벨).
 type K8s struct {
-	Kubeconfig        string // 빈 값이면 in-cluster→기본 kubeconfig 자동 로딩
+	Kubeconfig        string // 비면 in-cluster 를 먼저 보고 기본 kubeconfig 를 자동 로딩한다
 	GpuTypeLabel      string // 예: giosk.io/gpu-type (개발) / nvidia.com/gpu.product (운영)
 	CudaLabel         string // 노드 CUDA 툴킷(런타임) 버전 라벨. 기본은 GFD runtime.major/.minor 합성; 없으면 표기 생략.
 	NamespacePrefix   string // 세션 네임스페이스 prefix (그룹별)
@@ -99,18 +99,18 @@ type K8s struct {
 	CosignKeySecret        string // cosign 서명키 Secret 이름(cosign.key + password). 빈값=서명 단계 생략
 }
 
-// Admin — 최초 플랫폼 관리자 부트스트랩 자격(없으면 생성). Helm Secret 주입.
+// Admin은 최초 플랫폼 관리자 부트스트랩 자격(없으면 생성). Helm Secret 으로 주입한다.
 type Admin struct {
 	Username string
 	Password string
 }
 
-// Deployment — 실행 환경 축(container | hybrid).
+// Deployment는 실행 환경 축(container | hybrid).
 type Deployment struct {
 	Mode string
 }
 
-// Billing — 과금 축(credit | dynamic). 세부 정책은 설치 고정.
+// Billing은 과금 축(credit | dynamic). 세부 정책은 설치 시 고정된다.
 type Billing struct {
 	Mode    string
 	Credit  CreditPolicy
@@ -131,12 +131,12 @@ type DynamicPolicy struct {
 	MaxExtensions         int
 }
 
-// Storage — 영속성/데이터셋 스토리지 전략(설계 문서 §3).
+// Storage는 영속성과 데이터셋 스토리지 전략(설계 문서 3장).
 type Storage struct {
 	PersistenceClass string  // 영속 home(~/nfs) 스토리지클래스 (RWX·노드독립 필수, 예: nfs/longhorn)
-	SharedHome       bool    // 사용자 영속 home(~/nfs) 사용 여부. false 면 세션은 순수 로컬 임시(emptyDir)만 — RWX 불필요
+	SharedHome       bool    // 사용자 영속 home(~/nfs) 사용 여부. false 면 세션은 순수 로컬 임시(emptyDir)만 쓰므로 RWX 가 필요 없다
 	LocalClass       string  // 세션 전용 홈(/home/work) 로컬 스토리지클래스(노드로컬 디스크·WFFC, 예: local-path). 속도 위해 NFS 아님.
-	NFSClass         string  // RWX NFS 스토리지클래스(데이터셋·공유 볼륨용 — 항상 NFS 고정)
+	NFSClass         string  // RWX NFS 스토리지클래스. 데이터셋과 공유 볼륨용이며 항상 NFS 로 고정한다
 	VolumeQuotaGB    int     // 플랫폼 전역 볼륨 쿼터
 	PricePerGiBMonth int     // 스토리지 크레딧 단가(GiB·월). 0=무료. 크레딧 모드에서만 과금.
 	Datasets         Dataset // 데이터셋 사용 시 NFS
@@ -154,14 +154,14 @@ type Dataset struct {
 	LocalMount string
 }
 
-// NFS — in-cluster(클러스터 내 provisioner) 또는 external(외부 서버 마운트).
+// NFS는 in-cluster(클러스터 내 provisioner) 또는 external(외부 서버 마운트).
 type NFS struct {
 	Mode   string // in-cluster | external
 	Server string // external 시 필수
 	Path   string // external 시 필수
 }
 
-// PhysicalNodes — hybrid 물리노드. 활성 시 외부 NFS 필수.
+// PhysicalNodes는 hybrid 물리노드 설정. 켜면 외부 NFS 가 필수다.
 type PhysicalNodes struct {
 	Enabled    bool
 	Label      string // 물리노드 식별 K8s 라벨(멀티 인스턴스 격리; 기본 giosk.io/physical)
@@ -294,13 +294,13 @@ func Load(lookup func(string) (string, bool)) (*Config, error) {
 			MaxConcurrentSessions: g.intv("GIOSK_QUOTA_MAX_SESSIONS", 50),
 			MaxStoppedSessions:    g.intv("GIOSK_QUOTA_MAX_STOPPED", 5),
 			VolumeQuotaGB:         g.intv("GIOSK_VOLUME_QUOTA_GB", 2000),
-			MaxEphemeralGiB:       g.intv("GIOSK_QUOTA_MAX_EPHEMERAL_GIB", 0), // 0=무제한(기본). 캡의 강제수단이 eviction(세션 종료)이라 기본으론 안 건다 — 정책으로 티어별 opt-in. 진짜 하드캡은 ENOSPC(디스크 추가) 후.
+			MaxEphemeralGiB:       g.intv("GIOSK_QUOTA_MAX_EPHEMERAL_GIB", 0), // 0 이 무제한(기본). 캡의 강제수단이 eviction(세션 종료)이라 기본으론 안 건다. 정책으로 티어별 opt-in 하고, 진짜 하드캡은 디스크를 늘린 뒤에.
 			// 메모리 limit = GPU 지분 비례 보장(request) × 2. request 가 노드의 50% 이하로 잡히므로
 			// 배수 2 = "산 지분만큼까지 버스트". 메모리는 압축 불가라 상한이 없으면 한 세션이
 			// 노드 RAM 을 고갈시켜 kubelet 이 남의 세션을 축출한다(CPU 는 압축 가능해 상한 없음 유지).
 			MemBurst: g.intv("GIOSK_QUOTA_MEM_BURST", 2),
 			// 중단 세션 홈 회수(T1). 방치 14일 + 노드 디스크 88% 초과일 때만 집행.
-			// 88% = 정리 DaemonSet 의 scratch(85)/home(92) 사이 — 임시 공간을 먼저 비우고,
+			// 88% 는 정리 DaemonSet 의 scratch(85)와 home(92) 사이다. 임시 공간을 먼저 비우고,
 			// 그래도 모자라면 세션 홈을 건드리고, 사용자 작업 홈(92)이 마지막이다.
 			StoppedTTLDays: g.intv("GIOSK_STOPPED_TTL_DAYS", 14),
 			HomeReapPct:    g.intv("GIOSK_HOME_REAP_PCT", 88),

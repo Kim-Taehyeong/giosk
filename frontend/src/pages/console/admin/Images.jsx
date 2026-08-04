@@ -45,12 +45,12 @@ export default function Images() {
   const publish = async (id) => { await publishImage(id); toast(t('images.published')); load(); };
   const remove = async (id) => { if (!(await confirm({ title: t('images.delete'), message: t('confirmDelete'), confirmText: t('images.delete') }))) return; await deleteImage(id); toast(t('images.deleted')); load(); };
 
-  // 노드별 캐시(프리페치) — 모달이 아니라 해당 이미지 행 아래 인라인 패널로 펼친다.
+  // 노드별 캐시(프리페치)는 모달이 아니라 해당 이미지 행 아래 인라인 패널로 펼친다.
   const [cacheFor, setCacheFor] = useState(null);
   const [cacheRows, setCacheRows] = useState([]);
   const [nodes, setNodes] = useState([]);
   useEffect(() => { getAdminNodes().then(setNodes).catch(() => {}); }, []);
-  // 같은 이미지를 다시 누르면 닫기(토글). 열려 있는 동안 3초 폴링으로 진행상황(pulling→cached) 갱신.
+  // 같은 이미지를 다시 누르면 닫는다(토글). 열려 있는 동안 3초마다 폴링해 진행상황을 갱신한다.
   const openCache = async (img) => {
     if (cacheFor?.id === img.id) { setCacheFor(null); return; }
     setCacheFor(img); setCacheRows(await getImageCache(img.id));
@@ -66,7 +66,7 @@ export default function Images() {
   };
   const cacheStatusOf = (node) => cacheRows.find((c) => c.node === node)?.status;
 
-  // 캐시 패널 — 선택 이미지 행 바로 아래(아코디언)에 노드 체크리스트 + 진행상황 표시.
+  // 캐시 패널이다. 선택한 이미지 행 바로 아래에 아코디언으로 노드 체크리스트와 진행상황을 보여준다.
   const cachePanel = () => (
     <div style={{ padding: '12px 4px 14px' }}>
       <div className="legend mb">{t('images.cacheHint')}</div>

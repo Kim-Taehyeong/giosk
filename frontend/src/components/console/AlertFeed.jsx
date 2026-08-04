@@ -18,7 +18,7 @@ function fmtTime(ts) {
   return `${d.getMonth() + 1}/${d.getDate()} ${hm}`;
 }
 
-// 통합 경고 피드 — 운영/인프라 경고를 한 화면에 시간순으로.
+// 통합 경고 피드. 운영과 인프라 경고를 한 화면에 시간순으로 모은다.
 // live: 현재상태 경보(AdminAlert[] {type,title,detail,age}), events: 발화 이력(alert_events[]).
 export default function AlertFeed({ live = [], events = [], emptyLabel = '경고 없음' }) {
   const rows = [

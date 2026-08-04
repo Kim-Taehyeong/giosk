@@ -16,7 +16,7 @@ type NodeOps interface {
 	ListNodes(ctx context.Context) ([]k8s.LiveNode, error)
 	SetCordon(ctx context.Context, name string, on bool) error
 	PVCBackingNFS(ctx context.Context, ns, name string) (server, path string, ok bool)
-	SetNodeLabel(ctx context.Context, node, key, value string) error                         // value="" → 라벨 제거
+	SetNodeLabel(ctx context.Context, node, key, value string) error                         // value 가 비면 라벨 제거
 	EnsureTimeSlicingKey(ctx context.Context, ns, name string, replicas int) (string, error) // device plugin 타임슬라이싱 프로파일 upsert
 }
 
@@ -30,9 +30,9 @@ type Service struct {
 	scratchHostPath string                            // 노드로컬 스크래치 루트(/scratch). 노드별 활성은 DB scratch_enabled
 	localHomeHost   string                            // 물리 로컬 home 루트(/home/giosk). 물리 SSH home = <root>/<user> (노드 로컬 디스크)
 	uidBase         int                               // 물리 계정 UID = uidBase + userID(전역 안정, 재사용 안 함)
-	dpConfigNS      string                            // device plugin 설정 ConfigMap 네임스페이스(빈값=자동적용 비활성 → 수동 운영)
+	dpConfigNS      string                            // device plugin 설정 ConfigMap 네임스페이스(비면 자동적용을 끄고 수동 운영)
 	dpConfigName    string                            // device plugin 설정 ConfigMap 이름
-	freeMode        bool                              // 자유 모드: 임대 영속(cordon 없음·만료 없음·해제 안 함) → 계정 재사용·동시접속
+	freeMode        bool                              // 자유 모드에서는 임대가 영속이라(cordon 없음, 만료 없음, 해제 없음) 계정을 재사용하고 동시접속을 허용한다
 	cachedProvider  func() map[string][]CachedDataset // 노드별 캐시 데이터셋(세션 생성 노드 선호 표시). nil=빈 목록.
 	physicalLabel   string                            // 물리노드 식별 라벨(기본 giosk.io/physical). 토글 시 이 라벨을 노드에 적용.
 }
@@ -74,7 +74,7 @@ func (s *Service) WithUIDBase(base int) *Service {
 	return s
 }
 
-// WithFreeMode는 자유 모드를 켠다(임대 영속·cordon 없음·해제 없음 → 계정 재사용/동시접속).
+// WithFreeMode는 자유 모드를 켠다. 임대가 영속이라 cordon 도 해제도 없고 계정을 재사용하며 동시접속을 허용한다.
 func (s *Service) WithFreeMode(on bool) *Service { s.freeMode = on; return s }
 
 // List는 라이브 노드에 DB 오버레이/임대/라이브 지표를 머지한다.
@@ -167,7 +167,7 @@ func (s *Service) byGPU(ctx context.Context, q string) map[string]float64 {
 }
 
 // nodeMetrics는 Prometheus(DCGM+node-exporter)에서 노드별 지표를 일괄 조회한다.
-// pod→node 매핑은 kube_pod_info 조인으로 해결(DCGM/node-exporter 메트릭엔 node 라벨 없음).
+// pod 을 node 로 매핑하는 건 kube_pod_info 조인으로 해결한다(DCGM 이나 node-exporter 메트릭엔 node 라벨이 없다).
 // 미연동/미가용이면 빈 맵(0).
 func (s *Service) nodeMetrics(ctx context.Context) map[string]nodeMetric {
 	out := map[string]nodeMetric{}
@@ -296,7 +296,7 @@ func (s *Service) Cordon(ctx context.Context, name string, on bool) error {
 }
 
 // WithDevicePluginConfig는 device plugin 설정 ConfigMap 좌표를 주입한다(예: gpu-operator/time-slicing-config).
-// 지정하면 관리자가 웹에서 타임셰어링을 켜는 즉시 프로파일 upsert + 노드 라벨 부여 → operator 가 슬롯 광고를 반영.
+// 지정하면 관리자가 웹에서 타임셰어링을 켜는 즉시 프로파일을 upsert 하고 노드 라벨을 붙여 operator 가 슬롯 광고를 반영한다.
 // 빈 값이면 자동 적용을 건너뛴다(수동 운영).
 func (s *Service) WithDevicePluginConfig(ns, name string) *Service {
 	s.dpConfigNS, s.dpConfigName = ns, name
@@ -304,13 +304,13 @@ func (s *Service) WithDevicePluginConfig(ns, name string) *Service {
 }
 
 // applyDevicePlugin은 공유 전략에 맞춰 노드의 device plugin 설정을 실제로 적용한다.
-//   - timeslicing : 슬롯 수 프로파일을 ConfigMap 에 보장하고 노드에 라벨 부여 → GPU 가 N슬롯으로 광고됨.
-//   - 그 외        : 라벨 제거 → 기본(1 GPU = 1) 설정으로 복귀.
+//   - timeslicing : 슬롯 수 프로파일을 ConfigMap 에 보장하고 노드에 라벨을 붙인다. GPU 가 N슬롯으로 광고된다.
+//   - 그 외        : 라벨을 제거해 기본(1 GPU = 1) 설정으로 되돌린다.
 //
 // 슬롯 수는 이번 요청값이 없으면 기존 DB 설정을 쓴다(모드만 바꾸는 경우).
 func (s *Service) applyDevicePlugin(node, mode string, split *int) {
 	if s.dpConfigNS == "" || s.dpConfigName == "" {
-		return // 자동 적용 비활성 — 운영자가 직접 device plugin 을 설정
+		return // 자동 적용이 꺼져 있다. 운영자가 직접 device plugin 을 설정한다
 	}
 	ctx := context.Background()
 	if mode != ShareTimeslicing {
@@ -328,7 +328,7 @@ func (s *Service) applyDevicePlugin(node, mode string, split *int) {
 	}
 	key, err := s.ops.EnsureTimeSlicingKey(ctx, s.dpConfigNS, s.dpConfigName, n)
 	if err != nil {
-		log.Printf("[node] %s: device plugin 프로파일 생성 실패(%v) — 라벨 생략", node, err)
+		log.Printf("[node] %s: device plugin 프로파일 생성 실패(%v), 라벨 생략", node, err)
 		return
 	}
 	_ = s.ops.SetNodeLabel(ctx, node, k8s.DevicePluginConfigLabel, key)
@@ -342,7 +342,7 @@ func (s *Service) SetConfig(name string, req ConfigReq) error {
 	}
 	if req.ShareMode != nil {
 		fields["share_mode"] = *req.ShareMode
-		// 공유 전략을 노드 라벨로 노출 → 세션이 nodeSelector/affinity 로 올바른 노드를 고른다.
+		// 공유 전략을 노드 라벨로 노출하면 세션이 nodeSelector 나 affinity 로 올바른 노드를 고른다.
 		// 특히 타임셰어링 노드는 GPU 를 N슬롯으로 광고하므로, 전용 요청이 잘못 떨어지면
 		// 통 GPU 대신 슬롯만 받는다. 라벨이 그 오배치를 막는 유일한 수단.
 		_ = s.ops.SetNodeLabel(context.Background(), name, ShareModeLabel, *req.ShareMode)
@@ -385,7 +385,7 @@ func (s *Service) SetConfig(name string, req ConfigReq) error {
 func (s *Service) CreateLeaseFor(ctx context.Context, nodeName string, userID int64, instanceID string) error {
 	now := time.Now().UTC()
 	if s.freeMode {
-		// 자유 모드: 노드는 공유(cordon 없음), 임대는 영속(만료 100년) → 계정 1회 생성 후 재사용·동시접속.
+		// 자유 모드에서는 노드를 공유하고(cordon 없음) 임대를 영속으로 둔다(만료 100년). 계정을 한 번 만들고 재사용하며 동시접속을 허용한다.
 		// AcquireLease(exclusive=false)가 (node,user) 활성 임대를 원자적으로 재사용(멱등). 계정 삭제도 없음.
 		l := &Lease{
 			Node: nodeName, UserID: userID, InstanceID: instanceID, Status: LeaseActive,
@@ -396,7 +396,7 @@ func (s *Service) CreateLeaseFor(ctx context.Context, nodeName string, userID in
 	}
 	// 선착순(비-자유): 노드 전용. AcquireLease(exclusive=true)가 갭락으로 직렬화하여
 	// 거의 동시 요청 중 처음 한 건만 임대를 잡고, 나머지는 ErrNodeBusy.
-	// 고정 만료시간은 두지 않는다 — 물리 임대 회수는 유휴 리퍼(노드 GPU 유휴)·수동 반납·크레딧
+	// 고정 만료시간은 두지 않는다. 물리 임대 회수는 유휴 리퍼(노드 GPU 유휴)와 수동 반납, 크레딧
 	// 잔액 소진이 담당한다. (예전의 8h 하드코딩은 이를 처리하는 리퍼가 없어 무의미했다.)
 	l := &Lease{
 		Node: nodeName, UserID: userID, InstanceID: instanceID, Status: LeaseActive,
@@ -410,7 +410,7 @@ func (s *Service) CreateLeaseFor(ctx context.Context, nodeName string, userID in
 }
 
 // ReleaseLeaseFor는 instance_id 로 임대를 해제하고 노드 cordon 을 푼다.
-// 자유 모드에서는 계정 영속이 목적이므로 no-op(임대 유지 → node-agent 가 계정 삭제하지 않음).
+// 자유 모드에서는 계정 영속이 목적이라 아무것도 하지 않는다(임대를 유지하면 node-agent 가 계정을 지우지 않는다).
 func (s *Service) ReleaseLeaseFor(ctx context.Context, instanceID string) error {
 	if s.freeMode {
 		return nil
@@ -503,7 +503,7 @@ func (s *Service) leaseDatasets(ctx context.Context, instanceID, home string) []
 	return out
 }
 
-// dsMountName은 데이터셋 이름을 마운트 경로 세그먼트로 정규화(공백/슬래시→'-').
+// dsMountName은 데이터셋 이름을 마운트 경로 세그먼트로 정규화한다(공백과 슬래시를 - 로).
 func dsMountName(name string) string {
 	out := make([]rune, 0, len(name))
 	for _, r := range name {

@@ -26,22 +26,22 @@ Giosk는 이미 있는 쿠버네티스 클러스터 위에 얹어서, 그 흐름
 
 ## 주요 기능
 
-- **셀프서비스 GPU 세션** — VSCode(code-server), Jupyter, 브라우저 터미널을 사용자별 Pod로.
-- **유연한 GPU 모드** — 전용(카드 통째), 공유(HAMi vGPU로 VRAM·코어 분할), CPU 전용,
+- **셀프서비스 GPU 세션**: VSCode(code-server), Jupyter, 브라우저 터미널을 사용자별 Pod로.
+- **유연한 GPU 모드**: 전용(카드 통째), 공유(HAMi vGPU로 VRAM·코어 분할), CPU 전용,
   물리 노드 SSH 임대(hybrid).
-- **데이터셋과 볼륨** — NFS(RWX) 데이터셋과 노드 로컬 캐시, 영속 홈(`~/nfs`), 공유 볼륨.
-- **과금과 거버넌스** — 크레딧 회계(GPU 종류별 단가, 정기 리필), 조직 → 팀 → 사용자
+- **데이터셋과 볼륨**: NFS(RWX) 데이터셋과 노드 로컬 캐시, 영속 홈(`~/nfs`), 공유 볼륨.
+- **과금과 거버넌스**: 크레딧 회계(GPU 종류별 단가, 정기 리필), 조직에서 팀, 사용자로 이어지는
   계층 배분, 정책 한도, 감사 로그.
-- **관측과 알림** — Prometheus + DCGM 기반 대시보드(GPU 사용률/VRAM/온도), 규칙 기반 알림
+- **관측과 알림**: Prometheus + DCGM 기반 대시보드(GPU 사용률/VRAM/온도), 규칙 기반 알림
   (노드 다운, 디스크, GPU 온도, 크레딧 잔액, 세션 사용량)을 메일·웹훅·인앱으로.
-- **접속 게이트웨이(선택)** — 세션별 서브도메인 웹 접속과 복사·붙여넣기 SSH를 단일 접점으로.
+- **접속 게이트웨이(선택)**: 세션별 서브도메인 웹 접속과 복사·붙여넣기 SSH를 단일 접점으로.
 
 ## 구성
 
-- **백엔드** (`backend/`) — Go(Gin) API + `node-agent`. client-go로 Pod/Job/PVC/Service/exec을
+- **백엔드** (`backend/`): Go(Gin) API + `node-agent`. client-go로 Pod/Job/PVC/Service/exec을
   제어한다. 도메인 상태(사용자, 세션, 조직, 지갑)는 **MySQL**에 있다.
-- **프론트엔드** (`frontend/`) — React 콘솔(관리자 + 사용자).
-- **차트** (`charts/giosk/`) — 플랫폼 전체 Helm 차트. 인프라 의존성(MetalLB, NFS provisioner,
+- **프론트엔드** (`frontend/`): React 콘솔(관리자 + 사용자).
+- **차트** (`charts/giosk/`): 플랫폼 전체 Helm 차트. 인프라 의존성(MetalLB, NFS provisioner,
   Prometheus, DCGM, HAMi)은 `install: true/false`로 켜고 끈다.
 
 ## 빠른 시작
@@ -49,7 +49,7 @@ Giosk는 이미 있는 쿠버네티스 클러스터 위에 얹어서, 그 흐름
 **사전 요구사항** (설치 전에 있어야 한다)
 
 - 모든 노드에 CNI가 동작하는 쿠버네티스 클러스터
-- 쓰기 가능한 **NFS 서버** — 어떤 모드에서도 필요하다(영속 홈이 RWX)
+- 쓰기 가능한 **NFS 서버**. 어떤 모드에서도 필요하다(영속 홈이 RWX)
 - GPU를 쓰려면: NVIDIA 드라이버 + 컨테이너 런타임 + device-plugin + GFD 라벨
 - 베어메탈에서 LoadBalancer를 쓰려면 MetalLB에 줄 IP 대역
 

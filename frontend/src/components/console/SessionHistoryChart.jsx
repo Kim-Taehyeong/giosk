@@ -4,25 +4,25 @@ import { Activity } from 'lucide-react';
 import UtilLineChart from './UtilLineChart';
 import Spinner from './Spinner';
 
-// 세션 사용률 이력은 24시간 고정이다 — 세션 수명은 짧고, DB 미저장(Prometheus Range)이라
+// 세션 사용률 이력은 24시간 고정이다. 세션 수명이 짧고 DB 에 저장하지 않아(Prometheus Range)
 // 24시간 이전 데이터는 애초에 조회하지 않는다(Prometheus 보존정책이 알아서 폐기). 그래서 구간 탭이 없다.
 const HOURS = 24;
 
-// 시각 라벨 — 24h 이내라 시:분.
+// 시각 라벨은 24h 이내라 시:분으로 쓴다.
 function fmtTime(t) {
   const d = new Date(t * 1000);
   const p = (n) => String(n).padStart(2, '0');
   return `${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
-// GPU 측정 불가 사유 → 안내 문구 키.
+// GPU 측정 불가 사유를 안내 문구 키로 옮긴다.
 const REASON = {
   cpu: 'histReasonCpu', physical: 'histReasonPhysical', timeslice: 'histReasonTimeslice',
   unavailable: 'histReasonUnavailable',
 };
 
 // SessionHistoryChart는 세션 사용률 이력(24h 고정)을 라인차트로 렌더한다.
-// fetch(id, hours) → { points[], insights }. 좁은 열에 들어가도록 두 차트를 세로로 쌓는다.
+// fetch(id, hours)는 { points[], insights } 를 준다. 좁은 열에 들어가도록 두 차트를 세로로 쌓는다.
 export default function SessionHistoryChart({ id, fetch }) {
   const { t } = useTranslation('consoleUser');
   const [data, setData] = useState(null);

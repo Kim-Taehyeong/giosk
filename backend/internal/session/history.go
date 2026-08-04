@@ -62,7 +62,7 @@ func (s *Service) History(ctx context.Context, sess *Session, hours int) ([]Hist
 	}
 	ins := HistInsights{Window: fmt.Sprintf("%dh", hours), GpuSource: gpuSrcNone}
 
-	// GPU 출처 판정 — usageOf 와 같은 규칙.
+	// GPU 출처 판정. usageOf 와 같은 규칙이다.
 	switch {
 	case sess.Env == "ssh":
 		ins.GpuReason = gpuNonePhysical
@@ -105,23 +105,23 @@ func (s *Service) History(ctx context.Context, sess *Session, hours int) ([]Hist
 	}
 	pod := sess.InstanceID
 
-	// CPU/RAM — cgroup 기반, GPU 방식 무관하게 항상 정확.
+	// CPU/RAM 은 cgroup 기반이라 GPU 방식과 무관하게 항상 정확하다.
 	cpuCores := s.rangeMap(ctx, fmt.Sprintf(`sum(rate(container_cpu_usage_seconds_total{pod=%q,container!=""}[5m]))`, pod), start, end, step)
 	memBytes := s.rangeMap(ctx, fmt.Sprintf(`sum(container_memory_working_set_bytes{pod=%q,container!=""})`, pod), start, end, step)
 
-	// GPU — 출처별 쿼리.
+	// GPU 는 출처별로 쿼리한다.
 	var gpuUtil, vramUsedMB map[int64]float64
 	switch ins.GpuSource {
 	case gpuSrcDCGM:
 		// 전용 세션은 노드 GPU 를 통째로 쓴다 = 노드 GPU 지표가 곧 세션 지표. HAMi 가 클러스터 전체
-		// device-plugin 이라 DCGM 의 pod 매핑이 불가(exported_pod 없음) → 세션이 놓인 노드로 귀속한다
-		// (dcgm-exporter pod→node 는 kube_pod_info 조인). 노드당 1 GPU 전용에서 정확.
+		// device-plugin 이라 DCGM 의 pod 매핑이 불가능하므로(exported_pod 없음) 세션이 놓인 노드로 귀속한다
+		// (dcgm-exporter 의 pod 을 node 로 옮기는 건 kube_pod_info 조인). 노드당 1 GPU 전용에서 정확하다.
 		j := fmt.Sprintf(` * on(pod,namespace) group_left(node) kube_pod_info{node=%q}`, sess.Node)
 		gpuUtil = s.rangeMap(ctx, `avg by(node) (DCGM_FI_DEV_GPU_UTIL`+j+`)`, start, end, step)
 		vramUsedMB = s.rangeMap(ctx, `sum by(node) (DCGM_FI_DEV_FB_USED`+j+`)`, start, end, step)
 	case gpuSrcHAMi:
 		// HAMi v2.9.0 메트릭명(hami_* 접두, 라벨 exported_pod). 옛 Device_utilization_desc_of_container/
-		// vGPU_device_memory_usage_in_bytes{podname=} 는 v2.9.0 에서 사라져 이력이 항상 빈 값→"미가용"이 됐다.
+		// vGPU_device_memory_usage_in_bytes{podname=} 는 v2.9.0 에서 사라져 이력이 항상 빈 값이 되고 "미가용"으로 보였다.
 		gpuUtil = s.rangeMap(ctx, fmt.Sprintf(`avg(hami_container_device_utilization_ratio{exported_pod=%q})`, pod), start, end, step)
 		vramB := s.rangeMap(ctx, fmt.Sprintf(`sum(hami_vgpu_memory_used_bytes{exported_pod=%q})`, pod), start, end, step)
 		vramUsedMB = map[int64]float64{}
@@ -209,7 +209,7 @@ func (s *Service) History(ctx context.Context, sess *Session, hours int) ([]Hist
 	return points, ins
 }
 
-// rangeMap은 range 쿼리 결과를 unix초→값 맵으로 반환한다(미가용이면 빈 맵).
+// rangeMap은 range 쿼리 결과를 unix초 기준 맵으로 반환한다(미가용이면 빈 맵).
 func (s *Service) rangeMap(ctx context.Context, q string, start, end time.Time, step time.Duration) map[int64]float64 {
 	out := map[int64]float64{}
 	pts, ok := s.met.Range(ctx, q, start, end, step)

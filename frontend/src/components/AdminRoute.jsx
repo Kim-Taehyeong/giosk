@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { isManager } from '../config/consoleRoles';
 
-// 단일 콘솔 가드 — 플랫폼 관리자 또는 조직/그룹 관리자 통과(레벨별 탭·데이터는 내부에서 분기).
+// 단일 콘솔 가드다. 플랫폼 관리자나 조직·그룹 관리자가 통과하며 레벨별 탭과 데이터는 내부에서 갈린다.
 const AdminRoute = ({ children }) => {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;

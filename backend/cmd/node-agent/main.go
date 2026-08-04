@@ -24,11 +24,11 @@ func main() {
 	}
 
 	src := nodeagent.NewAPIClient(apiURL, token, node)
-	// GIOSK_AGENT_MODE=shell → 실제 호스트 계정/마운트(운영). 기본 log(개발/kind, 안전).
+	// GIOSK_AGENT_MODE=shell 이면 실제 호스트 계정과 마운트를 다룬다(운영). 기본은 log 라 개발이나 kind 에서 안전하다.
 	var exec nodeagent.Executor
 	if env("GIOSK_AGENT_MODE", "log") == "shell" {
 		homeBase := env("GIOSK_PHYSICAL_HOME_HOSTPATH", "/home/giosk")
-		nsenter := os.Getenv("GIOSK_AGENT_NSENTER") != "0" // 기본 on(privileged DaemonSet → 호스트 PID1)
+		nsenter := os.Getenv("GIOSK_AGENT_NSENTER") != "0" // 기본 on. privileged DaemonSet 이라 호스트 PID1 로 들어간다
 		exec = nodeagent.NewShellExecutor(node, homeBase, nsenter).
 			WithGatewayKey(os.Getenv("GIOSK_GATEWAY_SSH_PUBKEY")) // 게이트웨이 프록시 접속용 공개키 병기
 		log.Printf("giosk node-agent: ShellExecutor (homeBase=%s, nsenter=%v)", homeBase, nsenter)

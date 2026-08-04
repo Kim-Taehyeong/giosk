@@ -16,9 +16,9 @@ type Availability struct {
 	ByNode []NodeAvail `json:"byNode"`
 }
 
-// TypeAvail — GPU 타입별 가용(클러스터 capacity − running 세션).
-// Fractional* 는 분할(공유/HAMi) 가능한 GPU 만 집계 — share_mode='hami' 인 노드의 GPU.
-// HAMi 노드가 없으면 FractionalFree/Total=0 → 공유 모드는 "가용 없음".
+// TypeAvail은 GPU 타입별 가용량(클러스터 capacity 에서 running 세션을 뺀 값).
+// Fractional* 는 분할(공유·HAMi) 가능한 GPU 만 집계한다. share_mode=hami 인 노드의 GPU 다.
+// HAMi 노드가 없으면 FractionalFree/Total 이 0 이라 공유 모드는 "가용 없음"이 된다.
 type TypeAvail struct {
 	GpuType         string `json:"gpuType"`
 	Free            int    `json:"free"`
@@ -28,7 +28,7 @@ type TypeAvail struct {
 	FractionalTotal int    `json:"fractionalTotal"` // 분할 가능 물리 GPU 총수
 	// HAMi 분할 가용을 "GPU 단위 소수"로(물리 GPU=1, 잔여 코어·VRAM 비율의 작은 쪽). 10슬롯 뻥튀기 대신.
 	FractionalFreeUnits float64 `json:"fractionalFreeUnits"`
-	// HAMi 분할 자원 잔여 — 물리 GPU 개수가 아니라 실제 VRAM(MB)/코어(%)/태스크슬롯 기준.
+	// HAMi 분할 자원 잔여. 물리 GPU 개수가 아니라 실제 VRAM(MB), 코어(%), 태스크슬롯 기준이다.
 	// 프론트가 "이 오퍼링(예: 4GB) 이 몇 개 더 들어가는지"를 노드별로 계산해 합산한다.
 	FracVramFreeMB  int `json:"fracVramFreeMb"`
 	FracVramTotalMB int `json:"fracVramTotalMb"`
@@ -38,7 +38,7 @@ type TypeAvail struct {
 	FracSlotsTotal  int `json:"fracSlotsTotal"`
 }
 
-// NodeAvail — 노드별 가용(대시보드 노드 박스). 분할 노드는 VRAM/코어/슬롯 잔여도 포함.
+// NodeAvail은 노드별 가용량(대시보드 노드 박스). 분할 노드는 VRAM·코어·슬롯 잔여도 포함한다.
 type NodeAvail struct {
 	Node     string `json:"node"`
 	Gpu      string `json:"gpu"`
@@ -46,7 +46,7 @@ type NodeAvail struct {
 	GpuTotal int    `json:"gpuTotal"`
 	GpuFree  int    `json:"gpuFree"`
 	Physical bool   `json:"physical"`
-	// HAMi 분할 노드(share_mode='hami')만 채워짐 — 프론트 오퍼링 가용 계산용(노드 단위 패킹).
+	// HAMi 분할 노드만 채워진다. 프론트 오퍼링 가용 계산용(노드 단위 패킹)이다.
 	Fractional      bool `json:"fractional"`
 	FracVramFreeMB  int  `json:"fracVramFreeMb"`
 	FracVramTotalMB int  `json:"fracVramTotalMb"`
@@ -58,7 +58,7 @@ type NodeAvail struct {
 	Cached []CachedDS `json:"cached"`
 }
 
-// CachedDS — 노드 로컬 캐시 데이터셋(세션 생성 노드 picker 표시).
+// CachedDS는 노드 로컬 캐시 데이터셋(세션 생성 노드 picker 에 표시).
 type CachedDS struct {
 	Name      string `json:"name"`
 	SizeClass string `json:"sizeClass"`
@@ -68,16 +68,16 @@ type CachedDS struct {
 	Owner     string `json:"owner"`
 }
 
-// ShareUse — 한 노드에서 실행 중인 공유(HAMi) 세션들의 자원 점유 합.
+// ShareUse는 한 노드에서 실행 중인 공유(HAMi) 세션들의 자원 점유 합.
 type ShareUse struct {
 	VramMB int
 	Cores  int
 	Count  int
 }
 
-// Reservation — 아직 노드가 정해지지 않은(스케줄 대기) 세션들의 자원 예약분(GPU 타입별).
+// Reservation은 아직 노드가 정해지지 않은(스케줄 대기) 세션들의 자원 예약분(GPU 타입별).
 // 가용성 표시(Availability)에는 반영하지 않는다: 화면은 "실제로 놓인 것"을 보여주고,
-// 관문(CanPlace)만 이 예약분을 빼고 판정한다 — 표시는 정확하게, 승인은 보수적으로.
+// 관문(CanPlace)만 이 예약분을 빼고 판정한다. 표시는 정확하게, 승인은 보수적으로 하기 위해서다.
 type Reservation struct {
 	GpuByType    map[string]int      // 전용 예약 GPU 수
 	SharedByType map[string]ShareUse // 분할 예약(VRAM·코어·슬롯)
@@ -85,9 +85,9 @@ type Reservation struct {
 
 // SessionCounter는 자리를 차지한 세션(=관문을 통과해 admit 된 것)을 센다.
 //
-// "실행 중(running)"만 세면 안 된다 — 방금 만들어져 아직 스케줄 중(provisioning)인 세션도
+// "실행 중(running)"만 세면 안 된다. 방금 만들어져 아직 스케줄 중(provisioning)인 세션도
 // 이미 그 GPU 를 예약한 상태다. running 만 세던 시절에는 동시에 들어온 요청들이 모두 같은
-// 여유를 보고 통과해(TOCTOU) 뒤에 온 세션이 Pending 으로 매달렸다 — 이 제품이 두지 않기로 한
+// 여유를 보고 통과해(TOCTOU) 뒤에 온 세션이 Pending 으로 매달렸다. 이 제품이 두지 않기로 한
 // "보이지 않는 대기열"이 정확히 그렇게 생겼다.
 type SessionCounter interface {
 	RunningByGpuType() map[string]int
@@ -114,7 +114,7 @@ func (s *Service) Availability(ctx context.Context) Availability {
 	if s.cachedByNode != nil {
 		cachedDS = s.cachedByNode()
 	}
-	physNodes := s.counter.RunningPhysicalNodes() // 물리 임대 노드 → 통째 점유
+	physNodes := s.counter.RunningPhysicalNodes() // 물리 임대 노드는 통째로 점유된 것으로 본다
 	hamiNodes := s.counter.HamiNodes()            // 분할 가능(share_mode='hami') 노드
 	splitByNode := s.counter.NodeSplitCount()     // 노드별 deviceSplitCount
 	shareUse := s.counter.SharedUsageByNode()     // 노드별 실행중 공유세션 자원 점유
@@ -172,7 +172,7 @@ func (s *Service) Availability(ctx context.Context) Availability {
 			t.FracSlotsTotal += na.FracSlotsTotal
 			t.FracSlotsFree += na.FracSlotsFree
 		} else {
-			// 비-HAMi(전용/물리) 노드만 전용(whole-card) 가용에 포함 — 전용과 HAMi 분리.
+			// 비-HAMi(전용·물리) 노드만 전용(whole-card) 가용에 넣는다. 전용과 HAMi 는 분리 집계다.
 			t.Total += capN
 			usedByType[n.GpuType] += used
 		}
@@ -185,7 +185,7 @@ func (s *Service) Availability(ctx context.Context) Availability {
 		}
 		t.FractionalFree = clampNonNeg(fracFreeByType[gt])
 		// HAMi 분할 가용을 "GPU 단위 소수"로 표기(물리 GPU=1, 잔여는 코어·VRAM 비율 중 작은 쪽).
-		// 10슬롯 뻥튀기 대신 예: 2장 중 한 장 70% 사용 → 1.3 가용.
+		// 10슬롯으로 뻥튀기하지 않는다. 예를 들어 2장 중 한 장을 70% 쓰면 1.3 이 가용이다.
 		if t.FractionalTotal > 0 {
 			vf, cf := 1.0, 1.0
 			if t.FracVramTotalMB > 0 {
@@ -224,7 +224,7 @@ func atoiSafe(s string) int {
 	return n
 }
 
-// cmpVersion은 "535.104.05" / "12.4" 같은 점 구분 버전을 숫자 튜플로 비교한다(a<b→-1).
+// cmpVersion은 "535.104.05" 나 "12.4" 같은 점 구분 버전을 숫자 튜플로 비교한다(a<b 면 -1).
 // 비숫자 세그먼트는 0으로 취급. CUDA/드라이버 버전의 "최소값" 선택용.
 func cmpVersion(a, b string) int {
 	as, bs := strings.Split(a, "."), strings.Split(b, ".")
@@ -256,7 +256,7 @@ func NewSessionCounter(db *gorm.DB) SessionCounter { return &sessionCounter{db: 
 // (분할 세션의 실제 동거 배치는 추적하지 않으므로 보수적으로 1개로 본다)
 const usedGpuExpr = `SUM(CASE WHEN gpu_mode='exclusive' THEN GREATEST(gpu_count,1) WHEN gpu_mode='cpu' THEN 0 ELSE 1 END)`
 
-// admitted = 이미 자리를 차지한 세션. 스케줄 중(provisioning)도 포함한다 — Pod 가 이미 그 GPU 를
+// admitted 는 이미 자리를 차지한 세션이다. 스케줄 중(provisioning)도 포함한다. Pod 가 이미 그 GPU 를
 // 요청한 상태라, 여유로 세면 같은 자리를 두 번 내주게 된다.
 const admittedPhases = `phase IN ('provisioning','running')`
 
@@ -307,7 +307,7 @@ func (c *sessionCounter) RunningPhysicalNodes() map[string]bool {
 }
 
 // HamiNodes는 분할(공유) 가능한 노드 집합(nodes.share_mode='hami')을 반환한다.
-// 노드 설정 화면에서 '자원 공유(HAMi)'를 켠 노드만 분할 스케줄 대상 → 공유 가용 계산의 분모.
+// 노드 설정 화면에서 자원 공유(HAMi)를 켠 노드만 분할 스케줄 대상이며, 공유 가용 계산의 분모가 된다.
 func (c *sessionCounter) HamiNodes() map[string]bool {
 	var nodes []string
 	c.db.Raw(`SELECT name FROM nodes WHERE share_mode='hami'`).Scan(&nodes)
@@ -370,7 +370,7 @@ func (c *sessionCounter) group(q string) map[string]int {
 	return out
 }
 
-// PlaceReq — 세션 하나를 지금 배치할 수 있는지 묻는 요청(가용성 게이트).
+// PlaceReq는 세션 하나를 지금 배치할 수 있는지 묻는 요청(가용성 게이트).
 type PlaceReq struct {
 	GpuMode     string // shared|exclusive|cpu|timeslice
 	GpuType     string
@@ -386,7 +386,7 @@ type PlaceReq struct {
 // CanPlace는 "지금 이 세션이 들어갈 자리가 있는가"를 답한다.
 //
 // 대기열을 두지 않기로 한 제품 결정에 따라, 생성과 재시작 모두 이 관문을 통과해야 한다.
-// 판정 소스는 세션 마법사·대시보드가 쓰는 Availability 와 같다 — 화면이 "가용 없음"이라고
+// 판정 소스는 세션 마법사·대시보드가 쓰는 Availability 와 같다. 화면이 "가용 없음"이라고
 // 말하는데 API 는 받아주는(또는 그 반대의) 불일치가 생기지 않게 하기 위해서다.
 //
 // 모드별 기준:
@@ -396,7 +396,7 @@ type PlaceReq struct {
 //     (합계로 보면 여러 노드에 흩어진 잔여가 합쳐져 "있다"고 나오지만 실제로는 못 들어간다.)
 //   - timeslice : 그 타입에 여유 슬롯이 하나라도 있어야 한다.
 //
-// 클러스터 정보를 못 얻으면(빈 결과) 막지 않는다 — 조회 실패로 사용자를 잠그는 것보다
+// 클러스터 정보를 못 얻으면(빈 결과) 막지 않는다. 조회 실패로 사용자를 잠그는 것보다
 // 스케줄러가 판단하게 두는 편이 낫다.
 func (s *Service) CanPlace(ctx context.Context, r PlaceReq) bool {
 	if r.GpuMode == "cpu" || r.GpuType == "" {
@@ -404,9 +404,9 @@ func (s *Service) CanPlace(ctx context.Context, r PlaceReq) bool {
 	}
 	av := s.Availability(ctx)
 	if len(av.ByType) == 0 && len(av.ByNode) == 0 {
-		return true // 가용성 조회 실패 → 게이트 미적용
+		return true // 가용성 조회에 실패하면 게이트를 적용하지 않는다
 	}
-	// 스케줄 대기 중인(노드 미정) 세션의 예약분을 먼저 뺀다 — 같은 자리를 두 번 내주지 않기 위해.
+	// 스케줄 대기 중인(노드 미정) 세션의 예약분을 먼저 뺀다. 같은 자리를 두 번 내주지 않기 위해서다.
 	res := s.counter.Reserved()
 	if r.Node != "" {
 		return canPlaceOnNode(av, r, res)
@@ -448,7 +448,7 @@ func (s *Service) CanPlace(ctx context.Context, r PlaceReq) bool {
 }
 
 // fitsShared는 분할 요청이 이 노드에 들어가는지 본다(예약분 hold 를 뺀 잔여 기준).
-// hold 는 노드가 정해지지 않은 분할 세션의 예약분이다 — 어느 노드로 갈지 모르므로 후보 노드마다
+// hold 는 노드가 정해지지 않은 분할 세션의 예약분이다. 어느 노드로 갈지 모르므로 후보 노드마다
 // 빼고 본다(보수적). 그 결과 잠깐 실제보다 빡빡하게 판정될 수 있지만, 반대 방향의 실수(Pending)
 // 보다 낫다: 여기서 거절당한 사용자는 즉시 알고 다시 시도하면 되지만, Pending 은 알 길이 없다.
 func fitsShared(n NodeAvail, r PlaceReq, hold ShareUse) bool {
@@ -465,7 +465,7 @@ func fitsShared(n NodeAvail, r PlaceReq, hold ShareUse) bool {
 }
 
 // canPlaceOnNode는 지정 노드 한 대 안에서만 자리를 판정한다(노드 고정 세션용).
-// 그 노드가 인벤토리에 없으면(이름 오타·노드 제거·NotReady) 막지 않는다 — 조회 공백으로
+// 그 노드가 인벤토리에 없으면(이름 오타, 노드 제거, NotReady) 막지 않는다. 조회 공백으로
 // 사용자를 잠그기보다 스케줄러 판단에 맡기는 CanPlace 의 기존 원칙을 따른다.
 func canPlaceOnNode(av Availability, r PlaceReq, res Reservation) bool {
 	for _, n := range av.ByNode {
@@ -473,7 +473,7 @@ func canPlaceOnNode(av Availability, r PlaceReq, res Reservation) bool {
 			continue
 		}
 		if n.GpuType != r.GpuType {
-			return false // 이 노드엔 그 GPU 모델이 없다 → 그 사양으로는 여기서 못 뜬다
+			return false // 이 노드엔 그 GPU 모델이 없으니 그 사양으로는 여기서 못 뜬다
 		}
 		switch r.GpuMode {
 		case "exclusive":
@@ -483,7 +483,7 @@ func canPlaceOnNode(av Availability, r PlaceReq, res Reservation) bool {
 			}
 			return n.GpuFree-res.GpuByType[r.GpuType] >= need
 		case "shared":
-			// 분할은 HAMi 노드에서만 뜬다 — 같은 모델이어도 분할 노드가 아니면 스케줄 불가.
+			// 분할은 HAMi 노드에서만 뜬다. 같은 모델이어도 분할 노드가 아니면 스케줄되지 않는다.
 			if !n.Fractional {
 				return false
 			}

@@ -19,7 +19,7 @@ type SharedNFSSpec struct {
 	SizeGiB   int
 }
 
-// PVCBackingNFS는 PVC→PV 를 따라가 NFS 백엔드(server,path)를 반환한다(NFS 백엔드가 아니면 ok=false).
+// PVCBackingNFS는 PVC 에서 PV 를 따라가 NFS 백엔드(server, path)를 반환한다(NFS 백엔드가 아니면 ok=false).
 // 교차 네임스페이스 공유와 물리노드 직접 마운트에서 같은 NFS 경로를 재노출할 때 쓴다.
 func (c *Client) PVCBackingNFS(ctx context.Context, ns, name string) (server, path string, ok bool) {
 	if !c.Available() {
@@ -39,7 +39,7 @@ func (c *Client) PVCBackingNFS(ctx context.Context, ns, name string) (server, pa
 // EnsureSharedNFSPVC는 동일 NFS 경로를 가리키는 정적 PV+PVC 를 세션 네임스페이스에 멱등 생성한다.
 // 동적 NFS PV 는 1:1 바인딩이라 다른 ns 세션에 직접 못 붙으므로, 같은 server:path 를 가리키는
 // 정적 PV(ReclaimPolicy=Retain)와 그 PV 에 바인딩되는 PVC 를 만들어 공유 마운트를 가능케 한다.
-// RO/RW 강제는 여기서 굽지 않고 Pod 마운트(readOnly)가 담당한다 — 공유 권한이 ro→rw 로
+// RO/RW 강제는 여기서 굽지 않고 Pod 마운트(readOnly)가 담당한다. 공유 권한이 ro 에서 rw 로
 // 바뀌어도 정적 PV 가 ro 로 고정돼 rw 를 막는 stale 문제를 피하기 위함(권한은 매 마운트 재평가).
 func (c *Client) EnsureSharedNFSPVC(ctx context.Context, s SharedNFSSpec) error {
 	if !c.Available() {
@@ -54,7 +54,7 @@ func (c *Client) EnsureSharedNFSPVC(ctx context.Context, s SharedNFSSpec) error 
 	}
 	size := resource.MustParse(fmt.Sprintf("%dGi", gib))
 	pvName := fmt.Sprintf("giosk-shared-%s-%s", s.Namespace, s.Name)
-	static := "" // 정적 바인딩 — 동적 프로비저너 비활성
+	static := "" // 정적 바인딩이라 동적 프로비저너를 쓰지 않는다
 
 	pv := &corev1.PersistentVolume{
 		ObjectMeta: metav1.ObjectMeta{Name: pvName, Labels: map[string]string{"managed-by": "giosk-system"}},

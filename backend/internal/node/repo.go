@@ -28,7 +28,7 @@ type Repository interface {
 	AgentLeases(node string) ([]AgentLease, error)
 	LeaseVolumes(instanceID string) []LeaseVolRow        // 물리세션에 붙은 볼륨(PVC 좌표 + 권한)
 	LeaseDatasets(instanceID string) []LeaseDatasetRow   // 물리세션에 붙은 데이터셋(PVC 좌표, RO)
-	RunningByNode() map[string]int                       // node → running 세션 수
+	RunningByNode() map[string]int                       // 노드별 running 세션 수
 	ReleaseByInstance(instanceID string) (string, error) // 임대 해제 후 노드명 반환
 }
 
@@ -76,12 +76,12 @@ func (r *gormRepo) CreateLease(l *Lease) error { return r.db.Create(l).Error }
 
 // AcquireLease는 노드 활성 임대를 원자적으로 획득한다(선착순 정합성).
 // node_leases.lease_key(생성컬럼) 유니크 제약이 경합을 DB 레벨에서 보장한다(갭락/데드락 없음):
-//   - exclusive(비-자유): lease_key=node. 둘째 INSERT 는 1062 중복 → ErrNodeBusy.
-//   - !exclusive(자유):   lease_key=node#user. 둘째 INSERT 는 1062 중복 → 재사용(reused=true).
+//   - exclusive(비-자유): lease_key=node. 둘째 INSERT 는 1062 중복이라 ErrNodeBusy 가 된다.
+//   - !exclusive(자유):   lease_key=node#user. 둘째 INSERT 는 1062 중복이지만 재사용한다(reused=true).
 // 거의 동시에 들어온 다수 요청 중 처음 한 건만 INSERT 에 성공한다.
 func (r *gormRepo) AcquireLease(l *Lease, exclusive bool) (bool, error) {
 	l.Shared = !exclusive
-	// 흔한 경우는 사전 조회로 차단(유니크 제약은 동시 경합 백스톱) → 불필요한 1062 로그 억제.
+	// 흔한 경우는 사전 조회로 차단한다(유니크 제약은 동시 경합 백스톱). 불필요한 1062 로그를 줄인다.
 	if exclusive {
 		if _, taken := r.ActiveLeaseUser(l.Node); taken {
 			return false, ErrNodeBusy
@@ -94,7 +94,7 @@ func (r *gormRepo) AcquireLease(l *Lease, exclusive bool) (bool, error) {
 		if exclusive {
 			return false, ErrNodeBusy
 		}
-		return true, nil // 자유 모드: (node,user) 임대 이미 존재 → 멱등 재사용
+		return true, nil // 자유 모드에서 (node,user) 임대가 이미 있으면 멱등하게 재사용한다
 	}
 	return false, err
 }
@@ -163,7 +163,7 @@ func (r *gormRepo) AgentLeases(nodeName string) ([]AgentLease, error) {
 	return out, err
 }
 
-// LeaseVolRow — 물리세션에 붙은 볼륨 1건(PVC 좌표 + 서버판정 권한).
+// LeaseVolRow는 물리세션에 붙은 볼륨 1건(PVC 좌표와 서버 판정 권한).
 type LeaseVolRow struct {
 	PVCName      string
 	PVCNamespace string
@@ -184,7 +184,7 @@ func (r *gormRepo) LeaseVolumes(instanceID string) []LeaseVolRow {
 	return out
 }
 
-// LeaseDatasetRow — 물리세션에 붙은 데이터셋 1건(이름 + PVC 좌표, 항상 RO).
+// LeaseDatasetRow는 물리세션에 붙은 데이터셋 1건(이름과 PVC 좌표, 항상 RO).
 type LeaseDatasetRow struct {
 	Name         string
 	PVCName      string

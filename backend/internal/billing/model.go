@@ -1,6 +1,6 @@
 // Package billing은 크레딧 소비 showback(그룹/사용자/조직 집계)을 제공한다.
 //
-// 소비 원천: memberships.consumed(사용자/그룹/조직 모두 멤버 누적 합), gpuHours 는 gpu_usage 원장(초→시간).
+// 소비 원천은 memberships.consumed(사용자, 그룹, 조직 모두 멤버 누적 합)이고, gpuHours 는 gpu_usage 원장의 초를 시간으로 바꾼 값이다.
 // 조직 소비도 산하 그룹 멤버 consumed 합으로 일관화. credit 모드 전용 화면(프론트가 모드로 노출 제어).
 package billing
 
@@ -26,7 +26,7 @@ type GroupRow struct {
 
 type UserRow struct {
 	ID       int64   `json:"id"`
-	GroupID  int64   `json:"groupId"` // 이 행이 귀속된 팀(사용자×팀 단위) — 프론트 rowKey 구분용
+	GroupID  int64   `json:"groupId"` // 이 행이 귀속된 팀(사용자와 팀 단위). 프론트 rowKey 구분용
 	Name     string  `json:"name"`
 	Org      string  `json:"org"`
 	Group    string  `json:"group"`

@@ -17,7 +17,7 @@ import { getImages } from '../../../api/console/resources';
 
 const WINDOWS = [{ h: 6, k: 'w6h' }, { h: 24, k: 'w24h' }, { h: 168, k: 'w7d' }];
 
-// 시각 라벨 — 24h 이하는 시:분, 그 이상은 월/일 시.
+// 시각 라벨은 24h 이하면 시:분, 그 이상이면 월/일 시로 쓴다.
 function fmtTime(t, hours) {
   const d = new Date(t * 1000);
   const p = (n) => String(n).padStart(2, '0');
@@ -47,7 +47,7 @@ export default function NodeDetailPage() {
   useEffect(() => { getDatasets().then((d) => setCachedDs((d.global || []).filter((x) => (x.nodes || []).includes(name)))).catch(() => {}); }, [name]);
   useEffect(() => { getImages().then((d) => setCachedImg((d.items || []).filter((x) => (x.cachedNodes || []).includes(name)))).catch(() => {}); }, [name]);
 
-  // 설정 저장 — 로컬 반영 + 영속.
+  // 설정 저장이다. 로컬에 반영하고 영속화한다.
   const save = (p) => { setNode((n) => ({ ...n, ...p })); saveNodeConfig(name, p).catch(() => {}); };
   const setCordon = async (on) => {
     setNode((n) => ({ ...n, status: on ? 'cordoned' : 'ready' }));

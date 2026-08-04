@@ -11,7 +11,7 @@ import { getAllSessionsWithUsage } from '../../../api/console/sessions';
 import { measureRows, gpuUnmeasurable } from '../../../utils/sessionUsage';
 import { cU } from '../../../lib/credit';
 
-// 상태 → (Pill 변형, i18n 키). 미정의 상태는 원문 표시(폴백).
+// 상태를 (Pill 변형, i18n 키)로 옮긴다. 정의되지 않은 상태는 원문을 그대로 보여준다(폴백).
 const ST = {
   running: ['run', 'stRunning'], provisioning: ['wait', 'stProvisioning'],
   paused: ['pause', 'stPaused'], stopped: ['pause', 'stStopped'],
@@ -22,7 +22,7 @@ const sp = (s, t) => {
   return <Pill variant={variant} dot>{key ? t('monitor.' + key) : s}</Pill>;
 };
 
-// UsageCell — 세션별 실사용(GPU/VRAM, 못 재면 CPU/RAM). 사용자 화면과 같은 규칙을 쓴다:
+// UsageCell은 세션별 실사용을 보여준다(GPU 와 VRAM, 못 재면 CPU 와 RAM). 사용자 화면과 같은 규칙을 쓴다:
 // 못 재는 지표는 0% 막대가 아니라 "측정 불가"로 적는다(놀고 있는 세션과 구분).
 function UsageCell({ r, t }) {
   if (r.status !== 'running') return <span className="muted">—</span>;
@@ -56,7 +56,7 @@ export default function SessionMonitor() {
   const [q, setQ] = useState('');
 
   const load = () => getAllSessionsWithUsage().then(setRows);
-  // 5초 폴링 — 실행시간/실시간 누적 크레딧 갱신.
+  // 5초 폴링으로 실행시간과 실시간 누적 크레딧을 갱신한다.
   useEffect(() => { load(); const id = setInterval(load, 5000); return () => clearInterval(id); }, []);
 
   const filtered = (rows || []).filter((r) => !q || r.name.includes(q) || r.owner.includes(q) || r.group.includes(q) || (r.org || '').includes(q));

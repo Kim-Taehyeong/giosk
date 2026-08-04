@@ -4,7 +4,7 @@ import { Download, Upload } from 'lucide-react';
 import { useToast } from './Toast';
 import { downloadCsv, parseCsvText } from '../../utils/csv';
 
-// 엑셀(CSV) 양식 다운로드 + 일괄 업로드 버튼 묶음 — 사용자/그룹/조직 등에서 공용.
+// 엑셀(CSV) 양식 다운로드와 일괄 업로드 버튼 묶음이다. 사용자, 그룹, 조직 등에서 함께 쓴다.
 //  header: 양식 헤더 셀 배열, samples: 예시 행들, onRows: 파싱된 데이터 행(헤더 제외) 콜백.
 export default function BulkImport({ filename, header, samples = [], onRows }) {
   const { t } = useTranslation('consoleAdmin');

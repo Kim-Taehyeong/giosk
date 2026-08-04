@@ -19,7 +19,7 @@ function downloadText(filename, text) {
 
 // SshKeyForm은 SSH 공개키 등록/생성 UI(내정보·접속 모달 공용).
 // 저장은 백엔드(users.ssh_public_key)에 하며, 실행 중인 컨테이너 세션에도 즉시 반영된다.
-// "키 생성"은 서버가 키쌍을 만들어 개인키를 1회만 내려준다(서버 미보관 — EC2 키페어 방식).
+// 키 생성은 서버가 키쌍을 만들어 개인키를 1회만 내려준다(서버는 보관하지 않는 EC2 키페어 방식).
 export default function SshKeyForm({ onSaved }) {
   const { t } = useTranslation('consoleUser');
   const { user, refreshUser } = useAuth();

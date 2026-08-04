@@ -16,10 +16,10 @@ type Repository interface {
 	SetGpuPricing(p GpuPrice) error
 	GpuTypePrice(gpuType string) int
 
-	TimeslicingNodes() map[string]int // 타임슬라이싱 노드 → 슬롯 수(split_count)
+	TimeslicingNodes() map[string]int // 타임슬라이싱 노드별 슬롯 수(split_count)
 }
 
-// GpuPrice — gpuType별 단가: 전용(시간) + HAMi 분할 단위(VRAM GB/시간, 코어%/시간).
+// GpuPrice는 gpuType별 단가다. 전용(시간)과 HAMi 분할 단위(VRAM GB/시간, 코어%/시간)를 갖는다.
 type GpuPrice struct {
 	GpuType      string `gorm:"column:gpu_type" json:"gpuType"`
 	PricePerHour int    `gorm:"column:price_per_hour" json:"pricePerHour"` // 전용 1 GPU/시간

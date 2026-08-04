@@ -62,7 +62,7 @@ export default function Nodes() {
   const gpuNodes = nodes.filter((r) => r.total !== undefined);
   const metricsOff = gpuNodes.length > 0 && gpuNodes.every((r) => !(r.total > 0));
 
-  // 데이터셋 기능이 꺼진 배포에선 라우트 자체가 없다(404) → 켜져 있을 때만 조회.
+  // 데이터셋 기능이 꺼진 배포에선 라우트 자체가 없어 404 가 나므로 켜져 있을 때만 조회한다.
   useEffect(() => {
     if (!datasetsOn) return;
     getDatasets().then((d) => setDatasets(d.global || [])).catch(() => {});
@@ -82,7 +82,7 @@ export default function Nodes() {
   };
 
 
-  // 노드별 디스크(스토리지 현황) — 노드 표에 합쳐 한 번에 본다.
+  // 노드별 디스크(스토리지 현황)는 노드 표에 합쳐 한 번에 본다.
   const diskOf = (node) => (storage?.nodes || []).find((n) => n.node === node);
   const diskCell = (r) => {
     const d = diskOf(r.node);
@@ -98,7 +98,7 @@ export default function Nodes() {
     );
   };
 
-  // 공유 모드 — 자세히 보기를 열지 않아도 목록에서 바로 보이게 한다.
+  // 공유 모드는 자세히 보기를 열지 않아도 목록에서 바로 보이게 한다.
   const shareCell = (r) => {
     const mode = r.shareMode || (r.hami ? 'hami' : 'exclusive');
     const label = { exclusive: t('nodes.modeExclusive'), hami: t('nodes.modeHami'), timeslicing: t('nodes.modeTimeslicing') }[mode];

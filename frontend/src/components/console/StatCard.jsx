@@ -10,7 +10,7 @@ const TONE = {
   warn: { bg: 'var(--warn-soft, rgba(245,158,11,.14))', fg: 'var(--warn)' },
 };
 
-// unit: 값 옆 짧은 단위(%, C, W…). sub: 값 아래 설명 캡션("최근 24h 기준" 등 — 숫자 옆에 붙으면 어색한 것).
+// unit 은 값 옆 짧은 단위(%, C, W)다. sub 는 값 아래 설명 캡션이다(최근 24h 기준처럼 숫자 옆에 붙으면 어색한 것).
 export default function StatCard({ label, value, unit, sub, bar, icon: Icon, tone = 'primary' }) {
   const c = TONE[tone] || TONE.primary;
   return (

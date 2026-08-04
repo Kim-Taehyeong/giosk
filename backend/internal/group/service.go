@@ -12,7 +12,7 @@ var (
 	ErrUserUnknown  = errors.New("user not found")
 	ErrGroupUnknown = errors.New("target group not found")
 	ErrSameGroup    = errors.New("source and target group are identical")
-	// 삭제 가드 — 고아 멤버 방지.
+	// 삭제 가드로 고아 멤버를 막는다.
 	ErrDefaultGroup    = errors.New("default group cannot be deleted") // '일반'(general)은 이전 대상이라 삭제 불가
 	ErrGroupHasMembers = errors.New("group has active members")        // 멤버를 다른 팀으로 옮기거나 제거해야 삭제 가능
 )
@@ -26,7 +26,7 @@ type GroupWalletSeeder interface {
 // Service는 group 비즈니스 로직.
 type Service struct {
 	repo   Repository
-	wallet GroupWalletSeeder // nil=비크레딧/미주입 → 초기크레딧·리필 생략
+	wallet GroupWalletSeeder // nil 이면 비크레딧이거나 미주입이라 초기크레딧과 리필을 생략한다
 }
 
 func NewService(repo Repository) *Service { return &Service{repo: repo} }
@@ -80,7 +80,7 @@ func (s *Service) Create(req CreateReq) (*Group, error) {
 	return g, nil
 }
 
-// ResolveAdmin은 관리자 계정 존재 여부만 검증한다(조직 생성 전 사전 검증 → 원자성). 없으면 ErrUserUnknown.
+// ResolveAdmin은 관리자 계정 존재 여부만 검증한다(조직 생성 전 사전 검증이라 원자성을 지킨다). 없으면 ErrUserUnknown.
 func (s *Service) ResolveAdmin(account string) error {
 	_, err := s.repo.ResolveUserID(account)
 	if errors.Is(err, ErrNotFound) {
@@ -92,7 +92,7 @@ func (s *Service) ResolveAdmin(account string) error {
 // CreateOrgAdminGroup은 조직 생성 시 기본 그룹을 만들고 지정 계정을 org_admin 으로 배정한다(조직 관리자 부트스트랩).
 // CreateOrgAdminGroup은 조직의 기본('일반') 그룹을 만들고, 계정이 주어지면 org_admin 으로 배정한다.
 //
-// adminAccount 가 비어도 그룹은 만든다 — org_admin 은 독립 역할이 아니라 멤버십 역할이라
+// adminAccount 가 비어도 그룹은 만든다. org_admin 은 독립 역할이 아니라 멤버십 역할이라
 // 역할을 걸어둘 그룹이 먼저 있어야 한다. 그래야 "조직 먼저 만들고 관리자는 나중에" 가 가능하다
 // (나중에 그룹 상세에서 멤버 추가 + 역할=조직 관리자).
 func (s *Service) CreateOrgAdminGroup(orgID int64, adminAccount string) error {
@@ -107,7 +107,7 @@ func (s *Service) CreateOrgAdminGroup(orgID int64, adminAccount string) error {
 		}
 		uid = resolved
 	}
-	// 조직 기본(관리자) 그룹 — 가입 신청 대상 아님(AcceptsJoin=false). 관리자가 멤버를 직접 추가/그룹 신설.
+	// 조직 기본(관리자) 그룹은 가입 신청 대상이 아니다(AcceptsJoin=false). 관리자가 멤버를 직접 추가하거나 그룹을 새로 만든다.
 	g := &Group{OrgID: orgID, Name: "general", DisplayName: "일반", AcceptsJoin: false, Status: "active"}
 	if err := s.repo.Create(g); err != nil {
 		return err
@@ -132,7 +132,7 @@ func (s *Service) UpdateGroup(id int64, displayName *string, acceptsJoin *bool) 
 
 // ArchiveGroup은 그룹을 소프트 삭제한다(관리자).
 // ArchiveGroup은 팀을 삭제한다. 데이터 무결성 가드: '일반'(general)은 이전 대상이라 절대 삭제 불가,
-// 활성 멤버가 있는 팀도 삭제 불가(멤버를 다른 팀으로 옮기거나 제거한 뒤에야 삭제) → 고아 멤버 방지.
+// 활성 멤버가 있는 팀도 삭제할 수 없다. 멤버를 다른 팀으로 옮기거나 제거해야 지울 수 있고, 그래야 고아 멤버가 안 생긴다.
 func (s *Service) ArchiveGroup(id int64) error {
 	g, err := s.repo.Find(id)
 	if err != nil {
@@ -157,7 +157,7 @@ func (s *Service) RoleInGroup(userID, groupID int64) (string, bool) {
 	return s.repo.RoleInGroup(userID, groupID)
 }
 
-// Profile은 auth.Enricher 구현 — 주 멤버십 → 콘솔 라우팅 컨텍스트 + 전체 관리 스코프(멀티롤).
+// Profile은 auth.Enricher 구현이다. 주 멤버십에서 콘솔 라우팅 컨텍스트와 전체 관리 스코프(멀티롤)를 만든다.
 func (s *Service) Profile(userID int64) auth.ProfileExtra {
 	p, err := s.repo.PrimaryMembership(userID)
 	if err != nil || p == nil {
@@ -168,7 +168,7 @@ func (s *Service) Profile(userID int64) auth.ProfileExtra {
 		MembershipRole: membershipRole, ConsoleLevel: consoleLevel,
 		OrgID: &p.OrgID, GroupID: &p.GroupID, OrgName: p.OrgName, GroupName: p.GroupName,
 	}
-	// 전환기용 — 관리 멤버십이 2개 이상이면 프론트가 스코프 스위처를 띄운다.
+	// 전환기용이다. 관리 멤버십이 2개 이상이면 프론트가 스코프 스위처를 띄운다.
 	if mm, err := s.repo.ManagerMemberships(userID); err == nil {
 		for _, m := range mm {
 			ex.Scopes = append(ex.Scopes, scopeView(m))
@@ -185,8 +185,8 @@ func scopeView(m PrimaryMembership) auth.ProfileScope {
 	return auth.ProfileScope{Level: "group", OrgID: m.OrgID, GroupID: m.GroupID, OrgName: m.OrgName, GroupName: m.GroupName}
 }
 
-// PrimaryScope는 authz.ScopeReader 구현 — 주 멤버십 → 거버넌스 스코프(level/orgID/groupID).
-// org_admin→org(자기 조직), project_admin→group(자기 그룹), 그 외→member(권한 없음).
+// PrimaryScope는 authz.ScopeReader 구현이다. 주 멤버십에서 거버넌스 스코프(level, orgID, groupID)를 만든다.
+// org_admin 은 자기 조직, project_admin 은 자기 그룹, 그 외는 member(권한 없음)가 된다.
 func (s *Service) PrimaryScope(userID int64) (level string, orgID, groupID int64, ok bool) {
 	p, err := s.repo.PrimaryMembership(userID)
 	if err != nil || p == nil {
@@ -202,7 +202,7 @@ func (s *Service) PrimaryScope(userID int64) (level string, orgID, groupID int64
 	}
 }
 
-// ManagerScopes는 authz.ScopeReader 구현 — 사용자의 모든 관리 스코프(멀티롤).
+// ManagerScopes는 authz.ScopeReader 구현이다. 사용자의 모든 관리 스코프(멀티롤)를 준다.
 // 우선순위 순(org 먼저); [0] 은 PrimaryScope 와 동일(하위 호환 기본값).
 func (s *Service) ManagerScopes(userID int64) []authz.Scope {
 	mm, err := s.repo.ManagerMemberships(userID)
@@ -220,7 +220,7 @@ func (s *Service) ManagerScopes(userID int64) []authz.Scope {
 	return out
 }
 
-// mapConsole은 멤버십 role → (프론트 membershipRole, consoleLevel).
+// mapConsole은 멤버십 role 을 프론트 membershipRole 과 consoleLevel 로 옮긴다.
 func mapConsole(role string) (string, string) {
 	switch role {
 	case "org_admin":
@@ -237,7 +237,7 @@ func (s *Service) Members(groupID int64) ([]Member, error) {
 	if err != nil {
 		return nil, err
 	}
-	// 멀티롤 배지 — 각 멤버가 다른 그룹/조직에서 갖는 관리 역할까지 함께 보여준다.
+	// 멀티롤 배지다. 각 멤버가 다른 그룹이나 조직에서 갖는 관리 역할까지 함께 보여준다.
 	ids := make([]int64, 0, len(members))
 	for _, m := range members {
 		ids = append(ids, m.UserID)

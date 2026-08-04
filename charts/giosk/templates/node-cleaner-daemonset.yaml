@@ -27,7 +27,7 @@ spec:
     metadata:
       labels: { app: giosk-node-cleaner }
     spec:
-      # 정리 대상이 있는 노드에만 — scratch 노드 또는 물리 노드.
+      # 정리 대상이 있는 노드에만 둔다(scratch 노드나 물리 노드).
       # nodeSelectorTerms 는 OR 이므로 둘 중 하나만 맞아도 배치된다.
       affinity:
         nodeAffinity:
@@ -61,12 +61,12 @@ spec:
           args:
             - |
               set -u
-              # 사용률(%) — 대상 경로가 속한 파일시스템 기준.
+              # 사용률(%)은 대상 경로가 속한 파일시스템 기준이다.
               usage() { df -P "$1" 2>/dev/null | awk 'NR==2{gsub("%","",$5);print $5}'; }
 
               # purge <dir> <threshold> <min_age_days>
               #   임계 초과 시 atime 오래된 순으로 파일을 지워 임계 아래로 되돌린다.
-              #   디렉터리 구조(계정 폴더)는 보존한다 — 재대여 시 소유권/경로가 유지돼야 하므로.
+              #   디렉터리 구조(계정 폴더)는 보존한다. 재대여할 때 소유권과 경로가 유지돼야 하기 때문이다.
               purge() {
                 dir="$1"; th="$2"; min_age="$3"
                 [ -n "$dir" ] || return 0

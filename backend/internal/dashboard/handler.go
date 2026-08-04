@@ -38,5 +38,5 @@ func (h *Handler) Admin(c *gin.Context) {
 // OpsScoped는 운영 대시보드를 호출자 스코프로 반환한다(단일 /console 트리).
 func (h *Handler) OpsScoped(c *gin.Context) {
 	orgID, groupID := authz.CurrentScope(c).EffectiveIDs()
-	httpx.OK(c, h.svc.Ops(orgID, groupID)) // platform 은 orgID/groupID=0 → 전체
+	httpx.OK(c, h.svc.Ops(orgID, groupID)) // platform 은 orgID/groupID 가 0 이라 전체를 본다
 }

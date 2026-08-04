@@ -2,21 +2,21 @@ package systemconfig
 
 import "gorm.io/gorm"
 
-// 런타임 설정 키 — 운영 중 조정 가능한 단순 정책만(무거운 항목은 설치시 env 고정).
+// 런타임 설정 키다. 운영 중 조정할 수 있는 단순 정책만 두고 무거운 항목은 설치 시 env 로 고정한다.
 const (
 	KeyIdleTimeoutMin       = "idle_timeout_min"
 	KeyStoragePriceGiBMonth = "storage_price_gib_month" // 스토리지 크레딧 단가(GiB·월). 런타임 조정.
-	// 중단 세션 홈 회수 — 유휴 타임아웃과 같은 성격의 회수 정책이라 함께 런타임 조정한다.
+	// 중단 세션 홈 회수는 유휴 타임아웃과 같은 성격의 회수 정책이라 함께 런타임에서 조정한다.
 	// 운영하며 "며칠이 적당한가"가 바뀌는 값이고, 바꾸는 데 재배포가 필요할 이유가 없다.
 	KeyStoppedTTLDays       = "stopped_ttl_days"              // 중단 세션이 회수 후보가 되는 방치 일수(0=회수 비활성)
-	KeyHomeReapPct          = "home_reap_pct"                 // 노드 디스크 사용률 임계(%) — 이 이상인 노드에서만 집행
+	KeyHomeReapPct          = "home_reap_pct"                 // 노드 디스크 사용률 임계(%). 이 이상인 노드에서만 집행한다
 	KeyRechargeEnabled      = "credit_recharge_enabled"       // 크레딧 정기 재충전 on/off
 	KeyRechargeAmount       = "credit_recharge_amount"        // 재충전 크레딧 양
 	KeyRechargeIntervalDays = "credit_recharge_interval_days" // 재충전 주기(일)
-	KeyRechargeReset        = "credit_recharge_reset"         // (구) true=잔액 리셋 — 계층 이월로 대체됨
+	KeyRechargeReset        = "credit_recharge_reset"         // (구) true 면 잔액 리셋. 계층 이월로 대체됐다
 	KeyRechargeCarryover    = "credit_recharge_carryover"     // 플랫폼 이월 허용(계층 이월 상한 경계)
 	// 전역 하드 상한(정책 탭의 '전역' 행). 설치 기본은 env(config.Quota), 여기 값이 있으면 우선.
-	// 세션 생성 시 숫자 비교만 하는 값이라 인프라와 무관 → 재시작 없이 런타임 조정 가능.
+	// 세션 생성 시 숫자 비교만 하는 값이라 인프라와 무관하고, 재시작 없이 런타임에서 조정할 수 있다.
 	KeyQuotaMaxGpu      = "quota_max_gpu"
 	KeyQuotaMaxVramGB   = "quota_max_vram_gb"
 	KeyQuotaMaxVolGiB   = "quota_max_volume_gib"

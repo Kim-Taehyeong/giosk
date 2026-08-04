@@ -13,7 +13,7 @@ var ErrNotFound = errors.New("not found")
 // ErrSessionLimit는 사용자 동시 활성 세션 상한 초과.
 var ErrSessionLimit = errors.New("session limit reached")
 
-// ErrStoppedLimit는 중단(대기) 세션 상한 초과 — 중단 세션은 로컬 홈 PVC 를 물고 있어(노드 디스크 점유)
+// ErrStoppedLimit는 중단(대기) 세션 상한 초과다. 중단 세션은 로컬 홈 PVC 를 물고 있어(노드 디스크 점유)
 // 무한정 쌓이면 안 된다. 새 세션을 만들려면 기존 중단 세션을 삭제해야 한다.
 var ErrStoppedLimit = errors.New("stopped session limit reached")
 
@@ -38,7 +38,7 @@ var ErrMustJoinTeam = errors.New("must belong to a team")
 var ErrHardLimit = errors.New("hard resource limit exceeded")
 
 // ErrNoCapacity는 지금 그 GPU 를 넣을 자리가 없어 세션 생성·재시작을 거부할 때.
-// 이 제품은 대기열을 두지 않는다 — 자리가 없으면 Pending 으로 매달아 두는 대신 즉시 거절하고
+// 이 제품은 대기열을 두지 않는다. 자리가 없으면 Pending 으로 매달아 두는 대신 즉시 거절하고
 // 사용자가 다시 시도할지 다른 오퍼링을 고를지 결정하게 한다(순서 정책 없이 매달아 두면
 // 보이지 않는 새치기 줄이 생긴다).
 var ErrNoCapacity = errors.New("no capacity")
@@ -46,13 +46,13 @@ var ErrNoCapacity = errors.New("no capacity")
 // 세션 재구성(중단 상태에서 GPU 붙이기/떼기) 관련 오류.
 var (
 	// ErrNotStopped는 실행 중 세션의 사양을 바꾸려 할 때. 컨테이너 스펙(GPU 자원)은 Pod 생성 시
-	// 확정되므로 실행 중에는 바꿀 수 없다 — 중단 후 재구성해 재개하는 경로만 허용한다.
+	// 확정되므로 실행 중에는 바꿀 수 없다. 중단 후 재구성해 재개하는 경로만 허용한다.
 	ErrNotStopped = errors.New("session is not stopped")
-	// ErrReconfigureUnavailable는 재구성 대상이 아닌 세션(물리 SSH 임대 — 노드 통째 대여라 사양 개념이 없다).
+	// ErrReconfigureUnavailable는 재구성 대상이 아닌 세션(물리 SSH 임대는 노드를 통째로 빌려주므로 사양 개념이 없다).
 	ErrReconfigureUnavailable = errors.New("reconfigure unavailable")
 	// ErrBadSpec은 요청 사양이 유효하지 않을 때(알 수 없는 모드, GPU 모드인데 GPU 타입 없음 등).
 	ErrBadSpec = errors.New("invalid spec")
-	// ErrAlreadyStarting은 이미 시작(전이) 중인 세션을 또 시작하려 할 때 — 버튼 연타·중복 요청.
+	// ErrAlreadyStarting은 이미 시작(전이) 중인 세션을 또 시작하려 할 때다(버튼 연타·중복 요청).
 	ErrAlreadyStarting = errors.New("session already starting")
 	// ErrNodePinned는 클러스터에는 자리가 있지만 이 세션이 묶인 노드에는 그 사양을 넣을 수 없을 때.
 	// 세션 홈(/home/work)은 노드 로컬 디스크(local-path)라 세션은 그 노드에서만 재개된다.
@@ -67,7 +67,7 @@ type Repository interface {
 	UpdateLive(instanceID, phase, node, ip string) error
 	SetPhase(instanceID, phase string) error
 	UpdateSpec(instanceID string, s *Session) error // 중단 세션 계산자원 재구성(GPU 붙이기/떼기)
-	// ClaimForStart는 stopped → provisioning 전이를 조건부(CAS)로 시도한다(false=이미 누가 시작함).
+	// ClaimForStart는 stopped 에서 provisioning 으로의 전이를 조건부(CAS)로 시도한다(false 면 이미 누가 시작했다).
 	// 재시작 버튼 연타·동시 요청이 같은 세션을 두 번 띄우는 것을 DB 수준에서 막는다.
 	ClaimForStart(instanceID string) (bool, error)
 	SetBilled(instanceID string, billed int) error                                 // 정산 누적 갱신
@@ -78,16 +78,16 @@ type Repository interface {
 	ListAll() ([]AdminRow, error)
 	AdminOne(instanceID string) (*AdminRow, error)
 	ListRunning() ([]Session, error)
-	// 중단 세션의 홈 PVC 회계 — 중단 구간을 열고(MarkStopped) 닫으며(ClearStopped) 그 사이를 정산한다.
-	ListStopped() ([]Session, error) // 중단 세션(컨테이너만) — 스토리지 과금·홈 회수(T1) 대상
+	// 중단 세션의 홈 PVC 회계. 중단 구간을 열고(MarkStopped) 닫으며(ClearStopped) 그 사이를 정산한다.
+	ListStopped() ([]Session, error) // 중단 세션(컨테이너만). 스토리지 과금·홈 회수 대상
 	MarkStopped(instanceID string, at time.Time) error
 	ClearStopped(instanceID string, accrued int) error // 재개: 구간 종료(누적 초 반영, stopped_since=NULL)
 	SetStorageBilled(instanceID string, stoppedSeconds, billed int, at time.Time) error
 	NewestStoppedInstance(userID int64) string // 회수 면책 대상(사용자별 가장 최근 중단 세션)
 
-	ListActiveContainer() ([]Session, error)       // 컨테이너 활성(provisioning|running) 세션 — phase 리컨실용
+	ListActiveContainer() ([]Session, error)       // 컨테이너 활성(provisioning|running) 세션. phase 리컨실용
 	CountActive(userID int64) int                  // 활성(provisioning|running) 세션 수
-	CountStopped(userID int64) int                 // 중단(stopped) 세션 수 — 로컬 홈 PVC 점유로 상한 대상
+	CountStopped(userID int64) int                 // 중단(stopped) 세션 수. 로컬 홈 PVC 점유로 상한 대상
 	IsGroupMember(userID, groupID int64) bool      // 사용자가 그 팀의 활성 멤버인지(세션 팀 귀속 검증)
 	UserLeasedNode(userID int64, node string) bool // 사용자가 그 물리노드를 대여한 적 있는지(로컬 Home 접근 검증)
 	SetUserSSHKey(userID int64, key string) error
@@ -97,7 +97,7 @@ type Repository interface {
 
 	ImageRef(imageID int64) (string, error)    // name(:tag)
 	ImageChannels(imageID int64) ImageChannels // 이미지 제공 채널(vscode/jupyter/ssh)
-	CachedNodes(imageID int64) []string        // 이미지가 캐시 완료(cached)된 노드 — 스케줄 선호용
+	CachedNodes(imageID int64) []string        // 이미지가 캐시 완료(cached)된 노드. 스케줄 선호용
 	OfferingSpec(offeringID int64) (*OfferingSpec, error)
 	GpuTypePrice(gpuType string) int                                  // 전용 GPU 시간당 단가
 	GpuTypePricing(gpuType string) (perHour, perGB, perCore int)      // 전용/분할 단위 단가
@@ -115,7 +115,7 @@ type Repository interface {
 	ActiveSessionsWithDataset(userID, dsID int64, exclude string) int // 같은 데이터셋 쓰는 다른 활성 세션 수
 }
 
-// AdminRow — 관리자 세션 관제 행(소유자/조직/그룹 조인).
+// AdminRow는 관리자 세션 관제 행(소유자·조직·그룹 조인).
 type AdminRow struct {
 	ID           string `json:"id"`
 	Name         string `json:"name"`
@@ -135,7 +135,7 @@ type AdminRow struct {
 	Consumed     int    `json:"consumed"`     // 실제 소비 크레딧(billed_credits)
 }
 
-// OfferingSpec — 오퍼링에서 도출한 세션 스펙.
+// OfferingSpec은 오퍼링에서 도출한 세션 스펙.
 type OfferingSpec struct {
 	VramMB       int    `gorm:"column:vram_mb"`
 	CorePercent  int    `gorm:"column:core_percent"`
@@ -150,7 +150,7 @@ func NewRepository(db *gorm.DB) Repository { return &gormRepo{db: db} }
 
 func (r *gormRepo) Create(s *Session) error { return r.db.Create(s).Error }
 
-// ListByUser는 사용자의 세션을 반환한다. groupID>0 이면 그 팀(네임스페이스) 세션만 —
+// ListByUser는 사용자의 세션을 반환한다. groupID>0 이면 그 팀(네임스페이스) 세션만 주는데,
 // 그룹 단위 분리: 활성 팀 컨텍스트에선 그 팀 세션만 보이게 한다(팀 무관 전체 나열 방지).
 func (r *gormRepo) ListByUser(userID, groupID int64) ([]Session, error) {
 	var out []Session
@@ -180,7 +180,7 @@ func (r *gormRepo) SetPhase(instanceID, phase string) error {
 }
 
 // UpdateSpec은 중단 세션의 계산자원(모드·GPU·오퍼링·이미지·보장 CPU/Mem·단가)만 갱신한다.
-// 홈/볼륨/데이터셋·과금 누적·phase 는 건드리지 않는다 — 재구성은 "무엇으로 다시 뜰지"만 바꾼다.
+// 홈·볼륨·데이터셋과 과금 누적, phase 는 건드리지 않는다. 재구성은 "무엇으로 다시 뜰지"만 바꾼다.
 // offering_id/image_id 는 nil 로 지우는 경우(CPU 전환)가 있어 map 갱신을 쓴다(zero value 무시 방지).
 func (r *gormRepo) UpdateSpec(instanceID string, s *Session) error {
 	var offering, image any
@@ -291,7 +291,7 @@ func (r *gormRepo) ListRunning() ([]Session, error) {
 	return out, r.db.Where("phase = ?", PhaseRunning).Find(&out).Error
 }
 
-// ListStopped는 중단된 컨테이너 세션을 반환한다. 물리(ssh)는 로컬 홈 PVC 가 없어 제외 —
+// ListStopped는 중단된 컨테이너 세션을 반환한다. 물리(ssh)는 로컬 홈 PVC 가 없어 제외하는데,
 // 스토리지 과금도 홈 회수(T1)도 대상이 아니다.
 func (r *gormRepo) ListStopped() ([]Session, error) {
 	var out []Session
@@ -303,7 +303,7 @@ func (r *gormRepo) MarkStopped(instanceID string, at time.Time) error {
 	return r.db.Model(&Session{}).Where("instance_id = ?", instanceID).Update("stopped_since", at).Error
 }
 
-// ClearStopped는 재개 시 중단 구간을 닫는다 — 구간 길이(accrued 초)를 누적에 더하고 시작점을 비운다.
+// ClearStopped는 재개 시 중단 구간을 닫는다. 구간 길이(accrued 초)를 누적에 더하고 시작점을 비운다.
 // 누적(stopped_seconds)은 남겨야 이미 청구한 스토리지 크레딧과의 델타 회계가 깨지지 않는다.
 func (r *gormRepo) ClearStopped(instanceID string, accrued int) error {
 	if accrued < 0 {
@@ -313,7 +313,7 @@ func (r *gormRepo) ClearStopped(instanceID string, accrued int) error {
 		WHERE instance_id = ?`, accrued, instanceID).Error
 }
 
-// SetStorageBilled는 스토리지 정산 결과를 반영한다 — 누적 중단 시간을 확정하고 구간 시작점을
+// SetStorageBilled는 스토리지 정산 결과를 반영한다. 누적 중단 시간을 확정하고 구간 시작점을
 // 정산 기준시각(at)으로 리셋한다. at 은 누적을 계산할 때 쓴 바로 그 시각이어야 한다
 // (now() 를 여기서 다시 읽으면 계산~기록 사이 시간이 과금에서 누락된다).
 func (r *gormRepo) SetStorageBilled(instanceID string, stoppedSeconds, billed int, at time.Time) error {
@@ -326,7 +326,7 @@ func (r *gormRepo) SetStorageBilled(instanceID string, stoppedSeconds, billed in
 }
 
 // NewestStoppedInstance는 사용자의 가장 최근 중단 세션 instance_id 를 반환한다(없으면 "").
-// 회수 면책 규칙과 같은 기준이라 팀 스코프를 걸지 않는다 — 리퍼도 사용자 전체에서 하나를 남긴다.
+// 회수 면책 규칙과 같은 기준이라 팀 스코프를 걸지 않는다. 리퍼도 사용자 전체에서 하나를 남긴다.
 func (r *gormRepo) NewestStoppedInstance(userID int64) string {
 	var id string
 	r.db.Raw(`SELECT instance_id FROM sessions
@@ -368,7 +368,7 @@ func (r *gormRepo) CountActive(userID int64) int {
 	return int(n)
 }
 
-// CountStopped는 사용자의 중단(대기) 세션 수 — 각 세션이 로컬 홈 PVC 를 점유하므로 상한을 건다.
+// CountStopped는 사용자의 중단(대기) 세션 수를 센다. 각 세션이 로컬 홈 PVC 를 점유하므로 상한을 건다.
 func (r *gormRepo) CountStopped(userID int64) int {
 	var n int64
 	r.db.Model(&Session{}).Where("user_id = ? AND phase = ?", userID, PhaseStopped).Count(&n)
@@ -382,7 +382,7 @@ func (r *gormRepo) IsGroupMember(userID, groupID int64) bool {
 	return n > 0
 }
 
-// UserLeasedNode는 사용자가 그 물리노드를 대여한 적 있는지(이력 포함) 확인한다 — 로컬 Home 접근 검증.
+// UserLeasedNode는 사용자가 그 물리노드를 대여한 적 있는지(이력 포함) 확인한다. 로컬 Home 접근 검증용이다.
 func (r *gormRepo) UserLeasedNode(userID int64, node string) bool {
 	var n int64
 	r.db.Raw(`SELECT COUNT(*) FROM node_leases WHERE user_id = ? AND node = ?`, userID, node).Scan(&n)
@@ -422,7 +422,7 @@ func (r *gormRepo) CachedNodes(imageID int64) []string {
 	return nodes
 }
 
-// ImageChannels — 이미지가 제공하는 접속 채널(images.channels JSON).
+// ImageChannels는 이미지가 제공하는 접속 채널(images.channels JSON).
 //
 //	Web: 표준(VSCode 8080/Jupyter 8888) 외 커스텀 포트의 웹 앱(예: {name:"app", port:8501}).
 //	     시크릿 주입 없이 포트포워딩만 하는 제네릭 채널. 외부 이미지 등록에서 선택적으로 지정.
@@ -433,7 +433,7 @@ type ImageChannels struct {
 	Web     *WebPortSpec `json:"web,omitempty"`
 }
 
-// WebPortSpec — 커스텀 웹 채널(포트포워딩 대상). Name 은 k8s 포트명 규칙(소문자·≤15).
+// WebPortSpec은 커스텀 웹 채널(포트포워딩 대상). Name 은 k8s 포트명 규칙(소문자, 15자 이하)을 따른다.
 type WebPortSpec struct {
 	Name string `json:"name"`
 	Port int    `json:"port"`
@@ -486,7 +486,7 @@ func (r *gormRepo) GpuTypePricing(gpuType string) (int, int, int) {
 	return row.PricePerHour, row.PricePerGB, row.PricePerCore
 }
 
-// VolMountRow — 세션에 붙은 볼륨 마운트(재시작 복원용).
+// VolMountRow는 세션에 붙은 볼륨 마운트(재시작 복원용).
 type VolMountRow struct {
 	VolID     int64  `gorm:"column:volume_id"`
 	MountPath string `gorm:"column:mount_path"`
@@ -499,7 +499,7 @@ func (r *gormRepo) SessionVolumeMounts(sessionID int64) []VolMountRow {
 	return out
 }
 
-// VolAccess — 볼륨 접근 권한 + PVC 좌표. Perm 은 소유자=rw, 그 외엔 volume_shares.permission.
+// VolAccess는 볼륨 접근 권한과 PVC 좌표. Perm 은 소유자면 rw, 그 외엔 volume_shares.permission 을 따른다.
 type VolAccess struct {
 	PVCName      string
 	PVCNamespace string
@@ -510,7 +510,7 @@ type VolAccess struct {
 // VolumeAccess는 사용자의 볼륨 접근권을 서버에서 판정한다(클라 입력 perm 불신).
 // 소유자면 rw, 공유받았으면 share.permission, 권한 없으면 ok=false.
 func (r *gormRepo) VolumeAccess(volID, userID int64) (VolAccess, bool) {
-	// gorm:"column:" 필수 — 기본 네이밍은 SizeGiB 를 size_gi_b 로 바꿔 size_gib 와 어긋난다
+	// gorm:"column:" 이 반드시 필요하다. 기본 네이밍은 SizeGiB 를 size_gi_b 로 바꿔 size_gib 와 어긋난다
 	// (값이 0 으로 떨어져 공유 PV 가 항상 1Gi 로 만들어졌다). 같은 이유로 PVC* 도 명시한다.
 	var v struct {
 		PVCName      string `gorm:"column:pvc_name"`
@@ -585,7 +585,7 @@ func (r *gormRepo) AddDataset(sessionID, dsID int64, node string) error {
 		sessionID, dsID, node).Error
 }
 
-// DatasetRow — 데이터셋 마운트 원천(이름 + PVC 좌표).
+// DatasetRow는 데이터셋 마운트 원천(이름과 PVC 좌표).
 type DatasetRow struct {
 	Name         string
 	PVCName      string

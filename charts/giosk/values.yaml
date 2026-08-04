@@ -1,5 +1,5 @@
-# Giosk Helm values — 설치 시점에 고정되는 설정.
-# ConfigMap/Secret → 환경변수(GIOSK_*) → backend/internal/config 로 주입된다.
+# Giosk Helm values. 설치 시점에 고정되는 설정이다.
+# ConfigMap/Secret 을 거쳐 환경변수(GIOSK_*)로, 다시 backend/internal/config 로 주입된다.
 
 image:
   api:
@@ -58,7 +58,7 @@ billing:
 
 # ── 스토리지 전략 ──────────────────────────────────────────────────
 storage:
-  # 세션 홈(/home/work) 스토리지클래스. 노드 로컬(WFFC)이라 빠르다 — 홈 I/O 를 NFS 로 보내면 못 쓴다.
+  # 세션 홈(/home/work) 스토리지클래스. 노드 로컬(WFFC)이라 빠르다. 홈 I/O 를 NFS 로 보내면 못 쓴다.
   # 중지해도 남고 삭제할 때만 정리한다.
   localClass: local-path
   # 영속 home(~/nfs) 스토리지클래스. 노드 무관 저장소라 RWX 필수(NFS·CephFS·Longhorn-RWX).
@@ -234,7 +234,7 @@ quota:
   # 메모리 limit 배수(limit = GPU 지분 비례 보장 × 배수, 1 이하면 상한 없음).
   # 메모리는 압축이 안 돼서 상한이 없으면 한 세션이 노드 RAM 을 말리고 kubelet 이 남의 세션을 축출한다.
   memBurst: 2
-  # 중단 세션 홈 회수 — 방치 일수와 노드 디스크 사용률을 둘 다 넘겼을 때만 집행한다(0=비활성).
+  # 중단 세션 홈 회수. 방치 일수와 노드 디스크 사용률을 둘 다 넘겼을 때만 집행한다(0 이면 비활성).
   # 여기 값은 초기값일 뿐이라, 관리자 설정에서 바꾸면 그쪽이 우선한다.
   stoppedTtlDays: 14
   homeReapPct: 88         # nodeCleaner 의 scratch(85)와 home(92) 사이에서 개입

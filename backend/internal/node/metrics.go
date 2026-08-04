@@ -118,7 +118,7 @@ func (s *Service) NodeMetrics(ctx context.Context, node string, hours int) ([]Me
 	return points, ins
 }
 
-// rangeSeries는 range 쿼리 결과를 unix초→값 맵으로 반환한다(미가용이면 빈 맵).
+// rangeSeries는 range 쿼리 결과를 unix초 기준 맵으로 반환한다(미가용이면 빈 맵).
 func (s *Service) rangeSeries(ctx context.Context, q string, start, end time.Time, step time.Duration) map[int64]float64 {
 	out := map[int64]float64{}
 	pts, ok := s.met.Range(ctx, q, start, end, step)

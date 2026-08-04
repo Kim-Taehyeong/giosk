@@ -15,7 +15,7 @@ func Err(c *gin.Context, status int, code, msg string) {
 	c.AbortWithStatusJSON(status, gin.H{"error": msg, "code": code})
 }
 
-// BadRequest / Unauthorized / Forbidden / NotFound / Internal — 자주 쓰는 단축.
+// BadRequest, Unauthorized, Forbidden, NotFound, Internal 은 자주 쓰는 단축.
 func BadRequest(c *gin.Context, msg string)   { Err(c, 400, "bad_request", msg) }
 func Unauthorized(c *gin.Context, msg string) { Err(c, 401, "unauthorized", msg) }
 func Forbidden(c *gin.Context, msg string)    { Err(c, 403, "forbidden", msg) }

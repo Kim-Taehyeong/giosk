@@ -48,7 +48,7 @@ func (c *Client) ExecTerminal(ctx context.Context, ns, pod, container string, cm
 	})
 }
 
-// resizeQueue는 TermSize 채널을 remotecommand.TerminalSizeQueue 로 어댑트한다(채널 닫힘=nil→종료).
+// resizeQueue는 TermSize 채널을 remotecommand.TerminalSizeQueue 로 어댑트한다(채널이 닫히면 nil 을 주고 종료).
 type resizeQueue struct{ ch <-chan TermSize }
 
 func (r resizeQueue) Next() *remotecommand.TerminalSize {

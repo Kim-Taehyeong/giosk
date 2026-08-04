@@ -12,7 +12,7 @@ type Volume struct {
 	SizeGiB      int    `gorm:"column:size_gib" json:"capGb"`
 	UsedGiB      int    `gorm:"column:used_gib" json:"usedGb"`
 	AccessMode   string `gorm:"column:access_mode" json:"accessMode"`
-	Perm         string `gorm:"->;column:perm" json:"perm,omitempty"` // 공유 볼륨 권한(ro|rw) — ListShared 의 계산 컬럼. 읽기전용(->): INSERT/UPDATE 에서 제외(volumes 테이블엔 실제 perm 컬럼 없음).
+	Perm         string `gorm:"->;column:perm" json:"perm,omitempty"` // 공유 볼륨 권한(ro 나 rw). ListShared 의 계산 컬럼이라 읽기전용(->)으로 INSERT/UPDATE 에서 제외한다(volumes 테이블엔 실제 perm 컬럼이 없다).
 	PVCName      string `gorm:"column:pvc_name" json:"-"`
 	PVCNamespace string `gorm:"column:pvc_namespace" json:"-"`
 	// NFS 임포트 볼륨: 지정한 기존 NFS 경로를 정적 PV 로 바인딩(빈값=일반 동적 볼륨).
@@ -23,7 +23,7 @@ type Volume struct {
 	CreatedAt     time.Time `gorm:"column:created_at" json:"-"`
 	// 계산 컬럼(읽기전용 -> : INSERT/UPDATE 제외). List 쿼리의 JOIN 으로 채운다.
 	TeamName  string `gorm:"->;column:team_name" json:"teamName,omitempty"`   // 귀속 팀 표시명(쿼터·과금 홈)
-	OwnerName string `gorm:"->;column:owner_name" json:"ownerName,omitempty"` // 공유자(소유자) — 공유받은 볼륨용
+	OwnerName string `gorm:"->;column:owner_name" json:"ownerName,omitempty"` // 공유자(소유자). 공유받은 볼륨에만 채운다
 }
 
 func (Volume) TableName() string { return "volumes" }
@@ -45,14 +45,14 @@ const (
 	StatusFailed  = "failed"
 )
 
-// LocalHome — 물리노드 로컬 home 특수 볼륨(hostPath, 해당 노드 전용). 사용자가 대여한 적 있는 노드만 노출.
+// LocalHome은 물리노드 로컬 home 특수 볼륨이다(hostPath 라 해당 노드 전용). 사용자가 대여한 적 있는 노드만 노출한다.
 // 컨테이너 세션에서 선택하면 그 노드에 핀되고 노드 로컬 home 을 /home/work 로 마운트한다.
 type LocalHome struct {
 	Node string `json:"node"`
 	Name string `json:"name"`
 }
 
-// ListRes — /volumes 응답(owned + shared + 로컬 Home + quota).
+// ListRes는 /volumes 응답(owned, shared, 로컬 Home, quota).
 type ListRes struct {
 	Owned      []Volume    `json:"owned"`
 	Shared     []Volume    `json:"shared"`

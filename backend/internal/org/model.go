@@ -26,7 +26,7 @@ type Summary struct {
 	UserCount  int `json:"userCount"`
 }
 
-// PublicGroup / PublicOrg — 가입 폼용 공개 카탈로그(민감정보 제외).
+// PublicGroup 과 PublicOrg 는 가입 폼용 공개 카탈로그(민감정보 제외).
 type PublicGroup struct {
 	ID          int64  `json:"id"`
 	Name        string `json:"name"`
@@ -40,7 +40,7 @@ type PublicOrg struct {
 	Groups      []PublicGroup `json:"groups"`
 }
 
-// Overview — 조직 관리자 대시보드 집계.
+// Overview는 조직 관리자 대시보드 집계.
 type Overview struct {
 	OrgName            string        `json:"orgName"`
 	Pool               int           `json:"pool"`
@@ -57,7 +57,7 @@ type GroupCredit struct {
 	Credit int    `json:"credit"`
 }
 
-// GroupBudget — 조직 내 그룹 목록 행.
+// GroupBudget은 조직 내 그룹 목록 행.
 type GroupBudget struct {
 	ID          int64  `json:"id"`
 	Name        string `json:"name"`
@@ -68,7 +68,7 @@ type GroupBudget struct {
 	BudgetCap   int    `json:"budgetCap"`
 }
 
-// CreateReq / GrantReq — 요청 바디.
+// CreateReq 와 GrantReq 는 요청 바디.
 type CreateReq struct {
 	Name         string `json:"name" binding:"required"`
 	DisplayName  string `json:"displayName"`

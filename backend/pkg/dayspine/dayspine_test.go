@@ -20,7 +20,7 @@ func TestKeys_앵커포함_오래된순_days개(t *testing.T) {
 	}
 	for i := 1; i < len(got); i++ {
 		if got[i-1] >= got[i] {
-			t.Fatalf("오래된→최근 정렬이 깨짐: %q >= %q", got[i-1], got[i])
+			t.Fatalf("오래된 것부터 최근 순 정렬이 깨졌다: %q >= %q", got[i-1], got[i])
 		}
 	}
 }

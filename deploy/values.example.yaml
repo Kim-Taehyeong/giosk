@@ -1,4 +1,4 @@
-# Giosk 설치 예시 값 — 복사해서 실제 값으로 채운 뒤 `-f my-values.yaml` 로 넘기세요.
+# Giosk 설치 예시 값이다. 복사해서 실제 값으로 채운 뒤 `-f my-values.yaml` 로 넘기세요.
 #   helm install giosk deploy/helm/giosk -f my-values.yaml --set admin.password=<PW>
 #   또는  sudo ./deploy/deploy.sh   (values 파일 경로를 VALUES 환경변수로 지정)
 #
@@ -10,7 +10,7 @@ deployment:
 billing:
   mode: credit               # credit | dynamic | free
 
-# ── 영속 스토리지 (NFS 는 어떤 모드에서도 필수 — home ~/nfs = RWX) ──
+# ── 영속 스토리지 (NFS 는 어떤 모드에서도 필수다. home ~/nfs 가 RWX) ──
 storage:
   persistence:
     storageClass: nfs        # nfsProvisioner 가 만들거나(아래), 기존 RWX StorageClass 이름

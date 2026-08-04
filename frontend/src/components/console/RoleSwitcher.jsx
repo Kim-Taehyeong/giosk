@@ -6,11 +6,11 @@ import { useAuth } from '../../context/AuthContext';
 import { getAllOrgs, getAllGroups } from '../../api/console/governance';
 import { getConsoleScope } from '../../api/client';
 
-// scopeKey — 백엔드 X-Console-Scope 형식("org:10"|"group:2").
+// scopeKey 는 백엔드 X-Console-Scope 형식이다(org:10 이나 group:2).
 const keyOf = (s) => `${s.level}:${s.level === 'org' ? s.orgId : s.groupId}`;
 
 // RoleSwitcher는 관리자 뷰의 "역할 스코프" 셀렉터.
-//   최고관리자(admin): 조직 → 그룹 2드롭다운(한 사람이 여러 조직/그룹을 관리하므로 계층 선택).
+//   최고관리자(admin)는 조직과 그룹 2드롭다운을 쓴다. 한 사람이 여러 조직이나 그룹을 관리하므로 계층으로 고른다.
 //   조직/그룹 관리자: 보유한 스코프 단일 드롭다운.
 // 선택 스코프는 X-Console-Scope 로 전송돼 화면/데이터가 그 레벨로 좁혀진다.
 export default function RoleSwitcher({ ns }) {
@@ -53,7 +53,7 @@ export default function RoleSwitcher({ ns }) {
     return <Dropdown label={cur.sub} value={cur.label} icon={cur.icon} items={opts.map((o) => ({ id: o.id, label: o.label, sub: o.sub, active: o.id === cur.id, on: () => { setActiveScope(o.id); goHome(); } }))} single={opts.length === 1} />;
   }
 
-  // ── 최고관리자: 조직 → 그룹 2드롭다운 ──
+  // ── 최고관리자: 조직과 그룹 2드롭다운 ──
   const effOrgId = curOrgId; // 그룹 드롭다운이 보여줄 조직
   const orgName = (id) => adminOrgs.find((o) => o.id === id)?.displayName || adminOrgs.find((o) => o.id === id)?.name || '—';
   const groupsOfOrg = adminGroups.filter((g) => g.orgId === effOrgId);
@@ -83,7 +83,7 @@ export default function RoleSwitcher({ ns }) {
   );
 }
 
-// Dropdown — 탑바 .proj 셀 + 메뉴(공용). items: [{id,label,sub,icon,active,on}].
+// Dropdown은 탑바 .proj 셀과 메뉴를 함께 쓰는 공용 컴포넌트다. items 는 [{id,label,sub,icon,active,on}].
 function Dropdown({ label, value, icon: Icon, items, single }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);

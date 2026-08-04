@@ -29,7 +29,7 @@ export default function ImageDetail() {
   const load = () => getAdminImages().then((rows) => { const f = rows.find((r) => r.id === iid); if (!f) setNotFound(true); else setImg(f); });
   const loadCache = () => getImageCache(iid).then(setCacheRows).catch(() => {});
   useEffect(() => { load(); getAdminNodes().then(setNodes).catch(() => {}); loadCache(); /* eslint-disable-next-line */ }, [iid]);
-  // 캐시 진행상황(pulling→cached) 3초 폴링.
+  // 캐시 진행상황을 3초마다 폴링한다(pulling 에서 cached 로).
   useEffect(() => { const t = setInterval(loadCache, 3000); return () => clearInterval(t); /* eslint-disable-next-line */ }, [iid]);
 
   if (notFound) return <div className="card">{t('images.notFound', { defaultValue: '이미지를 찾을 수 없습니다.' })}</div>;
@@ -45,7 +45,7 @@ export default function ImageDetail() {
   const doPublish = async () => { await publishImage(iid); toast(t('images.published')); load(); };
   const doDelete = async () => { if (!(await confirm({ title: t('images.delete'), message: t('confirmDelete'), confirmText: t('images.delete'), danger: true }))) return; await deleteImage(iid); toast(t('images.deleted')); navigate('/console/admin/images'); };
 
-  // GPU 노드 먼저, CPU 풀 뒤 — 라인 리스트(노드가 많아도 세로 스크롤).
+  // GPU 노드를 먼저, CPU 풀을 뒤에 둔 라인 리스트다(노드가 많아도 세로로 스크롤한다).
   const orderedNodes = nodes.filter((n) => n.gpu && n.gpu !== '— (CPU 풀)').concat(nodes.filter((n) => !n.gpu || n.gpu === '— (CPU 풀)'));
   const cachedCount = cacheRows.filter((c) => c.status === 'cached').length;
   const CACHE_PER = 12; // 노드 많아질 수 있어 페이지네이션

@@ -9,7 +9,7 @@ function cssVar(name, fb) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fb;
 }
 
-// Chart.js 막대 — data: [{label,value}]. horizontal 옵션. 단일 색(테마 primary/gpu).
+// Chart.js 막대. data 는 [{label,value}] 이고 horizontal 옵션이 있다. 단일 색(테마 primary 나 gpu)을 쓴다.
 export default function BarChart({ data = [], height = 200, horizontal = false, color = '--gpu' }) {
   const { chartData, options } = useMemo(() => {
     const c = cssVar(color, '#7c6cf0');

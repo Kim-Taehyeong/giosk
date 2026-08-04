@@ -18,7 +18,7 @@ import (
 )
 
 // Terminal은 세션 웹터미널 websocket 을 처리한다(브라우저 xterm ↔ 여기 ↔ 컨테이너 exec / 물리 노드 SSH).
-// 인증: RequireAuth 가 헤더 또는 ?access_token= 쿼리로 사용자를 붙인다(ws 는 헤더 불가 → 쿼리 사용).
+// 인증: RequireAuth 가 헤더 또는 ?access_token= 쿼리로 사용자를 붙인다(ws 는 헤더를 못 써서 쿼리를 쓴다).
 func (h *Handler) Terminal(c *gin.Context) {
 	u := auth.CurrentUser(c)
 	if u == nil {
@@ -37,8 +37,8 @@ func (h *Handler) Terminal(c *gin.Context) {
 
 // serveTerminal은 ws 프레임 프로토콜을 stdin/stdout/resize 로 풀어 Service.RunTerminal 에 넘긴다.
 //
-//	C→S 프레임: 첫 바이트 '0'=입력(나머지=stdin), '1'=리사이즈("cols,rows").
-//	S→C 프레임: 원시 출력 바이트(xterm 이 그대로 write).
+//	클라이언트가 보내는 프레임: 첫 바이트 '0'=입력(나머지=stdin), '1'=리사이즈("cols,rows").
+//	서버가 보내는 프레임: 원시 출력 바이트(xterm 이 그대로 write).
 func (h *Handler) serveTerminal(ws *websocket.Conn, instanceID string, userID int64) {
 	ctx, cancel := context.WithCancel(ws.Request().Context())
 	defer cancel()
@@ -125,7 +125,7 @@ func (s *Service) RunTerminal(ctx context.Context, instanceID string, userID int
 	}
 	// 컨테이너 세션: 홈으로 이동 후 대화형(-i) 로그인(-l) 셸. -i 라야 프롬프트가 뜨고 job control 이 붙어
 	// Ctrl+C 가 터미널 전체가 아니라 포그라운드 명령만 끊는다. TERM 지정으로 컬러/편집키 동작.
-	// exec 셸에 2>/dev/null 을 붙이면 안 된다 — bash 는 프롬프트(PS1)와 readline 에코를 stderr 로
+	// exec 셸에 2>/dev/null 을 붙이면 안 된다. bash 는 프롬프트(PS1)와 readline 에코를 stderr 로
 	// 내보내므로, stderr 를 버리면 명령 출력(stdout)만 보이고 프롬프트·타자 에코가 사라진다.
 	cmd := []string{"/bin/sh", "-c", `cd "${HOME:-/home/work}" 2>/dev/null; export TERM=xterm-256color; exec bash -il || exec bash -i || exec sh -i`}
 	return s.prov.ExecTerminal(ctx, s.namespaceOf(sess), sess.InstanceID, "session", cmd, k8s.ExecIO{
@@ -133,7 +133,7 @@ func (s *Service) RunTerminal(ctx context.Context, instanceID string, userID int
 	})
 }
 
-// runPhysicalTerminal은 물리 세션의 웹터미널 — 게이트웨이 SSH 관리키로 노드의 사용자 계정에 붙는다.
+// runPhysicalTerminal은 물리 세션의 웹터미널이다. 게이트웨이 SSH 관리키로 노드의 사용자 계정에 붙는다.
 // 노드 authorized_keys 는 이미 게이트웨이 공개키를 신뢰한다(node-agent 가 병기 주입).
 func (s *Service) runPhysicalTerminal(ctx context.Context, sess *Session, userID int64, stdin io.Reader, stdout io.Writer, resize <-chan k8s.TermSize) error {
 	if len(s.gatewaySSHKey) == 0 {
@@ -150,7 +150,7 @@ func (s *Service) runPhysicalTerminal(ctx context.Context, sess *Session, userID
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // 사내망 노드, 키 고정 목록 없음
 		Timeout:         10 * time.Second,
 	}
-	// 노드 이름은 클러스터 DNS 에 없어 lookup 실패 → InternalIP 로 접속.
+	// 노드 이름은 클러스터 DNS 에 없어 lookup 이 실패하므로 InternalIP 로 접속한다.
 	nodeIP := s.prov.NodeIP(ctx, sess.Node)
 	client, err := ssh.Dial("tcp", nodeIP+":22", cfg)
 	if err != nil {

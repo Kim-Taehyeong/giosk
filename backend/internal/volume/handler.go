@@ -164,7 +164,7 @@ func (h *Handler) RegisterAdmin(admin gin.IRouter) {
 	admin.POST("/volumes", h.AdminImport)
 }
 
-// RegisterScoped는 매니저 볼륨 열람(/console) — 임포트는 플랫폼 유지.
+// RegisterScoped는 매니저 볼륨 열람(/console)이다. 임포트는 플랫폼에 남긴다.
 func (h *Handler) RegisterScoped(mgmt gin.IRouter) {
 	mgmt.GET("/volumes", h.ListScoped)
 }

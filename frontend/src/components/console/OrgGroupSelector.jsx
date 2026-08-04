@@ -8,10 +8,10 @@ import { getMembershipContext } from '../../api/console/membership';
 import { clickable as clickableProps } from '../../utils/a11y';
 
 // 탑바 도메인 셀렉터(사용자 뷰).
-//  조직 → 팀 2뎁스. 사용자는 여러 조직·여러 팀에 속할 수 있으므로 먼저 조직을 고르고,
+//  조직에서 팀으로 2뎁스다. 사용자는 여러 조직과 여러 팀에 속할 수 있으므로 먼저 조직을 고르고,
 //  그 조직 안의 내 팀을 고른다. 선택한 팀이 활성 컨텍스트(X-Console-Scope group:N)가 되어
 //  세션·크레딧(D 멤버십 지갑)이 그 팀에 귀속된다.
-//  admin 클러스터 표시는 이제 관리자 뷰의 RoleSwitcher(역할 설정)가 담당 — 여기선 사용자 뷰만.
+//  admin 클러스터 표시는 이제 관리자 뷰의 RoleSwitcher(역할 설정)가 맡으므로 여기선 사용자 뷰만 다룬다.
 export default function OrgGroupSelector({ variant, ns }) {
   const { t } = useTranslation(ns);
   const { activeGroup, setActiveGroup, activeCluster } = useConsole();
@@ -57,9 +57,9 @@ export default function OrgGroupSelector({ variant, ns }) {
   const orgs = [];
   myGroups.forEach((g) => { if (g.orgId && !orgs.some((o) => o.id === g.orgId)) orgs.push({ id: g.orgId, name: g.orgName || '—' }); });
 
-  // 현재 팀 — 저장된 활성 팀이 내 팀 목록에 있으면 그대로, 아니면 첫 팀.
+  // 현재 팀이다. 저장된 활성 팀이 내 팀 목록에 있으면 그대로 쓰고 없으면 첫 팀을 쓴다.
   const current = (activeGroup && myGroups.find((g) => g.id === activeGroup.id)) || myGroups[0] || null;
-  // 선택 조직 — 로컬 상태 우선, 없으면 현재 팀의 조직.
+  // 선택 조직이다. 로컬 상태를 먼저 보고 없으면 현재 팀의 조직을 쓴다.
   const curOrgId = orgId || current?.orgId || orgs[0]?.id || null;
   const curOrg = orgs.find((o) => o.id === curOrgId) || null;
   const teamsInOrg = myGroups.filter((g) => g.orgId === curOrgId);

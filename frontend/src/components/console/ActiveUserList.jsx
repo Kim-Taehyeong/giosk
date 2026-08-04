@@ -1,7 +1,7 @@
 import React from 'react';
 
 // ActiveUserList는 "지금 세션을 쓰고 있는 사용자" 목록(운영·인프라 대시보드 공용).
-// 세션 도넛 옆 여백에 붙는 컴팩트 리스트 — 별도 카드로 떼지 않는다(세션 현황과 같은 맥락).
+// 세션 도넛 옆 여백에 붙는 컴팩트 리스트다. 세션 현황과 같은 맥락이라 별도 카드로 떼지 않는다.
 export default function ActiveUserList({ users = [], title, emptyLabel, limit = 8 }) {
   return (
     <div style={{ flex: 1, minWidth: 200 }}>

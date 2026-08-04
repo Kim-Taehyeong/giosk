@@ -104,7 +104,7 @@ const userRoutes = {
   account: <Account />,
 };
 
-// 관리 콘솔의 'overview' 탭은 두 레벨이 공유 — 레벨에 맞는 대시보드로 분기.
+// 관리 콘솔의 overview 탭은 두 레벨이 공유하므로 레벨에 맞는 대시보드로 분기한다.
 const adminRoutes = {
   'dashboard/ops': <OpsDashboard />,
   'dashboard/infra': <InfraDashboard />,
@@ -135,14 +135,14 @@ const adminRoutes = {
 };
 
 // 로그인 후 진입점: 역할/레벨에 따라 알맞은 콘솔로.
-//  platform→/console/admin, org·group→/console/manage, 그 외→/console
-//  (설치 모드는 Helm values 로 고정 → 첫 실행 위저드 없음)
+//  platform 은 /console/admin, org 와 group 은 /console/manage, 그 외는 /console 로 간다
+//  (설치 모드가 Helm values 로 고정이라 첫 실행 위저드가 없다)
 const ConsoleHome = () => {
   const { user } = useAuth();
   return <Navigate to={consolePathFor(user)} replace />;
 };
 
-// 관리자 콘솔 인덱스(단일 콘솔) — 레벨별 첫 화면. 플랫폼=대시보드, 조직/그룹 관리자=자기 상세.
+// 관리자 콘솔 인덱스(단일 콘솔)의 레벨별 첫 화면이다. 플랫폼은 대시보드, 조직과 그룹 관리자는 자기 상세로 간다.
 const AdminHome = () => {
   const { user } = useAuth();
   return <Navigate to={consoleHomeFor(user)} replace />;

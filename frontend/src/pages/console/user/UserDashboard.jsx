@@ -24,11 +24,11 @@ const NOTICE_STYLE = {
 };
 const DISMISS_KEY = 'giosk_dismissed_notices';
 
-// 세션 접속 채널 → 버튼 아이콘·라벨. 세션의 conn 배열(VSCode/Jupyter/SSH)마다 버튼을 만든다.
+// 세션 접속 채널을 버튼 아이콘과 라벨로 옮긴다. 세션의 conn 배열(VSCode, Jupyter, SSH)마다 버튼을 만든다.
 const CONN_CH = {
   vscode: { icon: Code2, label: 'VSCode' },
   jupyter: { icon: NotebookPen, label: 'Jupyter' },
-  terminal: { icon: TerminalSquare, label: 'SSH' }, // 웹터미널(컨테이너) — SSH 로 표기
+  terminal: { icon: TerminalSquare, label: 'SSH' }, // 웹터미널(컨테이너)은 SSH 로 표기한다
   ssh: { icon: TerminalSquare, label: 'SSH' },
 };
 
@@ -40,7 +40,7 @@ export default function UserDashboard() {
   const creditMode = config.billing.mode === 'credit';
   const freeMode = config.billing.mode === 'free';
   const dyn = config.billing.dynamic;
-  // 동시 세션 상한은 정책(quota)으로 일원화 — 대시보드는 백엔드 k.maxSessions(정책 해석값)를 쓴다.
+  // 동시 세션 상한은 정책(quota)으로 일원화했으므로 대시보드는 백엔드 k.maxSessions(정책 해석값)를 쓴다.
   // billing.credit.maxConcurrentSessions 는 폐기.
   const [d, setD] = useState(null);
   const [connSession, setConnSession] = useState(null); // 접속 모달 대상 세션
@@ -58,7 +58,7 @@ export default function UserDashboard() {
   const visibleNotices = notices.filter((n) => n.active && (n.level === 'critical' || !dismissed.includes(n.id)));
   if (!d) return <div className="muted">{t('common.loading')}</div>;
   const k = d.kpis;
-  const hasSsh = !!user?.sshPublicKey; // 계정에 등록된 공개키(서버 권위 — 예전 localStorage 판단은 기기마다 달랐다)
+  const hasSsh = !!user?.sshPublicKey; // 계정에 등록된 공개키다. 서버가 권위이며 예전 localStorage 판단은 기기마다 달랐다
   const closeBanner = () => { localStorage.setItem('giosk_welcome_closed', '1'); setBannerClosed(true); };
 
   const quick = [
@@ -231,7 +231,7 @@ export default function UserDashboard() {
           ) : (
             avail.byType.map((r, i) => {
               // 전용(통 카드)과 HAMi(분할)를 분리해 표기한다. 전용=정수 카드, HAMi=소수 GPU 단위
-              //  (물리 GPU=1, 잔여는 VRAM·코어 비율 → 예 1.3/2). "10슬롯 뻥튀기" 폐기.
+              //  (물리 GPU 가 1장이면 잔여는 VRAM 과 코어 비율로 예를 들어 1.3/2 이다). 10슬롯 뻥튀기는 폐기했다.
               const hasExcl = r.total > 0;
               const hasHami = r.fractionalTotal > 0;
               const hamiFree = r.fractionalFreeUnits || 0;
@@ -309,7 +309,7 @@ export default function UserDashboard() {
                 : <span className="muted">—</span>
             ) },
             { key: 'status', header: t('dash.colStatus'), render: (r) => {
-              // 모든 상태를 i18n 라벨로 — running 만 번역하고 나머지를 raw enum(영문)으로 찍던 버그 수정.
+              // 모든 상태를 i18n 라벨로 쓴다. running 만 번역하고 나머지를 raw enum(영문)으로 찍던 버그를 고쳤다.
               const map = { running: ['run', 'running'], provisioning: ['wait', 'provisioning'], queued: ['wait', 'queued'], paused: ['pause', 'paused'], stopped: ['pause', 'paused'], terminated: ['pause', 'terminated'], failed: ['err', 'terminated'] };
               const [v, k] = map[r.status] || ['wait', null];
               return <Pill variant={v} dot>{k ? t('session.' + k, { defaultValue: r.status }) : r.status}</Pill>;

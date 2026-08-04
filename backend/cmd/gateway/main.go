@@ -15,7 +15,7 @@ import (
 func main() {
 	cfg := gateway.Load()
 	if len(cfg.Secret) == 0 {
-		log.Fatal("GIOSK_GATEWAY_SECRET 미설정 — API 와 공유하는 토큰 키가 필요합니다")
+		log.Fatal("GIOSK_GATEWAY_SECRET 미설정: API 와 공유하는 토큰 키가 필요합니다")
 	}
 	log.Printf("[gateway] domain=%s tls=%v sshPort=%d", cfg.Domain, cfg.TLSEnabled(), cfg.SSHPort)
 

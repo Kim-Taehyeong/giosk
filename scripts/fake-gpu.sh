@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 실제 GPU 없이 테스트 — kind worker 노드에 가짜 GPU 확장 리소스를 광고한다.
+# 실제 GPU 없이 테스트한다. kind worker 노드에 가짜 GPU 확장 리소스를 광고한다.
 # 기본 kube-scheduler 는 확장 리소스를 capacity 로 추적하므로,
 # nvidia.com/gpu(전용) · nvidia.com/gpumem · nvidia.com/gpucores(HAMi 분할) 요청 파드가 스케줄된다.
 # (device-plugin/HAMi 스케줄러 없이도 capacity 기반 배치 검증 가능)

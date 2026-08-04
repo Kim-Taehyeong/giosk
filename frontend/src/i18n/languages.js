@@ -1,4 +1,4 @@
-// 지원 언어 레지스트리 — 스위처 목록 + i18n supportedLngs 의 단일 출처.
+// 지원 언어 레지스트리다. 스위처 목록과 i18n supportedLngs 의 단일 출처다.
 //   code: BCP-47(간략), native: 자국어 표기, en: 영어명, flag: 대표 국기 이모지, dir: 'rtl' 만 표기(기본 ltr).
 // 실제 번역 파일이 있는 언어는 그 번역을, 없으면 fallback(en)으로 우아하게 표시된다.
 export const LANGUAGES = [
@@ -55,7 +55,7 @@ export const langMeta = (code) => {
   return LANGUAGES.find((l) => l.code === code) || LANGUAGES.find((l) => l.code.split('-')[0] === base);
 };
 
-// 국기 이모지(regional indicator 2글자) → ISO 3166 alpha-2 소문자(flag-icons 클래스용). 예: 🇰🇷 → 'kr'.
+// 국기 이모지(regional indicator 2글자)를 ISO 3166 alpha-2 소문자로 바꾼다(flag-icons 클래스용).
 export const flagCC = (flag) => {
   const cp = [...(flag || '')].map((c) => c.codePointAt(0));
   if (cp.length === 2 && cp[0] >= 0x1f1e6 && cp[0] <= 0x1f1ff) {

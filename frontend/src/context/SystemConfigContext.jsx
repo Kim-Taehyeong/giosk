@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect, use
 import { apiGet } from '../api/client';
 import { putSystemConfig } from '../api/console/systemconfig';
 
-// 전역 시스템 설정(목업) — 운영 모드/과금/유휴/예약 정책의 단일 출처.
+// 전역 시스템 설정이다. 운영 모드, 과금, 유휴, 예약 정책의 단일 출처다.
 // 백엔드 없이 localStorage 에 영속한다. 첫 실행 위저드(/setup)와 관리자 Settings 가 공유한다.
 const SystemConfigContext = createContext(null);
 
@@ -12,7 +12,7 @@ const STORAGE_KEY = 'giosk_system_config';
 export const DEFAULT_CONFIG = {
   setupComplete: false,
   deploymentMode: 'container', // 'container' | 'hybrid'
-  // 브랜딩 — 조직별 커스터마이즈. name=워드마크, accent=로고 마크 색(빈값=테마 기본색).
+  // 브랜딩은 조직별 커스터마이즈다. name 은 워드마크, accent 는 로고 마크 색이다(비면 테마 기본색).
   branding: { name: 'Giosk', accent: '' },
   billing: {
     // 과금 모드: 크레딧 ↔ Dynamic 은 상호 배타(하나만 사용).
@@ -25,18 +25,18 @@ export const DEFAULT_CONFIG = {
   // 방치 stoppedTtlDays 일을 넘긴 세션을 디스크 homeReapPct% 초과 노드에서만 회수한다.
   // stoppedTtlDays: 0 = 자동 회수 끔(중단 세션 개수 상한과 스토리지 과금만으로 억제).
   reclaim: { stoppedTtlDays: 14, homeReapPct: 88 },
-  // 선착순(Dynamic) 임대 세션 연장 정책 — 회당 최대 연장 시간·최대 연장 횟수.
+  // 선착순(Dynamic) 임대 세션 연장 정책이다. 회당 최대 연장 시간과 최대 연장 횟수를 정한다.
   lease: { extensionHours: 4, maxExtensions: 2 },
   // 사용자 기능 on/off (운영 중 조정 가능). 끄면 해당 기능은 관리자만 수행.
   features: {
     signupRequest: true,   // 사용자 가입 신청 허용
-    datasets: true,        // 데이터셋 기능 전체(메뉴·캐싱·선택) — 끄면 NFS/중앙 스토리지 의존도 낮아짐
+    datasets: true,        // 데이터셋 기능 전체(메뉴, 캐싱, 선택). 끄면 NFS 나 중앙 스토리지 의존도가 낮아진다
     datasetRegister: true, // 사용자 데이터셋 등록 허용 (datasets 켜진 경우만 의미)
     workloadAlerts: true,  // 워크로드(가용성) 알림 신청 허용
     groupJoinRequest: true, // 타 그룹 가입 신청 허용
     creditRequest: true,   // 크레딧 충전 요청 허용 (크레딧 모드 전용)
   },
-  // 전역 자원 할당량 — 최고 관리자가 모든 조직을 통틀어 적용하는 플랫폼 상한.
+  // 전역 자원 할당량이다. 최고 관리자가 모든 조직을 통틀어 적용하는 플랫폼 상한이다.
   quota: { maxGpuCount: 64, maxVramGb: 512, maxConcurrentSessions: 50, volumeQuotaGb: 2000 },
 };
 

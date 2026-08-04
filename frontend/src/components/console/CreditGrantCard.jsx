@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Coins } from 'lucide-react';
 
-// CreditGrantCard — 조직/그룹 상세에서 크레딧을 바로 부여하는 카드.
+// CreditGrantCard는 조직이나 그룹 상세에서 크레딧을 바로 부여하는 카드.
 //
 // 모달로 띄우면 (1) 버튼이 헤더에 묻혀 안 보이고 (2) 잔액을 보면서 넣지 못한다.
 // 상세 화면 안에 잔액과 입력을 나란히 두어 "여기서 하는 것"이 보이게 한다.

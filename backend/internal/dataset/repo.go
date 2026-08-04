@@ -37,7 +37,7 @@ type Repository interface {
 	CacheDelete(datasetID int64, node string) error
 	ListCaching() []DatasetCacheRow      // 복사중 캐시 행(리컨실러)
 	CachedNodesOf(datasetID int64) []string // 캐시 완료(cached) 노드(세션 마운트 판정)
-	AllCacheNodesOf(datasetID int64) []string // 캐시 행이 있는 모든 노드(cached+caching+failed) — 삭제 정리용
+	AllCacheNodesOf(datasetID int64) []string // 캐시 행이 있는 모든 노드(cached, caching, failed). 삭제 정리용
 	CacheDeleteAll(datasetID int64) error   // 데이터셋 삭제 시 그 데이터셋의 모든 캐시 행 정리
 	CachedDatasetsByNode() []NodeCachedDataset // 노드별 캐시 완료 데이터셋(세션 생성 노드 선호 UI)
 	NameTaken(name string) bool             // 동일 이름의 데이터셋/대기 신청 존재 여부(정규경로 충돌 방지)
@@ -53,7 +53,7 @@ func (r *gormRepo) GlobalActive() ([]GlobalItem, error) {
 		WHERE d.scope = 'global' AND d.status = 'active' ORDER BY d.id`).Scan(&out).Error; err != nil {
 		return nil, err
 	}
-	// dataset_id → 노드 로컬 캐시(상태 포함). Nodes 는 cached 완료분, Caches 는 전체(caching/cached/failed).
+	// dataset_id 별 노드 로컬 캐시(상태 포함). Nodes 는 cached 완료분, Caches 는 전체(caching/cached/failed).
 	var rows []struct {
 		DatasetID int64
 		Node      string
@@ -75,7 +75,7 @@ func (r *gormRepo) GlobalActive() ([]GlobalItem, error) {
 	return out, nil
 }
 
-// Mine — 내 개인 데이터셋 + 내 대기 신청(pending 으로 표시).
+// Mine은 내 개인 데이터셋과 내 대기 신청(pending 으로 표시)을 준다.
 func (r *gormRepo) Mine(userID int64) ([]Dataset, error) {
 	var out []Dataset
 	err := r.db.Raw(`
@@ -181,7 +181,7 @@ func (r *gormRepo) CacheUpsert(datasetID int64, node, status string) error {
 }
 
 // CacheDelete는 (dataset,node) 캐시 행을 제거한다.
-// NodeCachedDataset — 특정 노드에 캐시 완료된 데이터셋 메타(세션 생성 UI 노드 선호 표시용).
+// NodeCachedDataset은 특정 노드에 캐시 완료된 데이터셋 메타(세션 생성 UI 의 노드 선호 표시용).
 type NodeCachedDataset struct {
 	Node      string
 	Name      string
@@ -226,7 +226,7 @@ func (r *gormRepo) CachedNodesOf(datasetID int64) []string {
 	return nodes
 }
 
-// AllCacheNodesOf는 캐시 행이 있는 모든 노드를 반환한다(상태 무관) — 데이터셋 삭제 시 진행중 캐시도 정리.
+// AllCacheNodesOf는 캐시 행이 있는 모든 노드를 반환한다(상태 무관). 데이터셋 삭제 시 진행 중 캐시도 정리하기 위해서다.
 func (r *gormRepo) AllCacheNodesOf(datasetID int64) []string {
 	var nodes []string
 	r.db.Raw(`SELECT node FROM dataset_node_cache WHERE dataset_id=?`, datasetID).Scan(&nodes)
@@ -240,7 +240,7 @@ func (r *gormRepo) ListCaching() []DatasetCacheRow {
 	return out
 }
 
-// DatasetCacheRow — 캐시 리컨실 대상(dataset+node).
+// DatasetCacheRow는 캐시 리컨실 대상(dataset 과 node).
 type DatasetCacheRow struct {
 	DatasetID int64  `gorm:"column:dataset_id"`
 	Node      string `gorm:"column:node"`

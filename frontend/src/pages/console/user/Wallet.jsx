@@ -15,7 +15,7 @@ import { cU } from '../../../lib/credit';
 
 const txVariant = { topup: 'ok', hold: 'wait', consume: 'gpu', settle: 'pause', refund: 'free' };
 
-// 거래 설명 — 백엔드가 저장한 한국어 desc("GPU 사용(ref)") 대신 type+ref 로 현지화해서 렌더한다.
+// 거래 설명이다. 백엔드가 저장한 한국어 desc 대신 type 과 ref 로 현지화해서 렌더한다.
 // 소비(consume)만 자동 라벨이라 번역 대상, 그 외(충전 메모 등)는 저장된 desc 를 그대로 둔다.
 function txDesc(r, t) {
   const ref = (String(r.desc || '').match(/\(([^)]+)\)/) || [])[1] || '';
@@ -44,14 +44,14 @@ export default function Wallet() {
   if (!w) return <div className="muted">{t('common.loading')}</div>;
 
   const PAGE_SIZE = 12;
-  // 검색 — 유형/내용/세션 ref 를 소문자 부분일치.
+  // 검색은 유형, 내용, 세션 ref 를 소문자 부분일치로 본다.
   const ql = q.trim().toLowerCase();
   const matchTx = (r) => !ql || `${r.type} ${r.desc || ''} ${txDesc(r, t)}`.toLowerCase().includes(ql);
   const filteredHistory = w.history.filter(matchTx);
   const pageCount = Math.max(1, Math.ceil(filteredHistory.length / PAGE_SIZE));
   const curPage = Math.min(page, pageCount - 1);
   const pagedHistory = filteredHistory.slice(curPage * PAGE_SIZE, curPage * PAGE_SIZE + PAGE_SIZE);
-  // 세션별 묶기 — bySession(세션 단위 소비 합계)을 검색 필터해 표로.
+  // 세션별 묶기다. bySession(세션 단위 소비 합계)을 검색 필터해 표로 만든다.
   const groupedRows = [...w.bySession]
     .filter((s) => !ql || `${s.name || ''} ${s.ref || ''}`.toLowerCase().includes(ql))
     .sort((a, b) => b.credit - a.credit);
@@ -63,7 +63,7 @@ export default function Wallet() {
 
   const maxC = Math.max(...w.bySession.map((s) => s.credit), 1);
 
-  // 정기 재충전 — 다음 충전일 = 마지막 사이클 + 주기.
+  // 정기 재충전이다. 다음 충전일은 마지막 사이클에 주기를 더한 값이다.
   const rc = config.billing?.credit?.recharge || {};
   const nextRecharge = (rc.enabled && w.cycleStartedAt)
     ? new Date(new Date(w.cycleStartedAt).getTime() + (rc.intervalDays || 30) * 86400000).toLocaleDateString()

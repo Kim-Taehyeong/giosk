@@ -39,7 +39,7 @@ func (r *gormRepo) Get(scope string, owner int64) (Config, error) {
 }
 
 // EnabledUserRules는 활성 사용자 규칙 전체를 OwnerID 포함해 반환한다.
-// 기본 규칙(미저장)은 대상이 아니다 — 사용자가 명시적으로 켠 규칙만 발화한다.
+// 기본 규칙(미저장)은 대상이 아니다. 사용자가 명시적으로 켠 규칙만 발화한다.
 func (r *gormRepo) EnabledUserRules() ([]Rule, error) {
 	var rules []Rule
 	err := r.db.Where("scope = ? AND enabled = ?", ScopeUser, true).Order("owner_id, id").Find(&rules).Error

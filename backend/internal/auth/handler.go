@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Handler는 auth HTTP 핸들러(얇게: 파싱 → service → 응답).
+// Handler는 auth HTTP 핸들러다. 파싱하고 service 를 부르고 응답하는 정도로 얇게 유지한다.
 type Handler struct{ svc *Service }
 
 func NewHandler(svc *Service) *Handler { return &Handler{svc: svc} }
@@ -70,7 +70,7 @@ func (h *Handler) SetSSHKey(c *gin.Context) {
 }
 
 // GenerateSSHKey는 서버에서 키쌍을 만들어 공개키를 등록하고 개인키를 1회 반환한다.
-// 개인키는 서버에 저장하지 않는다 — 응답을 놓치면 다시 생성해야 한다.
+// 개인키는 서버에 저장하지 않는다. 응답을 놓치면 다시 생성해야 한다.
 func (h *Handler) GenerateSSHKey(c *gin.Context) {
 	u := CurrentUser(c)
 	priv, err := h.svc.GenerateSSHKey(u.ID, "giosk-"+u.Username)

@@ -44,7 +44,7 @@ type LeaseSource interface {
 type Reconciler struct {
 	src     LeaseSource
 	exec    Executor
-	applied map[int64]string // leaseID → username (현재 프로비저닝된 것)
+	applied map[int64]string // leaseID 별 username (현재 프로비저닝된 것)
 }
 
 func NewReconciler(src LeaseSource, exec Executor) *Reconciler {

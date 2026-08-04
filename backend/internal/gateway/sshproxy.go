@@ -59,9 +59,9 @@ func (p *SSHProxy) Listen(addr string) error {
 // serverConfig는 매 연결마다 claims 를 담을 수 있도록 새로 만든다(username 토큰 검증).
 // 여기서는 토큰의 유효성(서명·만료·타입)만 검사하고 nonce(1회성)는 소비하지 않는다.
 //
-//	publickey 인증은 콜백을 2번 호출한다(질의 단계 → 서명 단계). 콜백에서 nonce 를 소비하면
+//	publickey 인증은 콜백을 2번 호출한다(질의 단계와 서명 단계). 콜백에서 nonce 를 소비하면
 //	질의 단계가 먹어버려 서명 단계가 "이미 사용됨"으로 실패한다(클라가 실키를 제시할 때 재현).
-//	→ nonce 는 핸드셰이크 성공 후 handle 에서 정확히 1회만 소비한다.
+//	그래서 nonce 는 핸드셰이크 성공 후 handle 에서 정확히 1회만 소비한다.
 func (p *SSHProxy) serverConfig() (*ssh.ServerConfig, *Claims) {
 	var claims Claims
 	verify := func(user string) error {
@@ -104,7 +104,7 @@ func (p *SSHProxy) handle(nConn net.Conn) {
 		return // 인증 실패/핸드셰이크 오류
 	}
 	defer conn.Close()
-	// 핸드셰이크 성공 = 이 토큰으로 인증 성립 → 지금 정확히 1회 소비한다(재사용 방지).
+	// 핸드셰이크가 성공했다는 건 이 토큰으로 인증이 성립했다는 뜻이라 지금 정확히 1회 소비한다(재사용 방지).
 	// 경쟁(동시 2연결)에서 진 쪽은 여기서 걸러 즉시 닫는다.
 	if !p.nonce.use(claims.Jti, claims.Exp, p.now()) {
 		return
@@ -140,7 +140,7 @@ func (p *SSHProxy) dialBackend(c *Claims) (*ssh.Client, error) {
 	cc := &ssh.ClientConfig{
 		User:            user,
 		Auth:            []ssh.AuthMethod{ssh.PublicKeys(p.clientKey)},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // 인클러스터/신뢰망 — 백엔드 호스트키 미고정
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // 인클러스터 신뢰망이라 백엔드 호스트키를 고정하지 않는다
 		Timeout:         8 * time.Second,
 	}
 	return ssh.Dial("tcp", net.JoinHostPort(host, "22"), cc)
@@ -167,7 +167,7 @@ func proxyChannel(client *ssh.Client, nc ssh.NewChannel) {
 	// 대역외 요청 포워딩(pty-req·window-change·shell·exec·subsystem·exit-status 등).
 	go forwardRequests(userReqs, backendCh)
 	go forwardRequests(backendReqs, userCh)
-	// 데이터 스트림 양방향 복사. 양쪽 다 끝나면 채널을 완전히 닫는다 —
+	// 데이터 스트림을 양방향으로 복사한다. 양쪽이 다 끝나면 채널을 완전히 닫는다.
 	// CloseWrite(EOF)만 하면 클라이언트가 exec 종료 후 채널 close 를 기다리며 멈춘다(hang).
 	var wg sync.WaitGroup
 	wg.Add(2)
@@ -188,7 +188,7 @@ func forwardRequests(in <-chan *ssh.Request, target ssh.Channel) {
 	}
 }
 
-// bridge는 src→dst 로 데이터를 복사하고 완료 시 쓰기 종료(CloseWrite)한다.
+// bridge는 src 에서 dst 로 데이터를 복사하고 끝나면 쓰기를 종료한다(CloseWrite).
 func bridge(dst, src ssh.Channel) {
 	_, _ = io.Copy(dst, src)
 	_ = dst.CloseWrite()

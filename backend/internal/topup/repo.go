@@ -44,7 +44,7 @@ func (r *gormRepo) MyRequests(userID int64) ([]Item, error) {
 	return out, err
 }
 
-// PendingForGroup — 해당 그룹 멤버를 대상(target=user)으로 한 대기 요청.
+// PendingForGroup은 해당 그룹 멤버를 대상(target=user)으로 한 대기 요청.
 func (r *gormRepo) PendingForGroup(groupID int64) ([]Item, error) {
 	var out []Item
 	err := r.db.Raw(`
@@ -57,7 +57,7 @@ func (r *gormRepo) PendingForGroup(groupID int64) ([]Item, error) {
 	return out, err
 }
 
-// PendingForOrg — 조직 승인 큐(target=group, 해당 org 산하 그룹).
+// PendingForOrg는 조직 승인 큐(target=group 이며 해당 org 산하 그룹).
 func (r *gormRepo) PendingForOrg(orgID int64) ([]Item, error) {
 	var out []Item
 	err := r.db.Raw(`
@@ -70,7 +70,7 @@ func (r *gormRepo) PendingForOrg(orgID int64) ([]Item, error) {
 	return out, err
 }
 
-// PendingAll — 플랫폼 승인 큐(target=group 또는 org).
+// PendingAll은 플랫폼 승인 큐(target 이 group 이거나 org).
 func (r *gormRepo) PendingAll() ([]Item, error) {
 	var out []Item
 	err := r.db.Raw(`

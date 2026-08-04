@@ -36,7 +36,7 @@ func normalizePublicKey(raw string) (string, error) {
 }
 
 // generateKeyPair는 ed25519 키쌍을 만들어 (공개키 authorized_keys 1줄, 개인키 OpenSSH PEM)를 반환한다.
-// 개인키는 저장하지 않고 응답으로 1회만 내려준다(EC2 키페어 방식) — 분실 시 재발급.
+// 개인키는 저장하지 않고 응답으로 1회만 내려준다(EC2 키페어 방식). 분실하면 재발급해야 한다.
 func generateKeyPair(comment string) (pubLine, privPEM string, err error) {
 	pub, priv, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {

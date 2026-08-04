@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../context/ThemeContext';
 
-// GitHub 잔디 스타일 히트맵. data: [{ value }] (오래된→최근 순, 하루 1칸).
+// GitHub 잔디 스타일 히트맵. data 는 [{ value }] 이며 오래된 것부터 최근 순으로 하루에 한 칸이다.
 // 행=요일(일~토)에 정렬되고, 마지막 칸이 오늘. 상단에 월 라벨, hover 시 실제 날짜 툴팁.
 const LEVELS = ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'];
 const LEVELS_DARK = ['#23272e', '#0e4429', '#006d32', '#26a641', '#39d353'];
@@ -26,9 +26,9 @@ export default function Heatmap({ data, unit = 'C', rows = 7, cell = 16 }) {
   const level = (v) => (v <= 0 ? 0 : Math.min(4, Math.ceil((v / max) * 4)));
 
   // 각 칸의 실제 날짜. label('YYYY-MM-DD')이 오면 그걸 쓰고, 없을 때만 "마지막 칸=오늘"로 역산한다.
-  // 역산은 데이터가 하루도 빠짐없이 연속일 때만 맞다 — 하루라도 비면 이후 칸의 날짜와 요일 정렬이
+  // 역산은 데이터가 하루도 빠짐없이 연속일 때만 맞다. 하루라도 비면 이후 칸의 날짜와 요일 정렬이
   // 통째로 밀린다(값이 0인 날을 빼고 내려주던 시절의 버그). label 우선이면 그 함정이 사라진다.
-  // 문자열은 직접 분해해 만든다 — new Date('YYYY-MM-DD')는 UTC 자정으로 파싱돼 시간대에 따라 하루 밀린다.
+  // 문자열은 직접 분해해 만든다. new Date(YYYY-MM-DD)는 UTC 자정으로 파싱돼 시간대에 따라 하루 밀린다.
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const N = data.length;
   const parseDay = (s) => {

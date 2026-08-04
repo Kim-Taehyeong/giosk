@@ -1,6 +1,6 @@
 import { apiGet, apiPost, apiPut, apiDelete } from '../client';
 
-// 오퍼링/프리셋/GPU타입/이미지 — 실 백엔드 연결.
+// 오퍼링, 프리셋, GPU타입, 이미지. 실 백엔드에 연결한다.
 
 export const getOfferings = () => apiGet('/offerings?active=true').then((d) => ({ items: d.items || [] }));
 // 노드 라벨에서 수집된 GPU 타입 + 단가(전용/시간, 분할 GB·시간, 분할 코어%·시간).
@@ -10,10 +10,10 @@ export const getGpuTypes = () =>
     fullPricePerHour: g.pricePerHour || 0,
     pricePerGb: g.pricePerGb || 0,
     pricePerCore: g.pricePerCore || 0,
-    // 타임셰어링(노드가 GPU 를 slots 개로 광고) — 새 세션에서 슬롯 옵션 노출용.
+    // 타임셰어링(노드가 GPU 를 slots 개로 광고)은 새 세션에서 슬롯 옵션을 노출하는 데 쓴다.
     timeslicing: !!g.timeslicing,
     slots: g.slots || 0,
-    // 최소 후보 노드 사양 — CPU·메모리 최소 보장 = nodeCpu × (GPU 지분). 가상 기준값 하드코딩 금지.
+    // 최소 후보 노드 사양이다. CPU 와 메모리 최소 보장은 nodeCpu 에 GPU 지분을 곱한 값이다. 가상 기준값을 하드코딩하지 않는다.
     nodeCpu: g.nodeCpu || 0,
     nodeMemGb: g.nodeMemGb || 0,
     nodeGpus: g.nodeGpus || 0,
@@ -22,7 +22,7 @@ export const getGpuTypes = () =>
     cudaMax: g.cudaMax || '',
   })) }));
 
-// GPU 타입별 단가(전용/시간, 분할 VRAM GB/시간, 코어%/시간) — 과금 모델 관리자.
+// GPU 타입별 단가(전용 시간당, 분할 VRAM GB/시간, 코어%/시간). 과금 모델 관리자용이다.
 export const getGpuPricing = () => apiGet('/admin/gpu-pricing').then((d) => (d.items || []));
 export const setGpuPricing = (body) => apiPut('/admin/gpu-pricing', body); // {gpuType, pricePerHour, pricePerGb, pricePerCore}
 export const getAdminGpuTypes = () => apiGet('/admin/gpu-types').then((d) => (d.items || []));
@@ -39,12 +39,12 @@ export const deleteOffering = (id) => apiDelete(`/admin/offerings/${id}`);
 export const savePreset = (p) => (p.id ? apiPut(`/admin/presets/${p.id}`, p) : apiPost('/admin/presets', p));
 export const deletePreset = (id) => apiDelete(`/admin/presets/${id}`);
 
-// 이미지 카탈로그 — 백엔드 image → 프론트 image(shape: id/name/base/desc/conns/tags/gpu).
+// 이미지 카탈로그. 백엔드 image 를 프론트 image(id/name/base/desc/conns/tags/gpu)로 바꾼다.
 export const getImages = () => apiGet('/images?active=true').then((d) => ({ items: (d.items || []).map(adaptImage) }));
 
-// 관리자 이미지 레지스트리 — 실 백엔드(빌드/게시/삭제).
+// 관리자 이미지 레지스트리. 실 백엔드의 빌드, 게시, 삭제를 쓴다.
 export const getAdminImages = () => apiGet('/admin/images').then((d) => (d.items || []).map(adaptAdminImage));
-// 가이드형 빌드: 베이스 + apt/pip 패키지만 보내면 서버가 Dockerfile 생성 → Kaniko 빌드.
+// 가이드형 빌드: 베이스와 apt/pip 패키지만 보내면 서버가 Dockerfile 을 만들어 Kaniko 로 빌드한다.
 export const buildImage = (form) => apiPost('/admin/images', {
   name: form.name,
   desc: form.desc || '',
@@ -79,7 +79,7 @@ export const getImageCache = (id) => apiGet(`/admin/images/${id}/cache`).then((d
 export const cacheImageOnNode = (id, node) => apiPost(`/admin/images/${id}/cache`, { node });
 export const uncacheImageOnNode = (id, node) => apiDelete(`/admin/images/${id}/cache?node=${encodeURIComponent(node)}`);
 
-// 백엔드 channels({vscode,jupyter,ssh}) → 표시용 배열(['VSCode',...]).
+// 백엔드 channels({vscode,jupyter,ssh})를 표시용 배열([VSCode, ...])로 바꾼다.
 function adaptAdminImage(im) {
   const ch = im.channels || {};
   const channels = [];
@@ -117,6 +117,6 @@ function adaptImage(im) {
     conns: conns.length ? conns : ['SSH'],
     tags: im.tags || [],
     gpu: !!im.gpu,
-    cachedNodes: im.cachedNodes || [], // 캐시 완료 노드 — 빠른 생성 배지
+    cachedNodes: im.cachedNodes || [], // 캐시 완료 노드. 빠른 생성 배지에 쓴다
   };
 }

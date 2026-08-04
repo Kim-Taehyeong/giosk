@@ -18,9 +18,9 @@ import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { useAuth } from '../../../context/AuthContext';
 import { activeLevelOf } from '../../../config/consoleRoles';
 
-// ReqCard는 승인 대기 요청 카드(가입·크레딧 충전) — 클릭하면 승인 화면으로.
+// ReqCard는 승인 대기 요청 카드(가입이나 크레딧 충전)다. 누르면 승인 화면으로 간다.
 function ReqCard({ icon, label, n, tone, hint, onClick }) {
-  const Icon = icon; // JSX 전용 참조는 지역 변수로(무시 패턴 ^[A-Z] — eslint 설정과 동일 관례)
+  const Icon = icon; // JSX 전용 참조는 지역 변수로 둔다(무시 패턴이 대문자 시작이라 eslint 설정과 같은 관례다)
   return (
     <div className="card" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 0 }}
       onClick={onClick}>
@@ -39,7 +39,7 @@ function ReqCard({ icon, label, n, tone, hint, onClick }) {
   );
 }
 
-// 운영 대시보드(사용·거버넌스) — 전 관리 레벨, 과금모드 인식, 폴링 주기 선택 + 전체화면.
+// 운영 대시보드(사용과 거버넌스)다. 모든 관리 레벨이 보며 과금모드를 인식하고 폴링 주기 선택과 전체화면을 지원한다.
 export default function OpsDashboard() {
   const { t } = useTranslation('consoleAdmin');
   const { config } = useSystemConfig();
@@ -70,7 +70,7 @@ export default function OpsDashboard() {
   const reqHint = (n) => (n > 0 ? t('dash.pendingN', { n }) : t('dash.noPending'));
 
 
-  // 지금 쓰고 있는 사용자는 세션 현황과 같은 맥락 → 별도 카드가 아니라 세션 도넛 옆에 붙인다(인프라 대시보드와 동일).
+  // 지금 쓰고 있는 사용자는 세션 현황과 같은 맥락이라 별도 카드가 아니라 세션 도넛 옆에 붙인다(인프라 대시보드와 같다).
   const sessionCard = (
     <div className="card">
       <h3><Layers size={16} /> {t('dash.sessions')}</h3>

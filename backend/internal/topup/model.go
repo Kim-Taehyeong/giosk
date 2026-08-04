@@ -29,7 +29,7 @@ type Request struct {
 
 func (Request) TableName() string { return "topup_requests" }
 
-// Item — 승인 큐 표시용(요청자 정보 조인).
+// Item은 승인 큐 표시용(요청자 정보 조인).
 type Item struct {
 	ID            int64     `json:"id"`
 	RequesterName string    `json:"requesterName"`
@@ -41,10 +41,10 @@ type Item struct {
 	CreatedAt     time.Time `json:"createdAt"`
 }
 
-// CreateReq — 충전 요청 생성.
+// CreateReq는 충전 요청 생성.
 type CreateReq struct {
 	TargetType string `json:"targetType" binding:"required"` // user|group|org
-	TargetID   int64  `json:"targetId"`                      // user 자기충전 시 0 → 본인
+	TargetID   int64  `json:"targetId"`                      // user 가 자기충전할 때 0 이면 본인이다
 	Amount     int    `json:"amount" binding:"required"`
 	Reason     string `json:"reason"`
 }

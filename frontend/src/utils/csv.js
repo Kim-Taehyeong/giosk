@@ -1,4 +1,4 @@
-// CSV(엑셀 호환) 다운로드/파싱 유틸 — 외부 라이브러리 없이 동작. UTF-8 BOM 으로 한글 깨짐 방지.
+// CSV(엑셀 호환) 다운로드와 파싱 유틸이다. 외부 라이브러리 없이 동작하며 UTF-8 BOM 으로 한글 깨짐을 막는다.
 
 function escapeCell(v) {
   const s = String(v ?? '');
@@ -28,7 +28,7 @@ function parseLine(line) {
   return out.map((x) => x.trim());
 }
 
-// 텍스트 → 행 배열(빈 줄 제거). 헤더 처리는 호출측에서.
+// 텍스트를 행 배열로 바꾼다(빈 줄 제거). 헤더 처리는 호출측에서 한다.
 export function parseCsvText(text) {
   return String(text).replace(/^﻿/, '').split(/\r?\n/).filter((l) => l.trim()).map(parseLine);
 }

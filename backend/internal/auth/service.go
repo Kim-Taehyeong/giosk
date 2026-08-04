@@ -9,7 +9,7 @@ import (
 	"giosk/pkg/idgen"
 )
 
-// 서비스 레벨 에러 — 핸들러가 HTTP 코드/프론트 code 로 매핑.
+// 서비스 레벨 에러다. 핸들러가 HTTP 코드와 프론트 code 로 매핑한다.
 var (
 	ErrInvalidCredentials = errors.New("invalid credentials")
 	ErrPending            = errors.New("pending approval")
@@ -35,7 +35,7 @@ type KeySyncer interface {
 	SyncUserKeys(ctx context.Context, userID int64) error
 }
 
-// WithKeySync는 키 변경 → 실행 중 세션 반영 훅을 주입한다(미주입=저장만).
+// WithKeySync는 키가 바뀌면 실행 중 세션에 반영하는 훅을 주입한다(주입하지 않으면 저장만 한다).
 func (s *Service) WithKeySync(k KeySyncer) *Service { s.keySync = k; return s }
 
 // NewService는 auth 서비스를 만든다. sessionTTL 은 호출측(설정)에서 주입.
@@ -124,7 +124,7 @@ func (s *Service) SetSSHKey(userID int64, key string) error {
 }
 
 // GenerateSSHKey는 서버에서 ed25519 키쌍을 만들어 공개키만 저장하고 개인키를 1회 반환한다
-// (EC2 키페어 방식 — 서버는 개인키를 보관하지 않는다). 반환값=개인키 PEM.
+// EC2 키페어 방식이라 서버는 개인키를 보관하지 않는다. 반환값은 개인키 PEM 이다.
 func (s *Service) GenerateSSHKey(userID int64, comment string) (string, error) {
 	pub, priv, err := generateKeyPair(comment)
 	if err != nil {
@@ -137,7 +137,7 @@ func (s *Service) GenerateSSHKey(userID int64, comment string) (string, error) {
 	return priv, nil
 }
 
-// syncKeys는 키 저장 후 실행 중 세션에 반영을 시도한다(베스트에포트 — DB 저장은 이미 성공,
+// syncKeys는 키 저장 후 실행 중 세션에 반영을 시도한다(베스트에포트다. DB 저장은 이미 성공했고,
 // 클러스터 미가용/세션 없음은 실패로 볼 필요가 없다. 다음 세션 생성 때 다시 반영된다).
 func (s *Service) syncKeys(userID int64) {
 	if s.keySync == nil {

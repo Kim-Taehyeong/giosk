@@ -28,7 +28,7 @@ export const userNavGroups = [
     ],
   },
   {
-    // 사이드바는 '작업'만 남긴다 — 내 정보·설정/알림 센터는 개인 설정이라 탑바 아이콘으로 이동(Topbar.jsx).
+    // 사이드바는 작업만 남긴다. 내 정보, 설정, 알림 센터는 개인 설정이라 탑바 아이콘으로 옮겼다(Topbar.jsx).
     title: 'groupAccount',
     items: [
       { key: 'joinGroup', icon: UserPlus, path: 'join-group' },
@@ -36,7 +36,7 @@ export const userNavGroups = [
   },
 ];
 
-// 그룹 관리(그룹 마스터 전용) 섹션 — 활성 그룹 역할이 admin일 때만 사이드바에 삽입.
+// 그룹 관리(그룹 마스터 전용) 섹션이다. 활성 그룹 역할이 admin 일 때만 사이드바에 넣는다.
 export const groupManageNavGroup = {
   title: 'groupManage',
   items: [

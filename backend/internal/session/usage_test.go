@@ -15,7 +15,7 @@ import (
 )
 
 // fakeProm은 PromQL 쿼리의 메트릭 이름으로 응답을 고르는 가짜 Prometheus.
-// (metrics.Client 가 구체 타입이라 HTTP 로 세운다 — 디코드 경로까지 함께 검증된다.)
+// (metrics.Client 가 구체 타입이라 HTTP 로 세운다. 디코드 경로까지 함께 검증된다.)
 func fakeProm(t *testing.T, series map[string]map[string]float64) *metrics.Client {
 	t.Helper()
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -24,7 +24,7 @@ func fakeProm(t *testing.T, series map[string]map[string]float64) *metrics.Clien
 		if strings.Contains(q, "by(exported_pod)") {
 			label = "exported_pod" // HAMi v2.9.0 쿼리는 exported_pod 로 그룹핑
 		} else if strings.Contains(q, "by(node)") {
-			label = "node" // 전용(DCGM)은 노드 GPU 로 귀속 → by(node)
+			label = "node" // 전용(DCGM)은 노드 GPU 로 귀속하므로 by(node)
 		} else if strings.Contains(q, "podname") {
 			label = "podname"
 		}
@@ -76,7 +76,7 @@ func TestUsageOf_SourceBySharingMode(t *testing.T) {
 	}
 	got := svc.usageOf(context.Background(), rows)
 
-	// 전용 — DCGM 이 곧 세션 사용량.
+	// 전용은 DCGM 이 곧 세션 사용량이다.
 	excl := got["ses-excl"]
 	if excl.GpuSource != gpuSrcDCGM {
 		t.Fatalf("exclusive source = %q, want dcgm", excl.GpuSource)
@@ -88,10 +88,10 @@ func TestUsageOf_SourceBySharingMode(t *testing.T) {
 		t.Errorf("exclusive cpuCores = %v, want 2.5", excl.CPUCores)
 	}
 	if excl.MemUsedMB == nil || *excl.MemUsedMB != 2048 {
-		t.Errorf("exclusive memUsedMb = %v, want 2048 (bytes→MiB)", excl.MemUsedMB)
+		t.Errorf("exclusive memUsedMb = %v, want 2048 (bytes to MiB)", excl.MemUsedMB)
 	}
 
-	// 분할(HAMi) — DCGM 이 아니라 vGPUmonitor(hami_* 메트릭, exported_pod 라벨)에서 온다.
+	// 분할(HAMi)은 DCGM 이 아니라 vGPUmonitor(hami_* 메트릭, exported_pod 라벨)에서 온다.
 	hami := got["ses-hami"]
 	if hami.GpuSource != gpuSrcHAMi {
 		t.Fatalf("shared source = %q, want hami", hami.GpuSource)
@@ -100,16 +100,16 @@ func TestUsageOf_SourceBySharingMode(t *testing.T) {
 		t.Errorf("shared gpuUtil = %v, want 42", hami.GpuUtil)
 	}
 	if hami.VramUsedMB == nil || *hami.VramUsedMB != 3072 {
-		t.Errorf("shared vramUsedMb = %v, want 3072 (bytes→MiB)", hami.VramUsedMB)
+		t.Errorf("shared vramUsedMb = %v, want 3072 (bytes to MiB)", hami.VramUsedMB)
 	}
 
-	// 타임슬라이싱 — GPU 는 측정 불가지만 CPU/RAM 은 cgroup 기반이라 여전히 유효하다.
+	// 타임슬라이싱은 GPU 를 측정할 수 없지만 CPU/RAM 은 cgroup 기반이라 여전히 유효하다.
 	slice := got["ses-slice"]
 	if slice.GpuSource != gpuSrcNone || slice.GpuReason != gpuNoneTimeslice {
 		t.Errorf("timeslice = (%q,%q), want (none,timeslice)", slice.GpuSource, slice.GpuReason)
 	}
 	if slice.GpuUtil != nil {
-		t.Errorf("timeslice gpuUtil = %v, want nil — 카드 전체값을 세션값으로 내주면 안 된다", *slice.GpuUtil)
+		t.Errorf("timeslice gpuUtil = %v, want nil. 카드 전체값을 세션값으로 내주면 안 된다", *slice.GpuUtil)
 	}
 	if slice.CPUCores == nil || *slice.CPUCores != 0.5 {
 		t.Errorf("timeslice cpuCores = %v, want 0.5", slice.CPUCores)
@@ -124,7 +124,7 @@ func TestUsageOf_SourceBySharingMode(t *testing.T) {
 	}
 }
 
-// Prometheus 미연동이면 전 세션이 "측정 불가"여야 한다 — 0 으로 채워 "안 쓰는 중"처럼 보이면 안 된다.
+// Prometheus 미연동이면 전 세션이 "측정 불가"여야 한다. 0 으로 채워 "안 쓰는 중"처럼 보이면 안 된다.
 func TestUsageOf_NoPrometheus(t *testing.T) {
 	svc := &Service{met: metrics.New("")}
 	got := svc.usageOf(context.Background(), []Session{{InstanceID: "ses-a", GpuMode: "exclusive"}})
@@ -137,7 +137,7 @@ func TestUsageOf_NoPrometheus(t *testing.T) {
 	}
 }
 
-// gin 은 같은 자리에 정적 세그먼트와 :id 를 함께 등록하면 패닉한다 — 등록 시점에 잡는다.
+// gin 은 같은 자리에 정적 세그먼트와 :id 를 함께 등록하면 패닉한다. 등록 시점에 잡는다.
 func TestRoutesRegisterWithoutConflict(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := gin.New()

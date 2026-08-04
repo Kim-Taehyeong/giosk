@@ -46,7 +46,7 @@ function RechargeCard({ config, refresh, toast, t }) {
 }
 
 // 관리자 시스템 설정.
-//  - 운영 모드 / 과금 모델: 설치 시점(첫 실행 마법사)에만 결정 → 여기선 읽기 전용 + 재설치 안내.
+//  - 운영 모드와 과금 모델은 설치 시점(첫 실행 마법사)에만 정해지므로 여기선 읽기 전용으로 두고 재설치를 안내한다.
 //  - 유휴 등 운영 정책: 운영 중 조정 가능.
 const SUBHEAD = { fontWeight: 800, fontSize: 12.5, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.04em', margin: '4px 0 10px' };
 
@@ -78,7 +78,7 @@ export default function Settings() {
   const modeValue = hybrid ? tc('setup.mode.hybrid') : tc('setup.mode.container');
   const billingValue = freeMode ? tc('setup.billing.modeFree') : creditMode ? tc('setup.billing.modeCredit') : tc('setup.billing.modeDynamic');
 
-  // 설치시 고정(읽기전용) 요약 — 과금모델/동시세션/데이터셋/임대 등 스키마·인프라 영향 항목.
+  // 설치할 때 고정된 읽기전용 요약이다. 과금모델, 동시세션, 데이터셋, 임대처럼 스키마나 인프라에 영향을 주는 항목들이다.
   const pricingValue = creditMode
     ? (config.billing.credit.pricing === 'dynamic'
         ? tc('setup.billing.pricingDynamic') + ` (+${config.billing.credit.surgeIncrement})`

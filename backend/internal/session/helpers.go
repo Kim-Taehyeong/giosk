@@ -19,7 +19,7 @@ func (s *Session) labels() map[string]string {
 	return l
 }
 
-// mapOfferingMode는 오퍼링 mode(fractional/exclusive/mig) → 세션 gpuMode 로 변환.
+// mapOfferingMode는 오퍼링 mode(fractional/exclusive/mig)를 세션 gpuMode 로 변환한다.
 func mapOfferingMode(mode string) string {
 	if mode == "fractional" {
 		return k8s.GpuModeShared
@@ -30,7 +30,7 @@ func mapOfferingMode(mode string) string {
 	return k8s.GpuModeExclusive // exclusive | mig
 }
 
-// mapPodPhase는 corev1 Pod phase → 세션 phase 로 변환.
+// mapPodPhase는 corev1 Pod phase 를 세션 phase 로 변환한다.
 func mapPodPhase(podPhase string) string {
 	switch podPhase {
 	case "Running":

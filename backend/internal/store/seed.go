@@ -16,8 +16,8 @@ func SeedDefaults(db *gorm.DB) error {
 // seedOfferings는 GPU 무관한 기본 오퍼링만 넣는다.
 // 공유(fractional) GPU 오퍼링은 gpu_type 이 클러스터 노드 라벨(nvidia.com/gpu.product)과
 // 정확히 일치해야 가용성 조회·스케줄이 된다. 그 값은 설치 시점에 알 수 없으므로(클러스터마다 다름)
-// 하드코딩하지 않는다 — 관리자가 자원 관리 화면에서 실 gpu-types 드롭다운으로 생성한다.
-// (과거: rtx4090/a100 하드코딩 → 실 클러스터 라벨과 불일치해 공유 모드가 항상 "가용 없음"이었음.)
+// 하드코딩하지 않는다. 관리자가 자원 관리 화면에서 실제 gpu-types 드롭다운으로 만든다.
+// (예전엔 rtx4090 이나 a100 을 하드코딩해 실 클러스터 라벨과 어긋났고, 그래서 공유 모드가 항상 "가용 없음"이었다.)
 func seedOfferings(db *gorm.DB) error {
 	if count(db, "offerings") > 0 {
 		return nil
@@ -37,7 +37,7 @@ func seedPresets(db *gorm.DB) error {
 		('cpu','데이터 준비(CPU)','⬇',0,0,4,1)`).Error
 }
 
-// seedImages — 테스트에서 실제로 기동되는 이미지(nginx:alpine). 운영은 실 세션 이미지로 교체.
+// seedImages는 테스트에서 실제로 기동되는 이미지(nginx:alpine)다. 운영에서는 실 세션 이미지로 교체한다.
 func seedImages(db *gorm.DB) error {
 	if count(db, "images") > 0 {
 		return nil

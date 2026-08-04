@@ -8,9 +8,9 @@ import (
 	"giosk/internal/wallet"
 )
 
-// crediter는 topup.Crediter 구현 — 승인 시 target 종류별로 입금 라우팅.
+// crediter는 topup.Crediter 구현이다. 승인하면 target 종류별로 입금을 라우팅한다.
 //
-//	user → 개인 지갑, group → 그룹 지갑, org → 조직 풀.
+//	user 는 개인 지갑, group 은 그룹 지갑, org 는 조직 풀로 넣는다.
 type crediter struct {
 	wallet  *wallet.Service
 	orgRepo org.Repository

@@ -5,7 +5,7 @@ import { translateError } from '../i18n/translateError';
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 const KEY = 'giosk_sessionkey';
-// 스코프는 콘솔별로 분리 저장한다 — 관리자 콘솔(RoleSwitcher)과 사용자 콘솔(팀 선택)이 서로의
+// 스코프는 콘솔별로 나눠 저장한다. 관리자 콘솔(RoleSwitcher)과 사용자 콘솔(팀 선택)이 서로의
 // 스코프를 오염시키면(예전엔 한 키를 공유) org 관리자가 사용자 뷰에서 고른 팀 스코프를 물려받아
 // "내 조직이 안 보임 / 남의 팀이 보임" 같은 버그가 났다. 요청은 현재 콘솔(경로)에 맞는 키를 보낸다.
 const SCOPE_KEY = 'giosk_console_scope';   // 관리자/매니저 콘솔 관리 스코프("org:10" | "group:2")
@@ -22,11 +22,11 @@ export const setConsoleScope = (s) => (s ? localStorage.setItem(SCOPE_KEY, s) : 
 // 사용자 콘솔 팀 스코프(OrgGroupSelector 전용).
 export const getUserScope = () => localStorage.getItem(USER_SCOPE_KEY);
 export const setUserScope = (s) => (s ? localStorage.setItem(USER_SCOPE_KEY, s) : localStorage.removeItem(USER_SCOPE_KEY));
-// 현재 콘솔(경로)에 맞는 스코프 — 요청 헤더/컨텍스트 초기화에 사용.
+// 현재 콘솔(경로)에 맞는 스코프다. 요청 헤더와 컨텍스트 초기화에 쓴다.
 export const getScopeForRoute = () => (inAdminConsole() ? getConsoleScope() : getUserScope());
 export const setScopeForRoute = (s) => (inAdminConsole() ? setConsoleScope(s) : setUserScope(s));
 
-// wsURL은 웹터미널 등 WebSocket 접속 URL 을 만든다. http→ws / https→wss 변환하고,
+// wsURL은 웹터미널 등 WebSocket 접속 URL 을 만든다. http 는 ws 로, https 는 wss 로 바꾸고,
 // 브라우저 WebSocket 은 Authorization 헤더를 못 붙이므로 세션키를 access_token 쿼리로 실어 보낸다.
 // BASE 가 상대경로('/api')면 현재 오리진을 붙여 same-origin 으로 접속(nginx 가 /api 를 API 로 프록시).
 export function wsURL(path) {
@@ -52,7 +52,7 @@ async function request(method, path, body) {
   });
 
   const text = await res.text();
-  // 본문이 JSON 이 아닐 수 있다 — 라우트 미등록(gin 의 "404 page not found"), nginx 502/504 HTML,
+  // 본문이 JSON 이 아닐 수 있다. 라우트 미등록(gin 의 404 page not found), nginx 502/504 HTML,
   // 프록시 타임아웃 등. 그대로 JSON.parse 하면 SyntaxError 가 튀어 호출측 에러 처리가 통째로 무너진다.
   let data = null;
   try { data = text ? JSON.parse(text) : null; } catch { data = null; }

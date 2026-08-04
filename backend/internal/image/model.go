@@ -21,7 +21,7 @@ type Image struct {
 	Signed      bool            `gorm:"column:signed" json:"sign"`
 	Status      string          `gorm:"column:status" json:"status"`
 	CreatedAt   time.Time       `gorm:"column:created_at" json:"-"`
-	CachedNodes []string        `gorm:"-" json:"cachedNodes,omitempty"` // 캐시 완료(cached) 노드 — 빠른 생성 배지용(핸들러가 채움)
+	CachedNodes []string        `gorm:"-" json:"cachedNodes,omitempty"` // 캐시 완료(cached) 노드. 빠른 생성 배지용이며 핸들러가 채운다
 }
 
 func (Image) TableName() string { return "images" }
@@ -33,12 +33,12 @@ const (
 	StatusFailed   = "failed"
 )
 
-// StatusReq — 상태 전이 요청(publish 등).
+// StatusReq는 상태 전이 요청(publish 등).
 type StatusReq struct {
 	Status string `json:"status" binding:"required"`
 }
 
-// BuildReq — 가이드형 이미지 빌드 요청(베이스 + 패키지 → 서버가 Dockerfile 생성).
+// BuildReq는 가이드형 이미지 빌드 요청이다. 베이스와 패키지를 받아 서버가 Dockerfile 을 만든다.
 type BuildReq struct {
 	Name     string          `json:"name" binding:"required"`
 	Desc     string          `json:"desc"` // 이미지 설명(목록·세션 마법사 표시)
@@ -49,7 +49,7 @@ type BuildReq struct {
 	GPU      bool            `json:"gpu"`
 }
 
-// ExternalReq — 외부(Docker Hub/외부 레지스트리) 이미지 등록. 빌드 없이 그 ref 를 그대로 pull.
+// ExternalReq는 외부(Docker Hub 등 외부 레지스트리) 이미지 등록. 빌드 없이 그 ref 를 그대로 pull 한다.
 // Dockerfile 이 없으므로 재빌드 불가(외부 원본에 push 권한 없음). channels 로 VSCode/Jupyter/커스텀 웹포트를
 // 선언하며, 웹 채널이 하나도 없으면 세션은 SSH 전용이 된다.
 type ExternalReq struct {

@@ -12,15 +12,15 @@ import { reconfigureSession } from '../../api/console/sessions';
 import { c } from '../../lib/credit';
 import { clickable } from '../../utils/a11y';
 
-// 중단 세션의 계산자원 변경 — "CPU로 데이터 준비 → GPU 붙여서 학습"(그 반대도).
+// 중단 세션의 계산자원을 바꾼다. CPU로 데이터를 준비하고 GPU를 붙여 학습하는 흐름(반대도)이다.
 // 홈/볼륨/데이터셋은 그대로 두고 다음에 뜰 자원만 바꾼다. 세션을 새로 만들면 준비한 데이터를
 // 다시 옮겨야 하므로, 자원만 갈아끼우는 길을 여기서 준다.
 //
 // 노드 고정: 세션 홈(/home/work)은 노드 로컬 디스크라 세션은 이전에 떴던 노드에서만 재개된다.
-// 그래서 선택지도 그 노드가 실제로 줄 수 있는 GPU 로 좁힌다 — 클러스터 어딘가에 여유가 있어도
+// 그래서 선택지도 그 노드가 실제로 줄 수 있는 GPU 로 좁힌다. 클러스터 어딘가에 여유가 있어도
 // 그 노드에 없으면 재개되지 않기 때문이다(서버도 같은 기준으로 막는다).
 //
-// 부모는 반드시 조건부로(그리고 세션별 key 로) 렌더한다 — 선택 상태를 현재 사양에서 시작하기 위해
+// 부모는 반드시 조건부로(그리고 세션별 key 로) 렌더한다. 선택 상태를 현재 사양에서 시작하기 위해
 // 마운트 시점에 초기화하고, 세션이 바뀌면 새로 마운트되게 하기 위해서다.
 const MODES = [
   { key: 'cpu', icon: HardDriveDownload },
@@ -52,7 +52,7 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
 
   const [data, setData] = useState(null); // { offerings, gpuTypes, cpuPrice, images, byNode }
   // 선택 상태는 현재 사양에서 출발한다. 카탈로그를 받고 나면 유효하지 않은 선택은 아래에서
-  // "유효한 값으로 해석"해 쓴다(effective*) — 상태를 effect 로 되돌려 쓰면 렌더가 연쇄된다.
+  // 유효한 값으로 해석해 쓴다(effective*). 상태를 effect 로 되돌려 쓰면 렌더가 연쇄된다.
   const [mode, setMode] = useState(spec.gpuMode || 'cpu');
   const [gpuType, setGpuType] = useState(spec.gpuType || '');
   const [offeringId, setOfferingId] = useState(spec.offeringId || null);
@@ -103,7 +103,7 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
     : 0), [nodes, selGpu]);
   const selCount = Math.min(Math.max(1, gpuCount), Math.max(1, maxGpu));
 
-  // 공유(분할) 오퍼링 — 선택한 모델의 것만. 그 노드에 실제로 들어가는지(fits)도 함께 판정.
+  // 공유(분할) 오퍼링은 선택한 모델의 것만 본다. 그 노드에 실제로 들어가는지(fits)도 함께 판정한다.
   const offerings = useMemo(() => {
     if (!data || mode !== 'shared' || !selGpu) return [];
     const fracNodes = nodes.filter((n) => n.gpuType === selGpu && n.fractional);
@@ -120,7 +120,7 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
     ? offeringId
     : (offerings.find((o) => o.fits)?.id || null);
 
-  // 이미지 — GPU 모드는 GPU 이미지, CPU 모드는 CPU 이미지 우선(없으면 전체).
+  // 이미지는 GPU 모드면 GPU 이미지를, CPU 모드면 CPU 이미지를 우선한다(없으면 전체).
   const images = useMemo(() => {
     if (!data) return [];
     if (mode === 'cpu') { const cpu = data.images.filter((im) => !im.gpu); return cpu.length ? cpu : data.images; }

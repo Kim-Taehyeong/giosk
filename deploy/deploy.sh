@@ -2,9 +2,9 @@
 # ════════════════════════════════════════════════════════════════════
 #  Giosk 서비스 배포 (DKU Ubuntu kubeadm 클러스터, control 노드에서 실행)
 #
-#  방식: control 노드에서 이미지 빌드(nerdctl) → 각 워커에 ctr import(레지스트리 X)
-#        → helm 으로 API/프론트/번들MySQL 배포. 프론트는 MetalLB LoadBalancer.
-#        단일 오리진(nginx 가 /api 프록시) → CORS 없음.
+#  방식: control 노드에서 이미지를 빌드(nerdctl)해 각 워커에 ctr import 한다(레지스트리를 쓰지 않는다).
+#        그다음 helm 으로 API, 프론트, 번들 MySQL 을 배포한다. 프론트는 MetalLB LoadBalancer 다.
+#        단일 오리진이라(nginx 가 /api 를 프록시) CORS 가 필요 없다.
 #
 #  사용:  sudo ./deploy.sh                # 빌드+배급+배포
 #         sudo ./deploy.sh --skip-build   # 이미지 그대로 두고 helm 만 재적용
@@ -86,13 +86,13 @@ load_secrets(){
     DB_PASSWORD=$(openssl rand -hex 16)
     umask 077
     cat > "$SECRETS_ENV" <<EOF
-# Giosk 배포 비밀번호 — 자동생성. 절대 커밋 금지(.gitignore). 변경 시 재배포 필요.
+# Giosk 배포 비밀번호. 자동 생성하며 절대 커밋하지 않는다(.gitignore). 바꾸면 재배포해야 한다.
 ADMIN_PASSWORD=$ADMIN_PASSWORD
 DB_PASSWORD=$DB_PASSWORD
 EOF
     log "비밀번호 생성 → $SECRETS_ENV"
   fi
-  # 게이트웨이 비밀·SSH 키(고정) — drift 방지 위해 최초 1회 생성 후 재사용.
+  # 게이트웨이 비밀과 SSH 키는 고정이다. drift 를 막으려 최초 1회 생성 후 재사용한다.
   if [ -z "${GATEWAY_SECRET:-}" ]; then
     GATEWAY_SECRET=$(openssl rand -hex 20)
     local gkey; gkey=$(mktemp -u /tmp/giosk-gw-key.XXXX)
@@ -193,7 +193,7 @@ helm_deploy(){
   sed -i '/^dependencies:/,$d' "$tmpchart/Chart.yaml"
   rm -rf "$tmpchart/charts" "$tmpchart/Chart.lock"
 
-  # 게이트웨이 키/비밀은 멀티라인 PEM 이라 임시 파일로 --set-file 주입(고정 → drift 방지).
+  # 게이트웨이 키와 비밀은 멀티라인 PEM 이라 임시 파일로 --set-file 주입한다(고정해서 drift 를 막는다).
   local gwargs=()
   if $WITH_GATEWAY || grep -q 'enabled: *true' <(sed -n '/^gateway:/,/^[a-z]/p' "$VALUES" 2>/dev/null); then
     local gpriv gpub
@@ -209,7 +209,7 @@ helm_deploy(){
     )
     # 세션 SSH 사이드카 이미지는 이 배포의 TAG 로 고정(values 의 :latest 를 덮어씀).
     $WITH_GATEWAY && gwargs+=(--set gateway.sshdImage="giosk-sshd:$TAG")
-    # 게이트웨이 오버레이(domain/scheme/LB IP)를 겹쳐 쓴다 — base values 뒤에 적용되어 이긴다.
+    # 게이트웨이 오버레이(domain, scheme, LB IP)를 겹쳐 쓴다. base values 뒤에 적용되어 이긴다.
     $WITH_GATEWAY && [ -f "$SCRIPT_DIR/values-gateway-testbed.yaml" ] && gwargs+=(-f "$SCRIPT_DIR/values-gateway-testbed.yaml")
   fi
 
@@ -227,7 +227,7 @@ helm_deploy(){
 }
 
 # ── 인프라 번들: values 토글로 각 인프라를 별도 릴리스로 설치(install:true) ↔ 기존 사용(false) ──
-# vget: values 파일에서 중첩 스칼라 추출(2-space 들여쓰기, stdlib only — 랩 python 에 yaml 모듈 없음).
+# vget: values 파일에서 중첩 스칼라를 뽑는다(2-space 들여쓰기, stdlib 만 쓴다. 랩 python 에 yaml 모듈이 없다).
 vget(){
   VF="$VALUES" python3 - "$1" <<'PY'
 import os,sys

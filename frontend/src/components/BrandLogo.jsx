@@ -2,7 +2,7 @@ import React from 'react';
 import { Cpu, Server, Boxes, Cloud, Rocket, Zap, Layers, Hexagon, CircuitBoard, Atom, MemoryStick, Database } from 'lucide-react';
 import { useSystemConfig } from '../context/SystemConfigContext';
 
-// 브랜드 아이콘 세트(Lucide) — 설치자가 콘솔 로고 아이콘을 고를 수 있다. key=저장값.
+// 브랜드 아이콘 세트(Lucide)다. 설치자가 콘솔 로고 아이콘을 고를 수 있고 key 가 저장값이다.
 export const BRAND_ICONS = [
   { key: '', Icon: null }, // 기본(칩 마크)
   { key: 'cpu', Icon: Cpu }, { key: 'memory', Icon: MemoryStick }, { key: 'circuit', Icon: CircuitBoard },
@@ -12,7 +12,7 @@ export const BRAND_ICONS = [
 ];
 const ICON_MAP = Object.fromEntries(BRAND_ICONS.filter((x) => x.Icon).map((x) => [x.key, x.Icon]));
 
-// Giosk 로고 마크 — GPU(칩) 모티프. 색은 currentColor 를 따른다(테마/문맥에 맞춰 상속).
+// Giosk 로고 마크(GPU 칩 모티프)다. 색은 currentColor 를 따라 테마와 문맥에 맞춰 상속한다.
 export function LogoMark({ size = 28, style }) {
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden="true"

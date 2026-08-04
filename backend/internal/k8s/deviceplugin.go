@@ -52,7 +52,7 @@ func (c *Client) EnsureTimeSlicingKey(ctx context.Context, ns, name string, repl
 		cm.Data = map[string]string{}
 	}
 	if cm.Data[key] == timeSlicingYAML(replicas) {
-		return key, nil // 이미 동일 — 불필요한 업데이트로 plugin 재시작을 유발하지 않는다
+		return key, nil // 이미 같은 값이다. 불필요한 업데이트로 plugin 재시작을 유발하지 않는다
 	}
 	cm.Data[key] = timeSlicingYAML(replicas)
 	_, err = cms.Update(ctx, cm, metav1.UpdateOptions{})
