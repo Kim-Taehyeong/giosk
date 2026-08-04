@@ -128,6 +128,8 @@ export const startSession = (id) => apiPost(`/instances/${id}/start`);
 export const extendSession = (id) => apiPost(`/instances/${id}/extend`, { hours: 1 });
 // 중단 세션 자원 변경(GPU 붙이기/떼기). start=true 면 서버가 적용 후 바로 재개한다.
 export const reconfigureSession = (id, body) => apiPost(`/instances/${id}/reconfigure`, body);
+// 홈을 버리고 다른 노드에서 다시 시작한다. 되돌릴 수 없으므로 호출 전에 반드시 확인을 받는다.
+export const reallocateSession = (id, start) => apiPost(`/instances/${id}/reallocate`, { start });
 export const deleteSession = (id) => apiDelete(`/instances/${id}`);
 
 // 실시간 누적 크레딧(= 시간당 단가 × 실행시간, 내림). 정산(billed)과 동일 공식이라 더 즉각적.

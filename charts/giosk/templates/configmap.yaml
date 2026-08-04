@@ -35,6 +35,9 @@ data:
   GIOSK_SHARED_HOME: {{ .Values.storage.persistence.sharedHome | quote }}
   GIOSK_NFS_CLASS: {{ .Values.storage.nfsClass | default "nfs" | quote }}
   GIOSK_LOCAL_CLASS: {{ .Values.storage.localClass | default "local-path" | quote }}
+  # 세션 홈 PVC 표시 용량. local-path 는 하드 쿼터가 아니라 노드 디스크를 그대로 쓴다.
+  # 실제 방어선은 nodeCleaner 임계와 홈 회수, 디스크 알림이다.
+  GIOSK_SESSION_HOME_GIB: {{ .Values.storage.sessionHomeGiB | default 200 | quote }}
   GIOSK_STORAGE_PRICE_PER_GIB_MONTH: {{ (.Values.storage.pricePerGiBMonth | default 0) | quote }}
   GIOSK_SCRATCH_ENABLED: {{ (.Values.storage.scratch).enabled | default false | quote }}
   GIOSK_SCRATCH_HOSTPATH: {{ (.Values.storage.scratch).hostPath | default "/scratch" | quote }}

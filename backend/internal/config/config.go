@@ -136,6 +136,7 @@ type Storage struct {
 	PersistenceClass string  // 영속 home(~/nfs) 스토리지클래스 (RWX·노드독립 필수, 예: nfs/longhorn)
 	SharedHome       bool    // 사용자 영속 home(~/nfs) 사용 여부. false 면 세션은 순수 로컬 임시(emptyDir)만 쓰므로 RWX 가 필요 없다
 	LocalClass       string  // 세션 전용 홈(/home/work) 로컬 스토리지클래스(노드로컬 디스크·WFFC, 예: local-path). 속도 위해 NFS 아님.
+	SessionHomeGiB   int     // ì¸ì í(/home/work) PVC íì ì©ë(GiB). local-path ë íë ì¿¼í°ê° ìëë¤
 	NFSClass         string  // RWX NFS 스토리지클래스. 데이터셋과 공유 볼륨용이며 항상 NFS 로 고정한다
 	VolumeQuotaGB    int     // 플랫폼 전역 볼륨 쿼터
 	PricePerGiBMonth int     // 스토리지 크레딧 단가(GiB·월). 0=무료. 크레딧 모드에서만 과금.
@@ -216,6 +217,7 @@ func Load(lookup func(string) (string, bool)) (*Config, error) {
 			PersistenceClass: g.str("GIOSK_PERSISTENCE_CLASS", "longhorn"),
 			SharedHome:       g.boolv("GIOSK_SHARED_HOME", true),
 			LocalClass:       g.str("GIOSK_LOCAL_CLASS", "local-path"),
+			SessionHomeGiB:   g.intv("GIOSK_SESSION_HOME_GIB", 200),
 			NFSClass:         g.str("GIOSK_NFS_CLASS", "nfs"),
 			VolumeQuotaGB:    g.intv("GIOSK_VOLUME_QUOTA_GB", 2000),
 			PricePerGiBMonth: g.intv("GIOSK_STORAGE_PRICE_PER_GIB_MONTH", 0), // 0=스토리지 무료(크레딧 모드에서만 과금)

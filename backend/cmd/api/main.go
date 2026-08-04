@@ -138,6 +138,7 @@ func main() {
 	sessionSvc.WithUIDBase(cfg.PhysicalNodes.UIDBase)                                 // 컨테이너 안정 UID(물리 SSH 와 같은 공식)라 NFS 권한이 일관된다
 	sessionSvc.WithSharedHome(cfg.Storage.SharedHome)                                 // 영속 home(~/nfs) 사용 여부(설치시 고정)
 	sessionSvc.WithLocalClass(cfg.Storage.LocalClass)                                 // 세션 전용 홈(/home/work) 로컬 스토리지클래스(속도 위해 노드로컬)
+	sessionSvc.WithSessionHomeGiB(cfg.Storage.SessionHomeGiB)                         // ì¸ì í PVC íì ì©ë(íë ì¿¼í° ìë)
 	sessionSvc.WithMaxStopped(cfg.Quota.MaxStoppedSessions)                           // 중단(대기) 세션 상한(로컬 홈 PVC 누적 방지)
 	sessionSvc.WithMemBurst(cfg.Quota.MemBurst)                                       // 메모리 limit 배수. 노드 RAM 고갈로 남의 세션이 축출되는 걸 막는다
 	sessionSvc.WithHomeReap(func() (int, int) {                                       // 중단 세션 홈 회수. 운영 정책이라 라이브로 읽는다

@@ -429,7 +429,13 @@
     "whyNoOffering": "No shared offering exists for this GPU.",
     "whyAllShared": "This node is sharing-only, so a whole card cannot be assigned.",
     "full": "No capacity",
-    "tooBig": "Exceeds this node"
+    "tooBig": "Exceeds this node",
+    "applyElsewhere": "Wipe home and start elsewhere",
+    "reallocTitle": "Reallocate to another node",
+    "reallocWarn": "This session is bound to the home disk on {{node}}. Moving it to another node requires wiping the home directory (/home/work), and everything in it will be deleted. This cannot be undone.\n\n~/nfs, volumes and datasets are kept. Move anything you need out of home first.",
+    "reallocConfirm": "Wipe home and reallocate",
+    "reallocDone": "Home wiped, started on another node",
+    "startBlockedElsewhere": "No room on this node. Another node has capacity, so wiping home lets it start."
   },
   "conn": {
     "title": "Connect — {{name}}",
