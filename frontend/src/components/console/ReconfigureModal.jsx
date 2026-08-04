@@ -6,9 +6,10 @@ import Pill from './Pill';
 import Select from './Select';
 import Spinner from './Spinner';
 import { useToast } from './Toast';
+import { useConfirm } from './Confirm';
 import { useSystemConfig } from '../../context/SystemConfigContext';
 import { getOfferings, getGpuTypes, getImages, getAvailability } from '../../api/console/resources';
-import { reconfigureSession } from '../../api/console/sessions';
+import { reconfigureSession, reallocateSession } from '../../api/console/sessions';
 import { c } from '../../lib/credit';
 import { clickable } from '../../utils/a11y';
 
@@ -56,6 +57,7 @@ function ModeBox({ on, onClick, icon, title, desc, disabled, reason, current, cu
 export default function ReconfigureModal({ session, onClose, onDone }) {
   const { t } = useTranslation('consoleUser');
   const { toast } = useToast();
+  const confirm = useConfirm();
   const { config } = useSystemConfig();
   const creditMode = config.billing.mode === 'credit';
   const spec = session.spec || {};
@@ -181,6 +183,19 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
     || (mode === 'exclusive' ? !!selGpu : !!offering));
   const canStart = specValid && (mode === 'cpu'
     || (mode === 'exclusive' ? maxGpu >= selCount : !!offering?.fits));
+  // 노드 핀을 무시하면(=홈을 버리면) 클러스터 어딘가에서 뜰 수 있는가.
+  // 이게 참인데 canStart 가 거짓이면, 막은 것은 자원이 아니라 홈의 위치다.
+  const placeableSomewhere = useMemo(() => {
+    const all = data?.byNode || [];
+    if (mode === 'cpu') return all.length > 0;
+    if (mode === 'exclusive') {
+      return all.some((n) => n.gpuType === selGpu && !n.fractional && (n.gpuFree || 0) >= selCount);
+    }
+    if (!offering) return false;
+    return all.some((n) => n.gpuType === selGpu && n.fractional && (n.fracSlotsFree || 0) >= 1
+      && (!offering.vramMb || (n.fracVramFreeMb || 0) >= offering.vramMb)
+      && (!offering.corePercent || (n.fracCoresFree || 0) >= offering.corePercent));
+  }, [data, mode, selGpu, selCount, offering]);
   const changed = mode !== (spec.gpuMode || '') || selGpu !== (spec.gpuType || '')
     || (selOfferingId || null) !== (spec.offeringId || null) || (selImageId || null) !== (spec.imageId || null)
     || (mode === 'exclusive' && selCount !== spec.gpuCount);
@@ -206,6 +221,39 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
     }
   };
 
+  // 이 노드에서는 못 뜨지만 클러스터 어딘가에는 자리가 있는 경우.
+  // 홈을 옮기지 않고 버린 뒤 다른 노드에서 새로 시작한다(홈은 작업 공간이지 영속 저장소가 아니다).
+  const canElsewhere = specValid && !canStart && !!pinned && placeableSomewhere;
+  const applyElsewhere = async () => {
+    if (busy) return;
+    const ok = await confirm({
+      title: t('reconf.reallocTitle'),
+      message: t('reconf.reallocWarn', { node: pinned?.node || '' }),
+      confirmText: t('reconf.reallocConfirm'),
+      danger: true,
+    });
+    if (!ok) return;
+    setBusy(true);
+    try {
+      // 사양을 먼저 저장하고(시작 없이), 그다음 홈을 버리고 다른 노드에서 띄운다.
+      await reconfigureSession(session.id, {
+        gpuMode: mode,
+        gpuType: selGpu,
+        gpuCount: mode === 'exclusive' ? selCount : 0,
+        offeringId: mode === 'shared' ? selOfferingId : null,
+        imageId: selImageId || undefined,
+        start: false,
+      });
+      await reallocateSession(session.id, true);
+      toast(t('reconf.reallocDone'));
+      onDone?.();
+      onClose?.();
+    } catch (e) {
+      toast(e?.message || t('reconf.failed'));
+      setBusy(false);
+    }
+  };
+
   return (
     <Modal open title={t('reconf.title', { name: session.name || '' })} onClose={busy ? undefined : onClose} width={720}
       footer={(
@@ -213,6 +261,10 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
           <button className="btn" onClick={onClose} disabled={busy}>{t('newSession.cancel')}</button>
           <span className="flex" style={{ gap: 8 }}>
             <button className="btn" onClick={() => apply(false)} disabled={busy || !specValid || !changed}>{t('reconf.applyOnly')}</button>
+            {/* 이 노드에서 못 뜨는데 다른 노드엔 자리가 있으면, 홈을 버리고 옮겨 갈 길을 준다. */}
+            {canElsewhere && (
+              <button className="btn danger" onClick={applyElsewhere} disabled={busy}>{t('reconf.applyElsewhere')}</button>
+            )}
             <button className="btn primary" onClick={() => apply(true)} disabled={busy || !canStart}
               title={specValid && !canStart ? t('reconf.startBlocked') : undefined}>{t('reconf.applyStart')}</button>
           </span>
@@ -323,7 +375,9 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
             <div className="legend">{t('reconf.keepData')}</div>
             {/* 왜 "적용하고 시작"이 꺼져 있는지 말해준다. 사양은 저장할 수 있다. */}
             {specValid && !canStart && (
-              <div className="legend" style={{ color: 'var(--warn)' }}>{t('reconf.startBlocked')}</div>
+              <div className="legend" style={{ color: 'var(--warn)' }}>
+                {canElsewhere ? t('reconf.startBlockedElsewhere') : t('reconf.startBlocked')}
+              </div>
             )}
           </div>
         </>

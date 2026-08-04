@@ -67,6 +67,8 @@ type Repository interface {
 	UpdateLive(instanceID, phase, node, ip string) error
 	SetPhase(instanceID, phase string) error
 	UpdateSpec(instanceID string, s *Session) error // 중단 세션 계산자원 재구성(GPU 붙이기/떼기)
+	// ClearNode는 노드 핀을 푼다. 홈 PVC 를 버리고 다른 노드에서 다시 시작할 때 쓴다.
+	ClearNode(instanceID string) error
 	// ClaimForStart는 stopped 에서 provisioning 으로의 전이를 조건부(CAS)로 시도한다(false 면 이미 누가 시작했다).
 	// 재시작 버튼 연타·동시 요청이 같은 세션을 두 번 띄우는 것을 DB 수준에서 막는다.
 	ClaimForStart(instanceID string) (bool, error)
@@ -182,6 +184,12 @@ func (r *gormRepo) SetPhase(instanceID, phase string) error {
 // UpdateSpec은 중단 세션의 계산자원(모드·GPU·오퍼링·이미지·보장 CPU/Mem·단가)만 갱신한다.
 // 홈·볼륨·데이터셋과 과금 누적, phase 는 건드리지 않는다. 재구성은 "무엇으로 다시 뜰지"만 바꾼다.
 // offering_id/image_id 는 nil 로 지우는 경우(CPU 전환)가 있어 map 갱신을 쓴다(zero value 무시 방지).
+// ClearNode는 노드 핀과 IP 를 비운다. 다음 시작 때 스케줄러가 노드를 다시 고른다.
+func (r *gormRepo) ClearNode(instanceID string) error {
+	return r.db.Model(&Session{}).Where("instance_id = ?", instanceID).
+		Updates(map[string]any{"node": "", "ip_address": ""}).Error
+}
+
 func (r *gormRepo) UpdateSpec(instanceID string, s *Session) error {
 	var offering, image any
 	if s.OfferingID != nil {

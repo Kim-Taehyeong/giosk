@@ -139,6 +139,20 @@ func (h *Handler) Reconfigure(c *gin.Context) {
 	httpx.OK(c, sess)
 }
 
+// Reallocate는 홈을 버리고 세션을 다른 노드에서 다시 시작한다. 되돌릴 수 없으므로
+// 콘솔이 경고와 확인을 거친 뒤에만 호출한다.
+func (h *Handler) Reallocate(c *gin.Context) {
+	var req struct {
+		Start bool `json:"start"`
+	}
+	_ = c.ShouldBindJSON(&req) // 본문이 없으면 start=false(사양만 재배치 준비)
+	if err := h.svc.Reallocate(c.Request.Context(), c.Param("id"), uid(c), req.Start); err != nil {
+		h.writeErr(c, err, "노드 재할당 실패")
+		return
+	}
+	httpx.OK(c, gin.H{"ok": true})
+}
+
 func (h *Handler) Stop(c *gin.Context)  { h.act(c, h.svc.Stop, "정지 실패") }
 func (h *Handler) Start(c *gin.Context) { h.act(c, h.svc.Start, "시작 실패") }
 

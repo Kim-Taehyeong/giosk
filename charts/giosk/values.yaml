@@ -61,6 +61,10 @@ storage:
   # 세션 홈(/home/work) 스토리지클래스. 노드 로컬(WFFC)이라 빠르다. 홈 I/O 를 NFS 로 보내면 못 쓴다.
   # 중지해도 남고 삭제할 때만 정리한다.
   localClass: local-path
+  # 세션 홈 PVC 에 적는 용량(GiB). local-path 는 이걸 강제하지 않으므로 실제로는 노드 디스크만큼 쓴다.
+  # 작게 적으면 사용자에게 거짓 한도를 보여주게 되니 노드 규모에 맞춰 넉넉히 둔다.
+  # 노드 디스크를 지키는 건 아래 nodeCleaner 임계와 quota.homeReapPct, 그리고 디스크 알림이다.
+  sessionHomeGiB: 200
   # 영속 home(~/nfs) 스토리지클래스. 노드 무관 저장소라 RWX 필수(NFS·CephFS·Longhorn-RWX).
   # 노드 로컬 클래스를 쓰면 PV 가 노드에 묶여 volume node affinity conflict 로 스케줄이 막힌다.
   persistence:

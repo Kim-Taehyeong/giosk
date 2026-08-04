@@ -84,18 +84,19 @@ type DatasetCacheReader interface {
 
 // Service는 session 비즈니스 로직.
 type Service struct {
-	repo         Repository
-	prov         Provisioner
-	nsPrefix     string
-	gateway      string
-	storageClass string // 영속 home(~/nfs)·공유 PVC 스토리지클래스(NFS RWX, 노드독립)
-	localClass   string // 세션 전용 홈(/home/work) 로컬 스토리지클래스(노드로컬·WFFC, 예: local-path). 속도 위해 NFS 아님.
-	audit        AuditReader
-	met          *metrics.Client
-	leaser       NodeLeaser
-	charger      Charger          // 크레딧 소비 회계(nil=과금 비활성)
-	limits       *policy.Resolver // 하드 리소스 상한(계층 해석; nil=미강제)
-	expose       string           // 세션 웹 노출 모드(nodeport|loadbalancer)
+	repo           Repository
+	prov           Provisioner
+	nsPrefix       string
+	gateway        string
+	storageClass   string // 영속 home(~/nfs)·공유 PVC 스토리지클래스(NFS RWX, 노드독립)
+	localClass     string // 세션 전용 홈(/home/work) 로컬 스토리지클래스(노드로컬·WFFC, 예: local-path). 속도 위해 NFS 아님.
+	sessionHomeGiB int    // ì¸ì í PVC íì ì©ë(GiB). local-path ë ê°ì íì§ ìëë¤
+	audit          AuditReader
+	met            *metrics.Client
+	leaser         NodeLeaser
+	charger        Charger          // 크레딧 소비 회계(nil=과금 비활성)
+	limits         *policy.Resolver // 하드 리소스 상한(계층 해석; nil=미강제)
+	expose         string           // 세션 웹 노출 모드(nodeport|loadbalancer)
 
 	surgeDynamic   bool                                                        // 동적(서지) 가격 활성
 	surgeIncrement int                                                         // 최대 가산 크레딧/시간(가용성 0일 때)
@@ -412,7 +413,7 @@ func (s *Service) Extend(ctx context.Context, instanceID string, userID int64) e
 }
 
 func NewService(repo Repository, prov Provisioner, nsPrefix, gateway, storageClass string) *Service {
-	return &Service{repo: repo, prov: prov, nsPrefix: nsPrefix, gateway: gateway, storageClass: storageClass, localClass: "local-path", uidBase: 100000, sharedHome: true}
+	return &Service{repo: repo, prov: prov, nsPrefix: nsPrefix, gateway: gateway, storageClass: storageClass, localClass: "local-path", sessionHomeGiB: sessionHomeGiBDefault, uidBase: 100000, sharedHome: true}
 }
 
 // WithSharedHome은 영속 home(~/nfs) 사용 여부를 설정한다(설치시 고정). false=세션 순수 로컬 임시.
@@ -422,6 +423,14 @@ func (s *Service) WithSharedHome(on bool) *Service { s.sharedHome = on; return s
 func (s *Service) WithLocalClass(sc string) *Service {
 	if sc != "" {
 		s.localClass = sc
+	}
+	return s
+}
+
+// WithSessionHomeGiB는 세션 홈 PVC 표시 용량을 설정한다(0 이하면 기본값).
+func (s *Service) WithSessionHomeGiB(gib int) *Service {
+	if gib > 0 {
+		s.sessionHomeGiB = gib
 	}
 	return s
 }
@@ -459,7 +468,14 @@ func (s *Service) Audit(instanceID string, userID int64) ([]audit.Log, error) {
 	return s.audit.ListByTarget(instanceID, 100)
 }
 
-const homeSizeGiB = 10 // 세션 홈(/home/work) 영속 용량 기본값
+const homeSizeGiB = 10 // 영속 home(~/nfs) 용량. NFS 라 여러 세션이 공유한다.
+
+// 세션 홈(/home/work) PVC 표시 용량 기본값.
+//
+// local-path 는 hostPath 디렉터리라 이 값을 하드 쿼터로 강제하지 않는다. 노드 디스크를 지키는 것은
+// nodeCleaner(scratch 85%, home 92%)와 홈 회수(88%), 그리고 디스크 알림(85%)이다.
+// 그래서 실제 쓸 수 있는 만큼 넉넉히 잡아 사용자에게 거짓 한도를 보여주지 않는다.
+const sessionHomeGiBDefault = 200
 
 // Create는 스펙을 확정하고 Pod 를 프로비저닝한 뒤 세션을 기록한다.
 func (s *Service) Create(ctx context.Context, userID int64, username string, req CreateReq) (*Session, error) {
@@ -652,7 +668,7 @@ func sessionHomePVC(instanceID string) string { return homePVCPrefix + instanceI
 func (s *Service) ensureSessionHome(ctx context.Context, ns, instanceID string) (string, error) {
 	name := sessionHomePVC(instanceID)
 	if err := s.prov.CreatePVC(ctx, k8s.PVCSpec{
-		Namespace: ns, Name: name, SizeGiB: homeSizeGiB,
+		Namespace: ns, Name: name, SizeGiB: s.sessionHomeGiB,
 		StorageClass: s.localClass, AccessMode: "RWO",
 	}); err != nil {
 		return "", err
@@ -1794,6 +1810,40 @@ func (s *Service) Reconfigure(ctx context.Context, instanceID string, userID int
 		}
 	}
 	return next, nil
+}
+
+// Reallocate는 세션을 다른 노드에서 다시 시작한다. 홈(/home/work)을 버리고 노드 핀을 푼다.
+//
+// 홈이 노드 로컬 디스크라 세션은 원래 노드에서만 재개된다. 그 노드가 막혔거나(만석) 원하는 GPU 방식을
+// 주지 못하면 사용자는 갇힌다. 홈을 다른 노드로 복사하는 길도 있지만, 홈은 "빠른 작업 공간"이지
+// 영속 저장소가 아니다(영속은 ~/nfs 와 볼륨). 그래서 옮기지 않고 버린 뒤 다시 배치한다.
+//
+// 지우는 것은 홈 PVC 뿐이다. ~/nfs·볼륨·데이터셋은 노드와 무관하므로 그대로 다시 붙는다.
+// 되돌릴 수 없으므로 호출부(콘솔)가 반드시 경고하고 확인을 받아야 한다.
+func (s *Service) Reallocate(ctx context.Context, instanceID string, userID int64, start bool) error {
+	sess, err := s.repo.Get(instanceID, userID)
+	if err != nil {
+		return err
+	}
+	if sess.Env == "ssh" {
+		return ErrReconfigureUnavailable // 물리 임대는 노드를 통째로 빌려주는 것이라 재배치 개념이 없다
+	}
+	if sess.Phase != PhaseStopped {
+		return ErrNotStopped
+	}
+	ns := s.namespaceOf(sess)
+	// 홈 PVC 를 지우면 다음 시작에서 새 노드에 새로 만들어진다(WFFC).
+	if err := s.prov.DeletePVC(ctx, ns, sessionHomePVC(instanceID)); err != nil {
+		return err
+	}
+	if err := s.repo.ClearNode(instanceID); err != nil {
+		return err
+	}
+	s.recordAct(userID, "session_reallocate", instanceID)
+	if !start {
+		return nil
+	}
+	return s.Start(ctx, instanceID, userID)
 }
 
 // nextSpec은 재구성 요청을 검증·정규화해 "다음 사양"을 만든다(생성 경로 buildSession 과 같은 규칙).
