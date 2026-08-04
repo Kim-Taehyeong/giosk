@@ -91,8 +91,12 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
     if (!data || !spec.node) return null;
     return data.byNode.find((n) => n.node === spec.node) || null;
   }, [data, spec.node]);
-  // 노드 고정이면 후보 노드는 그 한 대뿐이다.
-  const nodes = useMemo(() => (pinned ? [pinned] : (data?.byNode || [])), [data, pinned]);
+  // 선택지는 클러스터 전체에서 고른다. 노드 핀으로 목록을 좁히지 않는다.
+  // 홈을 버리고 다른 노드로 재할당하는 길이 있으므로, 노드 때문에 고를 수조차 없게 만들 이유가 없다.
+  // "지금 이 노드에서 뜨는가"는 아래 canStart 가 따로 본다.
+  const nodes = useMemo(() => (data?.byNode || []), [data]);
+  // 지금 노드에서 바로 뜰 수 있는지 판정할 때만 쓰는 후보(핀이 없으면 전체).
+  const pinNodes = useMemo(() => (pinned ? [pinned] : nodes), [pinned, nodes]);
 
   // 각 모드를 이 노드에서 쓸 수 있는지. 못 쓰면 왜 못 쓰는지까지 같이 준다.
   // 구조적으로 불가한 것(공유가 꺼진 노드, 카드가 없는 노드)만 여기서 막는다.
@@ -125,35 +129,47 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
       .filter((name) => (mode === 'shared'
         ? frac.has(name) && nodes.some((n) => n.gpuType === name && n.fractional)
         : true))
-      .map((name) => ({ name, free: nodes.filter((n) => n.gpuType === name).reduce((sum, n) => sum + (n.gpuFree || 0), 0) }));
+      // 여유는 모드에 맞는 단위로 센다. 공유는 분할 슬롯, 전용은 통짜 카드다.
+      // (HAMi 노드는 통짜를 주지 않아 gpuFree 가 0 이다. 그걸 공유에 쓰면 멀쩡히 빈 노드가 "여유 없음"이 된다.)
+      .map((name) => {
+        const own = nodes.filter((n) => n.gpuType === name);
+        const key = mode === 'shared' ? 'fracSlotsFree' : 'gpuFree';
+        return { name, free: own.reduce((sum, n) => sum + (n[key] || 0), 0) };
+      });
   }, [data, nodes, mode]);
   // 현재 선택이 이 모드에서 유효하지 않으면 첫 후보로 해석한다(상태는 그대로 두고 표시·전송만 보정).
   const selGpu = mode === 'cpu' ? ''
     : (gpuChoices.some((g) => g.name === gpuType) ? gpuType : (gpuChoices[0]?.name || ''));
 
   // 전용 GPU 개수 상한 = 단일 노드의 빈 GPU 최댓값(파드는 노드에 걸칠 수 없다).
-  const maxGpu = useMemo(() => (selGpu
-    ? nodes.filter((n) => n.gpuType === selGpu).reduce((mx, n) => Math.max(mx, n.gpuFree || 0), 0)
-    : 0), [nodes, selGpu]);
+  // 상한은 클러스터 전체 기준이다. 지금 노드에서 뜨는지는 maxGpuHere 가 따로 본다.
+  const maxOn = (list) => (selGpu
+    ? list.filter((n) => n.gpuType === selGpu).reduce((mx, n) => Math.max(mx, n.gpuFree || 0), 0)
+    : 0);
+  const maxGpu = maxOn(nodes);
+  const maxGpuHere = maxOn(pinNodes);
   const selCount = Math.min(Math.max(1, gpuCount), Math.max(1, maxGpu));
 
   // 공유(분할) 오퍼링은 선택한 모델의 것만 본다. 그 노드에 실제로 들어가는지(fits)도 함께 판정한다.
   const offerings = useMemo(() => {
     if (!data || mode !== 'shared' || !selGpu) return [];
-    const fracNodes = nodes.filter((n) => n.gpuType === selGpu && n.fractional);
+    const frac = (list) => list.filter((n) => n.gpuType === selGpu && n.fractional);
+    const roomIn = (list, o) => frac(list).some((n) => (n.fracSlotsFree || 0) >= 1
+      && (!o.vramMb || (n.fracVramFreeMb || 0) >= o.vramMb)
+      && (!o.corePercent || (n.fracCoresFree || 0) >= o.corePercent));
     return data.offerings
       .filter((o) => o.gpuType === selGpu && o.mode === 'fractional')
       .map((o) => ({
         ...o,
-        // fits = 지금 들어갈 자리가 있다. capable = 노드 총량으로는 애초에 담을 수 있다.
-        // 둘을 갈라야 "지금 만석"과 "이 노드엔 영원히 안 들어감"을 다르게 다룰 수 있다.
-        fits: fracNodes.some((n) => (n.fracSlotsFree || 0) >= 1
-          && (!o.vramMb || (n.fracVramFreeMb || 0) >= o.vramMb)
-          && (!o.corePercent || (n.fracCoresFree || 0) >= o.corePercent)),
-        capable: fracNodes.some((n) => (!o.vramMb || (n.fracVramTotalMb || 0) >= o.vramMb)
+        // fits = 클러스터 어딘가에 자리가 있다. fitsHere = 지금 이 세션의 노드에 자리가 있다.
+        // capable = 노드 총량으로 애초에 담을 수 있다. 셋을 갈라야
+        // "만석", "여기선 안 되지만 옮기면 됨", "어디서도 안 됨"을 다르게 말할 수 있다.
+        fits: roomIn(nodes, o),
+        fitsHere: roomIn(pinNodes, o),
+        capable: frac(nodes).some((n) => (!o.vramMb || (n.fracVramTotalMb || 0) >= o.vramMb)
           && (!o.corePercent || (n.fracCoresTotal || 100) >= o.corePercent)),
       }));
-  }, [data, nodes, mode, selGpu]);
+  }, [data, nodes, pinNodes, mode, selGpu]);
   // 담을 수 있는 오퍼링 중에서 고른다. 지금 자리가 있는 것을 우선하되, 만석이면 그중 첫 번째로 둔다.
   // (담을 수 없는 오퍼링은 아예 고를 수 없다.)
   const usableOfferings = offerings.filter((o) => o.capable);
@@ -181,21 +197,13 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
   // 자리가 없으면 저장은 되고 시작만 막힌다. 나중에 자리가 나면 재시작만 누르면 된다.
   const specValid = !!selImageId && (mode === 'cpu'
     || (mode === 'exclusive' ? !!selGpu : !!offering));
+  // 지금 이 세션의 노드에서 바로 뜰 수 있는가(= 홈 그대로 재시작).
   const canStart = specValid && (mode === 'cpu'
+    || (mode === 'exclusive' ? maxGpuHere >= selCount : !!offering?.fitsHere));
+  // 홈을 버리고 옮기면 뜰 수 있는가. 이게 참인데 canStart 가 거짓이면
+  // 막은 것은 자원이 아니라 홈의 위치다.
+  const placeableSomewhere = specValid && (mode === 'cpu'
     || (mode === 'exclusive' ? maxGpu >= selCount : !!offering?.fits));
-  // 노드 핀을 무시하면(=홈을 버리면) 클러스터 어딘가에서 뜰 수 있는가.
-  // 이게 참인데 canStart 가 거짓이면, 막은 것은 자원이 아니라 홈의 위치다.
-  const placeableSomewhere = useMemo(() => {
-    const all = data?.byNode || [];
-    if (mode === 'cpu') return all.length > 0;
-    if (mode === 'exclusive') {
-      return all.some((n) => n.gpuType === selGpu && !n.fractional && (n.gpuFree || 0) >= selCount);
-    }
-    if (!offering) return false;
-    return all.some((n) => n.gpuType === selGpu && n.fractional && (n.fracSlotsFree || 0) >= 1
-      && (!offering.vramMb || (n.fracVramFreeMb || 0) >= offering.vramMb)
-      && (!offering.corePercent || (n.fracCoresFree || 0) >= offering.corePercent));
-  }, [data, mode, selGpu, selCount, offering]);
   const changed = mode !== (spec.gpuMode || '') || selGpu !== (spec.gpuType || '')
     || (selOfferingId || null) !== (spec.offeringId || null) || (selImageId || null) !== (spec.imageId || null)
     || (mode === 'exclusive' && selCount !== spec.gpuCount);
@@ -273,13 +281,6 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
       {!data ? <Spinner pad /> : (
         <>
           <div className="legend mb">{t('reconf.hint')}</div>
-          {/* 노드 고정 안내는 공유 GPU 를 고를 때만 띄운다. CPU 는 그 노드에서 그냥 뜨고,
-              전용은 아래 모델 목록이 이미 그 노드 것만 보여준다. */}
-          {pinned && mode === 'shared' && (
-            <div className="legend mb" style={{ color: 'var(--warn)' }}>
-              {t('reconf.pinned', { node: pinned.node, gpu: pinned.gpuType || t('reconf.noGpu') })}
-            </div>
-          )}
 
           {/* 모드 전환 자체는 막지 않는다 — 그 모드에 자원이 있는지는 아래 선택지가 말한다. */}
           <div className="grid cols-3" style={{ gap: 10 }}>
@@ -372,11 +373,15 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
             <div className="row"><span>{t('reconf.current')}</span><span>{session.offering || '—'}</span></div>
             <div className="row big"><span>{t('reconf.next')}</span><span>{specText}</span></div>
             {creditMode && <div className="row"><span>{t('newSession.estCost')}</span><span>{price ? `${c(price)} C/h` : t('session.free')}</span></div>}
+            {pinned && <div className="row"><span>{t('reconf.node')}</span><span>{pinned.node}</span></div>}
             <div className="legend">{t('reconf.keepData')}</div>
-            {/* 왜 "적용하고 시작"이 꺼져 있는지 말해준다. 사양은 저장할 수 있다. */}
+            {/* 왜 "적용하고 시작"이 꺼져 있는지 말해준다. 사양은 저장할 수 있다.
+                노드 제약은 실제로 막혔을 때만 꺼낸다. 막지도 않았는데 미리 경고하면 잡음이다. */}
             {specValid && !canStart && (
               <div className="legend" style={{ color: 'var(--warn)' }}>
-                {canElsewhere ? t('reconf.startBlockedElsewhere') : t('reconf.startBlocked')}
+                {canElsewhere
+                  ? t('reconf.needsOtherNode', { node: pinned?.node || '' })
+                  : t('reconf.startBlocked')}
               </div>
             )}
           </div>
