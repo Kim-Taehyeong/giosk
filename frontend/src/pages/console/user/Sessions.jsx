@@ -1,15 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Code2, NotebookPen, TerminalSquare, Power, RotateCcw, Trash2, Clock } from 'lucide-react';
+import { Code2, NotebookPen, TerminalSquare, Power, RotateCcw, Clock } from 'lucide-react';
 import PageHead from '../../../components/console/PageHead';
 import Pill from '../../../components/console/Pill';
 import Bar from '../../../components/console/Bar';
 import ConnectionModal from '../../../components/console/ConnectionModal';
 import RowMenu from '../../../components/console/RowMenu';
 import { useToast } from '../../../components/console/Toast';
-import { useConfirm } from '../../../components/console/Confirm';
-import { getMySessionsWithUsage, stopSession, startSession, deleteSession, extendSession } from '../../../api/console/sessions';
+import { getMySessionsWithUsage, stopSession, startSession, extendSession } from '../../../api/console/sessions';
 import { useSystemConfig } from '../../../context/SystemConfigContext';
 import { measureRows, gpuUnmeasurable } from '../../../utils/sessionUsage';
 import { reclaimInfo, RECLAIM_VARIANT } from '../../../utils/reclaim';
@@ -38,7 +37,6 @@ export default function Sessions() {
   const [connTab, setConnTab] = useState(null); // 클릭한 채널(모달 초기 탭). 안 넘기면 항상 VSCode 로 열린다
   const navigate = useNavigate();
   const { toast } = useToast();
-  const confirm = useConfirm();
 
   // 임대와 연장은 선착순(Dynamic) 모드 전용 개념이라 크레딧 모드에선 노출하지 않는다.
   const lease = config.lease || { extensionHours: 0, maxExtensions: 0 };
@@ -123,22 +121,12 @@ export default function Sessions() {
     );
   };
 
-  // 행 작업. 예전엔 이 열에 접속 칩만 있어서 중단된 세션은 목록에서 아무것도 할 수 없었다
-  // (상세로 들어가야만 재시작·삭제 가능). 중단 세션은 홈 디스크를 계속 물고 있으므로,
-  // 정리하는 길이 목록에 바로 있어야 한다. 그 결정은 유지한다.
-  //
-  // 다만 노출 무게는 다르게 준다. 행마다 "지금 할 일" 하나만 고스트 버튼으로 내놓고
-  // (실행 중=정지, 중단=재시작), 되돌릴 수 없는 삭제는 케밥 메뉴 뒤로 보낸다.
-  // 그래야 행마다 버튼 폭이 같아 열이 세로로 정렬되고, 빨간 아이콘이 상태 배지보다
-  // 시끄러워지는 일도 없다.
+  // 행 작업은 되돌릴 수 있는 것만 둔다. 정지와 재시작은 언제든 되돌릴 수 있어 목록에서 바로 하고,
+  // 삭제와 자원 변경처럼 되돌릴 수 없거나 판단이 필요한 것은 상세 페이지로 보낸다.
+  // 목록은 한눈에 훑는 화면이라 클릭 한 번에 홈 데이터가 사라지는 길이 있으면 안 된다.
   const rowActions = (r) => {
     const stop = () => act(stopSession, r.id, t('session.stopped'));
     const start = () => act(startSession, r.id, t('session.restarted'));
-    const del = async () => {
-      // 상세 페이지와 같은 문구에 같은 확인 절차를 쓴다. 삭제는 홈 데이터까지 지운다(중단은 보존한다).
-      if (!(await confirm({ title: t('session.delete'), message: t('confirmDelete'), confirmText: t('session.delete') }))) return;
-      act(deleteSession, r.id, t('session.deleted'));
-    };
     if (r.status === 'running') {
       const canExtend = dynamicMode && r.mode !== 'cpu' && (r.extensionsUsed || 0) < lease.maxExtensions;
       return (<>
@@ -150,14 +138,8 @@ export default function Sessions() {
       </>);
     }
     if (r.status === 'stopped') {
-      return (<>
-        <button className="btn sm ghost" onClick={start} disabled={!!pending[r.id]} title={t('session.restart')}><RotateCcw size={13} /> {t('session.restart')}</button>
-        {/* 자원 변경은 상세 페이지에만 둔다. 사양을 바꾸려면 지금 사양과 남은 자리를 보고 판단해야 하는데
-            목록에는 그 정보가 없다. 목록에서는 재시작과 삭제까지만 한다. */}
-        <RowMenu label={r.name} items={[
-          { key: 'delete', label: t('session.delete'), icon: Trash2, tone: 'danger', onSelect: del },
-        ]} />
-      </>);
+      // 삭제와 자원 변경은 상세에서 한다. 여기서는 다시 켜는 것만.
+      return <button className="btn sm ghost" onClick={start} disabled={!!pending[r.id]} title={t('session.restart')}><RotateCcw size={13} /> {t('session.restart')}</button>;
     }
     return null; // provisioning/queued 등 전이 중에는 조작을 막는다(중복 요청 방지)
   };
