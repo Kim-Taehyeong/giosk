@@ -7,6 +7,8 @@ kubeconfig
 admin.conf
 **/values-*.local.yaml
 **/*.secret.yaml
+# 설치별 values(관리자·DB 비밀번호가 들어간다). 서버에만 두고 커밋하지 않는다.
+my-values.yaml
 
 # ── Node / frontend ──
 node_modules/

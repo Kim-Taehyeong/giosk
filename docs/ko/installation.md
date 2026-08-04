@@ -87,8 +87,33 @@ kubectl -n giosk get svc giosk-giosk-frontend      # 콘솔 접속 주소
 
 ## 업그레이드
 
+레지스트리에서 이미지를 받는 배포라면 이 스크립트를 쓴다. 지금 커밋의 SHA 태그로 올린다.
+
 ```bash
-helm upgrade giosk charts/giosk -f my-values.yaml
+./deploy/upgrade.sh                # origin/main 최신으로
+REF=v0.1.0 ./deploy/upgrade.sh     # 특정 태그로
+```
+
+이미지 태그로 `:latest` 를 쓰지 않는 이유가 있다. `latest` 는 Deployment 스펙이 그대로라
+helm 이 파드를 다시 띄우지 않는다. 그래서 레지스트리에 새 이미지가 올라가 있어도 옛 파드가
+계속 돌고, 화면상으로는 배포된 것처럼 보인다. 커밋 SHA 태그를 쓰면 스펙이 바뀌므로 helm 이
+알아서 롤링하고, `kubectl get pods -o wide` 의 이미지만 봐도 무엇이 도는지 알 수 있다.
+
+스크립트는 배포 전에 그 태그의 이미지가 레지스트리에 실제로 있는지 먼저 확인한다.
+`main` 에 push 한 뒤 GitHub Actions `build-images` 가 끝나기 전에 배포하면 여기서 멈춘다.
+
+수동으로 할 때도 태그를 명시한다.
+
+```bash
+helm upgrade giosk charts/giosk -f my-values.yaml \
+  --set image.api.tag=sha-1234567 --set image.frontend.tag=sha-1234567
+```
+
+`my-values.yaml` 은 서버에만 두고 커밋하지 않는다(관리자·DB 비밀번호가 들어간다).
+파일이 라이브와 어긋나면 이전 설정이 되살아나므로, 배포 전에 라이브를 확인하는 습관을 들인다.
+
+```bash
+helm get values giosk -n giosk    # 지금 실제로 적용된 값
 ```
 
 DB 마이그레이션은 API 기동 시 자동 적용된다. 되돌리는 스크립트는 없으므로 업그레이드 전
