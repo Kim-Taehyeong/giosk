@@ -55,6 +55,11 @@ func (h *Handler) cordon(c *gin.Context, on bool) {
 	httpx.OK(c, gin.H{"ok": true})
 }
 
+// ModeImpact는 공유 모드를 바꾸기 전에 영향받는 세션 수를 알려준다(콘솔 확인 대화용).
+func (h *Handler) ModeImpact(c *gin.Context) {
+	httpx.OK(c, h.svc.ModeImpact(c.Param("name"), c.Query("mode")))
+}
+
 func (h *Handler) SetConfig(c *gin.Context) {
 	var req ConfigReq
 	if err := c.ShouldBindJSON(&req); err != nil {

@@ -57,6 +57,9 @@ var (
 	// ErrNodePinned는 클러스터에는 자리가 있지만 이 세션이 묶인 노드에는 그 사양을 넣을 수 없을 때.
 	// 세션 홈(/home/work)은 노드 로컬 디스크(local-path)라 세션은 그 노드에서만 재개된다.
 	ErrNodePinned = errors.New("session pinned to node")
+	// ErrNodeModeChanged는 관리자가 이 세션이 묶인 노드의 공유 모드를 바꿔, 그 사양으로는
+	// 더 이상 그 노드에 뜰 수 없을 때. 자리 문제가 아니라 설정 변경이라 사용자가 할 일이 다르다.
+	ErrNodeModeChanged = errors.New("node share mode changed")
 )
 
 // Repository는 session 영속성 계약. 이미지/오퍼링 스펙은 read 프로젝션으로 조회.

@@ -42,10 +42,11 @@ const (
 )
 
 // 노드 GPU 공유 전략(share_mode). 노드당 하나만 고를 수 있다(상호 배타).
-//   exclusive   : GPU 카드를 통째로 점유.
-//   hami        : HAMi 분할. VRAM(GB)과 코어(%) 단위이며 메모리 격리가 있다.
-//   timeslicing : NVIDIA device plugin 타임슬라이싱. GPU 1개를 split_count 슬롯으로 광고한다.
-//                 메모리 격리가 없어 한 파드의 OOM 이 같은 GPU 의 다른 파드로 전파된다. HAMi 를 못 깐 노드용 대안이다.
+//
+//	exclusive   : GPU 카드를 통째로 점유.
+//	hami        : HAMi 분할. VRAM(GB)과 코어(%) 단위이며 메모리 격리가 있다.
+//	timeslicing : NVIDIA device plugin 타임슬라이싱. GPU 1개를 split_count 슬롯으로 광고한다.
+//	              메모리 격리가 없어 한 파드의 OOM 이 같은 GPU 의 다른 파드로 전파된다. HAMi 를 못 깐 노드용 대안이다.
 const (
 	ShareExclusive   = "exclusive"
 	ShareHami        = "hami"
@@ -158,4 +159,18 @@ type ConfigReq struct {
 type LeaseReq struct {
 	UserID     int64 `json:"userId" binding:"required"`
 	LeaseHours int   `json:"leaseHours" binding:"required"`
+}
+
+// NodeSessionRef는 노드에 묶인 세션 한 줄(공유 모드 변경 영향 판정용).
+type NodeSessionRef struct {
+	InstanceID string `json:"instanceId"`
+	Name       string `json:"name"`
+	GpuMode    string `json:"gpuMode"`
+	Phase      string `json:"phase"`
+}
+
+// ModeImpact는 노드 공유 모드를 바꿨을 때 재시작이 막히는 세션들.
+type ModeImpact struct {
+	Count    int              `json:"count"`
+	Sessions []NodeSessionRef `json:"sessions"`
 }

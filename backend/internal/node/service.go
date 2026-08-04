@@ -335,6 +335,30 @@ func (s *Service) applyDevicePlugin(node, mode string, split *int) {
 	log.Printf("[node] %s: 타임셰어링 %d슬롯 적용(device plugin config=%s)", node, n, key)
 }
 
+// ModeImpact는 이 노드를 mode 로 바꿨을 때 재시작이 막히는 세션을 센다.
+//
+// 세션 홈이 노드 로컬이라 세션은 그 노드로만 돌아간다. 그런데 배치 규칙상
+// 전용은 분할·타임슬라이싱 노드에 못 뜨고, 공유는 분할 노드에만 뜬다.
+// 그래서 모드를 바꾸면 그 노드에 묶인 세션 중 일부가 영영 재시작하지 못한다.
+// 관리자가 그걸 모르고 바꾸지 않도록 미리 세어 준다.
+func (s *Service) ModeImpact(name, mode string) ModeImpact {
+	out := ModeImpact{Sessions: []NodeSessionRef{}}
+	for _, r := range s.repo.SessionsOnNode(name) {
+		broken := false
+		switch mode {
+		case ShareHami, ShareTimeslicing:
+			broken = r.GpuMode == "exclusive" || r.GpuMode == "mig"
+		default: // 전용(공유 끔)
+			broken = r.GpuMode == "shared"
+		}
+		if broken {
+			out.Sessions = append(out.Sessions, r)
+		}
+	}
+	out.Count = len(out.Sessions)
+	return out
+}
+
 func (s *Service) SetConfig(name string, req ConfigReq) error {
 	fields := map[string]any{}
 	if req.SplitCount != nil {

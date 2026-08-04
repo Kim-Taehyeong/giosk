@@ -505,7 +505,10 @@
     "metricsOffNotice": "모니터링(DCGM·Prometheus)이 설치되지 않아 GPU 사용률·VRAM 지표를 표시할 수 없습니다. 모니터링을 활성화하면 실시간 지표가 나타납니다.",
     "uncordon": "스케줄 허용",
     "cordon": "스케줄 차단",
-    "noMetrics": "지표 없음"
+    "noMetrics": "지표 없음",
+    "modeChangeTitle": "공유 모드를 바꾸시겠습니까?",
+    "modeChangeWarn": "이 노드에 홈이 묶인 세션 {{n}}개가 새 설정에서는 재시작할 수 없게 됩니다.\n\n세션 홈은 노드 로컬 디스크라 세션은 이 노드로만 돌아옵니다. 사용자는 자원 변경으로 다른 방식을 고르거나, 홈을 비우고 다른 노드로 재할당해야 합니다.",
+    "modeChangeConfirm": "알고 바꾸기"
   },
   "mset": {
     "title": "설정",

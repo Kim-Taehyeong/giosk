@@ -23,12 +23,14 @@ type Repository interface {
 	GetLease(id int64) (*Lease, error)
 	ExtendLease(id int64, addHours int) error
 	ReleaseLease(id int64) error
-	ActiveLeaseUser(node string) (string, bool)            // leasedTo username
+	ActiveLeaseUser(node string) (string, bool)             // leasedTo username
 	ActiveLeaseFor(node string, userID int64) (int64, bool) // (node,user) 활성 임대 id(자유모드 멱등 재사용)
 	AgentLeases(node string) ([]AgentLease, error)
-	LeaseVolumes(instanceID string) []LeaseVolRow        // 물리세션에 붙은 볼륨(PVC 좌표 + 권한)
-	LeaseDatasets(instanceID string) []LeaseDatasetRow   // 물리세션에 붙은 데이터셋(PVC 좌표, RO)
-	RunningByNode() map[string]int                       // 노드별 running 세션 수
+	LeaseVolumes(instanceID string) []LeaseVolRow      // 물리세션에 붙은 볼륨(PVC 좌표 + 권한)
+	LeaseDatasets(instanceID string) []LeaseDatasetRow // 물리세션에 붙은 데이터셋(PVC 좌표, RO)
+	RunningByNode() map[string]int                     // 노드별 running 세션 수
+	// SessionsOnNode는 그 노드에 묶인 세션(중단 포함)의 모드를 준다. 공유 모드 변경 영향 판정용.
+	SessionsOnNode(node string) []NodeSessionRef
 	ReleaseByInstance(instanceID string) (string, error) // 임대 해제 후 노드명 반환
 }
 
@@ -59,6 +61,15 @@ func (r *gormRepo) UpsertConfig(name string, fields map[string]any) error {
 	return r.db.Model(&Config{}).Where("name = ?", name).Updates(fields).Error
 }
 
+// SessionsOnNode는 홈이 그 노드에 묶인 세션을 준다(삭제된 것 제외).
+// 중단 세션도 포함해야 한다. 지금 안 돌 뿐 재시작하면 그 노드로 돌아가기 때문이다.
+func (r *gormRepo) SessionsOnNode(node string) []NodeSessionRef {
+	var rows []NodeSessionRef
+	r.db.Raw(`SELECT instance_id, name, gpu_mode, phase FROM sessions
+		WHERE node = ? AND phase <> 'deleted' AND env <> 'ssh'`, node).Scan(&rows)
+	return rows
+}
+
 func (r *gormRepo) RunningByNode() map[string]int {
 	var rows []struct {
 		Node string
@@ -78,6 +89,7 @@ func (r *gormRepo) CreateLease(l *Lease) error { return r.db.Create(l).Error }
 // node_leases.lease_key(생성컬럼) 유니크 제약이 경합을 DB 레벨에서 보장한다(갭락/데드락 없음):
 //   - exclusive(비-자유): lease_key=node. 둘째 INSERT 는 1062 중복이라 ErrNodeBusy 가 된다.
 //   - !exclusive(자유):   lease_key=node#user. 둘째 INSERT 는 1062 중복이지만 재사용한다(reused=true).
+//
 // 거의 동시에 들어온 다수 요청 중 처음 한 건만 INSERT 에 성공한다.
 func (r *gormRepo) AcquireLease(l *Lease, exclusive bool) (bool, error) {
 	l.Shared = !exclusive

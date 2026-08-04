@@ -103,7 +103,8 @@ type Service struct {
 	availFn        func(ctx context.Context, gpuType string) (free, total int) // GPU 타입별 가용 조회
 	// canPlaceFn은 "지금 이 세션이 들어갈 자리가 있는가"를 답한다(대기열 없음 정책의 관문).
 	// 생성·재시작 두 경로가 같은 함수를 타야 규칙이 화면마다 갈리지 않는다.
-	canPlaceFn func(ctx context.Context, p PlaceSpec) bool
+	nodeSupportsFn func(ctx context.Context, node, gpuMode string) (ok, known bool) // 노드가 그 모드를 원리상 주는가
+	canPlaceFn     func(ctx context.Context, p PlaceSpec) bool
 
 	// admitMu·admitLock은 "관문 통과 후 예약 기록"을 한 번에 하나만 지나게 한다.
 	// 이 구간을 열어두면 동시에 들어온 요청들이 모두 같은 여유를 보고 통과해(TOCTOU)
@@ -161,6 +162,13 @@ func (s *Service) WithGatewayProxyJump(jump string) *Service { s.gatewayJump = j
 
 // WithSurge는 동적/서지 가격(가용성이 낮을수록 단가 상승)을 설정한다. dynamic=false면 정적 단가.
 // WithCapacityGate는 가용성 관문을 주입한다. 미주입이면 게이트 미적용(기존 동작).
+// WithNodeSupports는 "이 노드가 그 GPU 모드를 주는가"를 묻는 함수를 주입한다.
+// 관리자가 노드 공유 모드를 바꾼 경우를 자리 부족과 갈라 말하기 위해 쓴다.
+func (s *Service) WithNodeSupports(fn func(ctx context.Context, node, gpuMode string) (bool, bool)) *Service {
+	s.nodeSupportsFn = fn
+	return s
+}
+
 func (s *Service) WithCapacityGate(fn func(ctx context.Context, p PlaceSpec) bool) *Service {
 	s.canPlaceFn = fn
 	return s
@@ -1708,10 +1716,7 @@ func (s *Service) Start(ctx context.Context, instanceID string, userID int64) er
 	// phase 전이(=예약)를 관문과 같은 구간에서 끝내, 다음 요청이 이 자리를 다시 보지 않게 한다.
 	if err := s.admit(ctx, func() error {
 		if err := s.checkCapacityOn(ctx, sess, sess.Node); err != nil {
-			if sess.Node != "" && s.checkCapacity(ctx, sess) == nil {
-				return ErrNodePinned // 클러스터엔 자리가 있는데 이 노드만 막힌 경우다. 사용자가 할 일이 다르다
-			}
-			return err
+			return s.pinnedFailure(ctx, sess, err)
 		}
 		// 예약 확정. stopped 일 때만 성공하는 조건부 전이라 연타나 동시 요청이 같은 세션을 두 번 띄우지 못한다.
 		ok, err := s.repo.ClaimForStart(instanceID)
@@ -1793,12 +1798,9 @@ func (s *Service) Reconfigure(ctx context.Context, instanceID string, userID int
 		return nil, err
 	}
 	if err := s.checkCapacityOn(ctx, next, sess.Node); err != nil {
-		// 노드 기준으로만 막혔다면 원인은 "자리 없음"이 아니라 "홈이 이 노드에 묶여 있음"이다.
-		// 둘은 사용자가 할 일이 다르므로(기다린다 vs 새 세션으로 옮긴다) 오류를 갈라 알려준다.
-		if sess.Node != "" && s.checkCapacity(ctx, next) == nil {
-			return nil, ErrNodePinned
-		}
-		return nil, err
+		// 원인을 갈라 알려준다. 자리 부족·홈 위치·노드 설정 변경은 사용자가 할 일이 각각 다르다.
+		next.Node = sess.Node
+		return nil, s.pinnedFailure(ctx, next, err)
 	}
 	if err := s.repo.UpdateSpec(instanceID, next); err != nil {
 		return nil, err
@@ -1810,6 +1812,24 @@ func (s *Service) Reconfigure(ctx context.Context, instanceID string, userID int
 		}
 	}
 	return next, nil
+}
+
+// pinnedFailure는 "이 노드에서 못 뜬다"의 원인을 갈라 준다.
+// 노드가 그 모드를 아예 안 주면 설정 변경(ErrNodeModeChanged), 클러스터엔 자리가 있으면
+// 홈 위치 문제(ErrNodePinned), 둘 다 아니면 그냥 자리 부족이다.
+func (s *Service) pinnedFailure(ctx context.Context, sess *Session, fallback error) error {
+	if sess.Node == "" {
+		return fallback
+	}
+	if s.nodeSupportsFn != nil {
+		if ok, known := s.nodeSupportsFn(ctx, sess.Node, sess.GpuMode); known && !ok {
+			return ErrNodeModeChanged
+		}
+	}
+	if s.checkCapacity(ctx, sess) == nil {
+		return ErrNodePinned
+	}
+	return fallback
 }
 
 // Reallocate는 세션을 다른 노드에서 다시 시작한다. 홈(/home/work)을 버리고 노드 핀을 푼다.

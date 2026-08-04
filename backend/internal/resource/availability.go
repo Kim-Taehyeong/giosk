@@ -493,3 +493,28 @@ func canPlaceOnNode(av Availability, r PlaceReq, res Reservation) bool {
 	}
 	return true
 }
+
+// NodeSupports는 그 노드가 이 GPU 모드를 원리상 지원하는지 답한다(자리 여부와 무관).
+// known=false 면 인벤토리에 없는 노드라 판단하지 않는다(조회 공백으로 사용자를 막지 않는다).
+//
+// 관리자가 노드 공유 모드를 바꾸면 그 노드에 묶인 세션이 재시작할 수 없게 되는데,
+// 그때 "자리가 없다"가 아니라 "이 노드가 더는 그 방식을 주지 않는다"고 말해야 사용자가 할 일을 안다.
+func (s *Service) NodeSupports(ctx context.Context, node, gpuMode string) (ok, known bool) {
+	if node == "" || gpuMode == "" || gpuMode == "cpu" {
+		return true, node != ""
+	}
+	av := s.Availability(ctx)
+	for _, n := range av.ByNode {
+		if n.Node != node {
+			continue
+		}
+		if n.GpuType == "" {
+			return false, true // GPU 가 없는 노드
+		}
+		if gpuMode == "shared" {
+			return n.Fractional, true
+		}
+		return !n.Fractional, true // 전용은 분할 노드에 뜨지 않는다(mapper 의 노드 어피니티와 같은 규칙)
+	}
+	return true, false
+}
