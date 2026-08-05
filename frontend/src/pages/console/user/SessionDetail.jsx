@@ -71,7 +71,17 @@ export default function UserSessionDetail() {
     load();
   };
   const doDelete = async () => {
-    if (!await confirm({ title: t('session.delete'), message: t('confirmDelete'), confirmText: t('session.delete') })) return;
+    // 삭제는 홈까지 지운다. 무엇이 사라지고 무엇이 남는지 재할당 확인과 같은 형식으로 보여준다.
+    if (!await confirm({
+      title: t('session.delete'),
+      message: t('session.deleteWarn'),
+      lost: t('reconf.reallocLost'),
+      kept: t('reconf.reallocKept'),
+      lostLabel: t('reconf.lostLabel'),
+      keptLabel: t('reconf.keptLabel'),
+      note: t('session.deleteNote'),
+      confirmText: t('session.delete'),
+    })) return;
     await deleteSession(id);
     toast(t('session.deleted'));
     navigate('/console/sessions'); // 삭제 후엔 상세에 머무르지 말고 목록으로(세션이 사라졌으므로)

@@ -391,7 +391,9 @@
     "detNoActivity": "No activity yet",
     "idlePolicy": "Sessions are auto-reclaimed after {{n}} min idle.",
     "usage": "Usage",
-    "actionFailed": "The request could not be completed"
+    "actionFailed": "The request could not be completed",
+    "deleteWarn": "This deletes the session. Stopping it instead keeps home intact.",
+    "deleteNote": "This cannot be undone."
   },
   "reconf": {
     "menu": "Change resources",
@@ -432,12 +434,17 @@
     "tooBig": "Exceeds this node",
     "applyElsewhere": "Wipe home and start elsewhere",
     "reallocTitle": "Reallocate to another node",
-    "reallocWarn": "This session is bound to the home disk on {{node}}. Moving it to another node requires wiping the home directory (/home/work), and everything in it will be deleted. This cannot be undone.\n\n~/nfs, volumes and datasets are kept. Move anything you need out of home first.",
+    "reallocWarn": "This session is bound to the home disk on {{node}}. Starting it elsewhere requires wiping home.",
     "reallocConfirm": "Wipe home and reallocate",
     "reallocDone": "Home wiped, started on another node",
     "startBlockedElsewhere": "No room on this node. Another node has capacity, so wiping home lets it start.",
     "node": "Node",
-    "needsOtherNode": "This spec cannot start on {{node}} right now. Another node has room, so wiping home lets it start there."
+    "needsOtherNode": "This spec cannot start on {{node}} right now. Another node has room, so wiping home lets it start there.",
+    "reallocLost": "Everything under /home/work",
+    "reallocKept": "~/nfs · volumes · datasets",
+    "lostLabel": "Deleted",
+    "keptLabel": "Kept",
+    "reallocNote": "This cannot be undone. Move anything you need out of home first."
   },
   "conn": {
     "title": "Connect — {{name}}",

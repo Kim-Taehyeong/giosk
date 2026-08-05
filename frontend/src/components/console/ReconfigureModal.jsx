@@ -237,6 +237,11 @@ export default function ReconfigureModal({ session, onClose, onDone }) {
     const ok = await confirm({
       title: t('reconf.reallocTitle'),
       message: t('reconf.reallocWarn', { node: pinned?.node || '' }),
+      lost: t('reconf.reallocLost'),
+      kept: t('reconf.reallocKept'),
+      lostLabel: t('reconf.lostLabel'),
+      keptLabel: t('reconf.keptLabel'),
+      note: t('reconf.reallocNote'),
       confirmText: t('reconf.reallocConfirm'),
       danger: true,
     });
