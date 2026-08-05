@@ -256,7 +256,10 @@ html[data-theme="dark"] .console-modal-bg .btn.primary{color:#0f1218}
 /* 모달 안에서도 못 누르는 버튼은 못 누르게 보여야 한다(.console-root 규칙은 포털 밖이라 안 닿는다). */
 .console-modal-bg .btn:disabled{opacity:.45;filter:saturate(.35);cursor:not-allowed;box-shadow:none;transform:none}
 .console-modal-bg .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
-.console-modal-bg .btn.danger{color:var(--danger);border-color:var(--danger)}
+/* 디자인 시스템의 button-danger 는 danger-soft 바탕이다. 모달 안에서만 바탕이 빠져 있어
+   되돌릴 수 없는 확인 버튼이 취소보다 약해 보였다. */
+.console-modal-bg .btn.danger{color:var(--danger);border-color:var(--danger);background:var(--danger-soft)}
+.console-modal-bg .btn.danger:hover:not(:disabled){background:color-mix(in srgb, var(--danger) 16%, transparent)}
 .console-modal-bg .btn.sm{padding:5px 10px;font-size:12px}
 .console-modal-bg .pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:var(--r-pill);font-size:12px;font-weight:700}
 .console-modal-bg .pill.primary{background:var(--primary-soft);color:var(--primary)}
