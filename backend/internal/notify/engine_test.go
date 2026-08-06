@@ -65,3 +65,29 @@ func TestSessionRuleFires(t *testing.T) {
 		t.Errorf("GPU 3%% 는 lte 10 위반이라 1건 적재돼야 한다: got %d", inbox.n)
 	}
 }
+
+// 쿨다운은 규칙 id 가 아니라 규칙 내용으로 기억해야 한다.
+//
+// 알림 설정 저장은 규칙을 통째로 지웠다가 다시 넣어서 같은 규칙이라도 id 가 매번 바뀐다.
+// 화면을 열면 저장이 한 번 나가던 때가 있었는데, id 로 기억하면 그때마다 쿨다운이 사라져
+// 같은 알림이 1분 간격으로 계속 왔다.
+func TestCooldownSurvivesRuleIDChange(t *testing.T) {
+	e := NewEngine(nil, nil, nil, nil)
+	before := Rule{ID: 41, Scope: ScopeUser, OwnerID: 1, Metric: "session_gpu", Op: "lte", Value: 10, Target: "ses-a"}
+	after := before
+	after.ID = 907 // 저장하면서 새로 채번된 같은 규칙
+
+	if e.cooling(ruleKey(before, "")) {
+		t.Fatal("첫 발화는 억제되면 안 된다")
+	}
+	if !e.cooling(ruleKey(after, "")) {
+		t.Error("id 만 바뀐 같은 규칙은 쿨다운에 걸려야 한다")
+	}
+
+	// 대상 세션이 다르면 별개 규칙이라 억제하지 않는다.
+	other := before
+	other.Target = "ses-b"
+	if e.cooling(ruleKey(other, "")) {
+		t.Error("대상이 다른 규칙까지 억제하면 안 된다")
+	}
+}

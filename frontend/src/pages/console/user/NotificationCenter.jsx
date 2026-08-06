@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { notifyText } from '../../../utils/notify';
 import { clickable } from '../../../utils/a11y';
@@ -48,14 +48,21 @@ export default function NotificationCenter() {
   const [availModal, setAvailModal] = useState(false);
   const [availForm, setAvailForm] = useState({ type: 'gpu', target: '' });
 
+  // 마지막으로 저장한 내용의 스냅샷이다. 바뀐 게 없는 저장을 걸러내는 데 쓴다.
+  const savedRef = useRef(null);
+
   // 백엔드에서 알림 규칙/채널 로드(없으면 백엔드 기본 규칙). 비크레딧 모드는 크레딧 지표 제외.
   useEffect(() => {
     getUserNotify().then((cfg) => {
       const rs = (cfg.rules || []).filter((r) => creditMode || !CREDIT_METRICS.includes(r.metric));
       // 기본 규칙은 저장돼 있지 않아 id 가 0 이라 고유 id 를 부여한다(React key 중복과 updateRule 오작동 방지).
-      setRules(rs.map((r, i) => ({ ...r, id: r.id || Date.now() + i })));
-      setEmails(cfg.emails && cfg.emails.length ? cfg.emails : (user?.email ? [user.email] : []));
-      setWebhooks(cfg.webhooks || []);
+      const mapped = rs.map((r, i) => ({ ...r, id: r.id || Date.now() + i }));
+      setRules(mapped);
+      const es = cfg.emails && cfg.emails.length ? cfg.emails : (user?.email ? [user.email] : []);
+      setEmails(es);
+      const ws = cfg.webhooks || [];
+      setWebhooks(ws);
+      savedRef.current = JSON.stringify({ rules: mapped, emails: es, webhooks: ws });
       setLoaded(true);
     });
   }, [creditMode]); // eslint-disable-line
@@ -72,9 +79,15 @@ export default function NotificationCenter() {
   }, []);
 
   // 규칙/채널 변경 시 백엔드에 전체 저장(최초 로드 이후).
+  // 저장은 규칙을 통째로 지웠다가 다시 넣으므로, 바뀐 게 없으면 보내지 않는다.
+  // 화면을 열기만 해도 저장이 나가면 알림 쿨다운이 초기화돼 같은 알림이 다시 온다.
   useEffect(() => {
     if (!loaded) return;
-    saveUserNotify({ rules, emails, webhooks });
+    const payload = { rules, emails, webhooks };
+    const snap = JSON.stringify(payload);
+    if (savedRef.current === snap) return;
+    savedRef.current = snap;
+    saveUserNotify(payload);
   }, [rules, emails, webhooks, loaded]);
 
   useEffect(() => {
