@@ -384,8 +384,8 @@ html[data-theme="dark"] .console-modal-bg .btn.primary{color:#0f1218}
 .console-root .selbox:hover{transform:translateY(-1px)}
 .console-root .selbox:active{transform:scale(.99)}
 .console-root .selbox.on{box-shadow:0 0 0 3px var(--primary-soft)}
-@keyframes console-pop-in{from{transform:scale(0) rotate(-25deg);opacity:0}to{transform:none;opacity:1}}
-.console-root .pop-in{display:inline-flex;align-items:center;animation:console-pop-in .24s cubic-bezier(.34,1.56,.64,1)}
+@keyframes console-pop-in{from{transform:scale(.85) rotate(-8deg);opacity:0}to{transform:none;opacity:1}}
+.console-root .pop-in{display:inline-flex;align-items:center;animation:console-pop-in .24s cubic-bezier(.16,1,.3,1)}
 
 /* generic helpers used in pages */
 .console-root .muted{color:var(--muted)}
@@ -445,6 +445,7 @@ html[dir="rtl"] .console-root .progress-fill{transform-origin:right center}
   .console-root .console-page .card,
   .console-root .console-page .task-card,
   .console-root .console-page .bar > i,
+  .console-root .pop-in,
   .console-root .console-page .chart .col .cbar{animation:none !important}
 }
 
