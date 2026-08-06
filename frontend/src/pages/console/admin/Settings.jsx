@@ -84,7 +84,7 @@ export default function Settings() {
         ? tc('setup.billing.pricingDynamic') + ` (+${config.billing.credit.surgeIncrement})`
         : tc('setup.billing.pricingStatic'))
     : '—';
-  const concurrency = freeMode ? '∞' : creditMode ? config.billing.credit.maxConcurrentSessions : config.billing.dynamic.maxConcurrentSessions;
+  // 동시 세션 표기는 정책(quota)으로 일원화되어 이 화면에서 빠졌다. 계산도 함께 걷어낸다.
 
   // 운영 중 조정 항목만 백엔드에 영속(유휴 타임아웃 + 단순 기능 토글). 무거운 항목은 무시됨.
   const save = async () => {

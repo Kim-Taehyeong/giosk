@@ -42,16 +42,6 @@ export default function OrgGroupSelector({ variant, ns }) {
     return () => document.removeEventListener('mousedown', onDoc);
   }, []);
 
-  // 관리자 뷰에서 실수로 렌더되면 클러스터 이름만(안전망). 정상 경로는 RoleSwitcher.
-  if (variant === 'admin') {
-    return (
-      <div className="proj" role="button" style={{ cursor: 'default' }}>
-        <small>{t('topbar.cluster')}</small>
-        <span>{activeCluster?.name || config?.branding?.name || 'Giosk'}</span>
-      </div>
-    );
-  }
-
   const myGroups = ctx?.myGroups || [];
   // 내가 속한 조직 목록(팀들의 소속 조직에서 유일 추출).
   const orgs = [];
@@ -72,6 +62,17 @@ export default function OrgGroupSelector({ variant, ns }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ctx]);
+
+  // 관리자 뷰에서 실수로 렌더되면 클러스터 이름만(안전망). 정상 경로는 RoleSwitcher.
+  // 훅은 이 return 위에서 전부 부른다. 아래에 두면 variant 가 바뀔 때 훅 순서가 달라진다.
+  if (variant === 'admin') {
+    return (
+      <div className="proj" role="button" style={{ cursor: 'default' }}>
+        <small>{t('topbar.cluster')}</small>
+        <span>{activeCluster?.name || config?.branding?.name || 'Giosk'}</span>
+      </div>
+    );
+  }
 
   const pickOrg = (o) => {
     setOrgId(o.id);

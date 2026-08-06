@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Container, ShieldCheck, ShieldAlert, Hammer, Bug, BadgeCheck, ChevronRight } from 'lucide-react';
+import { Container, ShieldCheck, ShieldAlert, Hammer, Bug, BadgeCheck, ChevronRight, HardDriveDownload, ScrollText, Trash2 } from 'lucide-react';
 import PageHead from '../../../components/console/PageHead';
 import StatCard from '../../../components/console/StatCard';
 import Pill from '../../../components/console/Pill';
 import DataTable from '../../../components/console/DataTable';
+import RowMenu from '../../../components/console/RowMenu';
 import Modal from '../../../components/console/Modal';
 import { useToast } from '../../../components/console/Toast';
 import { useConfirm } from '../../../components/console/Confirm';
@@ -131,8 +132,22 @@ export default function Images() {
             ) },
             { key: 'sign', header: t('images.sign'), render: (r) => (r.sign ? <Pill variant="ok">{t('images.signed')}</Pill> : <Pill variant="pause">{t('images.unsigned')}</Pill>) },
             { key: 'status', header: t('images.status'), render: (r) => <Pill variant={r.status === 'active' ? 'ok' : r.status === 'building' ? 'wait' : 'pause'} dot>{r.status}</Pill> },
-            { key: 'act', header: '', render: () => <ChevronRight size={15} style={{ color: 'var(--muted)' }} /> },
+            // 행 작업. 되돌릴 수 없는 삭제는 메뉴 뒤로 보낸다(행 클릭은 상세로 간다).
+            { key: 'act', header: '', render: (r) => (
+              <span className="flex" style={{ gap: 4, alignItems: 'center', justifyContent: 'flex-end' }}>
+                <RowMenu label={`${r.name}:${r.tag}`} items={[
+                  { key: 'cache', label: t('images.cache'), icon: HardDriveDownload, onSelect: () => openCache(r) },
+                  { key: 'logs', label: t('images.logs'), icon: ScrollText, onSelect: () => openLogs(r) },
+                  // 재빌드는 우리가 만든 이미지에만 있다. 외부 이미지는 Dockerfile 이 없다.
+                  !r.external && { key: 'rebuild', label: t('images.rebuild'), icon: Hammer, onSelect: () => rebuild(r.id) },
+                  r.status === 'draft' && { key: 'publish', label: t('images.publish'), icon: BadgeCheck, onSelect: () => publish(r.id) },
+                  { key: 'delete', label: t('images.delete'), icon: Trash2, tone: 'danger', onSelect: () => remove(r.id) },
+                ].filter(Boolean)} />
+                <ChevronRight size={15} style={{ color: 'var(--muted)' }} />
+              </span>) },
           ]}
+          // 노드 캐시는 모달이 아니라 그 이미지 행 아래에서 펼친다. 어느 이미지 이야기인지 잃지 않는다.
+          expandedRow={(r) => (cacheFor?.id === r.id ? cachePanel() : null)}
         />
       </div>
 

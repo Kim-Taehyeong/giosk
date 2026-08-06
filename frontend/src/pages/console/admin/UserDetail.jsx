@@ -22,7 +22,6 @@ import { c, cU } from '../../../lib/credit';
 const MROLES = ['org_admin', 'project_admin', 'member'];
 
 const roleVariant = { member: 'pause', admin: 'err' };
-const memberRoleVariant = { org_admin: 'gpu', project_admin: 'primary', member: 'pause' };
 const statusVariant = { approved: 'ok', pending: 'wait', suspended: 'err', rejected: 'err', running: 'run', stopped: 'pause', terminated: 'pause', failed: 'err', ready: 'ok', loading: 'wait' };
 const sessVariant = { running: 'run', provisioning: 'wait', stopped: 'pause', terminated: 'pause', failed: 'err' };
 // 세션 상태를 monitor.st* i18n 키로 옮긴다(원문 영어가 노출되지 않게).
