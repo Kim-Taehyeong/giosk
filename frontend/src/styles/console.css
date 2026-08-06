@@ -158,6 +158,14 @@ html[data-theme="dark"] .auth-submit{color:#0f1218}
 .console-root .bar.gpu > i{background:var(--primary)}
 .console-root .bar.warn > i{background:var(--warn)}
 .console-root .bar.free > i{background:var(--free)}
+/* 세션 실사용량 미터. 사용률을 크게 읽히게 두고 절대값은 라벨 옆 보조로 둔다. */
+.console-root .usage-meters{display:flex;flex-direction:column;gap:15px}
+.console-root .usage-meter-head{display:flex;align-items:baseline;gap:8px;margin-bottom:7px}
+.console-root .usage-meter-label{font-size:12px;font-weight:800;letter-spacing:.4px;color:var(--muted)}
+.console-root .usage-meter-sub{font-size:11.5px;color:var(--muted);opacity:.75}
+.console-root .usage-meter-val{margin-left:auto;font-size:22px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.console-root .usage-meter-val i{font-style:normal;font-size:12px;font-weight:700;margin-left:2px;color:var(--muted)}
+.console-root .usage-meter .bar{height:10px;margin-top:0}
 
 /* Badges & pills */
 .console-root .pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:var(--r-pill);font-size:12px;font-weight:700}

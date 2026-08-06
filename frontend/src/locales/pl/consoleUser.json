@@ -158,6 +158,7 @@
     "kpiMaxLease": "Maksymalny leasing",
     "kpiNodes": "Dostępne węzły",
     "exclusiveWhole": "Dedykowane (cała karta)",
+    "cores": "Cores",
     "slots": "Sloty",
     "hamiFractional": "Ułamkowe (według pamięci VRAM i rdzeni)",
     "hamiShared": "Ułamek HAMI"

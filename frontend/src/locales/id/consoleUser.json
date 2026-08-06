@@ -157,6 +157,7 @@
     "kpiMaxLease": "Sewa maksimal",
     "gpuAvail": "GPU tersedia",
     "kpiCooldown": "Coba lagi cooldown",
+    "cores": "Cores",
     "slots": "slot",
     "exclusiveWhole": "Khusus (seluruh kartu)",
     "hamiShared": "pecahan HAMi",

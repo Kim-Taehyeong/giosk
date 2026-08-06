@@ -157,6 +157,7 @@
     "kpiEta": "Tar slut",
     "gpuAvail": "GPU tillgänglig",
     "kpiNodes": "Tillgängliga noder",
+    "cores": "Cores",
     "slots": "Slots",
     "hamiShared": "HAMi fraktionerad",
     "hamiFractional": "Bråkdel (med VRAM och kärnor)",

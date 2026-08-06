@@ -157,6 +157,7 @@
     "kpiFree": "အခမဲ့ (အကန့်အသတ်မရှိ)",
     "kpiCooldown": "အအေးခံပြီး ပြန်စမ်းကြည့်ပါ။",
     "kpiNodes": "ရနိုင်သော ဆုံမှတ်များ",
+    "cores": "Cores",
     "slots": "အထိုင်များ",
     "exclusiveWhole": "လှူ (ကဒ်တစ်ခုလုံး)",
     "hamiFractional": "အပိုင်းပိုင်း (VRAM နှင့် cores အားဖြင့်)",

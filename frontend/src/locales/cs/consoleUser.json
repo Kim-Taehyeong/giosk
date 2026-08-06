@@ -157,6 +157,7 @@
     "kpiEtaVal": "~{{n}}d",
     "kpiCooldown": "Znovu zkusit cooldown",
     "kpiNodes": "Dostupné uzly",
+    "cores": "Cores",
     "slots": "Sloty",
     "exclusiveWhole": "Věnováno (celá karta)",
     "hamiShared": "HAMi zlomkové",

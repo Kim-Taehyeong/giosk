@@ -157,6 +157,7 @@
     "qsVolDesc": "個人/團體/資料集",
     "kpiMaxLease": "最大租期",
     "qsCpuDesc": "下載·預處理",
+    "cores": "Cores",
     "slots": "老虎機",
     "hamiShared": "HAMi 分數",
     "hamiFractional": "小數（按 VRAM 和核心）",

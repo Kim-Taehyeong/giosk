@@ -158,6 +158,7 @@
     "kpiMaxLease": "Max vuokrasopimus",
     "kpiNodes": "Käytettävissä olevat solmut",
     "hamiShared": "HAMi murtoluku",
+    "cores": "Cores",
     "slots": "Slots",
     "exclusiveWhole": "Omistettu (koko kortti)",
     "hamiFractional": "Murtoluku (VRAM:in ja ytimien mukaan)"

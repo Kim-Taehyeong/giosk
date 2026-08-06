@@ -157,6 +157,7 @@
     "kpiNodes": "可用节点",
     "kpiMaxLease": "最大租期",
     "gpuAvail": "GPU可用",
+    "cores": "Cores",
     "slots": "老虎机",
     "exclusiveWhole": "专用（全卡）",
     "hamiShared": "HAMi 分数",

@@ -160,6 +160,7 @@
     "hamiFractional": "Fracionário (por VRAM e núcleos)",
     "exclusiveWhole": "Dedicado (cartão inteiro)",
     "hamiShared": "HAMi fracionário",
+    "cores": "Cores",
     "slots": "Caça-níqueis"
   },
   "newSession": {

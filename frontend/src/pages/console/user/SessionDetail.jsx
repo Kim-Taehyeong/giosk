@@ -5,7 +5,7 @@ import { ArrowLeft, Code2, NotebookPen, TerminalSquare, Square, RotateCcw, Trash
 import PageHead from '../../../components/console/PageHead';
 import StatCard from '../../../components/console/StatCard';
 import Pill from '../../../components/console/Pill';
-import Bar from '../../../components/console/Bar';
+import UsageMeters from '../../../components/console/UsageMeters';
 import Spinner from '../../../components/console/Spinner';
 import PagedTable from '../../../components/console/PagedTable';
 import ConnectionModal from '../../../components/console/ConnectionModal';
@@ -136,17 +136,7 @@ export default function UserSessionDetail() {
             {r.status !== 'running' ? (
               <div className="muted" style={{ fontSize: 12.5 }}>{t('sdetail.metricsIdle', { defaultValue: '세션이 실행 중일 때만 실사용량을 볼 수 있습니다.' })}</div>
             ) : rows.length > 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {rows.map((x) => (
-                  <div key={x.label}>
-                    <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 5, fontSize: 12.5 }}>
-                      <span style={{ fontWeight: 700, color: 'var(--muted)' }}>{x.label}</span>
-                      <span><b style={{ fontSize: 14 }}>{Math.round(x.pct)}%</b> <span className="muted mono" style={{ fontSize: 11 }}>{x.txt}</span></span>
-                    </div>
-                    <Bar value={x.pct} max={100} variant={x.variant} className="framed" />
-                  </div>
-                ))}
-              </div>
+              <UsageMeters rows={rows} />
             ) : gpuUnmeasurable(r) ? <div className="muted" style={{ fontSize: 12.5 }}>{t(`session.gpuReason.${r.gpuReason}`)}</div>
               : <div className="muted" style={{ fontSize: 12.5 }}>{t('session.usageUnavailable')}</div>}
           </div>

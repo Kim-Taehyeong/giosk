@@ -160,6 +160,7 @@
     "hamiFractional": "Frazionario (per VRAM e core)",
     "hamiShared": "HAMi frazionario",
     "exclusiveWhole": "Dedicato (scheda intera)",
+    "cores": "Cores",
     "slots": "Slot"
   },
   "newSession": {

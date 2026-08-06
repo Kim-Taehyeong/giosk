@@ -158,6 +158,7 @@
     "kpiMaxLease": "Ukodishaji wa kiwango cha juu",
     "kpiNodes": "Nodi zinazopatikana",
     "exclusiveWhole": "Imejitolea (kadi nzima)",
+    "cores": "Cores",
     "slots": "Slots",
     "hamiShared": "Sehemu ya HAMI",
     "hamiFractional": "Sehemu (na VRAM na cores)"

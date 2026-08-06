@@ -157,6 +157,7 @@
     "kpiFree": "Ingyenes (korlátlan)",
     "gpuAvail": "GPU elérhető",
     "kpiCooldown": "Próbálja újra a hűtést",
+    "cores": "Cores",
     "slots": "Slots",
     "hamiShared": "HAMi tört",
     "exclusiveWhole": "Dedikált (egész kártya)",
