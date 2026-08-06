@@ -2222,6 +2222,15 @@ func (s *Service) RunIdleReaper(ctx context.Context, window func() int) {
 	}
 }
 
+// runStart는 이번 가동이 시작된 시각이다. 재개하면 started_at 이 갱신되므로 그것을 쓰고,
+// 아직 한 번도 안 뜬 세션은 생성 시각으로 본다.
+func runStart(s *Session) time.Time {
+	if s.StartedAt != nil && s.StartedAt.After(s.CreatedAt) {
+		return *s.StartedAt
+	}
+	return s.CreatedAt
+}
+
 func (s *Service) reapIdleOnce(ctx context.Context, windowMin int) {
 	rows, err := s.repo.ListRunning()
 	if err != nil {
@@ -2230,7 +2239,10 @@ func (s *Service) reapIdleOnce(ctx context.Context, windowMin int) {
 	window := time.Duration(windowMin) * time.Minute
 	for i := range rows {
 		sess := rows[i]
-		if time.Since(sess.CreatedAt) < window {
+		// 유예는 "이번 가동"이 시작된 시각부터 잰다. 생성 시각으로 재면 예전에 만들어 둔 세션을
+		// 재개했을 때 유예가 처음부터 0 이라, 지표가 쌓이기도 전에 유휴로 보고 바로 멈춘다.
+		// (실제로 재개 39초 만에 정지된 사례가 있었다. 재개 시 started_at 은 갱신된다.)
+		if time.Since(runStart(&sess)) < window {
 			continue // 갓 시작한 세션은 제외
 		}
 		if idle, ok := s.isIdle(ctx, &sess, windowMin); ok && idle {
@@ -2253,6 +2265,10 @@ func (s *Service) CountIdleRunning(ctx context.Context) int {
 	idle := 0
 	for i := range rows {
 		sess := rows[i]
+		// 방금 뜬 세션은 아직 지표가 없어 0% 로 읽힌다. 리퍼와 같은 기준으로 제외한다.
+		if time.Since(runStart(&sess)) < window*time.Minute {
+			continue
+		}
 		if is, ok := s.isIdle(ctx, &sess, window); ok && is {
 			idle++
 		}
