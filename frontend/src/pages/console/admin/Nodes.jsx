@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Server, Cpu, MemoryStick, HeartPulse, ChevronRight } from 'lucide-react';
+import { Server, Cpu, MemoryStick, HeartPulse, ChevronRight, PauseCircle, PlayCircle } from 'lucide-react';
 import PageHead from '../../../components/console/PageHead';
 import StatCard from '../../../components/console/StatCard';
 import Pill from '../../../components/console/Pill';
+import RowMenu from '../../../components/console/RowMenu';
 import Bar from '../../../components/console/Bar';
 import { useToast } from '../../../components/console/Toast';
 import MetricsOffNotice from '../../../components/console/MetricsOffNotice';
@@ -50,7 +51,6 @@ export default function Nodes() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { config } = useSystemConfig();
-  const hybrid = config.deploymentMode === 'hybrid';
   const datasetsOn = config.features.datasets;
 
   const [nodes, setNodes] = useState([]);
@@ -74,7 +74,6 @@ export default function Nodes() {
 
   // 인라인 편집은 노드 state 에 즉시 반영.
   const patch = (node, p) => setNodes((ns) => ns.map((n) => (n.node === node ? { ...n, ...p } : n)));
-  const setLease = (node, leased) => { patch(node, { leased, status: leased ? 'cordoned' : 'ready' }); toast(leased ? t('nodes.leased') : t('nodes.released')); };
   const setCordon = async (node, cordon) => {
     patch(node, { status: cordon ? 'cordoned' : 'ready' });
     try { await (cordon ? cordonNode(node) : uncordonNode(node)); } catch { /* 낙관적 UI 유지 */ }
@@ -158,10 +157,16 @@ export default function Nodes() {
                   {datasetsOn && <td><span style={{ fontWeight: 600 }}>{t('nodes.cachedN', { n: cachedFor(r.node).length })}</span></td>}
                   <td>{statusCell(r)}</td>
                   <td>
-                    <button className="btn sm" title={t('nodes.detail')} aria-label={t('nodes.detail')}
-                      onClick={() => navigate(`/console/admin/nodes/${r.node}`)}>
-                      <ChevronRight size={15} />
-                    </button>
+                    <span className="flex" style={{ gap: 4, alignItems: 'center', justifyContent: 'flex-end' }}>
+                      {/* 스케줄 차단은 되돌릴 수 있어 목록에서 바로 한다. 설정 변경은 상세로 간다. */}
+                      <RowMenu label={r.node} items={[r.status === 'cordoned'
+                        ? { key: 'uncordon', label: t('nodes.uncordon', { defaultValue: 'uncordon' }), icon: PlayCircle, onSelect: () => setCordon(r.node, false) }
+                        : { key: 'cordon', label: t('nodes.cordon', { defaultValue: 'cordon' }), icon: PauseCircle, onSelect: () => setCordon(r.node, true) }]} />
+                      <button className="btn sm" title={t('nodes.detail')} aria-label={t('nodes.detail')}
+                        onClick={() => navigate(`/console/admin/nodes/${r.node}`)}>
+                        <ChevronRight size={15} />
+                      </button>
+                    </span>
                   </td>
                 </tr>
               </React.Fragment>

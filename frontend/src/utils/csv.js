@@ -7,7 +7,7 @@ function escapeCell(v) {
 
 export function downloadCsv(filename, rows2d) {
   const csv = rows2d.map((r) => r.map(escapeCell).join(',')).join('\r\n');
-  const blob = new Blob(['﻿', csv], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url; a.download = filename; a.click();
@@ -30,5 +30,5 @@ function parseLine(line) {
 
 // 텍스트를 행 배열로 바꾼다(빈 줄 제거). 헤더 처리는 호출측에서 한다.
 export function parseCsvText(text) {
-  return String(text).replace(/^﻿/, '').split(/\r?\n/).filter((l) => l.trim()).map(parseLine);
+  return String(text).replace(/^\uFEFF/, '').split(/\r?\n/).filter((l) => l.trim()).map(parseLine);
 }

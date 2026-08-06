@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { formatBytes, formatEta } from '../../../utils/format';
-import { Database, HardDrive, Layers, Inbox, ChevronDown, ChevronRight, Server, Plus, RefreshCw, FolderInput, Link2 } from 'lucide-react';
+import { Database, HardDrive, Layers, Inbox, ChevronDown, ChevronRight, Server, Plus, RefreshCw, FolderInput, Link2, Trash2 } from 'lucide-react';
 import PageHead from '../../../components/console/PageHead';
 import StatCard from '../../../components/console/StatCard';
 import Pill from '../../../components/console/Pill';
+import RowMenu from '../../../components/console/RowMenu';
 import DataTable from '../../../components/console/DataTable';
 import Modal from '../../../components/console/Modal';
 import { Req } from '../../../components/console/Advanced';
@@ -156,7 +157,21 @@ export default function Datasets() {
                     <td><span className="mono" style={{ fontSize: 12 }}>{r.hash}</span></td>
                     <td>{t('datasets.cachedN', { n: r.nodes.length })}</td>
                     <td>{r.owner}</td>
-                    <td><ChevronRight size={15} style={{ color: 'var(--muted)' }} /></td>
+                    <td>
+                      <span className="flex" style={{ gap: 4, alignItems: 'center', justifyContent: 'flex-end' }}>
+                        {/* 노드 배치는 이 행 아래에서 펼친다. 적재 중에는 아직 배치할 것이 없다. */}
+                        <RowMenu label={r.name} items={[
+                          r.loadStatus !== 'loading' && {
+                            key: 'nodes',
+                            label: openId === r.id ? t('datasets.hideNodes', { defaultValue: '노드 배치 닫기' }) : t('datasets.showNodes', { defaultValue: '노드 배치' }),
+                            icon: HardDrive,
+                            onSelect: () => setOpenId(openId === r.id ? null : r.id),
+                          },
+                          { key: 'delete', label: t('datasets.delete'), icon: Trash2, tone: 'danger', onSelect: () => remove(r.id) },
+                        ].filter(Boolean)} />
+                        <ChevronRight size={15} style={{ color: 'var(--muted)' }} />
+                      </span>
+                    </td>
                   </tr>
                   {openId === r.id && (
                     <tr>
