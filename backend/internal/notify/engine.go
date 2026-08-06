@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"giosk/internal/alertlog"
@@ -52,18 +53,18 @@ type CreditTeamsFn func(ctx context.Context) map[int64][]TeamBalance
 //
 // 사용자 규칙(scope=user)은 inbox·userMetric 이 주입되면 매 tick 마다 함께 평가해, 위반 시 인앱 수신함에 적재한다.
 type Engine struct {
-	repo       Repository
-	met        *metrics.Client
-	nodesDown  func(ctx context.Context) (int, bool) // 비가용(NotReady) 노드 수; 미가용이면 ok=false
-	mailer     Mailer
-	http       *http.Client
-	cooldown   time.Duration
-	lastFired  map[int64]time.Time
-	recorder   *alertlog.Store // 발화 이벤트 이력 적재(감시월 통합 피드). nil 허용.
-	inbox      Inbox           // 사용자 인앱 수신함. nil 이면 사용자 규칙 평가를 건너뛴다.
-	userMetric UserMetricFn    // 사용자 지표 평가기. nil 이면 사용자 규칙 평가를 건너뛴다.
-	sessMetric SessionMetricFn // 세션 단위 지표 평가기(session_* 규칙용). nil 이면 세션 규칙 건너뜀.
-	creditTeams CreditTeamsFn  // credit_balance 를 팀별로 평가(팀 귀속). nil 이면 팀별 크레딧 알림 건너뜀.
+	repo        Repository
+	met         *metrics.Client
+	nodesDown   func(ctx context.Context) (int, bool) // 비가용(NotReady) 노드 수; 미가용이면 ok=false
+	mailer      Mailer
+	http        *http.Client
+	cooldown    time.Duration
+	lastFired   map[string]time.Time
+	recorder    *alertlog.Store // 발화 이벤트 이력 적재(감시월 통합 피드). nil 허용.
+	inbox       Inbox           // 사용자 인앱 수신함. nil 이면 사용자 규칙 평가를 건너뛴다.
+	userMetric  UserMetricFn    // 사용자 지표 평가기. nil 이면 사용자 규칙 평가를 건너뛴다.
+	sessMetric  SessionMetricFn // 세션 단위 지표 평가기(session_* 규칙용). nil 이면 세션 규칙 건너뜀.
+	creditTeams CreditTeamsFn   // credit_balance 를 팀별로 평가(팀 귀속). nil 이면 팀별 크레딧 알림 건너뜀.
 }
 
 // WithSessionMetric은 세션 단위 지표 평가기를 주입한다(session_gpu/cpu/vram 규칙 활성화).
@@ -86,8 +87,24 @@ func NewEngine(repo Repository, met *metrics.Client, nodesDown func(context.Cont
 		repo: repo, met: met, nodesDown: nodesDown, mailer: mailer,
 		http:      &http.Client{Timeout: 8 * time.Second},
 		cooldown:  10 * time.Minute,
-		lastFired: map[int64]time.Time{},
+		lastFired: map[string]time.Time{},
 	}
+}
+
+// ruleKey는 쿨다운 키다. 규칙 id 가 아니라 규칙의 내용으로 만든다.
+// 설정 저장이 규칙을 통째로 지웠다가 다시 넣어서 id 가 매번 바뀌기 때문이다. id 로 기억하면
+// 사용자가 알림 설정 화면을 열기만 해도 쿨다운이 사라져, 같은 알림이 1분 만에 다시 온다.
+func ruleKey(r Rule, extra string) string {
+	return fmt.Sprintf("%s|%d|%s|%s|%d|%s|%s", r.Scope, r.OwnerID, r.Metric, r.Op, r.Value, r.Target, extra)
+}
+
+// cooling은 쿨다운 중이면 true 를 주고, 아니면 지금을 발화 시각으로 찍는다.
+func (e *Engine) cooling(key string) bool {
+	if last, seen := e.lastFired[key]; seen && time.Since(last) < e.cooldown {
+		return true
+	}
+	e.lastFired[key] = time.Now()
+	return false
 }
 
 // Run은 interval 마다 규칙을 평가한다(블로킹; goroutine 으로 실행).
@@ -124,10 +141,9 @@ func (e *Engine) tick(ctx context.Context) {
 		if !breached(r.Op, val, float64(r.Value)) {
 			continue
 		}
-		if last, seen := e.lastFired[r.ID]; seen && time.Since(last) < e.cooldown {
+		if e.cooling(ruleKey(r, "")) {
 			continue // 쿨다운 중이라 반복 발송을 억제한다
 		}
-		e.lastFired[r.ID] = time.Now()
 		e.deliver(ctx, r, cfg, val)
 	}
 	e.userTick(ctx)
@@ -181,10 +197,9 @@ func (e *Engine) userTick(ctx context.Context) {
 		if !breached(r.Op, val, float64(r.Value)) {
 			continue
 		}
-		if last, seen := e.lastFired[r.ID]; seen && time.Since(last) < e.cooldown {
+		if e.cooling(ruleKey(r, "")) {
 			continue
 		}
-		e.lastFired[r.ID] = time.Now()
 		// 표시 문자열 대신 metric 과 파라미터만 적재해 프론트가 언어별로 렌더한다(i18n). target 은 대상 세션이다.
 		_ = e.inbox.Record(r.OwnerID, userSeverity(r.Metric), r.Metric, val, r.Value, r.Target)
 		log.Printf("[alert-engine] USER FIRE uid=%d %s%s %s %d (현재 %.0f)", r.OwnerID, r.Metric, targetLog(r.Target), opSymbol(r.Op), r.Value, val)
@@ -222,11 +237,10 @@ func (e *Engine) creditTick(ctx context.Context, rules []Rule) {
 			if !breached(r.Op, float64(tb.Balance), float64(r.Value)) {
 				continue
 			}
-			key := r.ID*1_000_000 + tb.GroupID // 규칙×팀 쿨다운(팀마다 개별 억제)
-			if last, seen := e.lastFired[key]; seen && time.Since(last) < e.cooldown {
+			// 규칙×팀 쿨다운(팀마다 개별 억제)
+			if e.cooling(ruleKey(r, strconv.FormatInt(tb.GroupID, 10))) {
 				continue
 			}
-			e.lastFired[key] = time.Now()
 			_ = e.inbox.Record(r.OwnerID, userSeverity(r.Metric), r.Metric, float64(tb.Balance), r.Value, tb.Name)
 			log.Printf("[alert-engine] USER FIRE uid=%d credit_balance@%s %s %d (현재 %d)", r.OwnerID, tb.Name, opSymbol(r.Op), r.Value, tb.Balance)
 		}
