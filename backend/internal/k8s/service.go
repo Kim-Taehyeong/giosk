@@ -40,6 +40,12 @@ type SvcAccess struct {
 	SSHNodePort int
 }
 
+// sshSvcName은 SSH 전용 보조 Service 이름이다.
+// 게이트웨이를 켜면 세션 Service 가 ClusterIP 라 사내망에서 컨테이너로 바로 SSH 할 수단이 사라진다.
+// Service 는 포트별로 타입을 나눌 수 없으므로, 22 번만 담은 NodePort Service 를 따로 하나 더 만든다.
+// 웹 채널은 그대로 ClusterIP 에 남아 게이트웨이만 거친다.
+func sshSvcName(name string) string { return name + "-ssh" }
+
 func svcType(mode string) corev1.ServiceType {
 	if mode == ExposeLoadBalancer {
 		return corev1.ServiceTypeLoadBalancer
@@ -75,6 +81,42 @@ func (c *Client) EnsureSessionService(ctx context.Context, s SvcSpec) error {
 		},
 	}
 	_, err := c.cs.CoreV1().Services(s.Namespace).Create(ctx, svc, v1.CreateOptions{})
+	if err != nil && !apierrors.IsAlreadyExists(err) {
+		return err
+	}
+	if s.Internal {
+		return c.ensureSSHService(ctx, s)
+	}
+	return nil
+}
+
+// ensureSSHService는 게이트웨이 모드에서 22 번만 NodePort 로 여는 보조 Service 를 만든다.
+// LoadBalancer 를 쓰지 않는 이유는 세션마다 IP 를 하나씩 먹어 MetalLB 풀이 금방 마르기 때문이다.
+func (c *Client) ensureSSHService(ctx context.Context, s SvcSpec) error {
+	var ssh *SvcPort
+	for i := range s.Ports {
+		if s.Ports[i].Name == "ssh" {
+			ssh = &s.Ports[i]
+			break
+		}
+	}
+	if ssh == nil {
+		return nil
+	}
+	svc := &corev1.Service{
+		ObjectMeta: v1.ObjectMeta{
+			Name: sshSvcName(s.Name), Namespace: s.Namespace,
+			Labels: map[string]string{"managed-by": "giosk-system", "giosk.io/session": s.Name},
+		},
+		Spec: corev1.ServiceSpec{
+			Type:     corev1.ServiceTypeNodePort,
+			Selector: map[string]string{"giosk.io/session": s.Name},
+			Ports: []corev1.ServicePort{{
+				Name: "ssh", Port: int32(ssh.Port), TargetPort: intstr.FromInt(ssh.Port),
+			}},
+		},
+	}
+	_, err := c.cs.CoreV1().Services(s.Namespace).Create(ctx, svc, v1.CreateOptions{})
 	if apierrors.IsAlreadyExists(err) {
 		return nil
 	}
@@ -85,6 +127,9 @@ func (c *Client) EnsureSessionService(ctx context.Context, s SvcSpec) error {
 func (c *Client) DeleteSessionService(ctx context.Context, ns, name string) error {
 	if !c.Available() {
 		return nil
+	}
+	if err := c.cs.CoreV1().Services(ns).Delete(ctx, sshSvcName(name), v1.DeleteOptions{}); err != nil && !apierrors.IsNotFound(err) {
+		return err
 	}
 	err := c.cs.CoreV1().Services(ns).Delete(ctx, name, v1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
@@ -119,6 +164,17 @@ func (c *Client) SessionServiceAccess(ctx context.Context, ns, name, mode string
 		if ing.IP != "" {
 			out.LBIP = ing.IP
 			break
+		}
+	}
+	if out.SSHNodePort == 0 {
+		// 게이트웨이 모드면 22 번은 보조 Service 에 있다.
+		if aux, err := c.cs.CoreV1().Services(ns).Get(ctx, sshSvcName(name), v1.GetOptions{}); err == nil {
+			for _, p := range aux.Spec.Ports {
+				if p.Name == "ssh" {
+					out.SSHNodePort = int(p.NodePort)
+					break
+				}
+			}
 		}
 	}
 	return out, nil

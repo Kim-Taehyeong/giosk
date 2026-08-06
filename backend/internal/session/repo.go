@@ -122,15 +122,19 @@ type Repository interface {
 
 // AdminRow는 관리자 세션 관제 행(소유자·조직·그룹 조인).
 type AdminRow struct {
-	ID           string `json:"id"`
-	Name         string `json:"name"`
-	UserID       int64  `json:"userId"` // 소유자 id(상세 페이지에서 사용자 상세로 링크)
-	Image        string `json:"image"`  // 사용 이미지(name:tag)
-	Owner        string `json:"owner"`
-	Org          string `json:"org"`
-	Group        string `json:"group"`
-	GpuType      string `json:"gpuType"`
-	GpuMode      string `json:"gpuMode"`
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	UserID  int64  `json:"userId"` // 소유자 id(상세 페이지에서 사용자 상세로 링크)
+	Image   string `json:"image"`  // 사용 이미지(name:tag)
+	Owner   string `json:"owner"`
+	Org     string `json:"org"`
+	Group   string `json:"group"`
+	GpuType string `json:"gpuType"`
+	GpuMode string `json:"gpuMode"`
+	// 사양 표기용. 이게 없으면 관제 화면이 GPU 종류만 보여줘, 오퍼링을 바꿔도 표기가 그대로다.
+	GpuCount     int    `json:"gpuCount"`
+	VramMB       int    `json:"vramMb"`
+	CorePercent  int    `json:"corePercent"`
 	Env          string `json:"env"`
 	Node         string `json:"node"`
 	Status       string `json:"status"`
@@ -274,7 +278,8 @@ const adminRowSelect = `
 	       COALESCE(NULLIF(CONCAT(img.name, IF(img.tag IS NULL OR img.tag='','',CONCAT(':',img.tag))), ''), '') AS image,
 	       COALESCE(NULLIF(TRIM(CONCAT(COALESCE(u.last_name,''),COALESCE(u.first_name,''))),''), u.username) AS owner,
 	       COALESCE(o.display_name,'') AS org, COALESCE(g.display_name,'') AS ` + "`group`" + `,
-	       s.gpu_type, s.gpu_mode, s.env, s.node, s.phase AS status,
+	       s.gpu_type, s.gpu_mode, s.gpu_count, s.vram_mb, s.core_percent,
+	       s.env, s.node, s.phase AS status,
 	       DATE_FORMAT(s.created_at, '%Y-%m-%dT%H:%i:%sZ') AS created_at,
 	       DATE_FORMAT(s.started_at, '%Y-%m-%dT%H:%i:%sZ') AS started_at,
 	       s.price_per_hour, s.billed_credits AS consumed
