@@ -1423,6 +1423,10 @@ func (s *Service) containerSSHAccess(ctx context.Context, sess *Session) map[str
 		return nil
 	}
 	const user = "work"
+	// 게이트웨이 모드에서는 SSH 전용 보조 Service 가 MetalLB IP 를 받는다. 이게 제일 붙기 쉽다.
+	if acc.SSHLBIP != "" {
+		return map[string]string{"direct": "true", "cmd": fmt.Sprintf("ssh %s@%s", user, acc.SSHLBIP)}
+	}
 	if acc.LBIP != "" {
 		return map[string]string{"direct": "true", "cmd": fmt.Sprintf("ssh %s@%s", user, acc.LBIP)}
 	}
