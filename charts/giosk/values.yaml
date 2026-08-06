@@ -47,11 +47,9 @@ billing:
   credit:
     pricing: static      # static | dynamic(혼잡 surge)
     surgeIncrement: 10
-    maxConcurrentSessions: 3
   dynamic:               # 선착순
     maxLeaseHours: 8
     cooldownHours: 2
-    maxConcurrentSessions: 1
     lease:
       extensionHours: 4
       maxExtensions: 2

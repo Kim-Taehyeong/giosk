@@ -61,9 +61,8 @@ func (h *Handler) Config(c *gin.Context) {
 		"billing": gin.H{
 			"mode": cfg.Billing.Mode,
 			"credit": gin.H{
-				"pricing":               cfg.Billing.Credit.Pricing,
-				"surgeIncrement":        cfg.Billing.Credit.SurgeIncrement,
-				"maxConcurrentSessions": cfg.Billing.Credit.MaxConcurrentSessions,
+				"pricing":        cfg.Billing.Credit.Pricing,
+				"surgeIncrement": cfg.Billing.Credit.SurgeIncrement,
 				"recharge": gin.H{
 					"enabled":      rt[KeyRechargeEnabled] == "true",
 					"intervalDays": atoiOr(rt[KeyRechargeIntervalDays], 30),
@@ -71,9 +70,8 @@ func (h *Handler) Config(c *gin.Context) {
 				},
 			},
 			"dynamic": gin.H{
-				"maxLeaseHours":         cfg.Billing.Dynamic.MaxLeaseHours,
-				"cooldownHours":         cfg.Billing.Dynamic.CooldownHours,
-				"maxConcurrentSessions": cfg.Billing.Dynamic.MaxConcurrentSessions,
+				"maxLeaseHours": cfg.Billing.Dynamic.MaxLeaseHours,
+				"cooldownHours": cfg.Billing.Dynamic.CooldownHours,
 			},
 		},
 		"idle": gin.H{"timeoutMin": idleTimeout},
@@ -87,7 +85,7 @@ func (h *Handler) Config(c *gin.Context) {
 		"features": gin.H{
 			"signupRequest":    feat(KeySignupRequest, cfg.Features.SignupRequest),
 			"datasets":         cfg.Storage.Datasets.Enabled, // 설치시 고정(인프라)
-			"imageBuild":       cfg.K8s.Registry != "",      // 설치시 고정(레지스트리 유무). 없으면 외부 이미지 등록만.
+			"imageBuild":       cfg.K8s.Registry != "",       // 설치시 고정(레지스트리 유무). 없으면 외부 이미지 등록만.
 			"datasetRegister":  feat(KeyDatasetRegister, cfg.Features.DatasetRegister),
 			"workloadAlerts":   feat(KeyWorkloadAlerts, cfg.Features.WorkloadAlerts),
 			"groupJoinRequest": feat(KeyGroupJoinRequest, cfg.Features.GroupJoinRequest),

@@ -23,10 +23,8 @@ data:
   GIOSK_NS_PREFIX: {{ .Values.k8s.namespacePrefix | default "giosk-grp-" | quote }}
   GIOSK_CREDIT_PRICING: {{ .Values.billing.credit.pricing | quote }}
   GIOSK_CREDIT_SURGE_INCREMENT: {{ .Values.billing.credit.surgeIncrement | quote }}
-  GIOSK_CREDIT_MAX_SESSIONS: {{ .Values.billing.credit.maxConcurrentSessions | quote }}
   GIOSK_DYNAMIC_MAX_LEASE_HOURS: {{ .Values.billing.dynamic.maxLeaseHours | quote }}
   GIOSK_DYNAMIC_COOLDOWN_HOURS: {{ .Values.billing.dynamic.cooldownHours | quote }}
-  GIOSK_DYNAMIC_MAX_SESSIONS: {{ .Values.billing.dynamic.maxConcurrentSessions | quote }}
   GIOSK_LEASE_EXTENSION_HOURS: {{ .Values.billing.dynamic.lease.extensionHours | quote }}
   GIOSK_LEASE_MAX_EXTENSIONS: {{ .Values.billing.dynamic.lease.maxExtensions | quote }}
   GIOSK_PERSISTENCE_CLASS: {{ .Values.storage.persistence.storageClass | quote }}

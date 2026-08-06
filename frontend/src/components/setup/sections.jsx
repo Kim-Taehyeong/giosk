@@ -118,9 +118,6 @@ export function BillingSection({ config, update, hideModeSelect }) {
                   { value: 'dynamic', label: t('setup.billing.pricingDynamic') },
                 ]} />
             </Field>
-            <Field label={t('setup.billing.maxConcurrent')} w={160}>
-              <NumInput value={credit.maxConcurrentSessions} min={1} onChange={(v) => setCredit({ maxConcurrentSessions: v })} suffix={t('setup.unit.sessions')} />
-            </Field>
           </div>
           {credit.pricing === 'dynamic' && (
             <div style={{ marginTop: 14 }}>
@@ -137,9 +134,6 @@ export function BillingSection({ config, update, hideModeSelect }) {
           </Field>
           <Field label={t('setup.billing.cooldown')} w={160}>
             <NumInput value={dynamic.cooldownHours} min={0} onChange={(v) => setDynamic({ cooldownHours: v })} suffix={t('setup.unit.hour')} />
-          </Field>
-          <Field label={t('setup.billing.maxConcurrent')} w={160}>
-            <NumInput value={dynamic.maxConcurrentSessions} min={1} onChange={(v) => setDynamic({ maxConcurrentSessions: v })} suffix={t('setup.unit.sessions')} />
           </Field>
         </div>
       )}

@@ -17,8 +17,8 @@ export const DEFAULT_CONFIG = {
   billing: {
     // 과금 모드: 크레딧 ↔ Dynamic 은 상호 배타(하나만 사용).
     mode: 'credit', // 'credit' | 'dynamic'
-    credit: { pricing: 'static', surgeIncrement: 10, maxConcurrentSessions: 3 }, // pricing: 'static' | 'dynamic'
-    dynamic: { maxLeaseHours: 8, cooldownHours: 2, maxConcurrentSessions: 1 },
+    credit: { pricing: 'static', surgeIncrement: 10 }, // pricing: 'static' | 'dynamic'
+    dynamic: { maxLeaseHours: 8, cooldownHours: 2 },
   },
   idle: { timeoutMin: 30 },
   // 중단 세션 홈 회수 정책(운영 중 조정). 중단 세션도 노드 로컬 디스크를 계속 점유하므로,

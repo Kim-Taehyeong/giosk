@@ -118,17 +118,15 @@ type Billing struct {
 }
 
 type CreditPolicy struct {
-	Pricing               string // static | dynamic
-	SurgeIncrement        int
-	MaxConcurrentSessions int
+	Pricing        string // static | dynamic
+	SurgeIncrement int
 }
 
 type DynamicPolicy struct {
-	MaxLeaseHours         int
-	CooldownHours         int
-	MaxConcurrentSessions int
-	ExtensionHours        int
-	MaxExtensions         int
+	MaxLeaseHours  int
+	CooldownHours  int
+	ExtensionHours int
+	MaxExtensions  int
 }
 
 // Storage는 영속성과 데이터셋 스토리지 전략(설계 문서 3장).
@@ -201,16 +199,14 @@ func Load(lookup func(string) (string, bool)) (*Config, error) {
 		Billing: Billing{
 			Mode: g.str("GIOSK_BILLING_MODE", BillingCredit),
 			Credit: CreditPolicy{
-				Pricing:               g.str("GIOSK_CREDIT_PRICING", "static"),
-				SurgeIncrement:        g.intv("GIOSK_CREDIT_SURGE_INCREMENT", 10),
-				MaxConcurrentSessions: g.intv("GIOSK_CREDIT_MAX_SESSIONS", 3),
+				Pricing:        g.str("GIOSK_CREDIT_PRICING", "static"),
+				SurgeIncrement: g.intv("GIOSK_CREDIT_SURGE_INCREMENT", 10),
 			},
 			Dynamic: DynamicPolicy{
-				MaxLeaseHours:         g.intv("GIOSK_DYNAMIC_MAX_LEASE_HOURS", 8),
-				CooldownHours:         g.intv("GIOSK_DYNAMIC_COOLDOWN_HOURS", 2),
-				MaxConcurrentSessions: g.intv("GIOSK_DYNAMIC_MAX_SESSIONS", 1),
-				ExtensionHours:        g.intv("GIOSK_LEASE_EXTENSION_HOURS", 4),
-				MaxExtensions:         g.intv("GIOSK_LEASE_MAX_EXTENSIONS", 2),
+				MaxLeaseHours:  g.intv("GIOSK_DYNAMIC_MAX_LEASE_HOURS", 8),
+				CooldownHours:  g.intv("GIOSK_DYNAMIC_COOLDOWN_HOURS", 2),
+				ExtensionHours: g.intv("GIOSK_LEASE_EXTENSION_HOURS", 4),
+				MaxExtensions:  g.intv("GIOSK_LEASE_MAX_EXTENSIONS", 2),
 			},
 		},
 		Storage: Storage{
@@ -336,15 +332,3 @@ func (c *Config) IsCredit() bool { return c.Billing.Mode == BillingCredit }
 
 // IsFree는 자유 모드 여부(크레딧·임대·동시세션 제한 없음).
 func (c *Config) IsFree() bool { return c.Billing.Mode == BillingFree }
-
-// MaxSessionsPerUser는 과금 모드별 사용자당 동시 활성 세션 상한(0=무제한).
-func (c *Config) MaxSessionsPerUser() int {
-	switch c.Billing.Mode {
-	case BillingFree:
-		return 0 // 무제한
-	case BillingCredit:
-		return c.Billing.Credit.MaxConcurrentSessions
-	default:
-		return c.Billing.Dynamic.MaxConcurrentSessions
-	}
-}
