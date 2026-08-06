@@ -59,8 +59,8 @@ func TestUsageOf_SourceBySharingMode(t *testing.T) {
 	// FB_USED 는 "DCGM_FI_DEV_FB_USED" 와 "...FB_USED + ...FB_FREE" 두 쿼리에 모두 걸리므로
 	// 맵 순회 순서에 의존하지 않도록 총량 쿼리는 이 테스트에서 확인하지 않는다.
 	met := fakeProm(t, map[string]map[string]float64{
-		"container_cpu_usage_seconds_total":    {"ses-excl": 2.5, "ses-hami": 1.0, "ses-slice": 0.5, "ses-cpu": 3.0},
-		"container_memory_working_set_bytes":   {"ses-excl": 2 * 1024 * 1024 * 1024},
+		"container_cpu_usage_seconds_total":       {"ses-excl": 2.5, "ses-hami": 1.0, "ses-slice": 0.5, "ses-cpu": 3.0},
+		"container_memory_working_set_bytes":      {"ses-excl": 2 * 1024 * 1024 * 1024},
 		"DCGM_FI_DEV_GPU_UTIL":                    {"node-a": 73}, // 전용은 노드 GPU 로 귀속(by node)
 		"hami_container_device_utilization_ratio": {"ses-hami": 42},
 		"hami_vgpu_memory_used_bytes":             {"ses-hami": 3 * 1024 * 1024 * 1024},
