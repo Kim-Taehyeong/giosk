@@ -157,6 +157,7 @@
     "nodeAvail": "Düğüm başına kullanılabilirlik",
     "mySessions": "Seanslarım",
     "kpiNodes": "Kullanılabilir düğümler",
+    "cores": "Cores",
     "slots": "Yuvalar",
     "hamiFractional": "Kesirli (VRAM ve çekirdeklere göre)",
     "exclusiveWhole": "Adanmış (tüm kart)",

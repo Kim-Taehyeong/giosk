@@ -157,6 +157,7 @@
     "kpiMaxLease": "Μέγιστη μίσθωση",
     "kpiFree": "Δωρεάν (απεριόριστο)",
     "kpiNodes": "Διαθέσιμοι κόμβοι",
+    "cores": "Cores",
     "slots": "Κουλοχέρηδες",
     "hamiFractional": "Fractional (κατά VRAM και πυρήνες)",
     "exclusiveWhole": "Αφιερωμένο (ολόκληρη η κάρτα)",

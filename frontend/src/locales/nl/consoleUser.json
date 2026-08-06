@@ -157,6 +157,7 @@
     "gpuAvail": "GPU beschikbaar",
     "kpiNodes": "Beschikbare knooppunten",
     "kpiMaxLease": "Maximale huur",
+    "cores": "Cores",
     "slots": "Slots",
     "hamiShared": "HAMi fractioneel",
     "hamiFractional": "Fractioneel (door VRAM en kernen)",

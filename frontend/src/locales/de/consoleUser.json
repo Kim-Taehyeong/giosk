@@ -159,6 +159,7 @@
     "gpuAvail": "GPU verfügbar",
     "hamiFractional": "Bruchteil (nach VRAM und Kernen)",
     "exclusiveWhole": "Dediziert (ganze Karte)",
+    "cores": "Cores",
     "slots": "Spielautomaten",
     "hamiShared": "HAMi Bruchteil"
   },

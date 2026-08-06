@@ -159,6 +159,7 @@
     "kpiNodes": "가용 노드",
     "noticePinned": "고정",
     "hamiShared": "HAMi 분할",
+    "cores": "코어",
     "slots": "슬롯",
     "exclusiveWhole": "전용 (통 카드)",
     "hamiFractional": "분할 (VRAM·코어 단위)"

@@ -186,7 +186,11 @@ export default function UserDashboard() {
                 // HAMi(분할) 노드는 정수 GPU 개수가 아니라 소수 단위로 여유를 보여준다(VRAM 비율×GPU수).
                 // 전용 노드는 기존대로 정수 카드.
                 const isHami = !!n.fractional;
-                const hamiFree = isHami && n.fracVramTotalMb > 0 ? (n.fracVramFreeMb / n.fracVramTotalMb) * (n.gpuTotal || 1) : 0;
+                // 분할 노드의 여유는 VRAM 과 코어 중 모자란 쪽이 정한다. VRAM 만 보면
+                // 코어가 다 찼는데도 여유가 있는 것처럼 보인다.
+                const vramRatio = isHami && n.fracVramTotalMb > 0 ? n.fracVramFreeMb / n.fracVramTotalMb : 0;
+                const coreRatio = isHami && n.fracCoresTotal > 0 ? n.fracCoresFree / n.fracCoresTotal : vramRatio;
+                const hamiFree = isHami ? Math.min(vramRatio, coreRatio) * (n.gpuTotal || 1) : 0;
                 const availOk = isHami ? hamiFree > 0.05 : n.gpuFree > 0;
                 const pct = isHami ? Math.max(0, Math.min(100, (hamiFree / (n.gpuTotal || 1)) * 100)) : 0;
                 return (
@@ -214,9 +218,12 @@ export default function UserDashboard() {
                     <div style={{ height: 10, borderRadius: 3, background: 'var(--danger)', overflow: 'hidden' }}>
                       <div style={{ width: `${pct}%`, height: '100%', background: 'var(--free)' }} />
                     </div>
-                    {n.fracSlotsTotal > 0 && (
-                      <div className="muted" style={{ fontSize: 11.5, marginTop: 6 }}>{t('dash.slots', { defaultValue: '슬롯' })} {n.fracSlotsFree}/{n.fracSlotsTotal}</div>
-                    )}
+                    <div className="muted" style={{ fontSize: 11.5, marginTop: 6, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                      <span>VRAM {(n.fracVramFreeMb / 1024).toFixed(1)}/{(n.fracVramTotalMb / 1024).toFixed(0)}G</span>
+                      <span style={{ opacity: .5 }}>·</span>
+                      <span>{t('dash.cores', { defaultValue: '코어' })} {n.fracCoresFree}/{n.fracCoresTotal}%</span>
+                      {n.fracSlotsTotal > 0 && <><span style={{ opacity: .5 }}>·</span><span>{t('dash.slots', { defaultValue: '슬롯' })} {n.fracSlotsFree}/{n.fracSlotsTotal}</span></>}
+                    </div>
                   </>) : (
                     <div className="flex" style={{ gap: 4 }}>
                       {Array.from({ length: n.gpuTotal }).map((_, j) => (

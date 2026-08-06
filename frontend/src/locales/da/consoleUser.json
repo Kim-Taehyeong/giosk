@@ -157,6 +157,7 @@
     "kpiFree": "Gratis (ubegrænset)",
     "kpiCooldown": "Prøv nedkøling igen",
     "kpiMaxLease": "Max lejemål",
+    "cores": "Cores",
     "slots": "Slots",
     "exclusiveWhole": "Dedikeret (helt kort)",
     "hamiFractional": "Fraktionel (ved VRAM og kerner)",

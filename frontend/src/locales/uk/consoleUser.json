@@ -157,6 +157,7 @@
     "gpuAvail": "Доступний графічний процесор",
     "kpiMaxLease": "Максимальна оренда",
     "unavailable": "Недоступний",
+    "cores": "Cores",
     "slots": "Слоти",
     "hamiFractional": "Дробовий (за VRAM і ядрами)",
     "exclusiveWhole": "Присвячений (ціла карта)",

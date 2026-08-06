@@ -157,6 +157,7 @@
     "unavailable": "មិនអាចប្រើបាន",
     "kpiMaxLease": "ការជួលអតិបរមា",
     "nodeAvail": "ភាពអាចរកបានក្នុងមួយថ្នាំង",
+    "cores": "Cores",
     "slots": "រន្ធ",
     "hamiFractional": "ប្រភាគ (ដោយ VRAM និងស្នូល)",
     "exclusiveWhole": "ឧទ្ទិស (កាតទាំងមូល)",

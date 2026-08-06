@@ -157,6 +157,7 @@
     "nodeAvail": "ప్రతి నోడ్ లభ్యత",
     "kpiNodes": "అందుబాటులో ఉన్న నోడ్‌లు",
     "kpiCooldown": "కూల్‌డౌన్‌ని మళ్లీ ప్రయత్నించండి",
+    "cores": "Cores",
     "slots": "స్లాట్లు",
     "hamiShared": "HAMi భిన్నం",
     "exclusiveWhole": "అంకితం (మొత్తం కార్డ్)",

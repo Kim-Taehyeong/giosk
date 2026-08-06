@@ -157,6 +157,7 @@
     "kpiMaxLease": "সর্বোচ্চ লিজ",
     "kpiNodes": "উপলব্ধ নোড",
     "kpiFree": "বিনামূল্যে (সীমাহীন)",
+    "cores": "Cores",
     "slots": "স্লট",
     "hamiFractional": "ভগ্নাংশ (VRAM এবং কোর দ্বারা)",
     "exclusiveWhole": "উত্সর্গীকৃত (পুরো কার্ড)",

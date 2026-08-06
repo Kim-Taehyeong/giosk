@@ -157,6 +157,7 @@
     "nodeAvail": "در دسترس بودن هر گره",
     "kpiNodes": "گره های موجود",
     "kpiFree": "رایگان (نامحدود)",
+    "cores": "Cores",
     "slots": "شکاف ها",
     "hamiFractional": "کسری (توسط VRAM و هسته ها)",
     "hamiShared": "کسری HAMI",

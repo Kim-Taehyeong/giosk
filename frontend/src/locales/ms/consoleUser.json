@@ -157,6 +157,7 @@
     "kpiMaxLease": "Pajakan maksimum",
     "kpiNodes": "Nod yang tersedia",
     "kpiFree": "Percuma (tidak terhad)",
+    "cores": "Cores",
     "slots": "Slot",
     "hamiShared": "pecahan HAMi",
     "exclusiveWhole": "Dedicated (seluruh kad)",

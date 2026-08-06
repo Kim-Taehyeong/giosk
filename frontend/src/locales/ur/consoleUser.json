@@ -157,6 +157,7 @@
     "kpiCooldown": "کولڈاؤن کی دوبارہ کوشش کریں۔",
     "kpiMaxLease": "زیادہ سے زیادہ لیز",
     "kpiNodes": "دستیاب نوڈس",
+    "cores": "Cores",
     "slots": "سلاٹس",
     "hamiFractional": "جزوی (VRAM اور cores کے ذریعے)",
     "exclusiveWhole": "وقف (پورا کارڈ)",

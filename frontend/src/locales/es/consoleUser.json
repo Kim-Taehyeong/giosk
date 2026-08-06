@@ -157,6 +157,7 @@
     "mySessions": "Mis sesiones",
     "kpiCooldown": "Reintentar el tiempo de reutilización",
     "nodeAvail": "Disponibilidad por nodo",
+    "cores": "Cores",
     "slots": "Tragamonedas",
     "hamiFractional": "Fraccionado (por VRAM y núcleos)",
     "hamiShared": "HAMi fraccional",

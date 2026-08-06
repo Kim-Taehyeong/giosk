@@ -157,6 +157,7 @@
     "kpiCooldown": "クールダウンを再試行する",
     "kpiNodes": "利用可能なノード",
     "kpiMaxLease": "最大リース",
+    "cores": "Cores",
     "slots": "スロット",
     "exclusiveWhole": "専用（カード全体）",
     "hamiShared": "HAMi分数",

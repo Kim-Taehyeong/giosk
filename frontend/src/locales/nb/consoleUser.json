@@ -160,6 +160,7 @@
     "hamiFractional": "Fraksjonert (av VRAM og kjerner)",
     "exclusiveWhole": "Dedikert (helt kort)",
     "hamiShared": "HAMi brøkdel",
+    "cores": "Cores",
     "slots": "spilleautomater"
   },
   "newSession": {

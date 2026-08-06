@@ -158,6 +158,7 @@
     "kpiNodes": "צמתים זמינים",
     "kpiFree": "חינם (ללא הגבלה)",
     "exclusiveWhole": "ייעודי (כרטיס שלם)",
+    "cores": "Cores",
     "slots": "חריצים",
     "hamiFractional": "חלקי (על ידי VRAM וליבות)",
     "hamiShared": "שבר HAMi"

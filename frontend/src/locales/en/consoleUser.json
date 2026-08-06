@@ -159,6 +159,7 @@
     "kpiNodes": "Available nodes",
     "noticePinned": "Pinned",
     "hamiShared": "HAMi fractional",
+    "cores": "Cores",
     "slots": "Slots",
     "exclusiveWhole": "Dedicated (whole card)",
     "hamiFractional": "Fractional (by VRAM and cores)"

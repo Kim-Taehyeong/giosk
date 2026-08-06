@@ -157,6 +157,7 @@
     "nodeAvail": "Доступность для каждого узла",
     "kpiCooldown": "Повторить перезарядку",
     "kpiMaxLease": "Макс. аренда",
+    "cores": "Cores",
     "slots": "Слоты",
     "hamiFractional": "Дробный (по видеопамяти и ядрам)",
     "exclusiveWhole": "Выделенный (вся карта)",

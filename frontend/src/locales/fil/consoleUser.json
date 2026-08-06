@@ -157,6 +157,7 @@
     "nodeAvail": "Ang pagkakaroon ng per-node",
     "kpiFree": "Libre (walang limitasyon)",
     "kpiCooldown": "Subukan muli ang cooldown",
+    "cores": "Cores",
     "slots": "Mga puwang",
     "hamiShared": "HAMi fractional",
     "hamiFractional": "Fractional (sa pamamagitan ng VRAM at mga core)",

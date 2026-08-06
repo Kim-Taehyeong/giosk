@@ -6,7 +6,7 @@ import PageHead from '../../../components/console/PageHead';
 import StatCard from '../../../components/console/StatCard';
 import PagedTable from '../../../components/console/PagedTable';
 import Pill from '../../../components/console/Pill';
-import Bar from '../../../components/console/Bar';
+import UsageMeters from '../../../components/console/UsageMeters';
 import Spinner from '../../../components/console/Spinner';
 import { useToast } from '../../../components/console/Toast';
 import { useConfirm } from '../../../components/console/Confirm';
@@ -140,16 +140,9 @@ export default function SessionDetailPage() {
         ) : rows.length === 0 && !gpuUnmeasurable(s) ? (
           <div className="legend">{t('sdetail.metricsNone')}</div>
         ) : (
-          <div className="grid cols-2" style={{ gap: 16 }}>
-            {rows.map((x) => (
-              <div key={x.label}>
-                <div className="flex" style={{ justifyContent: 'space-between', fontSize: 12, color: 'var(--muted)', fontWeight: 700, marginBottom: 4 }}>
-                  <span>{x.label}</span><span>{x.txt}</span>
-                </div>
-                <Bar value={x.pct} max={100} variant={x.variant} />
-              </div>
-            ))}
-            {gpuUnmeasurable(s) && <div className="muted" style={{ fontSize: 12 }}>GPU {t('monitor.notMeasurable')}</div>}
+          <div>
+            <UsageMeters rows={rows} />
+            {gpuUnmeasurable(s) && <div className="muted" style={{ fontSize: 12, marginTop: 10 }}>GPU {t('monitor.notMeasurable')}</div>}
           </div>
         )}
       </div>

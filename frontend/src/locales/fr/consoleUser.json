@@ -157,6 +157,7 @@
     "kpiCooldown": "Réessayez le temps de recharge",
     "kpiFree": "Gratuit (illimité)",
     "kpiMaxLease": "Bail maximum",
+    "cores": "Cores",
     "slots": "Machines à sous",
     "hamiFractional": "Fractionnel (par VRAM et cœurs)",
     "exclusiveWhole": "Dédié (carte entière)",
