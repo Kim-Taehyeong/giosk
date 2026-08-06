@@ -36,14 +36,16 @@ type SvcAccess struct {
 	LBIP     string // loadbalancer 할당 IP(없으면 대기중)
 	NodePort int    // nodeport 할당 포트(primary=첫 포트=웹 채널)
 	// sshd 사이드카 포트("ssh")의 NodePort. 웹과 포트가 다르므로 따로 읽는다.
-	// loadbalancer 모드면 LBIP 로 22 번에 바로 붙으므로 이 값은 쓰지 않는다.
 	SSHNodePort int
+	// SSH 전용 보조 Service 의 LB IP. 게이트웨이 모드에서 세션 Service 는 ClusterIP 지만
+	// SSH 는 보조 Service 로 MetalLB IP 를 따로 받는다(22 번 그대로 붙는다).
+	SSHLBIP string
 }
 
 // sshSvcName은 SSH 전용 보조 Service 이름이다.
 // 게이트웨이를 켜면 세션 Service 가 ClusterIP 라 사내망에서 컨테이너로 바로 SSH 할 수단이 사라진다.
-// Service 는 포트별로 타입을 나눌 수 없으므로, 22 번만 담은 NodePort Service 를 따로 하나 더 만든다.
-// 웹 채널은 그대로 ClusterIP 에 남아 게이트웨이만 거친다.
+// Service 는 포트별로 타입을 나눌 수 없으므로, 22 번만 담은 Service 를 따로 하나 더 만들어
+// MetalLB IP 를 받는다. 웹 채널(VSCode·Jupyter)은 그대로 ClusterIP 에 남아 게이트웨이만 거친다.
 func sshSvcName(name string) string { return name + "-ssh" }
 
 func svcType(mode string) corev1.ServiceType {
@@ -90,8 +92,10 @@ func (c *Client) EnsureSessionService(ctx context.Context, s SvcSpec) error {
 	return nil
 }
 
-// ensureSSHService는 게이트웨이 모드에서 22 번만 NodePort 로 여는 보조 Service 를 만든다.
-// LoadBalancer 를 쓰지 않는 이유는 세션마다 IP 를 하나씩 먹어 MetalLB 풀이 금방 마르기 때문이다.
+// ensureSSHService는 게이트웨이 모드에서 22 번만 여는 보조 Service 를 만든다.
+// MetalLB 가 있으면 LoadBalancer 로 만들어 세션마다 IP 를 받는다(사내망에서 ssh user@IP 로 바로 붙는다).
+// 풀이 마르면 IP 가 안 나오는데, LoadBalancer Service 는 NodePort 도 함께 잡으므로
+// 그때는 노드 IP + 포트로 안내가 이어진다.
 func (c *Client) ensureSSHService(ctx context.Context, s SvcSpec) error {
 	var ssh *SvcPort
 	for i := range s.Ports {
@@ -109,7 +113,7 @@ func (c *Client) ensureSSHService(ctx context.Context, s SvcSpec) error {
 			Labels: map[string]string{"managed-by": "giosk-system", "giosk.io/session": s.Name},
 		},
 		Spec: corev1.ServiceSpec{
-			Type:     corev1.ServiceTypeNodePort,
+			Type:     svcType(s.Mode),
 			Selector: map[string]string{"giosk.io/session": s.Name},
 			Ports: []corev1.ServicePort{{
 				Name: "ssh", Port: int32(ssh.Port), TargetPort: intstr.FromInt(ssh.Port),
@@ -166,14 +170,17 @@ func (c *Client) SessionServiceAccess(ctx context.Context, ns, name, mode string
 			break
 		}
 	}
-	if out.SSHNodePort == 0 {
-		// 게이트웨이 모드면 22 번은 보조 Service 에 있다.
-		if aux, err := c.cs.CoreV1().Services(ns).Get(ctx, sshSvcName(name), v1.GetOptions{}); err == nil {
-			for _, p := range aux.Spec.Ports {
-				if p.Name == "ssh" {
-					out.SSHNodePort = int(p.NodePort)
-					break
-				}
+	// 게이트웨이 모드면 22 번은 보조 Service 에 있다.
+	if aux, err := c.cs.CoreV1().Services(ns).Get(ctx, sshSvcName(name), v1.GetOptions{}); err == nil {
+		for _, p := range aux.Spec.Ports {
+			if p.Name == "ssh" && out.SSHNodePort == 0 {
+				out.SSHNodePort = int(p.NodePort)
+			}
+		}
+		for _, ing := range aux.Status.LoadBalancer.Ingress {
+			if ing.IP != "" {
+				out.SSHLBIP = ing.IP
+				break
 			}
 		}
 	}
