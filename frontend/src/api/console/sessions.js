@@ -37,21 +37,23 @@ function adaptUsage(u) {
   };
 }
 
+// 세션 사양을 한 줄 라벨로 만든다. 사용자 목록과 관리자 관제가 같은 값을 보여야 해서
+// 두 어댑터가 이 함수를 함께 쓴다(예전엔 각자 만들어서 관제 쪽만 GPU 종류로 굳어 있었다).
+export function offeringLabel(s) {
+  if (s.env === 'ssh') return s.node ? `물리 노드 · ${s.node}` : '물리 노드';
+  if (s.gpuMode === 'cpu') return 'CPU';
+  const gpu = s.gpuType || 'GPU';
+  if (s.gpuMode === 'exclusive') return `${gpu} ×${s.gpuCount || 1}`; // 전용은 카드 통째라 VRAM/코어% 표기 없음
+  if (s.gpuMode === 'timeslice') return gpu; // 시분할은 VRAM/코어% 개념이 없음
+  const gb = (s.vramMb || 0) / 1024;
+  if (s.vramMb || s.corePercent) return `${gpu} · ${gb.toFixed(0)}GB·GPU ${s.corePercent || 0}%`;
+  return s.gpuType || '—';
+}
+
 // 백엔드 Session 을 프론트 세션 목록 shape 으로 변환한다(라이브 지표는 metrics 에서 머지).
 function adaptSession(s) {
-  const gb = (s.vramMb || 0) / 1024;
   const ssh = s.env === 'ssh'; // 물리노드 임대 세션
-  const offering = ssh
-    ? `물리 노드 · ${s.node || ''}`
-    : s.gpuMode === 'cpu'
-      ? 'CPU'
-      : s.gpuMode === 'exclusive'
-        ? `${s.gpuType || 'GPU'} ×${s.gpuCount || 1}` // 전용=GPU 통째 (VRAM/코어% 미표기)
-        : s.gpuMode === 'timeslice'
-          ? `${s.gpuType || 'GPU'}` // 타임슬라이스=시분할 (VRAM/코어% 개념 없음)
-          : s.gpuType && (s.vramMb || s.corePercent)
-            ? `${s.gpuType} · ${gb.toFixed(0)}GB·GPU ${s.corePercent}%` // 분할=VRAM·GPU 점유율
-            : (s.gpuType || `${gb.toFixed(0)}GB·GPU ${s.corePercent}%`); // 폴백: 0/0 이면 GPU타입만
+  const offering = offeringLabel(s);
   const running = s.status === 'running';
   return {
     id: s.id,
@@ -143,7 +145,7 @@ export function accruedCredits(startedAt, pricePerHour) {
 
 // 백엔드 AdminRow 를 관제 테이블 shape 으로 바꾼다.
 function adaptAdminRow(r) {
-  const offering = r.env === 'ssh' ? '물리 노드' : r.gpuMode === 'cpu' ? 'CPU' : (r.gpuType || '—');
+  const offering = offeringLabel(r);
   const running = r.status === 'running';
   // 실제 소비 = 정산된 billed_credits 와 실시간 누적값 중 큰 값(정산 주기 사이에도 반영).
   const credit = Math.max(r.consumed || 0, running ? accruedCredits(r.startedAt, r.pricePerHour) : 0);

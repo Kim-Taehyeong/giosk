@@ -1427,7 +1427,15 @@ func (s *Service) containerSSHAccess(ctx context.Context, sess *Session) map[str
 		return map[string]string{"direct": "true", "cmd": fmt.Sprintf("ssh %s@%s", user, acc.LBIP)}
 	}
 	if acc.SSHNodePort > 0 {
-		if ip := s.prov.FirstNodeIP(ctx); ip != "" {
+		// NodePort 는 어느 노드로 붙어도 되지만, 세션이 뜬 노드를 알면 그쪽 IP 를 준다(한 홉 절약).
+		ip := ""
+		if sess.Node != "" {
+			ip = s.prov.NodeIP(ctx, sess.Node)
+		}
+		if ip == "" || ip == sess.Node {
+			ip = s.prov.FirstNodeIP(ctx)
+		}
+		if ip != "" {
 			return map[string]string{"direct": "true", "cmd": fmt.Sprintf("ssh -p %d %s@%s", acc.SSHNodePort, user, ip)}
 		}
 	}
