@@ -14,6 +14,10 @@ image:
   gateway:
     repository: giosk-gateway
     tag: latest
+  # 세션 홈 볼륨 드라이버(CSI). csi.enabled 참고.
+  csi:
+    repository: giosk-csi
+    tag: latest
   # 컨테이너 세션 SSH 사이드카. session.ssh 참고.
   sshd:
     repository: giosk-sshd
@@ -84,6 +88,27 @@ storage:
   scratch:
     enabled: false
     hostPath: /scratch
+
+# ── 세션 홈 볼륨 드라이버 (CSI) ─────────────────────────────────────
+# 세션 홈을 노드 로컬 파일시스템 이미지로 준다. 이미지 크기가 곧 파일시스템 크기라
+# PVC 에 적은 용량이 실제로 강제되고, 넘기면 세션이 죽는 대신 ENOSPC 가 난다.
+# local-path 는 디렉터리를 그대로 내주기 때문에 용량이 지켜지지 않고 사용자에게
+# 노드 디스크 전체가 보인다(200Gi 를 주고 df 에 2TB 가 뜨는 상태).
+#
+# 이미지는 희소 파일이라 물리 소비는 쓴 만큼이고, 지우면 discard 로 회수된다.
+# 끄면 storage.localClass 가 그대로 쓰인다.
+csi:
+  enabled: false
+  storageClassName: giosk-local
+  # 이미지와 마운트 지점이 놓이는 노드 경로. 세션 홈 실데이터가 여기 쌓인다.
+  dataRoot: /var/lib/giosk/csi
+  # 이미지 파일시스템. xfs 는 마운트한 채로 확장할 수 있어 홈 늘리기가 무중단이다.
+  fsType: xfs
+  # 쿠버네티스 표준 CSI 사이드카. 에어갭이면 사내 레지스트리 주소로 바꾼다.
+  sidecars:
+    provisioner: registry.k8s.io/sig-storage/csi-provisioner:v5.1.0
+    resizer: registry.k8s.io/sig-storage/csi-resizer:v1.12.0
+    registrar: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.12.0
 
 # ── 노드 디스크 정리 DaemonSet ──────────────────────────────────────
 # scratch 와 로컬 home 은 사용자별 쿼터가 없다. 방치하면 DiskPressure 로 노드가 통째로 빠지므로,

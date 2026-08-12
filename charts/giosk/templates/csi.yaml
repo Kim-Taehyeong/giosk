@@ -1,0 +1,176 @@
+{{- if .Values.csi.enabled }}
+{{- /*
+  Giosk CSI 드라이버. 세션 홈을 노드 로컬 파일시스템 이미지로 주어 PVC 에 적은 용량을
+  실제로 강제한다. local-path 는 디렉터리를 그대로 내주기 때문에 용량이 지켜지지 않고
+  사용자에게 노드 디스크 전체가 보인다.
+
+  구성은 둘이다.
+    - 컨트롤러(Deployment) : 볼륨 등록과 토폴로지 반환. external-provisioner/resizer 사이드카와 함께.
+    - 노드 플러그인(DaemonSet, privileged) : 이미지 생성, 루프 마운트, bind.
+
+  노드 플러그인은 호스트의 마운트 네임스페이스에 마운트를 만들어야 해서 privileged 이고
+  마운트 전파가 Bidirectional 이어야 한다. 이 권한을 DaemonSet 하나에 가두는 것이 요점이다.
+  세션 파드마다 privileged 사이드카를 붙이는 방식은 세션 격리를 무너뜨린다.
+*/ -}}
+apiVersion: storage.k8s.io/v1
+kind: CSIDriver
+metadata:
+  name: csi.giosk.io
+spec:
+  attachRequired: false          # 노드 로컬이라 붙이고 떼는 단계가 없다
+  podInfoOnMount: false
+  volumeLifecycleModes: [Persistent]
+  storageCapacity: false
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ .Values.csi.storageClassName }}
+provisioner: csi.giosk.io
+# 이미지가 노드 로컬이므로 파드가 스케줄된 뒤에 볼륨을 만들어야 한다. Immediate 로 두면
+# 노드를 모르는 채 CreateVolume 이 와서 실패한다.
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+reclaimPolicy: Delete
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "giosk.fullname" . }}-csi
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "giosk.fullname" . }}-csi
+rules:
+  - apiGroups: [""]
+    resources: [persistentvolumes]
+    verbs: [get, list, watch, create, delete, patch, update]
+  - apiGroups: [""]
+    resources: [persistentvolumeclaims]
+    verbs: [get, list, watch, update, patch]
+  - apiGroups: [""]
+    resources: [persistentvolumeclaims/status]
+    verbs: [update, patch]
+  - apiGroups: [""]
+    resources: [events]
+    verbs: [list, watch, create, update, patch]
+  - apiGroups: [""]
+    resources: [nodes]
+    verbs: [get, list, watch]
+  - apiGroups: [storage.k8s.io]
+    resources: [storageclasses, csinodes, volumeattachments]
+    verbs: [get, list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "giosk.fullname" . }}-csi
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "giosk.fullname" . }}-csi
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "giosk.fullname" . }}-csi
+    namespace: {{ .Release.Namespace }}
+---
+{{- /* 컨트롤러: 볼륨 등록만 한다. 디스크에 손대지 않으므로 특권이 필요 없다. */}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "giosk.fullname" . }}-csi-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: {{ include "giosk.fullname" . }}-csi-controller}
+  template:
+    metadata:
+      labels: {app: {{ include "giosk.fullname" . }}-csi-controller}
+    spec:
+      serviceAccountName: {{ include "giosk.fullname" . }}-csi
+      {{- if .Values.controlPlane.enabled }}
+      nodeSelector: {{- toYaml .Values.controlPlane.nodeSelector | nindent 8 }}
+      tolerations: {{- toYaml .Values.controlPlane.tolerations | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: driver
+          image: "{{ .Values.image.csi.repository }}:{{ .Values.image.csi.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - {name: CSI_ENDPOINT, value: "unix:///csi/csi.sock"}
+          volumeMounts:
+            - {name: socket, mountPath: /csi}
+        - name: provisioner
+          image: {{ .Values.csi.sidecars.provisioner }}
+          args:
+            - --csi-address=/csi/csi.sock
+            - --feature-gates=Topology=true
+            - --strict-topology                 # 스케줄러가 고른 노드만 넘긴다
+            - --extra-create-metadata           # PVC 어노테이션을 파라미터로 전달
+            - --leader-election=false
+          volumeMounts:
+            - {name: socket, mountPath: /csi}
+        - name: resizer
+          image: {{ .Values.csi.sidecars.resizer }}
+          args: [--csi-address=/csi/csi.sock, --leader-election=false]
+          volumeMounts:
+            - {name: socket, mountPath: /csi}
+      volumes:
+        - {name: socket, emptyDir: {}}
+---
+{{- /* 노드 플러그인: 이미지 생성과 마운트. GPU 워커에만 둔다(세션이 뜨는 곳). */}}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "giosk.fullname" . }}-csi-node
+spec:
+  selector:
+    matchLabels: {app: {{ include "giosk.fullname" . }}-csi-node}
+  template:
+    metadata:
+      labels: {app: {{ include "giosk.fullname" . }}-csi-node}
+    spec:
+      serviceAccountName: {{ include "giosk.fullname" . }}-csi
+      hostPID: true
+      containers:
+        - name: driver
+          image: "{{ .Values.image.csi.repository }}:{{ .Values.image.csi.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            privileged: true      # losetup/mount 는 호스트 마운트 네임스페이스를 건드린다
+          env:
+            - {name: CSI_ENDPOINT, value: "unix:///csi/csi.sock"}
+            - {name: GIOSK_CSI_DATA_ROOT, value: {{ .Values.csi.dataRoot | quote }}}
+            - {name: GIOSK_CSI_FSTYPE, value: {{ .Values.csi.fsType | quote }}}
+            - name: GIOSK_CSI_NODE_ID
+              valueFrom: {fieldRef: {fieldPath: spec.nodeName}}
+          volumeMounts:
+            - {name: socket, mountPath: /csi}
+            - name: pods
+              mountPath: /var/lib/kubelet/pods
+              mountPropagation: Bidirectional   # 여기서 만든 마운트가 kubelet 에 보여야 한다
+            - name: data
+              mountPath: {{ .Values.csi.dataRoot }}
+              mountPropagation: Bidirectional
+            - {name: dev, mountPath: /dev}
+        - name: registrar
+          image: {{ .Values.csi.sidecars.registrar }}
+          args:
+            - --csi-address=/csi/csi.sock
+            - --kubelet-registration-path=/var/lib/kubelet/plugins/csi.giosk.io/csi.sock
+          volumeMounts:
+            - {name: socket, mountPath: /csi}
+            - {name: registration, mountPath: /registration}
+      volumes:
+        - name: socket
+          hostPath: {path: /var/lib/kubelet/plugins/csi.giosk.io, type: DirectoryOrCreate}
+        - name: registration
+          hostPath: {path: /var/lib/kubelet/plugins_registry, type: Directory}
+        - name: pods
+          hostPath: {path: /var/lib/kubelet/pods, type: Directory}
+        - name: data
+          hostPath: {path: {{ .Values.csi.dataRoot }}, type: DirectoryOrCreate}
+        - name: dev
+          hostPath: {path: /dev, type: Directory}
+{{- end }}
