@@ -34,6 +34,9 @@ type LiveNode struct {
 	GpuType     string `json:"gpuType"`
 	Physical    bool   `json:"physical"`
 	Cordoned    bool   `json:"cordoned"`
+	// ShareMode 는 노드의 공유 전략 라벨(giosk.io/share-mode) 값이다(hami/timeslicing, 없으면 빈 문자열=전용).
+	// 세션을 특정 노드에 하드 핀하기 전에 ShareModeAllows 로 배치 가능 여부를 걸러내는 데 쓴다.
+	ShareMode   string `json:"shareMode"`
 	Ready       bool   `json:"ready"`
 	GpuCapacity string `json:"gpuCapacity"`
 	CPUCores    int    `json:"cpuCores"`    // 노드 CPU capacity(코어)
@@ -86,6 +89,7 @@ func toLiveNode(n *corev1.Node, gpuTypeLabel, physicalLabel, cudaLabel string) L
 		GpuType:     n.Labels[gpuTypeLabel],
 		Physical:    n.Labels[physicalLabel] == "true",
 		Cordoned:    n.Spec.Unschedulable,
+		ShareMode:   n.Labels[ShareModeLabel],
 		Ready:       isNodeReady(n),
 		GpuCapacity: gpuCap,
 		CPUCores:    int(cpu.Value()),

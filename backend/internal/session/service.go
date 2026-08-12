@@ -51,6 +51,8 @@ type NodeLeaser interface {
 // Provisioner는 K8s 프로비저닝 계약(*k8s.Client 가 구현). 테스트 시 fake 주입 가능.
 type Provisioner interface {
 	EnsureNamespace(ctx context.Context, ns string) error
+	// 세션 파드가 사내망으로 나가지 못하게 하는 이그레스 정책을 적용한다(세션 파드 라벨 대상).
+	EnsureSessionEgressPolicy(ctx context.Context, spec k8s.SessionEgressSpec) error
 	// 사용자 등록 SSH 공개키를 authorized_keys Secret 으로 반영(생성/갱신). sshd 사이드카가 마운트해
 	// 접속마다 다시 읽으므로, 실행 중 세션에도 키 등록/교체가 즉시 반영된다.
 	UpsertUserKeys(ctx context.Context, ns string, userID int64, keys string) error
@@ -147,6 +149,18 @@ type Service struct {
 	sshdPubKey     string // sshd 사이드카가 신뢰할 게이트웨이 공개키(authorized_keys)
 	gatewayJump    string // 외부(VPN 밖) 접속용 SSH 점프 호스트(user@host). 빈값=내부 명령만.
 	gatewaySSHKey  []byte // 게이트웨이 SSH 관리 개인키(PEM). 물리 세션 웹터미널이 노드로 SSH 할 때 사용(빈값=물리 웹터미널 비활성).
+
+	// 세션 파드 이그레스 제한. 세션에서 사내망(스토리지·노드·API·다른 클러스터)으로 나가는 것을 막는다.
+	// 빈 목록이면 정책을 만들지 않는다.
+	egressDenyCIDRs  []string
+	egressAllowCIDRs []string
+	dnsServiceIP     string
+}
+
+// WithSessionEgress는 세션 파드 이그레스 제한 대역을 주입한다(deny 가 비면 정책 비활성).
+func (s *Service) WithSessionEgress(deny, allow []string, dnsIP string) *Service {
+	s.egressDenyCIDRs, s.egressAllowCIDRs, s.dnsServiceIP = deny, allow, dnsIP
+	return s
 }
 
 // WithGatewaySSHKey는 물리 세션 웹터미널용 게이트웨이 SSH 관리 개인키를 주입한다(빈값=물리 웹터미널 비활성).
@@ -806,7 +820,10 @@ func (s *Service) pickDatasetNode(ctx context.Context, ids []int64, gpuType, gpu
 	if len(hostPaths) == 0 {
 		return "", nil, nil
 	}
-	typeNodes := s.nodesOfType(ctx, gpuType, gpuMode) // 후보를 GPU 타입 일치 노드로 제한
+	// 후보는 "핀을 걸어도 실제로 그 노드에 뜰 수 있는" 노드로 제한한다. GPU 타입뿐 아니라
+	// 공유 전략(전용/HAMi/타임슬라이싱)과 cordon 까지 봐야 한다. 파드에는 공유 전략 affinity 가 함께
+	// 구워지므로, 그걸 무시하고 핀하면 두 조건이 서로를 배제해 영구 Pending 이 된다.
+	typeNodes := s.pinnableNodes(ctx, gpuType, gpuMode)
 	// 사용자가 노드를 직접 고르지 않은 경우, 데이터셋 캐시 노드로 "하드핀"하면 그 노드가 만석일 때
 	// 다른 빈 노드가 있어도 영구 Pending 이 된다. 그러니 GPU 여유가 있는 캐시 노드만 후보로 삼고,
 	// 여유 있는 캐시 노드가 없으면 핀하지 않는다(빈 값이면 데이터셋은 NFS 로 읽고 스케줄러가 알아서 배치).
@@ -832,9 +849,38 @@ func (s *Service) pickDatasetNode(ctx context.Context, ids []int64, gpuType, gpu
 		}
 	}
 	if bestN == 0 {
-		return "", nil, nil // 여유 있는 캐시 노드가 없으니 핀 없이 NFS 로(빈 노드로 스케줄)
+		// 캐시는 있는데 그 노드에 이 세션을 못 넣는 상황이다(만석이거나 공유 전략이 안 맞거나 cordon).
+		// 속도를 포기하고 NFS 로 읽는 편이, 뜨지 못하는 세션보다 낫다.
+		log.Printf("[session] 데이터셋 캐시 노드 핀 생략(gpuType=%s mode=%s 로 배치 가능한 캐시 노드 없음): 데이터셋을 NFS 로 마운트", gpuType, gpuMode)
+		return "", nil, nil
 	}
 	return best, cached, hostPaths
+}
+
+// pinnableNodes는 하드 핀을 걸어도 실제로 스케줄될 수 있는 노드 집합이다(nil 이면 판단 불가라 제한 없음).
+// 파드에 구워지는 required 제약과 같은 조건을 미리 적용한다.
+//   - GPU 타입 일치(nodeSelector 와 동일 기준)
+//   - 공유 전략 호환(k8s.ShareModeAllows, 파드 affinity 와 동일 판정)
+//   - Ready 이고 cordon 아님. 물리 임대가 노드를 cordon 하므로 이걸 빼면 임대 중 노드에 핀할 수 있다.
+func (s *Service) pinnableNodes(ctx context.Context, gpuType, gpuMode string) map[string]bool {
+	live, err := s.prov.ListNodes(ctx)
+	if err != nil || len(live) == 0 {
+		return nil
+	}
+	out := map[string]bool{}
+	for _, n := range live {
+		if !n.Ready || n.Cordoned {
+			continue
+		}
+		if !(gpuMode == "cpu" || gpuType == "" || n.GpuType == gpuType) {
+			continue
+		}
+		if !k8s.ShareModeAllows(gpuMode, n.ShareMode) {
+			continue
+		}
+		out[n.Name] = true
+	}
+	return out
 }
 
 // freeGpuByNode는 노드별 남은 GPU 수를 근사한다(데이터셋 캐시 핀의 여유 판정용).
@@ -1233,6 +1279,18 @@ func (s *Service) ephemeralGiB(userID int64) int {
 func (s *Service) provision(ctx context.Context, ns string, sess *Session, imageRef, homePVC string, mounts []k8s.VolMountSpec, preferNodes []string, requireNode string) error {
 	if err := s.prov.EnsureNamespace(ctx, ns); err != nil {
 		return err
+	}
+	// 세션 파드 이그레스 제한. 파드가 뜨기 전에 걸어야 정책 없는 틈이 생기지 않는다.
+	// 정책 적용 실패로 세션 생성을 막지는 않되(가용성 우선), 조용히 넘어가면 안 되므로 로그를 남긴다.
+	if len(s.egressDenyCIDRs) > 0 {
+		if err := s.prov.EnsureSessionEgressPolicy(ctx, k8s.SessionEgressSpec{
+			Namespace:    ns,
+			DenyCIDRs:    s.egressDenyCIDRs,
+			AllowCIDRs:   s.egressAllowCIDRs,
+			DNSServiceIP: s.dnsServiceIP,
+		}); err != nil {
+			log.Printf("[session] %s 이그레스 정책 적용 실패(세션은 계속 생성): %v", ns, err)
+		}
 	}
 	// 컨테이너 SSH 가 켜져 있으면 사용자 공개키 Secret 을 먼저 준비한다(키를 등록하지 않았으면 빈 파일이라
 	// 세션은 정상 기동하고, 나중에 등록하면 Secret 갱신만으로 이 세션에도 바로 반영된다).
