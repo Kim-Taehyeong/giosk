@@ -20,7 +20,7 @@ jobs:
       packages: write        # ghcr 로 push 권한
     strategy:
       matrix:
-        target: [api, node-agent, gateway, sshd]
+        target: [api, node-agent, gateway, csi, sshd]
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
