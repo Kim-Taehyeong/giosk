@@ -91,6 +91,13 @@ type K8s struct {
 	SessionSSHDImage  string // 컨테이너 세션 sshd 사이드카 이미지. 빈값=컨테이너 SSH 비활성.
 	SessionSSHDPubKey string // sshd 사이드카가 신뢰할 게이트웨이 공개키(authorized_keys)
 	SessionExpose     string // 세션 웹 노출: nodeport(기본) | loadbalancer(MetalLB)
+	// 세션 파드 이그레스 차단 대역. 세션에서 사내망(스토리지 NFS·노드 kubelet·API 서버·다른 클러스터)으로
+	// 나가는 것을 막는다. 볼륨 마운트는 kubelet 이 하므로 영향받지 않는다. 비면 정책을 만들지 않는다.
+	SessionEgressDenyCIDRs []string
+	// 위 차단 대역 안에서도 예외로 열어 줄 대역(사내 패키지 미러 등).
+	SessionEgressAllowCIDRs []string
+	// 클러스터 DNS Service IP. 이름 해석을 명시로 열어 주는 데 쓴다(비면 kube-dns 셀렉터만 사용).
+	DNSServiceIP string
 	// NVIDIA device plugin 설정 ConfigMap(GPU Operator). 지정 시 관리자가 웹에서 타임셰어링을 켜면
 	// 프로파일 upsert + 노드 라벨 부여로 즉시 반영된다. 빈값이면 자동 적용 생략(수동 운영).
 	DevicePluginConfigNS   string
@@ -273,6 +280,12 @@ func Load(lookup func(string) (string, bool)) (*Config, error) {
 			SessionSSHDImage:       g.str("GIOSK_SESSION_SSHD_IMAGE", ""),
 			SessionSSHDPubKey:      g.str("GIOSK_GATEWAY_SSH_PUBKEY", ""),
 			SessionExpose:          g.str("GIOSK_SESSION_EXPOSE", "nodeport"),
+			// 기본으로 사설 대역 전체와 링크로컬(클라우드 메타데이터 169.254.169.254 포함)을 막는다.
+			// 사내망 구성이 달라도 RFC1918 밖으로 나가는 스토리지는 없으므로 이 기본값이 안전하다.
+			// 끄려면 GIOSK_SESSION_EGRESS_DENY_CIDRS=none.
+			SessionEgressDenyCIDRs:  g.list("GIOSK_SESSION_EGRESS_DENY_CIDRS", []string{"10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "169.254.0.0/16"}),
+			SessionEgressAllowCIDRs: g.list("GIOSK_SESSION_EGRESS_ALLOW_CIDRS", nil),
+			DNSServiceIP:            g.str("GIOSK_DNS_SERVICE_IP", ""),
 			DevicePluginConfigNS:   g.str("GIOSK_DEVICE_PLUGIN_CONFIG_NS", ""),
 			DevicePluginConfigName: g.str("GIOSK_DEVICE_PLUGIN_CONFIG_NAME", ""),
 			Registry:               g.str("GIOSK_REGISTRY", ""),

@@ -80,6 +80,13 @@ data:
   GIOSK_HOME_REAP_PCT: {{ .Values.quota.homeReapPct | default 88 | quote }}
   # 세션 웹(VSCode) 노출 모드: nodeport(기본) | loadbalancer(MetalLB)
   GIOSK_SESSION_EXPOSE: {{ .Values.session.expose | quote }}
+  # 세션 파드 이그레스 차단 대역(콤마구분). 사용자 코드가 사내망(스토리지 NFS·노드 kubelet·API 서버·
+  # 다른 클러스터)에 닿는 것을 막는다. 볼륨 마운트는 kubelet 이 하므로 영향받지 않는다.
+  # none = 정책 비활성. 사내 미러 등 예외는 allowCidrs 에 적는다.
+  GIOSK_SESSION_EGRESS_DENY_CIDRS: {{ .Values.session.egress.denyCidrs | default (list) | join "," | default "none" | quote }}
+  GIOSK_SESSION_EGRESS_ALLOW_CIDRS: {{ .Values.session.egress.allowCidrs | default (list) | join "," | quote }}
+  # 클러스터 DNS Service IP. 이름 해석을 명시로 열어 준다(비우면 kube-dns 파드 셀렉터만 사용).
+  GIOSK_DNS_SERVICE_IP: {{ .Values.session.egress.dnsServiceIP | default "" | quote }}
   # Prometheus(메트릭). monitoring.enabled 면 in-cluster 서비스를, 아니면 외부 URL 을 쓴다.
   GIOSK_PROMETHEUS_URL: {{ .Values.monitoring.prometheusURL | default (ternary (printf "http://kps-kube-prometheus-stack-prometheus.%s:9090" .Release.Namespace) "" .Values.monitoring.install) | quote }}
   # CORS 허용 오리진(콤마구분). 단일 오리진(nginx 프록시) 배포면 비워둬도 무방.

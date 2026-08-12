@@ -30,11 +30,16 @@ const shareHami = "hami" // HAMi 분할 노드 라벨값(node.ShareHami 와 동�
 // buildPod은 SessionSpec 을 corev1.Pod 로 변환한다(노드셀렉터와 GPU 리소스 매핑).
 func buildPod(s SessionSpec, gpuTypeLabel string) *corev1.Pod {
 	vols, mounts := podVolumes(s)
+	// 세션은 사용자가 임의 코드를 돌리는 곳이라 쿠버네티스 API 토큰을 줄 이유가 없다.
+	// 기본값이면 default SA 토큰이 마운트돼 API 서버에 도달할 수 있다. RBAC 이 막고 있더라도
+	// 필요 없는 공격 표면이므로 아예 넣지 않는다(세션 컨테이너는 API 를 쓰지 않는다).
+	noSAToken := false
 	spec := corev1.PodSpec{
-		NodeSelector:  nodeSelector(s, gpuTypeLabel),
-		Affinity:      nodeAffinity(s.PreferNodes, s.RequireNode, shareModeReqs(s)),
-		RestartPolicy: corev1.RestartPolicyNever,
-		Volumes:       vols,
+		NodeSelector:                 nodeSelector(s, gpuTypeLabel),
+		Affinity:                     nodeAffinity(s.PreferNodes, s.RequireNode, shareModeReqs(s)),
+		RestartPolicy:                corev1.RestartPolicyNever,
+		AutomountServiceAccountToken: &noSAToken,
+		Volumes:                      vols,
 		Containers: []corev1.Container{{
 			Name:  "session",
 			Image: s.Image,
@@ -266,6 +271,24 @@ func shareModeReqs(s SessionSpec) []corev1.NodeSelectorRequirement {
 		}}
 	}
 	return nil
+}
+
+// ShareModeAllows는 이 GPU 모드의 세션이 그 노드(공유 전략 라벨 값)에 배치될 수 있는지 판정한다.
+// 위 shareModeReqs 가 파드에 굽는 required affinity 와 반드시 같은 답을 내야 한다.
+//
+// 스케줄 전에 노드를 골라 하드 핀하는 쪽(데이터셋 로컬 캐시)이 이 판정을 건너뛰면, 핀과 affinity 가
+// 서로를 배제해 어떤 노드도 만족하지 못하는 영구 Pending 이 된다. 전용 세션을 HAMi 노드에 핀하는 경우다.
+// 라벨이 없는 노드는 전용으로 취급한다(shareModeReqs 의 NotIn 이 무라벨 노드를 매칭하는 것과 같다).
+func ShareModeAllows(gpuMode, nodeShareMode string) bool {
+	switch gpuMode {
+	case GpuModeTimeslice:
+		return nodeShareMode == shareTimeslicing
+	case GpuModeExclusive:
+		return nodeShareMode != shareTimeslicing && nodeShareMode != shareHami
+	case GpuModeShared:
+		return nodeShareMode == shareHami
+	}
+	return true // CPU 전용이나 모드 미지정은 배치 제약이 없다
 }
 
 // nodeAffinity는 이미지 캐시 노드 소프트 선호(prefer) + 데이터셋 로컬캐시 하드 핀(require)
