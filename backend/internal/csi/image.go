@@ -125,7 +125,10 @@ func (s *ImageStore) loopDevice(ctx context.Context, volumeID string) (string, e
 
 // Mount는 이미지를 루프로 붙여 마운트 지점에 올린다(멱등). 이미 마운트돼 있으면 그대로 둔다.
 // discard 를 켜서 이미지 안에서 파일을 지우면 백업 파일에 구멍이 뚫려 실제 공간이 회수된다.
-func (s *ImageStore) Mount(ctx context.Context, volumeID string, uid int) (string, error) {
+//
+// 소유권은 건드리지 않는다. 세션이 비-root 라 홈이 세션 UID 소유여야 하지만, 그건
+// CSIDriver fsGroupPolicy 를 통해 kubelet 이 파드의 fsGroup 으로 맞춰 준다.
+func (s *ImageStore) Mount(ctx context.Context, volumeID string) (string, error) {
 	mnt := s.mountPath(volumeID)
 	if err := os.MkdirAll(mnt, 0o755); err != nil {
 		return "", err
@@ -136,16 +139,6 @@ func (s *ImageStore) Mount(ctx context.Context, volumeID string, uid int) (strin
 	}
 	if !mounted {
 		if _, err := run(ctx, "mount", "-o", "loop,discard", s.imagePath(volumeID), mnt); err != nil {
-			return "", err
-		}
-	}
-	// 세션은 비-root 로 돌아가므로 마운트 루트를 세션 UID 소유로 만든다. 매 마운트마다
-	// 확인하는 이유는 UID 가 바뀐 채 같은 이미지를 재사용하는 경우(재할당)를 덮기 위함이다.
-	if uid > 0 {
-		if err := os.Chown(mnt, uid, uid); err != nil {
-			return "", err
-		}
-		if err := os.Chmod(mnt, 0o700); err != nil {
 			return "", err
 		}
 	}

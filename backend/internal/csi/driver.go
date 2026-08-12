@@ -25,13 +25,6 @@ const Version = "0.1.0"
 // PV 의 nodeAffinity 로 이 제약을 보고 파드를 같은 노드에 배치한다.
 const TopologyKey = "topology." + DriverName + "/node"
 
-// 볼륨 파라미터(StorageClass parameters 로 전달).
-const (
-	// ParamUID는 마운트 루트를 소유할 UID. 세션은 비-root 로 돌아 이게 없으면 쓰지 못한다.
-	// PVC 어노테이션에서 온 값이 CreateVolume 의 파라미터로 넘어온다.
-	ParamUID = DriverName + "/uid"
-)
-
 // Driver는 노드 플러그인과 컨트롤러 플러그인을 같은 바이너리로 제공한다.
 // 실행 모드는 NodeID 유무로 갈린다(노드 플러그인만 NodeID 를 받는다).
 type Driver struct {
@@ -186,12 +179,12 @@ func (d *Driver) NodePublishVolume(ctx context.Context, req *csi.NodePublishVolu
 	if size <= 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "볼륨 %s 의 크기를 알 수 없습니다", volID)
 	}
-	uid := atoiDefault(req.GetVolumeContext()[ParamUID], 0)
-
 	if err := d.Store.EnsureImage(ctx, volID, size); err != nil {
 		return nil, status.Errorf(codes.Internal, "이미지 준비 실패: %v", err)
 	}
-	src, err := d.Store.Mount(ctx, volID, uid)
+	// 소유권은 여기서 손대지 않는다. CSIDriver fsGroupPolicy=File 이라 kubelet 이
+	// 파드의 fsGroup(세션 UID)으로 맞춰 준다.
+	src, err := d.Store.Mount(ctx, volID)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "이미지 마운트 실패: %v", err)
 	}

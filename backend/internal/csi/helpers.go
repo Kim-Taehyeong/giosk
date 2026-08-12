@@ -17,12 +17,3 @@ func volumeSize(ctx map[string]string) int64 {
 	}
 	return n
 }
-
-// atoiDefault는 정수 문자열을 파싱하되 실패하면 기본값을 쓴다.
-func atoiDefault(s string, def int) int {
-	n, err := strconv.Atoi(s)
-	if err != nil {
-		return def
-	}
-	return n
-}

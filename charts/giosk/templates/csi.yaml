@@ -21,6 +21,10 @@ spec:
   podInfoOnMount: false
   volumeLifecycleModes: [Persistent]
   storageCapacity: false
+  # 세션은 비-root 로 돌기 때문에 홈의 소유권이 세션 UID 여야 쓸 수 있다. 파드가 이미
+  # fsGroup 을 세션 UID 로 설정하므로, kubelet 이 그 값으로 볼륨 소유권을 맞추게 한다.
+  # 드라이버가 UID 를 따로 전달받아 chown 하는 것보다 표준 경로라 어긋날 여지가 적다.
+  fsGroupPolicy: File
 ---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass

@@ -33,7 +33,7 @@ func TestCreateVolumeCarriesNodeAndSize(t *testing.T) {
 	resp, err := d.CreateVolume(context.Background(), &csi.CreateVolumeRequest{
 		Name:          "vol-1",
 		CapacityRange: &csi.CapacityRange{RequiredBytes: size},
-		Parameters:    map[string]string{ParamUID: "100001"},
+		Parameters:    map[string]string{"foo": "bar"},
 		AccessibilityRequirements: &csi.TopologyRequirement{
 			Preferred: []*csi.Topology{{Segments: map[string]string{TopologyKey: "gpu2-1"}}},
 		},
@@ -49,7 +49,7 @@ func TestCreateVolumeCarriesNodeAndSize(t *testing.T) {
 	if vc[ParamSize] != strconv.FormatInt(size, 10) {
 		t.Errorf("크기가 VolumeContext 에 실리지 않았다: %q", vc[ParamSize])
 	}
-	if vc[ParamUID] != "100001" {
+	if vc["foo"] != "bar" {
 		t.Errorf("StorageClass 파라미터가 전달되지 않았다: %+v", vc)
 	}
 }
