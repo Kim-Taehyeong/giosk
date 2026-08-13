@@ -694,7 +694,10 @@
     "changeTeam": "Change team",
     "sharedBy": "Shared by",
     "changeTeamTitle": "Change team — {{name}}",
-    "teamHint": "This volume's capacity quota and storage credits come from the selected team. You remain the owner."
+    "teamHint": "This volume's capacity quota and storage credits come from the selected team. You remain the owner.",
+    "sessionHomes": "Session homes",
+    "sessionHomesHint": "One home (/home/work) per session. It is reclaimed only when the session is deleted, and it draws on the same storage allowance as volumes.",
+    "quotaBreakdown": "Volumes {{vol}} GB, session homes {{home}} GB"
   },
   "gmembers": {
     "title": "Members",

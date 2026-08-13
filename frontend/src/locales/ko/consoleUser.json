@@ -694,7 +694,10 @@
     "changeTeam": "팀 변경",
     "sharedBy": "공유자",
     "changeTeamTitle": "귀속 팀 변경 — {{name}}",
-    "teamHint": "이 볼륨의 용량 쿼터와 스토리지 크레딧이 선택한 팀에서 나갑니다. 소유는 그대로 본인입니다."
+    "teamHint": "이 볼륨의 용량 쿼터와 스토리지 크레딧이 선택한 팀에서 나갑니다. 소유는 그대로 본인입니다.",
+    "sessionHomes": "세션 홈",
+    "sessionHomesHint": "세션마다 하나씩 생기는 홈(/home/work)입니다. 세션을 지워야 회수되며, 볼륨과 같은 저장공간 할당량에서 나갑니다.",
+    "quotaBreakdown": "볼륨 {{vol}} GB, 세션 홈 {{home}} GB"
   },
   "gmembers": {
     "title": "멤버 관리",

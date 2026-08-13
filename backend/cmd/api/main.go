@@ -68,9 +68,9 @@ func main() {
 
 	// K8s 클라이언트. 미가용이면 nil 이고 gpu-types 같은 건 빈 결과를 준다.
 	kc, _ := k8s.New(cfg.K8s.Kubeconfig, cfg.K8s.GpuTypeLabel)
-	kc.WithPhysicalLabel(cfg.PhysicalNodes.Label) // 물리노드 식별 라벨(멀티 인스턴스 격리)
-	kc.WithCudaLabel(cfg.K8s.CudaLabel)           // 노드 CUDA(드라이버) 버전 라벨(GFD)
-	kc.WithNFSFuse(cfg.K8s.NFSFuse, cfg.K8s.NFSFuseAttrTimeoutSec)               // 공유 NFS 볼륨을 CSI(FUSE)로 붙여 스토리지 주소를 감춘다
+	kc.WithPhysicalLabel(cfg.PhysicalNodes.Label)                  // 물리노드 식별 라벨(멀티 인스턴스 격리)
+	kc.WithCudaLabel(cfg.K8s.CudaLabel)                            // 노드 CUDA(드라이버) 버전 라벨(GFD)
+	kc.WithNFSFuse(cfg.K8s.NFSFuse, cfg.K8s.NFSFuseAttrTimeoutSec) // 공유 NFS 볼륨을 CSI(FUSE)로 붙여 스토리지 주소를 감춘다
 	if kc.Available() {
 		log.Printf("k8s connected (gpu-type label=%s)", cfg.K8s.GpuTypeLabel)
 	} else {
@@ -144,10 +144,21 @@ func main() {
 	sessionSvc.WithMemBurst(cfg.Quota.MemBurst)                                       // 메모리 limit 배수. 노드 RAM 고갈로 남의 세션이 축출되는 걸 막는다
 	// 세션 홈이 이미지 기반이라 실제로 디스크를 예약하므로 볼륨과 같은 쿼터에서 센다.
 	sessionSvc.WithVolumeUsage(volumeSvc.AllocatedGiB)
+	// 같은 쿼터를 쓰는 만큼 볼륨 화면에도 세션 홈이 내역으로 보여야 한다.
+	volumeSvc.WithSessionHomes(func(userID int64) []volume.SessionHome {
+		rows := sessionSvc.HomeUsages(userID)
+		out := make([]volume.SessionHome, 0, len(rows))
+		for _, r := range rows {
+			out = append(out, volume.SessionHome{
+				InstanceID: r.InstanceID, Name: r.Name, Node: r.Node, Phase: r.Phase, SizeGiB: r.SizeGiB,
+			})
+		}
+		return out
+	})
 	// 세션 파드 이그레스 제한. 사용자가 임의 코드를 돌리는 곳이라 사내망(스토리지 NFS·노드·API·다른 클러스터)
 	// 접근을 막는다. 볼륨 마운트는 kubelet 이 하므로 영향받지 않는다.
 	sessionSvc.WithSessionEgress(cfg.K8s.SessionEgressDenyCIDRs, cfg.K8s.SessionEgressAllowCIDRs, cfg.K8s.DNSServiceIP)
-	sessionSvc.WithHomeReap(func() int {                                              // 방치 중단 세션 홈 회수. 운영 정책이라 라이브로 읽는다
+	sessionSvc.WithHomeReap(func() int { // 방치 중단 세션 홈 회수. 운영 정책이라 라이브로 읽는다
 		return cfgStore.IntOr(systemconfig.KeyStoppedTTLDays, cfg.Quota.StoppedTTLDays)
 	})
 	// 가용성 관문. 자리가 없으면 생성과 재시작을 모두 거절한다(대기열 없음).

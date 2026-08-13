@@ -52,16 +52,31 @@ type LocalHome struct {
 	Name string `json:"name"`
 }
 
-// ListRes는 /volumes 응답(owned, shared, 로컬 Home, quota).
-type ListRes struct {
-	Owned      []Volume    `json:"owned"`
-	Shared     []Volume    `json:"shared"`
-	LocalHomes []LocalHome `json:"localHomes"`
-	Quota      Quota       `json:"quota"`
+// SessionHome은 세션이 잡고 있는 홈 용량 한 건이다. 홈은 볼륨과 같은 저장공간 할당량에서
+// 세어지므로 볼륨 목록과 나란히 보여야 한다. 그렇지 않으면 사용자는 만든 적 없는 용량이
+// 할당량에서 빠져 있는 것으로 보게 된다.
+type SessionHome struct {
+	InstanceID string `json:"instanceId"`
+	Name       string `json:"name"`
+	Node       string `json:"node"`
+	Phase      string `json:"phase"`
+	SizeGiB    int    `json:"sizeGib"`
 }
 
+// ListRes는 /volumes 응답(owned, shared, 로컬 Home, 세션 홈, quota).
+type ListRes struct {
+	Owned        []Volume      `json:"owned"`
+	Shared       []Volume      `json:"shared"`
+	LocalHomes   []LocalHome   `json:"localHomes"`
+	SessionHomes []SessionHome `json:"sessionHomes"`
+	Quota        Quota         `json:"quota"`
+}
+
+// Quota의 AllocatedGB는 볼륨과 세션 홈을 합친 값이다(강제 기준과 같아야 한다).
+// HomeGB는 그중 세션 홈 몫으로, 화면에서 내역을 나눠 보여 주는 데 쓴다.
 type Quota struct {
 	AllocatedGB int `json:"allocatedGb"`
+	HomeGB      int `json:"homeGb"`
 	TotalGB     int `json:"totalGb"`
 }
 

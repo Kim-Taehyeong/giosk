@@ -59,6 +59,10 @@ type Service struct {
 	charger          Charger          // 스토리지 과금(nil=비크레딧 모드=미과금)
 	pricePerGiBMonth int              // GiB·월 크레딧 단가(설치 기본; 런타임 미설정 시 폴백)
 	priceFn          func() int       // 라이브 단가(런타임 조정 반영; nil=pricePerGiBMonth 사용)
+	// homesFn은 사용자의 세션 홈 내역을 돌려준다(nil 이면 없음).
+	// 세션 홈은 같은 저장공간 할당량에서 강제되므로 여기서도 같이 세지 않으면
+	// 화면의 남은 용량이 실제로 만들 수 있는 양보다 크게 나온다.
+	homesFn func(userID int64) []SessionHome
 }
 
 func NewService(repo Repository, prov Provisioner, storageClass, nsPrefix string, totalGiB int) *Service {
@@ -67,6 +71,12 @@ func NewService(repo Repository, prov Provisioner, storageClass, nsPrefix string
 
 // WithMetrics는 실사용량 조회용 Prometheus 클라이언트를 주입한다.
 func (s *Service) WithMetrics(m *metrics.Client) *Service { s.met = m; return s }
+
+// WithSessionHomes는 세션 홈 내역 조회를 주입한다(session 서비스가 제공).
+func (s *Service) WithSessionHomes(fn func(userID int64) []SessionHome) *Service {
+	s.homesFn = fn
+	return s
+}
 
 // WithLocalHome은 물리노드 활성 여부에 따라 로컬 Home 특수 볼륨 노출을 켠다.
 func (s *Service) WithLocalHome(on bool) *Service { s.localHomeOn = on; return s }
@@ -95,6 +105,18 @@ func (s *Service) monthlyCost(sizeGiB int) int { return sizeGiB * s.price() }
 // 세션 홈이 같은 쿼터에서 세어지므로 세션 쪽에서 이 값을 참조한다.
 func (s *Service) AllocatedGiB(userID int64) int {
 	n, _ := s.repo.AllocatedGiB(userID)
+	return n
+}
+
+// homeUsedGiB는 사용자의 세션 홈 합계(주입 안 됐으면 0).
+func (s *Service) homeUsedGiB(userID int64) int {
+	if s.homesFn == nil {
+		return 0
+	}
+	n := 0
+	for _, h := range s.homesFn(userID) {
+		n += h.SizeGiB
+	}
 	return n
 }
 
@@ -147,7 +169,18 @@ func (s *Service) List(userID int64) (*ListRes, error) {
 	// 돌려준다(실측: 50Gi PVC 가 capacity 97.87GiB). 예전엔 그 값을 볼륨 사용량으로 표시해
 	// "50/10 GB" 같은 거짓 수치가 나왔다. 실제 사용량은 NFS 하위 디렉터리 du 가 필요(미구현).
 	alloc, _ := s.repo.AllocatedGiB(userID)
-	return &ListRes{Owned: owned, Shared: shared, LocalHomes: s.localHomes(userID), Quota: Quota{AllocatedGB: alloc, TotalGB: s.quotaFor(userID)}}, nil
+	var homes []SessionHome
+	homeGB := 0
+	if s.homesFn != nil {
+		homes = s.homesFn(userID)
+		for _, h := range homes {
+			homeGB += h.SizeGiB
+		}
+	}
+	return &ListRes{
+		Owned: owned, Shared: shared, LocalHomes: s.localHomes(userID), SessionHomes: homes,
+		Quota: Quota{AllocatedGB: alloc + homeGB, HomeGB: homeGB, TotalGB: s.quotaFor(userID)},
+	}, nil
 }
 
 // StorageOverview는 관리자 스토리지 현황(노드 디스크, NFS 실용량, 사용자별 할당).
@@ -237,6 +270,9 @@ func (s *Service) Create(ctx context.Context, userID, groupID int64, req CreateR
 		alloc, _ = s.repo.AllocatedGiBInTeam(userID, groupID)
 	} else {
 		alloc, _ = s.repo.AllocatedGiB(userID)
+		// 세션 홈도 같은 사용자 할당량에서 세어진다(세션 생성 쪽 검사와 같은 기준).
+		// 팀 귀속 볼륨은 팀 합계로 보는데, 홈은 팀에 귀속되지 않아 개인 기준일 때만 더한다.
+		alloc += s.homeUsedGiB(userID)
 	}
 	if alloc+req.SizeGiB > s.quotaForTeam(userID, groupID) {
 		return nil, ErrQuotaExceeded

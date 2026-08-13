@@ -87,6 +87,11 @@ export default function Volumes() {
           <span className="muted">{t('volume.remain', { n: remainGb })}</span>
         </div>
         <Bar value={quota.allocatedGb} max={quota.totalGb} variant={remainGb < quota.totalGb * 0.15 ? 'warn' : 'gpu'} />
+        {/* 세션 홈도 같은 할당량에서 나간다. 내역을 나눠 주지 않으면 만든 적 없는 용량이
+            빠져 있는 것으로 보인다. */}
+        {quota.homeGb > 0 && (
+          <div className="legend mt">{t('volume.quotaBreakdown', { vol: quota.allocatedGb - quota.homeGb, home: quota.homeGb })}</div>
+        )}
         <div className="legend mt">{t('volume.quotaHint')}</div>
       </div>
 
@@ -160,6 +165,23 @@ export default function Volumes() {
           ]}
         />
       </div>
+
+      {(data.sessionHomes?.length > 0) && (
+        <div className="card mt">
+          <h3><HardDrive size={16} /> {t('volume.sessionHomes')}</h3>
+          <div className="legend mb">{t('volume.sessionHomesHint')}</div>
+          <DataTable
+            rows={data.sessionHomes}
+            rowKey={(r) => r.instanceId}
+            columns={[
+              { key: 'name', header: t('volume.name'), render: (r) => <span style={{ fontWeight: 600 }}>{r.name || r.instanceId}</span> },
+              { key: 'node', header: t('volume.node'), render: (r) => (r.node ? <span className="mono">{r.node}</span> : <span className="muted">—</span>) },
+              { key: 'phase', header: t('volume.perm'), render: (r) => <Pill variant={r.phase === 'running' ? 'ok' : 'pause'}>{r.phase}</Pill> },
+              { key: 'size', header: t('volume.usage'), render: (r) => <div style={{ minWidth: 90, fontWeight: 600 }}>{r.sizeGib} GB</div> },
+            ]}
+          />
+        </div>
+      )}
 
       {(data.localHomes?.length > 0) && (
         <div className="card mt">

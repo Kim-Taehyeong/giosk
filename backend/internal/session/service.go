@@ -2591,3 +2591,35 @@ func (s *Service) namespaceOf(sess *Session) string {
 	}
 	return fmt.Sprintf("%suser-%d", s.nsPrefix, sess.UserID)
 }
+
+// HomeUsage는 세션 하나가 붙들고 있는 홈 용량이다. 볼륨 화면에서 저장공간 할당량이
+// 어디에 쓰였는지 보여 주는 데 쓴다. 홈은 볼륨과 같은 쿼터에서 세면서도 볼륨 목록에는
+// 없어서, 사용자 눈에는 쓴 적 없는 용량이 사라진 것처럼 보였다.
+type HomeUsage struct {
+	InstanceID string `json:"instanceId"`
+	Name       string `json:"name"`
+	Node       string `json:"node"`
+	Phase      string `json:"phase"`
+	SizeGiB    int    `json:"sizeGib"`
+}
+
+// HomeUsages는 사용자의 살아있는 세션 홈 내역이다. 합계는 쿼터 검사(checkHomeQuota)와
+// 같은 기준이어야 하므로 물리(SSH) 임대는 빼고 phase 로도 거르지 않는다. 홈은 세션을
+// 지워야 사라지기 때문이다.
+func (s *Service) HomeUsages(userID int64) []HomeUsage {
+	rows, err := s.repo.ListByUser(userID, 0)
+	if err != nil {
+		return nil
+	}
+	out := make([]HomeUsage, 0, len(rows))
+	for _, r := range rows {
+		if r.Env == "ssh" {
+			continue
+		}
+		out = append(out, HomeUsage{
+			InstanceID: r.InstanceID, Name: r.Name, Node: r.Node,
+			Phase: r.Phase, SizeGiB: s.homeGiBOf(&r),
+		})
+	}
+	return out
+}
