@@ -218,6 +218,9 @@ export default function NewSession() {
   const [vols, setVols] = useState({ owned: [], shared: [], localHomes: [] });
   const [selVols, setSelVols] = useState([]); // [{ id, name, mountPath, perm }]
   const [localHomeNode, setLocalHomeNode] = useState(''); // 로컬 Home 선택(빈값=노드 로컬 임시 home, 영속은 ~/nfs)
+  // 홈 용량(GiB). 홈은 이미지 기반이라 이 값이 실제 파일시스템 크기이자 저장공간 쿼터 차감분이다.
+  // 빈 문자열이면 설치 기본값을 쓴다(서버가 판단).
+  const [homeGib, setHomeGib] = useState('');
   const [selNode, setSelNode] = useState('auto'); // 데이터셋 고급 선택에서 실제 노드를 지정한다
   const [selDs, setSelDs] = useState([]); // 선택한 캐시 데이터셋명
   const [name, setName] = useState('');
@@ -470,6 +473,7 @@ export default function NewSession() {
         cpuCores: dc.cpu,
         memGb: dc.memGb,
         volumes: selVols.map((v) => ({ id: v.id, mountPath: v.mountPath })),
+        homeGib: Number(homeGib) > 0 ? Number(homeGib) : undefined, // 미지정이면 서버 기본값
         node: selNode && selNode !== 'auto' ? selNode : undefined, // 데이터셋 노드 picker 선택 = 실행 노드 하드 핀
         localHomeNode: localHomeNode || undefined, // 선택 시 그 노드 로컬 디스크 home 을 /home/work 로(노드 핀)
         datasets: [], // 데이터셋은 서버가 승인된 전체를 자동 마운트
@@ -725,6 +729,14 @@ export default function NewSession() {
               <div>
                 <h3>{t('newSession.pickVolume')} <span className="muted">{t('newSession.volumeOptional')}</span></h3>
                 <div className="legend mb">{t('newSession.homeModelHint')}</div>
+                <HomeSizeField
+                  t={t}
+                  value={homeGib}
+                  onChange={setHomeGib}
+                  defaultGib={config.storage?.sessionHomeGib}
+                  quota={vols.quota}
+                  disabled={!!localHomeNode}
+                />
                 <VolumePicker t={t} vols={vols} selVols={selVols} toggleVol={toggleVol} setMount={setMount} localHomeNode={localHomeNode} setLocalHomeNode={setLocalHomeNode} />
               </div>
             )}
@@ -782,6 +794,44 @@ export default function NewSession() {
 }
 
 // 볼륨 선택. 컨테이너와 SSH 가 함께 쓰며 NFS 기반 볼륨을 마운트한다.
+// HomeSizeField는 세션 홈(/home/work) 용량 입력이다.
+//
+// 홈은 이미지 기반이라 여기 적은 숫자가 실제 파일시스템 크기가 된다. 넘겨 쓰면 세션이
+// 죽는 게 아니라 "디스크 가득 참"이 나므로, 남은 저장공간 안에서 정하도록 잔여량을 함께 보여준다.
+// 로컬 Home(물리노드)을 고르면 그 노드 디스크를 직접 쓰므로 이 값이 적용되지 않는다.
+function HomeSizeField({ t, value, onChange, defaultGib, quota, disabled }) {
+  const remain = quota && quota.totalGb > 0 ? Math.max(0, quota.totalGb - quota.allocatedGb) : null;
+  const num = Number(value);
+  const over = remain !== null && num > 0 && num > remain;
+  return (
+    <div className="mb">
+      <label className="fld" htmlFor="user-newsession-home-gib" style={{ marginTop: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+        <HardDrive size={13} /> {t('newSession.homeSize')}
+      </label>
+      <input
+        id="user-newsession-home-gib"
+        type="number"
+        min="1"
+        inputMode="numeric"
+        value={value}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={defaultGib ? String(defaultGib) : ''}
+        aria-describedby="user-newsession-home-gib-hint"
+      />
+      <div id="user-newsession-home-gib-hint" className="legend" style={{ marginTop: 6 }}>
+        {disabled
+          ? t('newSession.homeSizeLocalHome')
+          : over
+            ? t('newSession.homeSizeOver', { remain })
+            : remain !== null
+              ? t('newSession.homeSizeHint', { remain })
+              : t('newSession.homeSizeHintNoQuota')}
+      </div>
+    </div>
+  );
+}
+
 function VolumePicker({ t, vols, selVols, toggleVol, setMount, localHomeNode, setLocalHomeNode }) {
   const groups = [
     { label: t('newSession.volMine'), list: vols.owned },

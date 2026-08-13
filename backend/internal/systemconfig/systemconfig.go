@@ -99,6 +99,9 @@ func (h *Handler) Config(c *gin.Context) {
 		},
 		"storage": gin.H{
 			"pricePerGiBMonth": storagePrice, // 스토리지 크레딧 단가(GiB·월). 런타임 조정 가능. 0=무료
+			// 세션 홈 기본 용량(GiB). 사용자가 세션마다 조정할 수 있고, 이 값이 그 기본이다.
+			// 홈은 이미지 기반이라 이 숫자가 실제 파일시스템 크기이자 볼륨 쿼터 차감분이다.
+			"sessionHomeGib": cfg.Storage.SessionHomeGiB,
 		},
 	})
 }

@@ -317,7 +317,12 @@
     "notEnough": "크레딧 부족 — 최소 1시간치 필요",
     "tsSlotN": "슬롯 1개 / {{n}}",
     "sshKeyChange": "변경",
-    "sshCacheCount": "캐시 {{n}}개"
+    "sshCacheCount": "캐시 {{n}}개",
+    "homeSize": "홈 용량 (GiB)",
+    "homeSizeHint": "세션 홈(~)의 크기입니다. 비워 두면 기본값을 씁니다. 저장공간 할당량에서 함께 차감되며 남은 용량은 {{remain}}GiB 입니다.",
+    "homeSizeHintNoQuota": "세션 홈(~)의 크기입니다. 비워 두면 기본값을 씁니다.",
+    "homeSizeOver": "남은 저장공간({{remain}}GiB)을 넘습니다. 크기를 줄이거나 쓰지 않는 볼륨·세션을 정리하세요.",
+    "homeSizeLocalHome": "로컬 Home 을 선택하면 그 물리노드의 디스크를 직접 쓰므로 이 값이 적용되지 않습니다."
   },
   "session": {
     "title": "세션",
