@@ -32,7 +32,7 @@ echo "이미지 태그: $TAG"
 # 이미지가 실제로 올라와 있는지 먼저 본다. 없으면 파드가 ImagePullBackOff 로 죽는다.
 # (main push 후 GitHub Actions build-images 가 끝나야 존재한다.)
 owner=$(git remote get-url origin | sed -E 's#.*[/:]([^/]+)/[^/]+(\.git)?$#\1#' | tr 'A-Z' 'a-z')
-for img in api frontend; do
+for img in api frontend csi; do
   repo="$owner/giosk-$img"
   tok=$(curl -fsSL "https://ghcr.io/token?scope=repository:$repo:pull" | sed 's/.*"token":"\([^"]*\)".*/\1/')
   curl -fsSI -o /dev/null -H "Authorization: Bearer $tok" \
@@ -47,6 +47,7 @@ helm upgrade "$RELEASE" charts/giosk -n "$NS" -f "$VALUES" \
   --set image.nodeAgent.tag="$TAG" \
   --set image.gateway.tag="$TAG" \
   --set image.sshd.tag="$TAG" \
+  --set image.csi.tag="$TAG" \
   --wait --timeout "${TIMEOUT:-10m}"
 
 # 무엇이 도는지 이미지 태그로 확인한다. 파드 라벨은 app=giosk-<컴포넌트> 라 이름으로 거른다.

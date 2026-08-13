@@ -3,6 +3,8 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"log"
+	"time"
 
 	"strconv"
 
@@ -71,6 +73,13 @@ func (c *Client) EnsureSharedNFSPVC(ctx context.Context, s SharedNFSSpec) error 
 			ClaimRef:                      &corev1.ObjectReference{Namespace: s.Namespace, Name: s.Name},
 		},
 	}
+	// 붙이는 방식이 바뀌었는데 PV 가 예전 방식으로 남아 있으면 갈아 끼운다. 정적 PV 는 이름으로
+	// 재사용되므로 그냥 두면 영원히 옛 방식으로 붙는다. 실제로 NFS 직접 마운트에서 FUSE 로
+	// 바꾼 뒤에도 예전 PV 를 쓰는 데이터셋만 컨테이너에 스토리지 주소가 그대로 보였다.
+	// 데이터는 손대지 않는다. 회수 정책이 Retain 이고 원격 디렉터리는 건드리지 않는다.
+	if err := c.replaceStaleSharedPV(ctx, pvName, s.Namespace, s.Name, pv.Spec.PersistentVolumeSource); err != nil {
+		return err
+	}
 	if _, err := c.cs.CoreV1().PersistentVolumes().Create(ctx, pv, metav1.CreateOptions{}); err != nil && !apierrors.IsAlreadyExists(err) {
 		return err
 	}
@@ -138,4 +147,55 @@ func (c *Client) DeleteSharedNFSPVC(ctx context.Context, ns, name string) error 
 		return err
 	}
 	return nil
+}
+
+// replaceStaleSharedPV는 기존 PV 의 붙이는 방식이 지금 방식과 다르면 PVC 와 함께 지운다.
+// 쓰고 있는 파드가 있으면 건드리지 않는다. 실행 중인 세션의 마운트를 뽑는 것보다 다음 세션까지
+// 옛 방식으로 붙는 편이 낫다. 세션이 끝나면 다음 생성에서 갈린다.
+func (c *Client) replaceStaleSharedPV(ctx context.Context, pvName, ns, pvcName string, want corev1.PersistentVolumeSource) error {
+	cur, err := c.cs.CoreV1().PersistentVolumes().Get(ctx, pvName, metav1.GetOptions{})
+	if err != nil {
+		return nil // 없으면 새로 만들면 된다. 조회 실패로 생성을 막지 않는다.
+	}
+	if sameVolumeKind(cur.Spec.PersistentVolumeSource, want) {
+		return nil
+	}
+	used, err := c.pvcInUse(ctx, ns, pvcName)
+	if err != nil || used {
+		return nil
+	}
+	log.Printf("[k8s] 공유 볼륨 %s 를 지금 방식으로 다시 만든다(예전 PV 교체)", pvName)
+	_ = c.cs.CoreV1().PersistentVolumeClaims(ns).Delete(ctx, pvcName, metav1.DeleteOptions{})
+	if err := c.cs.CoreV1().PersistentVolumes().Delete(ctx, pvName, metav1.DeleteOptions{}); err != nil && !apierrors.IsNotFound(err) {
+		return err
+	}
+	// PV 는 PVC 가 정리될 때까지 Terminating 으로 남는다. 사라진 뒤에 만들어야 이름이 겹치지 않는다.
+	for i := 0; i < 30; i++ {
+		if _, err := c.cs.CoreV1().PersistentVolumes().Get(ctx, pvName, metav1.GetOptions{}); apierrors.IsNotFound(err) {
+			return nil
+		}
+		time.Sleep(time.Second)
+	}
+	return fmt.Errorf("공유 볼륨 %s 가 아직 삭제되지 않았다", pvName)
+}
+
+// sameVolumeKind는 두 볼륨 소스가 같은 방식(CSI 인지 NFS 직접인지)인지 본다.
+func sameVolumeKind(a, b corev1.PersistentVolumeSource) bool {
+	return (a.CSI != nil) == (b.CSI != nil) && (a.NFS != nil) == (b.NFS != nil)
+}
+
+// pvcInUse는 그 네임스페이스에 이 PVC 를 마운트한 파드가 있는지 본다.
+func (c *Client) pvcInUse(ctx context.Context, ns, pvcName string) (bool, error) {
+	pods, err := c.cs.CoreV1().Pods(ns).List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return false, err
+	}
+	for _, p := range pods.Items {
+		for _, v := range p.Spec.Volumes {
+			if v.PersistentVolumeClaim != nil && v.PersistentVolumeClaim.ClaimName == pvcName {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
 }
