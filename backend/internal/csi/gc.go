@@ -72,27 +72,38 @@ func (g *GC) sweep(ctx context.Context) error {
 		}
 	}
 
-	ids, err := g.Store.ListVolumeIDs()
+	// 이 노드가 들고 있는 것 두 종류를 모두 본다. 로컬 이미지(세션 홈)와 NFS 스테이지(FUSE 볼륨).
+	// 스테이지를 빼먹으면 세션이 사라져도 노드에 NFS 마운트가 계속 쌓인다.
+	imgs, err := g.Store.ListVolumeIDs()
 	if err != nil {
 		return err
 	}
-	next := map[string]bool{}
-	for _, id := range ids {
-		if live[id] {
-			continue
-		}
-		if !g.suspects[id] {
-			// 처음 보는 고아는 한 번 더 확인하고 지운다.
-			next[id] = true
-			continue
-		}
-		if err := g.Store.Delete(ctx, id); err != nil {
-			log.Printf("이미지 %s 회수 실패: %v", id, err)
-			next[id] = true // 다음 주기에 재시도
-			continue
-		}
-		log.Printf("고아 이미지 회수: %s (PV 없음)", id)
+	stages, err := g.Store.ListStageIDs()
+	if err != nil {
+		return err
 	}
+
+	next := map[string]bool{}
+	sweep := func(ids []string, kind string, del func(string) error) {
+		for _, id := range ids {
+			if live[id] {
+				continue
+			}
+			if !g.suspects[kind+id] {
+				// 처음 보는 고아는 한 번 더 확인하고 지운다.
+				next[kind+id] = true
+				continue
+			}
+			if err := del(id); err != nil {
+				log.Printf("%s %s 회수 실패: %v", kind, id, err)
+				next[kind+id] = true // 다음 주기에 재시도
+				continue
+			}
+			log.Printf("고아 %s 회수: %s (PV 없음)", kind, id)
+		}
+	}
+	sweep(imgs, "이미지", func(id string) error { return g.Store.Delete(ctx, id) })
+	sweep(stages, "NFS 스테이지", func(id string) error { return g.Store.DeleteStage(ctx, id) })
 	g.suspects = next
 	return nil
 }

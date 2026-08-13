@@ -4,6 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"strconv"
+
+	"giosk/internal/csi"
+
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -63,10 +67,8 @@ func (c *Client) EnsureSharedNFSPVC(ctx context.Context, s SharedNFSSpec) error 
 			AccessModes:                   []corev1.PersistentVolumeAccessMode{corev1.ReadWriteMany},
 			PersistentVolumeReclaimPolicy: corev1.PersistentVolumeReclaimRetain,
 			StorageClassName:              static,
-			PersistentVolumeSource: corev1.PersistentVolumeSource{
-				NFS: &corev1.NFSVolumeSource{Server: s.NFSServer, Path: s.NFSPath},
-			},
-			ClaimRef: &corev1.ObjectReference{Namespace: s.Namespace, Name: s.Name},
+			PersistentVolumeSource:        c.sharedVolumeSource(pvName, s),
+			ClaimRef:                      &corev1.ObjectReference{Namespace: s.Namespace, Name: s.Name},
 		},
 	}
 	if _, err := c.cs.CoreV1().PersistentVolumes().Create(ctx, pv, metav1.CreateOptions{}); err != nil && !apierrors.IsAlreadyExists(err) {
@@ -91,6 +93,35 @@ func (c *Client) EnsureSharedNFSPVC(ctx context.Context, s SharedNFSSpec) error 
 		return err
 	}
 	return nil
+}
+
+// sharedVolumeSource는 이 PV 를 어떤 방식으로 붙일지 고른다.
+//
+// FUSE 가 켜져 있으면 우리 CSI 드라이버로 보낸다. 드라이버가 NFS 를 노드에서 마운트하고
+// 그 위에 FUSE 를 얹으므로, 컨테이너에는 fuse 마운트만 보이고 스토리지 주소가 남지 않는다.
+// 커널 NFS 마운트를 그대로 주면 devname 과 addr= 에 서버 주소가 찍히고, bind 로 다시 걸어도
+// 슈퍼블록이 같아 지워지지 않는다.
+//
+// 꺼져 있으면 예전대로 NFS 를 직접 붙인다(드라이버 미설치 배포).
+func (c *Client) sharedVolumeSource(pvName string, s SharedNFSSpec) corev1.PersistentVolumeSource {
+	if !c.nfsFuse {
+		return corev1.PersistentVolumeSource{
+			NFS: &corev1.NFSVolumeSource{Server: s.NFSServer, Path: s.NFSPath},
+		}
+	}
+	return corev1.PersistentVolumeSource{
+		CSI: &corev1.CSIPersistentVolumeSource{
+			Driver: csi.DriverName,
+			// 볼륨 핸들은 PV 이름과 같게 둔다. 노드 플러그인의 고아 정리가 PV 목록과
+			// 대조할 때 이 값을 쓰므로 PV 와 1:1 이어야 한다.
+			VolumeHandle: pvName,
+			VolumeAttributes: map[string]string{
+				csi.ParamNFSServer:   s.NFSServer,
+				csi.ParamNFSPath:     s.NFSPath,
+				csi.ParamAttrTimeout: strconv.Itoa(c.nfsFuseAttrSec),
+			},
+		},
+	}
 }
 
 // DeleteSharedNFSPVC는 EnsureSharedNFSPVC 로 만든 정적 PVC+PV 를 삭제한다(없어도 성공).

@@ -97,6 +97,11 @@ type K8s struct {
 	SessionEgressAllowCIDRs []string
 	// 클러스터 DNS Service IP. 이름 해석을 명시로 열어 주는 데 쓴다(비면 kube-dns 셀렉터만 사용).
 	DNSServiceIP string
+	// NFSFuse는 공유 NFS 볼륨(공유 볼륨·데이터셋)을 CSI 드라이버로 붙일지 여부다.
+	// 켜면 컨테이너에 FUSE 마운트만 보여 스토리지 주소가 남지 않는다. 드라이버가 설치된 배포에서만 켠다.
+	NFSFuse bool
+	// NFSFuseAttrTimeoutSec는 FUSE 속성 캐시 유지 시간(초). 0 이면 매번 하부에 물어본다.
+	NFSFuseAttrTimeoutSec int
 	// NVIDIA device plugin 설정 ConfigMap(GPU Operator). 지정 시 관리자가 웹에서 타임셰어링을 켜면
 	// 프로파일 upsert + 노드 라벨 부여로 즉시 반영된다. 빈값이면 자동 적용 생략(수동 운영).
 	DevicePluginConfigNS   string
@@ -285,6 +290,8 @@ func Load(lookup func(string) (string, bool)) (*Config, error) {
 			SessionEgressDenyCIDRs:  g.list("GIOSK_SESSION_EGRESS_DENY_CIDRS", []string{"10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "169.254.0.0/16"}),
 			SessionEgressAllowCIDRs: g.list("GIOSK_SESSION_EGRESS_ALLOW_CIDRS", nil),
 			DNSServiceIP:            g.str("GIOSK_DNS_SERVICE_IP", ""),
+			NFSFuse:                 g.boolv("GIOSK_NFS_FUSE", false),
+			NFSFuseAttrTimeoutSec:   g.intv("GIOSK_NFS_FUSE_ATTR_TIMEOUT_SEC", 30),
 			DevicePluginConfigNS:   g.str("GIOSK_DEVICE_PLUGIN_CONFIG_NS", ""),
 			DevicePluginConfigName: g.str("GIOSK_DEVICE_PLUGIN_CONFIG_NAME", ""),
 			Registry:               g.str("GIOSK_REGISTRY", ""),
