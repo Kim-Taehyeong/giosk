@@ -517,9 +517,6 @@
     "reclaim": {
       "stoppedTtl": "Retenção de sessões paradas",
       "stoppedTtlHint": "As sessões paradas continuam a ocupar o respetivo disco pessoal. Ultrapassado este período, tornam-se candidatas a recuperação. 0 = nunca recuperar automaticamente.",
-      "diskThreshold": "Utilização de disco para iniciar a recuperação",
-      "diskThresholdHint": "A recuperação só é executada em nós acima desta utilização de disco. Havendo espaço de sobra, as sessões paradas antigas ficam intactas.",
-      "note": "A recuperação começa pelas sessões há mais tempo inativas dos utilizadores que acumulam mais sessões paradas e para assim que o nó volta a ficar abaixo do limiar.",
       "exemptNote": "A sessão parada mais recente de cada utilizador nunca é recuperada. As sessões em execução nunca são tocadas.",
       "offNote": "A recuperação automática está desativada. As sessões paradas só são contidas pelo limite de quantidade e pela cobrança de armazenamento; quando os discos encherem, os administradores terão de limpar manualmente."
     }

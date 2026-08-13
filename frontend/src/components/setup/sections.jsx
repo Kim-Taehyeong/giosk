@@ -206,9 +206,6 @@ export function IdleSection({ config, update }) {
       <Field label={t('setup.reclaim.stoppedTtl')} hint={t('setup.reclaim.stoppedTtlHint')} w={220}>
         <NumInput value={ttl} min={0} w={140} onChange={(v) => update({ reclaim: { stoppedTtlDays: v } })} suffix={t('setup.unit.day')} />
       </Field>
-      <Field label={t('setup.reclaim.diskThreshold')} hint={t('setup.reclaim.diskThresholdHint')} w={220}>
-        <NumInput value={rc.homeReapPct ?? 88} min={50} max={99} w={140} onChange={(v) => update({ reclaim: { homeReapPct: v } })} suffix="%" />
-      </Field>
       <div className="legend" style={{ marginTop: 14, lineHeight: 1.7 }}>
         {ttl > 0 ? <>• {t('setup.reclaim.note')}<br />• {t('setup.reclaim.exemptNote')}</> : <>• {t('setup.reclaim.offNote')}</>}
       </div>

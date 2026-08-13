@@ -72,7 +72,6 @@ type Quota struct {
 	// 홈 회수 초기값. 유휴 타임아웃과 같은 운영 정책이라 런타임 설정(systemconfig)이 우선한다.
 	// 여기 값은 관리자가 아직 저장한 적 없을 때의 폴백일 뿐.
 	StoppedTTLDays int // 중단 세션이 홈 회수 후보가 되기까지의 방치 일수(0=회수 비활성)
-	HomeReapPct    int // 노드 루트 디스크 사용률 임계(%). 이 이상인 노드에서만 방치 회수를 집행한다
 }
 
 // K8s는 클러스터 연동 설정. GPU 타입은 노드 라벨에서 수집한다(운영은 GFD 라벨, 개발은 fake 라벨).
@@ -314,7 +313,6 @@ func Load(lookup func(string) (string, bool)) (*Config, error) {
 			// 88% 는 정리 DaemonSet 의 scratch(85)와 home(92) 사이다. 임시 공간을 먼저 비우고,
 			// 그래도 모자라면 세션 홈을 건드리고, 사용자 작업 홈(92)이 마지막이다.
 			StoppedTTLDays: g.intv("GIOSK_STOPPED_TTL_DAYS", 14),
-			HomeReapPct:    g.intv("GIOSK_HOME_REAP_PCT", 88),
 		},
 		PrometheusURL: g.str("GIOSK_PROMETHEUS_URL", ""),
 		SMTP: SMTP{

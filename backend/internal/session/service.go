@@ -129,7 +129,7 @@ type Service struct {
 	storagePrice func() int // 스토리지 GiB·월 단가(런타임 라이브 read). nil/0 이면 중단 세션 과금 없음.
 	// 홈 회수(T1) 조건: (방치 일수, 노드 디스크 사용률 임계%). 유휴 타임아웃과 마찬가지로
 	// 운영 중 조정되는 정책이라 매 틱 라이브 read 한다(nil=회수 비활성).
-	homeReap func() (ttlDays, thresholdPct int)
+	homeReap func() (ttlDays int)
 
 	memBurst int // 메모리 limit 배수(limit = 보장 request × 배수). 1 이하 = 상한 없음.
 
@@ -509,10 +509,10 @@ func (s *Service) WithVolumeUsage(fn func(userID int64) int) *Service {
 	return s
 }
 
-// WithHomeReap는 중단 세션 홈 회수(T1) 조건을 라이브 getter 로 주입한다.
+// WithHomeReap는 중단 세션 홈 회수(T1)의 방치 일수를 라이브 getter 로 주입한다.
 // 매 틱 다시 읽으므로 관리자가 운영 중 바꾼 값이 다음 틱부터 반영된다(재배포 불필요).
-// getter 가 (0, _) 를 주면 그 틱은 회수하지 않는다.
-func (s *Service) WithHomeReap(f func() (ttlDays, thresholdPct int)) *Service {
+// getter 가 0 을 주면 그 틱은 회수하지 않는다.
+func (s *Service) WithHomeReap(f func() (ttlDays int)) *Service {
 	s.homeReap = f
 	return s
 }

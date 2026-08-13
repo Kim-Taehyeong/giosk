@@ -1,19 +1,16 @@
 {{- /*
-노드 디스크 정리 DaemonSet.
+Scratch 정리 DaemonSet.
 
-Scratch(/scratch)와 물리 로컬 Home(<homeHostPath>/<user>)은 노드 로컬 디스크이고 사용자별 쿼터가 없다.
-(로컬 Home 쿼터 nodes.home_quota_gb 는 0032 에서 제거됐고, ~/nfs 볼륨 쿼터는 NFS 만 제한할 뿐
- 노드 디스크와 무관하다.) 방치하면 디스크가 100% → kubelet DiskPressure → 파드 축출로 노드가 빠진다.
+Scratch(/scratch)는 노드 로컬이고 사용자별 쿼터가 없다. "임시"라고 계약된 공간이라 그게
+정상이지만, 방치하면 디스크가 100% 로 차서 kubelet DiskPressure 가 걸리고 노드가 통째로
+빠진다. 그래서 임계(기본 85%)를 넘으면 atime 오래된 순으로 지워 임계 아래로 되돌린다.
+계정 폴더 구조는 남긴다. 재사용할 때 소유권과 경로가 유지돼야 하기 때문이다.
 
-정리 정책은 두 공간의 성격이 달라 임계도 다르다:
-  scratch : "임시"라고 계약된 공간 → 임계(기본 85%) 초과 시 atime 오래된 순으로 바로 삭제.
-  home    : 사용자가 SSH 로 작업하던 결과물 → 더 늦게(기본 92%) 개입하고,
-            minAgeDays 보다 최근에 접근한 파일은 건드리지 않는다(작업 중 파일 보호).
-            삭제 전에 알림센터의 disk_usage 규칙(기본 85%)이 먼저 관리자에게 울린다.
-
-정리할 공간이 있을 때만(scratch 또는 물리노드 활성) 배포한다.
+세션 홈은 여기서 다루지 않는다. 홈은 이미지 기반이라 각 세션이 자기 몫만 쓰고, 넘기면
+커널이 ENOSPC 로 막는다. 남의 파일을 지워서 공간을 만들 이유가 없어졌다.
+방치된 중단 세션 홈은 API 의 home-reaper 가 방치 일수만 보고 회수한다.
 */ -}}
-{{- if and .Values.nodeCleaner.enabled (or .Values.storage.scratch.enabled .Values.physicalNodes.enabled) }}
+{{- if and .Values.nodeCleaner.enabled .Values.storage.scratch.enabled }}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -27,20 +24,13 @@ spec:
     metadata:
       labels: { app: giosk-node-cleaner }
     spec:
-      # 정리 대상이 있는 노드에만 둔다(scratch 노드나 물리 노드).
-      # nodeSelectorTerms 는 OR 이므로 둘 중 하나만 맞아도 배치된다.
+      # scratch 가 켜진 노드에만 둔다.
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
-              {{- if .Values.storage.scratch.enabled }}
               - matchExpressions:
                   - { key: giosk.io/scratch, operator: In, values: ["true"] }
-              {{- end }}
-              {{- if .Values.physicalNodes.enabled }}
-              - matchExpressions:
-                  - { key: giosk.io/physical, operator: In, values: ["true"] }
-              {{- end }}
       tolerations:
         - operator: Exists          # 물리/전용 노드에도 배치
       containers:
@@ -52,11 +42,8 @@ spec:
             limits:   { memory: 64Mi }
           env:
             - { name: INTERVAL,          value: {{ .Values.nodeCleaner.intervalSec | quote }} }
-            - { name: SCRATCH_DIR,       value: {{ .Values.storage.scratch.enabled | ternary "/scratch" "" | quote }} }
+            - { name: SCRATCH_DIR,       value: "/scratch" }
             - { name: SCRATCH_THRESHOLD, value: {{ .Values.nodeCleaner.scratchThreshold | quote }} }
-            - { name: HOME_DIR,          value: {{ .Values.physicalNodes.enabled | ternary "/host-home" "" | quote }} }
-            - { name: HOME_THRESHOLD,    value: {{ .Values.nodeCleaner.homeThreshold | quote }} }
-            - { name: HOME_MIN_AGE_DAYS, value: {{ .Values.nodeCleaner.homeMinAgeDays | quote }} }
           command: ["/bin/sh", "-c"]
           args:
             - |
@@ -64,11 +51,11 @@ spec:
               # 사용률(%)은 대상 경로가 속한 파일시스템 기준이다.
               usage() { df -P "$1" 2>/dev/null | awk 'NR==2{gsub("%","",$5);print $5}'; }
 
-              # purge <dir> <threshold> <min_age_days>
+              # purge <dir> <threshold>
               #   임계 초과 시 atime 오래된 순으로 파일을 지워 임계 아래로 되돌린다.
-              #   디렉터리 구조(계정 폴더)는 보존한다. 재대여할 때 소유권과 경로가 유지돼야 하기 때문이다.
+              #   디렉터리 구조(계정 폴더)는 보존한다. 재사용할 때 소유권과 경로가 유지돼야 하기 때문이다.
               purge() {
-                dir="$1"; th="$2"; min_age="$3"
+                dir="$1"; th="$2"
                 [ -n "$dir" ] || return 0
                 [ -d "$dir" ] || return 0
                 u=$(usage "$dir"); [ -n "${u:-}" ] || return 0
@@ -89,24 +76,12 @@ spec:
 
               apk add --no-cache findutils >/dev/null 2>&1  # busybox find 는 -printf 미지원
               while true; do
-                purge "${SCRATCH_DIR}" "${SCRATCH_THRESHOLD}" 0
-                purge "${HOME_DIR}" "${HOME_THRESHOLD}" "${HOME_MIN_AGE_DAYS}"
+                purge "${SCRATCH_DIR}" "${SCRATCH_THRESHOLD}"
                 sleep "${INTERVAL}"
               done
           volumeMounts:
-            {{- if .Values.storage.scratch.enabled }}
             - { name: scratch, mountPath: /scratch }
-            {{- end }}
-            {{- if .Values.physicalNodes.enabled }}
-            - { name: host-home, mountPath: /host-home }
-            {{- end }}
       volumes:
-        {{- if .Values.storage.scratch.enabled }}
         - name: scratch
           hostPath: { path: {{ .Values.storage.scratch.hostPath | quote }}, type: DirectoryOrCreate }
-        {{- end }}
-        {{- if .Values.physicalNodes.enabled }}
-        - name: host-home
-          hostPath: { path: {{ .Values.physicalNodes.homeHostPath | quote }}, type: DirectoryOrCreate }
-        {{- end }}
 {{- end }}

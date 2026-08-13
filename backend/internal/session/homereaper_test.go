@@ -41,31 +41,24 @@ func TestStorageDueOf_장기방치_오버플로없음(t *testing.T) {
 	}
 }
 
-// 회수 우선순위: 오래 방치할수록, 그리고 같은 사용자가 많이 물고 있을수록 먼저.
-// 방치기간만 보면 과독점이 남고 점유량만 보면 정상 사용자가 매번 걸린다. 곱으로 둘 다 반영한다.
-func TestReapScore_방치기간과_과독점을_함께_반영한다(t *testing.T) {
+// 면책은 사용자별로 "가장 최근 중단 세션 1개"다. 이게 없으면 방치 기간만으로 전부
+// 털려서 잠깐 멈춰 둔 것까지 사라진다.
+func TestStoppedProfile_사용자별_최신_중단세션은_면책된다(t *testing.T) {
 	now := time.Date(2026, 7, 28, 0, 0, 0, 0, time.UTC)
-	at := func(days int) *Session {
-		s := now.Add(-time.Duration(days) * 24 * time.Hour)
-		return &Session{StoppedSince: &s}
+	at := func(user int64, id string, days int) Session {
+		ts := now.Add(-time.Duration(days) * 24 * time.Hour)
+		return Session{InstanceID: id, UserID: user, StoppedSince: &ts}
 	}
-
-	// 같은 점유량이면 오래 방치된 쪽이 먼저.
-	occ := map[int64]int{0: 1}
-	if reapScore(at(30), occ, now) <= reapScore(at(15), occ, now) {
-		t.Fatal("같은 점유량이면 오래 방치된 세션이 먼저 회수돼야 한다")
+	rows := []Session{
+		at(1, "old-1", 30),
+		at(1, "new-1", 3), // 사용자 1 의 최신
+		at(2, "only-2", 90),
 	}
-
-	// 방치기간이 짧아도 과독점(중단 세션 5개)이면 앞선다.
-	hog, light := at(15), at(30)
-	hog.UserID, light.UserID = 1, 2
-	occ = map[int64]int{1: 5, 2: 1}
-	if reapScore(hog, occ, now) <= reapScore(light, occ, now) {
-		t.Fatal("과독점 사용자의 세션이 먼저 회수돼야 한다")
+	keep := (&Service{}).stoppedProfile(rows, now)
+	if keep[1] != "new-1" {
+		t.Errorf("사용자 1 의 면책이 최신 세션이 아니다: %q", keep[1])
 	}
-
-	// occupancy 에 없는 사용자도 0 으로 죽지 않고 방치기간만으로 순위가 매겨져야 한다.
-	if reapScore(at(10), map[int64]int{}, now) <= 0 {
-		t.Fatal("occupancy 미기록 사용자의 점수가 0 이하다. 영원히 회수되지 않는다")
+	if keep[2] != "only-2" {
+		t.Errorf("중단 세션이 하나뿐인 사용자도 면책돼야 한다: %q", keep[2])
 	}
 }

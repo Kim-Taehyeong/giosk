@@ -146,9 +146,8 @@ func main() {
 	// 세션 파드 이그레스 제한. 사용자가 임의 코드를 돌리는 곳이라 사내망(스토리지 NFS·노드·API·다른 클러스터)
 	// 접근을 막는다. 볼륨 마운트는 kubelet 이 하므로 영향받지 않는다.
 	sessionSvc.WithSessionEgress(cfg.K8s.SessionEgressDenyCIDRs, cfg.K8s.SessionEgressAllowCIDRs, cfg.K8s.DNSServiceIP)
-	sessionSvc.WithHomeReap(func() (int, int) {                                       // 중단 세션 홈 회수. 운영 정책이라 라이브로 읽는다
-		return cfgStore.IntOr(systemconfig.KeyStoppedTTLDays, cfg.Quota.StoppedTTLDays),
-			cfgStore.IntOr(systemconfig.KeyHomeReapPct, cfg.Quota.HomeReapPct)
+	sessionSvc.WithHomeReap(func() int {                                              // 방치 중단 세션 홈 회수. 운영 정책이라 라이브로 읽는다
+		return cfgStore.IntOr(systemconfig.KeyStoppedTTLDays, cfg.Quota.StoppedTTLDays)
 	})
 	// 가용성 관문. 자리가 없으면 생성과 재시작을 모두 거절한다(대기열 없음).
 	// 판정 소스는 세션 마법사가 보는 Availability 와 동일해야 화면과 API 가 갈라지지 않는다.

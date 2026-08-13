@@ -517,9 +517,6 @@
     "reclaim": {
       "stoppedTtl": "Leállított munkamenetek megőrzése",
       "stoppedTtlHint": "A leállított munkamenetek továbbra is foglalják a saját home-lemezüket. Ezt az időt túllépve visszanyerési jelöltté válnak. 0 = soha ne nyerje vissza automatikusan.",
-      "diskThreshold": "Visszanyerést indító lemezhasználat",
-      "diskThresholdHint": "A visszanyerés csak az e lemezhasználat feletti csomópontokon fut. Ha van elég hely, a régi leállított munkamenetek is érintetlenek maradnak.",
-      "note": "A visszanyerés a legrégebb óta tétlen munkamenetekkel kezdődik azoknál a felhasználóknál, akik a legtöbb leállítottat halmozták fel, és leáll, amint a csomópont ismét a küszöb alá kerül.",
       "exemptNote": "Minden felhasználó legutóbb leállított munkamenete soha nem kerül visszanyerésre. A futó munkameneteket soha nem érinti.",
       "offNote": "Az automatikus visszanyerés ki van kapcsolva. A leállított munkameneteket csak a darabszámkorlát és a tárolási díj fogja vissza; ha megtelnek a lemezek, az adminisztrátoroknak kézzel kell takarítaniuk."
     }

@@ -517,9 +517,6 @@
     "reclaim": {
       "stoppedTtl": "Retención de sesiones detenidas",
       "stoppedTtlHint": "Las sesiones detenidas siguen ocupando su disco personal. Pasado este tiempo pasan a ser candidatas a recuperación. 0 = nunca recuperar automáticamente.",
-      "diskThreshold": "Uso de disco para iniciar la recuperación",
-      "diskThresholdHint": "La recuperación solo se ejecuta en nodos por encima de este uso de disco. Si hay espacio de sobra, las sesiones detenidas antiguas se dejan intactas.",
-      "note": "La recuperación empieza por las sesiones más tiempo inactivas de los usuarios que acumulan más sesiones detenidas, y se detiene en cuanto el nodo vuelve a estar por debajo del umbral.",
       "exemptNote": "La sesión detenida más reciente de cada usuario nunca se recupera. Las sesiones en ejecución nunca se tocan.",
       "offNote": "La recuperación automática está desactivada. Las sesiones detenidas solo se contienen mediante el límite de cantidad y el cobro de almacenamiento; los administradores tendrán que limpiar manualmente cuando se llenen los discos."
     }

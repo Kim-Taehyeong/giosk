@@ -517,9 +517,6 @@
     "reclaim": {
       "stoppedTtl": "Opbevaringstid for stoppede sessioner",
       "stoppedTtlHint": "Stoppede sessioner optager stadig deres hjemmedisk. Efter denne periode bliver de kandidater til frigivelse. 0 = frigiv aldrig automatisk.",
-      "diskThreshold": "Diskforbrug der starter frigivelse",
-      "diskThresholdHint": "Frigivelse kører kun på noder over dette diskforbrug. Er der plads nok, får gamle stoppede sessioner lov at blive.",
-      "note": "Frigivelsen begynder med de længst inaktive sessioner hos de brugere, der har flest stoppede sessioner, og stopper så snart noden er under tærsklen igen.",
       "exemptNote": "Hver brugers senest stoppede session frigives aldrig. Kørende sessioner røres aldrig.",
       "offNote": "Automatisk frigivelse er slået fra. Stoppede sessioner begrænses kun af antalsgrænsen og lagerbetalingen; når diskene fyldes, må administratorer rydde op manuelt."
     }

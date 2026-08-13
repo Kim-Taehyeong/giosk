@@ -517,9 +517,6 @@
     "reclaim": {
       "stoppedTtl": "Păstrarea sesiunilor oprite",
       "stoppedTtlHint": "Sesiunile oprite ocupă în continuare discul lor home. După această perioadă devin candidate la recuperare. 0 = nu recupera niciodată automat.",
-      "diskThreshold": "Utilizarea discului care declanșează recuperarea",
-      "diskThresholdHint": "Recuperarea rulează doar pe nodurile peste această utilizare a discului. Dacă există spațiu suficient, chiar și sesiunile oprite vechi rămân neatinse.",
-      "note": "Recuperarea începe cu sesiunile inactive de cel mai mult timp ale utilizatorilor care au acumulat cele mai multe sesiuni oprite și se încheie de îndată ce nodul revine sub prag.",
       "exemptNote": "Cea mai recentă sesiune oprită a fiecărui utilizator nu este niciodată recuperată. Sesiunile în execuție nu sunt atinse niciodată.",
       "offNote": "Recuperarea automată este dezactivată. Sesiunile oprite sunt limitate doar de plafonul numeric și de tarifarea stocării; când discurile se umplu, administratorii vor trebui să facă curat manual."
     }

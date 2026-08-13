@@ -63,9 +63,9 @@ storage:
   # 세션 홈(/home/work) 스토리지클래스. 노드 로컬(WFFC)이라 빠르다. 홈 I/O 를 NFS 로 보내면 못 쓴다.
   # 중지해도 남고 삭제할 때만 정리한다.
   localClass: local-path
-  # 세션 홈 PVC 에 적는 용량(GiB). local-path 는 이걸 강제하지 않으므로 실제로는 노드 디스크만큼 쓴다.
-  # 작게 적으면 사용자에게 거짓 한도를 보여주게 되니 노드 규모에 맞춰 넉넉히 둔다.
-  # 노드 디스크를 지키는 건 아래 nodeCleaner 임계와 quota.homeReapPct, 그리고 디스크 알림이다.
+  # 세션 홈 기본 용량(GiB). 사용자가 세션마다 조정할 수 있고 이 값이 그 기본이다.
+  # csi.enabled 면 이 숫자가 실제 파일시스템 크기이자 저장공간 쿼터 차감분이 된다.
+  # 끄면(local-path) 강제되지 않아 표시용 숫자에 그친다.
   sessionHomeGiB: 200
   # 영속 home(~/nfs) 스토리지클래스. 노드 무관 저장소라 RWX 필수(NFS·CephFS·Longhorn-RWX).
   # 노드 로컬 클래스를 쓰면 PV 가 노드에 묶여 volume node affinity conflict 로 스케줄이 막힌다.
@@ -114,16 +114,18 @@ csi:
     resizer: registry.k8s.io/sig-storage/csi-resizer:v1.12.0
     registrar: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.12.0
 
-# ── 노드 디스크 정리 DaemonSet ──────────────────────────────────────
-# scratch 와 로컬 home 은 사용자별 쿼터가 없다. 방치하면 DiskPressure 로 노드가 통째로 빠지므로,
-# 임계를 넘으면 atime 이 오래된 파일부터 지운다. scratch 는 임시 공간이라 먼저, home 은 더 늦게.
-# scratch.enabled 또는 physicalNodes.enabled 일 때만 배포된다.
+# ── Scratch 정리 DaemonSet ──────────────────────────────────────────
+# scratch 는 "임시"라고 계약된 공간이라 사용자별 쿼터가 없다. 방치하면 DiskPressure 로
+# 노드가 통째로 빠지므로, 임계를 넘으면 atime 이 오래된 파일부터 지운다.
+# storage.scratch.enabled 일 때만 배포된다.
+#
+# 세션 홈은 여기서 다루지 않는다. 홈은 이미지 기반이라 각 세션이 자기 몫만 쓰고 넘기면
+# ENOSPC 로 막히므로, 남의 파일을 지워 공간을 만들 이유가 없다. 방치된 중단 세션 홈은
+# quota.stoppedTtlDays 로 회수한다.
 nodeCleaner:
   enabled: true
   intervalSec: 300
   scratchThreshold: 85
-  homeThreshold: 92
-  homeMinAgeDays: 3     # 이보다 최근에 쓴 파일은 지우지 않는다(작업 중인 파일 보호)
 
 # ── 인클러스터 이미지 레지스트리 (이미지 빌드용) ────────────────────
 # Kaniko 빌드 푸시와 세션 이미지 풀이 여기를 쓴다. 외부 레지스트리를 쓰려면
@@ -285,7 +287,6 @@ quota:
   # 중단 세션 홈 회수. 방치 일수와 노드 디스크 사용률을 둘 다 넘겼을 때만 집행한다(0 이면 비활성).
   # 여기 값은 초기값일 뿐이라, 관리자 설정에서 바꾸면 그쪽이 우선한다.
   stoppedTtlDays: 14
-  homeReapPct: 88         # nodeCleaner 의 scratch(85)와 home(92) 사이에서 개입
 
 branding:
   name: Giosk
