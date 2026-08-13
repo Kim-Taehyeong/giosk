@@ -104,6 +104,10 @@ csi:
   dataRoot: /var/lib/giosk/csi
   # 이미지 파일시스템. xfs 는 마운트한 채로 확장할 수 있어 홈 늘리기가 무중단이다.
   fsType: xfs
+  # 고아 이미지 회수 주기(분). 볼륨을 지워도 이미지는 노드에 남으므로, 각 노드가 주기적으로
+  # PV 목록과 대조해 짝 없는 이미지를 회수한다. 연속 두 번 고아로 확인돼야 지우므로
+  # 실제 회수까지는 이 값의 두 배가 걸린다. 0 이면 회수하지 않는다(디스크가 계속 줄어든다).
+  gcIntervalMin: 10
   # 쿠버네티스 표준 CSI 사이드카. 에어갭이면 사내 레지스트리 주소로 바꾼다.
   sidecars:
     provisioner: registry.k8s.io/sig-storage/csi-provisioner:v5.1.0

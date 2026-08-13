@@ -147,6 +147,7 @@ spec:
             - {name: CSI_ENDPOINT, value: "unix:///csi/csi.sock"}
             - {name: GIOSK_CSI_DATA_ROOT, value: {{ .Values.csi.dataRoot | quote }}}
             - {name: GIOSK_CSI_FSTYPE, value: {{ .Values.csi.fsType | quote }}}
+            - {name: GIOSK_CSI_GC_INTERVAL_MIN, value: {{ .Values.csi.gcIntervalMin | default 10 | quote }}}
             - name: GIOSK_CSI_NODE_ID
               valueFrom: {fieldRef: {fieldPath: spec.nodeName}}
           volumeMounts:
