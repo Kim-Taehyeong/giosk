@@ -139,7 +139,7 @@ func (d *Driver) mountNFSFuse(ctx context.Context, volID, target string, spec nf
 	// 데몬이 살아 있어야 하므로, 드라이버 파드가 재시작하면 그 노드의 FUSE 마운트가 끊긴다.
 	// 끊긴 마운트는 아래 staleFUSE 판정으로 감지해 다시 붙인다. kubelet 이 파드를 다시 만들 때
 	// NodePublish 가 다시 오기 때문이다(이미 떠 있는 파드는 재시작해야 복구된다).
-	if _, err := run(ctx, "bindfs", "-o", opts, stage, target); err != nil {
+	if err := runDaemon(ctx, "bindfs", "-o", opts, stage, target); err != nil {
 		return fmt.Errorf("bindfs: %w", err)
 	}
 	return nil

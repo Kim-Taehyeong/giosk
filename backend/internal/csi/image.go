@@ -49,6 +49,23 @@ func run(ctx context.Context, name string, args ...string) (string, error) {
 	return string(out), nil
 }
 
+// runDaemon은 스스로 배경으로 물러나는 명령(FUSE 마운트 등)을 실행한다.
+//
+// run 과 달리 출력을 파이프로 받지 않는다. CombinedOutput 은 자식이 모두 끝나고 파이프가
+// 닫힐 때까지 기다리는데, 데몬화한 프로세스는 상속받은 파이프를 계속 붙들고 있어서 호출이
+// 영영 돌아오지 않는다(랩에서 마운트가 DeadlineExceeded 로 죽었다).
+// 드라이버의 stdout/stderr 를 그대로 물려주면 데몬 로그가 파드 로그로 나오고 대기도 없다.
+func runDaemon(ctx context.Context, name string, args ...string) error {
+	cctx, cancel := context.WithTimeout(ctx, 1*time.Minute)
+	defer cancel()
+	cmd := exec.CommandContext(cctx, name, args...)
+	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("%s %s: %w", name, strings.Join(args, " "), err)
+	}
+	return nil
+}
+
 // EnsureImage는 지정 크기의 이미지가 없으면 만든다(희소 + mkfs). 이미 있으면 아무것도 하지 않는다.
 // 크기를 줄이는 것은 XFS 가 지원하지 않으므로 기존 이미지의 크기는 건드리지 않는다.
 func (s *ImageStore) EnsureImage(ctx context.Context, volumeID string, sizeBytes int64) error {
