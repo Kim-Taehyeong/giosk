@@ -52,10 +52,22 @@ EXPOSE 80 443 2222
 ENTRYPOINT ["/usr/local/bin/gateway"]
 
 # ── CSI 드라이버 (노드 플러그인은 DaemonSet privileged, 컨트롤러는 Deployment) ──
-# 세션 홈 이미지를 만들고 루프로 붙인다. mkfs.xfs·losetup·mount·xfs_growfs 가 필요하다.
-# 노드 플러그인은 호스트 마운트 네임스페이스에서 동작해야 하므로 privileged 로 뜬다.
-FROM base AS csi
-RUN apk add --no-cache xfsprogs e2fsprogs util-linux
+# 두 가지 볼륨을 다룬다.
+#   loop    : 세션 홈 이미지 생성·루프 마운트 (mkfs.xfs, losetup, mount, xfs_growfs)
+#   nfsfuse : NFS 를 노드에서 마운트하고 그 위에 FUSE 를 얹어 컨테이너에 준다 (mount.nfs, bindfs)
+#
+# alpine 이 아니라 debian 을 쓴다. bindfs 가 alpine 저장소에 없다(mergerfs 도 없다).
+# 바이너리는 CGO 없이 정적으로 빌드하므로 베이스 교체가 자유롭다.
+#
+# nsenter 는 bindfs 를 호스트 네임스페이스에서 띄우는 데 쓴다. FUSE 는 데몬 프로세스가
+# 살아 있어야 마운트가 유지되는데, 드라이버 컨테이너의 자식으로 두면 파드가 재시작할 때
+# 모든 세션의 마운트가 한꺼번에 끊긴다.
+FROM debian:bookworm-slim AS csi
+RUN apt-get -qq update \
+ && apt-get -qq install -y --no-install-recommends \
+      ca-certificates xfsprogs e2fsprogs util-linux bindfs fuse3 nfs-common \
+ && rm -rf /var/lib/apt/lists/*
+ENV TZ=Asia/Seoul
 COPY --from=build /out/csi /usr/local/bin/csi
 ENTRYPOINT ["/usr/local/bin/csi"]
 

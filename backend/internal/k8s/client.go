@@ -18,6 +18,20 @@ type Client struct {
 	gpuTypeLabel  string
 	physicalLabel string // 물리노드 식별 라벨(멀티 인스턴스 격리용, 기본 giosk.io/physical)
 	cudaLabel     string // 노드 CUDA(드라이버) 버전 라벨(GFD). 빈값이면 CUDA 표기 생략.
+	// nfsFuse는 공유 NFS 볼륨(공유 볼륨·데이터셋)을 우리 CSI 드라이버로 붙일지 여부다.
+	// 켜면 컨테이너에 FUSE 마운트만 보여 스토리지 주소가 남지 않는다. 끄면 NFS 를 직접 붙인다.
+	nfsFuse bool
+	// nfsFuseAttrSec는 FUSE 속성 캐시 유지 시간(초). 0 이면 드라이버 기본값을 쓴다.
+	nfsFuseAttrSec int
+}
+
+// WithNFSFuse는 공유 NFS 볼륨을 CSI(FUSE) 경로로 붙일지 정한다(드라이버가 설치된 배포에서만 켠다).
+// attrSec 은 FUSE 속성 캐시 유지 시간(초)이며 0 이면 드라이버 기본값을 쓴다.
+func (c *Client) WithNFSFuse(on bool, attrSec int) *Client {
+	if c != nil {
+		c.nfsFuse, c.nfsFuseAttrSec = on, attrSec
+	}
+	return c
 }
 
 // WithCudaLabel은 노드 CUDA 버전 라벨명을 설정한다(빈 값이면 무시).

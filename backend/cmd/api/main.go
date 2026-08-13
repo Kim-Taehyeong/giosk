@@ -70,6 +70,7 @@ func main() {
 	kc, _ := k8s.New(cfg.K8s.Kubeconfig, cfg.K8s.GpuTypeLabel)
 	kc.WithPhysicalLabel(cfg.PhysicalNodes.Label) // 물리노드 식별 라벨(멀티 인스턴스 격리)
 	kc.WithCudaLabel(cfg.K8s.CudaLabel)           // 노드 CUDA(드라이버) 버전 라벨(GFD)
+	kc.WithNFSFuse(cfg.K8s.NFSFuse, cfg.K8s.NFSFuseAttrTimeoutSec)               // 공유 NFS 볼륨을 CSI(FUSE)로 붙여 스토리지 주소를 감춘다
 	if kc.Available() {
 		log.Printf("k8s connected (gpu-type label=%s)", cfg.K8s.GpuTypeLabel)
 	} else {

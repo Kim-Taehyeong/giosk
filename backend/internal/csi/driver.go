@@ -175,6 +175,15 @@ func (d *Driver) NodePublishVolume(ctx context.Context, req *csi.NodePublishVolu
 	if volID == "" || target == "" {
 		return nil, status.Error(codes.InvalidArgument, "볼륨 ID 또는 대상 경로가 비어 있습니다")
 	}
+	// NFS 위 FUSE 볼륨은 크기 개념이 없다(원격 저장소를 그대로 보여 준다). 서버·경로가
+	// 있으면 그 경로로 가고, 없으면 로컬 이미지 볼륨이다.
+	if spec, ok := nfsFuseFrom(req.GetVolumeContext(), req.GetReadonly()); ok {
+		if err := d.mountNFSFuse(ctx, volID, target, spec); err != nil {
+			return nil, status.Errorf(codes.Internal, "NFS FUSE 마운트 실패: %v", err)
+		}
+		return &csi.NodePublishVolumeResponse{}, nil
+	}
+
 	size := volumeSize(req.GetVolumeContext())
 	if size <= 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "볼륨 %s 의 크기를 알 수 없습니다", volID)
@@ -213,6 +222,14 @@ func (d *Driver) NodeUnpublishVolume(ctx context.Context, req *csi.NodeUnpublish
 	target := req.GetTargetPath()
 	if target == "" {
 		return nil, status.Error(codes.InvalidArgument, "대상 경로가 비어 있습니다")
+	}
+	// 이 요청에는 볼륨 속성이 없어서 타입을 알 수 없다. NFS 스테이지 경로가 있으면
+	// FUSE 볼륨이다(해제 방식이 다르다. FUSE 는 fusermount 로 데몬까지 정리해야 한다).
+	if st, err := os.Stat(d.Store.nfsStagePath(req.GetVolumeId())); err == nil && st.IsDir() {
+		if err := d.unmountNFSFuse(ctx, req.GetVolumeId(), target); err != nil {
+			return nil, status.Errorf(codes.Internal, "NFS FUSE 해제 실패: %v", err)
+		}
+		return &csi.NodeUnpublishVolumeResponse{}, nil
 	}
 	mounted, err := IsMountPoint(target)
 	if err != nil {
