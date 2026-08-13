@@ -136,7 +136,6 @@ spec:
       labels: {app: {{ include "giosk.fullname" . }}-csi-node}
     spec:
       serviceAccountName: {{ include "giosk.fullname" . }}-csi
-      hostPID: true
       containers:
         - name: driver
           image: "{{ .Values.image.csi.repository }}:{{ .Values.image.csi.tag }}"

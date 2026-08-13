@@ -2,10 +2,12 @@ package csi
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
+	"syscall"
 )
 
 // NFS 위에 FUSE 를 얹는 볼륨의 파라미터. PV 의 volumeAttributes 로 전달된다.
@@ -116,7 +118,13 @@ func (d *Driver) mountNFSFuse(ctx context.Context, volID, target string, spec nf
 		return err
 	}
 	if mounted {
-		return nil // 멱등. kubelet 은 같은 호출을 여러 번 보낸다.
+		if !staleFUSE(target) {
+			return nil // 멱등. kubelet 은 같은 호출을 여러 번 보낸다.
+		}
+		// 드라이버가 재시작해 데몬이 죽은 마운트다. 강제로 떼고 다시 붙인다.
+		if _, err := run(ctx, "umount", "-l", target); err != nil {
+			return fmt.Errorf("끊긴 FUSE 마운트 정리: %w", err)
+		}
 	}
 
 	opts := fmt.Sprintf("allow_other,default_permissions,attr_timeout=%d,entry_timeout=%d",
@@ -124,14 +132,24 @@ func (d *Driver) mountNFSFuse(ctx context.Context, volID, target string, spec nf
 	if spec.ReadOnly {
 		opts += ",ro"
 	}
-	// bindfs 는 데몬으로 남아 있어야 마운트가 유지된다. 드라이버 컨테이너의 자식으로 띄우면
-	// 파드가 재시작할 때 그 노드 모든 세션의 마운트가 한꺼번에 끊긴다. 호스트 네임스페이스에서
-	// 띄워 드라이버 수명과 분리한다.
-	if _, err := run(ctx, "nsenter", "-t", "1", "-m", "-p", "--",
-		"bindfs", "-o", opts, stage, target); err != nil {
+	// bindfs 는 이 컨테이너 안에서 띄운다. 호스트 네임스페이스로 들어가서 띄우면(nsenter -m)
+	// 호스트에는 bindfs 바이너리가 없어 실행 자체가 안 된다.
+	//
+	// 마운트는 kubelet 디렉터리의 Bidirectional 전파를 타고 호스트에 보인다. 다만 FUSE 는
+	// 데몬이 살아 있어야 하므로, 드라이버 파드가 재시작하면 그 노드의 FUSE 마운트가 끊긴다.
+	// 끊긴 마운트는 아래 staleFUSE 판정으로 감지해 다시 붙인다. kubelet 이 파드를 다시 만들 때
+	// NodePublish 가 다시 오기 때문이다(이미 떠 있는 파드는 재시작해야 복구된다).
+	if _, err := run(ctx, "bindfs", "-o", opts, stage, target); err != nil {
 		return fmt.Errorf("bindfs: %w", err)
 	}
 	return nil
+}
+
+// staleFUSE는 마운트는 남아 있는데 데몬이 죽어 접근이 안 되는 상태인지 본다.
+// FUSE 데몬이 사라지면 커널이 ENOTCONN(Transport endpoint is not connected)을 돌려준다.
+func staleFUSE(path string) bool {
+	_, err := os.Stat(path)
+	return err != nil && errors.Is(err, syscall.ENOTCONN)
 }
 
 // unmountNFSFuse는 FUSE 마운트를 풀고, 이 볼륨을 쓰는 곳이 없으면 NFS 스테이지도 정리한다.
@@ -141,8 +159,8 @@ func (d *Driver) unmountNFSFuse(ctx context.Context, volID, target string) error
 		return err
 	}
 	if mounted {
-		// FUSE 는 fusermount 로 푼다. 데몬이 호스트에 있으므로 해제도 호스트에서 한다.
-		if _, err := run(ctx, "nsenter", "-t", "1", "-m", "-p", "--", "fusermount3", "-u", target); err != nil {
+		// FUSE 는 fusermount 로 푼다(데몬에 정상 종료를 알린다).
+		if _, err := run(ctx, "fusermount3", "-u", target); err != nil {
 			// 데몬이 이미 죽어 스테일 마운트가 된 경우 fusermount 가 실패한다. 강제 분리로 정리한다.
 			if _, err2 := run(ctx, "umount", "-l", target); err2 != nil {
 				return fmt.Errorf("FUSE 해제: %w", err)
