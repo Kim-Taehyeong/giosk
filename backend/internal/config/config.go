@@ -270,20 +270,20 @@ func Load(lookup func(string) (string, bool)) (*Config, error) {
 			Password: g.str("GIOSK_ADMIN_PASSWORD", ""),
 		},
 		K8s: K8s{
-			Kubeconfig:             g.str("GIOSK_KUBECONFIG", ""),
-			GpuTypeLabel:           g.str("GIOSK_GPU_TYPE_LABEL", "giosk.io/gpu-type"),
-			CudaLabel:              g.str("GIOSK_CUDA_LABEL", "nvidia.com/cuda.runtime-version"),
-			NamespacePrefix:        g.str("GIOSK_NS_PREFIX", "giosk-grp-"),
-			GatewayDomain:          g.str("GIOSK_GATEWAY_DOMAIN", "gw.giosk.local"),
-			GatewaySecret:          g.str("GIOSK_GATEWAY_SECRET", ""),
-			GatewaySSHKey:          g.str("GIOSK_GATEWAY_SSH_KEY", ""),
-			GatewayScheme:          g.str("GIOSK_GATEWAY_SCHEME", "https"),
-			GatewayHost:            g.str("GIOSK_GATEWAY_HOST", ""),
-			GatewaySSHPort:         g.intv("GIOSK_GATEWAY_SSH_PORT", 2222),
-			GatewayJump:            g.str("GIOSK_GATEWAY_SSH_PROXY_JUMP", ""),
-			SessionSSHDImage:       g.str("GIOSK_SESSION_SSHD_IMAGE", ""),
-			SessionSSHDPubKey:      g.str("GIOSK_GATEWAY_SSH_PUBKEY", ""),
-			SessionExpose:          g.str("GIOSK_SESSION_EXPOSE", "nodeport"),
+			Kubeconfig:        g.str("GIOSK_KUBECONFIG", ""),
+			GpuTypeLabel:      g.str("GIOSK_GPU_TYPE_LABEL", "giosk.io/gpu-type"),
+			CudaLabel:         g.str("GIOSK_CUDA_LABEL", "nvidia.com/cuda.runtime-version"),
+			NamespacePrefix:   g.str("GIOSK_NS_PREFIX", "giosk-grp-"),
+			GatewayDomain:     g.str("GIOSK_GATEWAY_DOMAIN", "gw.giosk.local"),
+			GatewaySecret:     g.str("GIOSK_GATEWAY_SECRET", ""),
+			GatewaySSHKey:     g.str("GIOSK_GATEWAY_SSH_KEY", ""),
+			GatewayScheme:     g.str("GIOSK_GATEWAY_SCHEME", "https"),
+			GatewayHost:       g.str("GIOSK_GATEWAY_HOST", ""),
+			GatewaySSHPort:    g.intv("GIOSK_GATEWAY_SSH_PORT", 2222),
+			GatewayJump:       g.str("GIOSK_GATEWAY_SSH_PROXY_JUMP", ""),
+			SessionSSHDImage:  g.str("GIOSK_SESSION_SSHD_IMAGE", ""),
+			SessionSSHDPubKey: g.str("GIOSK_GATEWAY_SSH_PUBKEY", ""),
+			SessionExpose:     g.str("GIOSK_SESSION_EXPOSE", "nodeport"),
 			// 기본으로 사설 대역 전체와 링크로컬(클라우드 메타데이터 169.254.169.254 포함)을 막는다.
 			// 사내망 구성이 달라도 RFC1918 밖으로 나가는 스토리지는 없으므로 이 기본값이 안전하다.
 			// 끄려면 GIOSK_SESSION_EGRESS_DENY_CIDRS=none.
@@ -292,10 +292,10 @@ func Load(lookup func(string) (string, bool)) (*Config, error) {
 			DNSServiceIP:            g.str("GIOSK_DNS_SERVICE_IP", ""),
 			NFSFuse:                 g.boolv("GIOSK_NFS_FUSE", false),
 			NFSFuseAttrTimeoutSec:   g.intv("GIOSK_NFS_FUSE_ATTR_TIMEOUT_SEC", 30),
-			DevicePluginConfigNS:   g.str("GIOSK_DEVICE_PLUGIN_CONFIG_NS", ""),
-			DevicePluginConfigName: g.str("GIOSK_DEVICE_PLUGIN_CONFIG_NAME", ""),
-			Registry:               g.str("GIOSK_REGISTRY", ""),
-			CosignKeySecret:        g.str("GIOSK_COSIGN_KEY_SECRET", ""),
+			DevicePluginConfigNS:    g.str("GIOSK_DEVICE_PLUGIN_CONFIG_NS", ""),
+			DevicePluginConfigName:  g.str("GIOSK_DEVICE_PLUGIN_CONFIG_NAME", ""),
+			Registry:                g.str("GIOSK_REGISTRY", ""),
+			CosignKeySecret:         g.str("GIOSK_COSIGN_KEY_SECRET", ""),
 		},
 		IdleTimeoutMin: g.intv("GIOSK_IDLE_TIMEOUT_MIN", 30),
 		Features: Features{
@@ -311,7 +311,7 @@ func Load(lookup func(string) (string, bool)) (*Config, error) {
 			MaxConcurrentSessions: g.intv("GIOSK_QUOTA_MAX_SESSIONS", 50),
 			MaxStoppedSessions:    g.intv("GIOSK_QUOTA_MAX_STOPPED", 5),
 			VolumeQuotaGB:         g.intv("GIOSK_VOLUME_QUOTA_GB", 2000),
-			MaxEphemeralGiB:       g.intv("GIOSK_QUOTA_MAX_EPHEMERAL_GIB", 0), // 0 이 무제한(기본). 캡의 강제수단이 eviction(세션 종료)이라 기본으론 안 건다. 정책으로 티어별 opt-in 하고, 진짜 하드캡은 디스크를 늘린 뒤에.
+			MaxEphemeralGiB:       g.intv("GIOSK_QUOTA_MAX_EPHEMERAL_GIB", 50), // 컨테이너 쓰기 레이어 상한(GiB). 0=무제한. 임시/캐시는 홈으로 돌려 두었으므로 여기에 남는 건 apt/pip 시스템 설치 정도다.
 			// 메모리 limit = GPU 지분 비례 보장(request) × 2. request 가 노드의 50% 이하로 잡히므로
 			// 배수 2 = "산 지분만큼까지 버스트". 메모리는 압축 불가라 상한이 없으면 한 세션이
 			// 노드 RAM 을 고갈시켜 kubelet 이 남의 세션을 축출한다(CPU 는 압축 가능해 상한 없음 유지).

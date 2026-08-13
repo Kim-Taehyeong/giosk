@@ -1,0 +1,70 @@
+{{- /*
+HAMi 락 디렉터리 크기 제한 DaemonSet.
+
+HAMi 는 GPU 를 나눠 쓰는 컨테이너들 사이에서 VRAM/SM 회계를 직렬화하려고 노드의
+/tmp/vgpulock 을 세션 컨테이너에 붙인다. 디바이스 플러그인이 붙이는 것이라 파드 스펙에는
+안 보이고, 우리가 파드에서 덮어쓸 수도 없다. 그 결과 세션 안에서 df 를 보면 그 자리에
+노드 루트 파일시스템(예: 2TB)이 통째로 보이고, 모든 세션이 rw 로 공유하는 0777 디렉터리라
+실제로 그만큼 쓸 수도 있다.
+
+실제로 필요한 것은 락 파일 하나뿐이다(실측 4KB). 그래서 노드에서 그 자리에 작은 tmpfs 를
+깔아 둔다. 컨테이너는 여전히 같은 디렉터리를 공유하므로 락 기능은 그대로고, 크기만 잘린다.
+
+호스트 마운트 네임스페이스에 직접 건다(nsenter). 파드 볼륨의 전파를 쓰면 파드가 사라질 때
+kubelet 이 같이 걷어갈 수 있어, 노드가 소유하는 마운트로 두는 편이 안전하다.
+*/ -}}
+{{- if .Values.hami.lockTmpfs.enabled }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "giosk.fullname" . }}-vgpulock-tmpfs
+  namespace: {{ .Release.Namespace }}
+  labels: { app: giosk-vgpulock-tmpfs }
+spec:
+  selector:
+    matchLabels: { app: giosk-vgpulock-tmpfs }
+  template:
+    metadata:
+      labels: { app: giosk-vgpulock-tmpfs }
+    spec:
+      # HAMi 분할 노드에만 둔다. 그 밖의 노드에는 /tmp/vgpulock 자체가 없다.
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - { key: giosk.io/share-mode, operator: In, values: ["hami"] }
+      tolerations:
+        - operator: Exists
+      hostPID: true              # nsenter 로 1번 프로세스(호스트)의 마운트 네임스페이스에 들어간다
+      containers:
+        - name: mounter
+          image: alpine:3.19
+          securityContext:
+            privileged: true     # 호스트 네임스페이스에서 mount
+          resources:
+            requests: { cpu: 10m, memory: 16Mi }
+            limits:   { memory: 64Mi }
+          env:
+            - { name: SIZE_MI, value: {{ .Values.hami.lockTmpfs.sizeMi | quote }} }
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -u
+              LOCK=/tmp/vgpulock
+              ensure() {
+                # 이미 tmpfs 면 아무것도 하지 않는다. 여러 번 깔면 마운트가 겹겹이 쌓인다.
+                if nsenter -t 1 -m -- sh -c "df -PT $LOCK 2>/dev/null | awk 'NR==2{print \$2}'" | grep -qx tmpfs; then
+                  return 0
+                fi
+                nsenter -t 1 -m -- mkdir -p "$LOCK" || return 1
+                # mode 0777: 세션마다 UID 가 달라도 같은 락 파일을 열어야 한다(HAMi 가 쓰는 방식).
+                nsenter -t 1 -m -- mount -t tmpfs -o "size=${SIZE_MI}m,mode=0777" vgpulock "$LOCK" || return 1
+                echo "[vgpulock] $LOCK 을 ${SIZE_MI}Mi tmpfs 로 덮었다"
+              }
+              # 주기적으로 확인한다. 노드 재부팅이나 다른 이유로 마운트가 풀리면 다시 건다.
+              while true; do
+                ensure || echo "[vgpulock] 마운트 실패"
+                sleep 300
+              done
+{{- end }}

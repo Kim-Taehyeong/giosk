@@ -186,6 +186,14 @@ monitoring:
 # ── GPU 분할 스케줄러 (HAMi) ───────────────────────────────────────
 # 공유(분할) GPU 세션에만 필요하다. 전용·CPU 세션은 device-plugin 만으로 동작한다.
 hami:
+  # HAMi 는 GPU 를 나눠 쓰는 컨테이너들의 회계를 직렬화하려고 노드의 /tmp/vgpulock 을
+  # 세션 컨테이너에 그대로 붙인다(디바이스 플러그인이 붙이는 것이라 파드 스펙에 안 보인다).
+  # 그 디렉터리는 노드 루트 파일시스템이라, 세션 안에서 df 를 보면 노드 디스크 전체가 보이고
+  # 실제로 그만큼 쓸 수 있다(모든 세션이 rw 로 공유하는 0777 디렉터리다).
+  # 노드에서 그 자리에 작은 tmpfs 를 깔면 락 기능은 그대로 두고 크기만 잘라낼 수 있다.
+  lockTmpfs:
+    enabled: true
+    sizeMi: 16
   install: false          # true=HAMi 스케줄러를 별도 릴리스로 번들 설치
 
 # ── 베어메탈 LoadBalancer (MetalLB) ────────────────────────────────
@@ -291,6 +299,11 @@ quota:
   maxVramGb: 512
   maxConcurrentSessions: 50
   maxStoppedSessions: 5   # 사용자당 중단(대기) 세션 상한(0=무제한). 중단 세션은 로컬 홈 PVC 로 노드 디스크 점유.
+  # 컨테이너 쓰기 레이어(overlay) 상한 GiB. 0=무제한.
+  # 런타임에 컨테이너별 디스크 하드 리밋이 없어서, 이 값의 집행 수단은 kubelet 축출(세션 종료)이다.
+  # 임시 파일과 pip/conda/HuggingFace 캐시는 홈(하드 리밋)으로 돌려 두었으므로 여기 남는 건
+  # apt/pip 시스템 설치 정도다. 그 폭주를 막는 마지막 방어선으로 본다.
+  maxEphemeralGib: 50
   volumeQuotaGb: 2000
   # 메모리 limit 배수(limit = GPU 지분 비례 보장 × 배수, 1 이하면 상한 없음).
   # 메모리는 압축이 안 돼서 상한이 없으면 한 세션이 노드 RAM 을 말리고 kubelet 이 남의 세션을 축출한다.

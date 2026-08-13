@@ -80,16 +80,23 @@ func buildPod(s SessionSpec, gpuTypeLabel string) *corev1.Pod {
 		}
 		spec.Containers = append(spec.Containers, sshdSidecar(s, mounts))
 	}
-	// scratch(hostPath)는 kubelet 이 root 로 만들어 FSGroup 이 적용되지 않으므로 비-root 세션이 못 쓴다.
-	// initContainer(root)로 계정 폴더를 세션 UID 소유로 chown(이미지 재사용, 추가 풀 없음).
-	if s.ScratchHost != "" && s.UID > 0 {
+	// 세션이 뜨기 전에 root 로 준비해야 하는 것들. 이미지를 재사용하므로 추가 풀은 없다.
+	//   - 홈 안의 임시/캐시 디렉터리(TMPDIR 등이 가리키는 곳). 없으면 도구가 실패한다.
+	//   - scratch(hostPath)는 kubelet 이 root 로 만들어 FSGroup 이 안 먹으므로 세션 UID 로 chown.
+	if s.UID > 0 {
 		root := int64(0)
+		cmds := []string{homeDirsCmd(homeMount, s.UID)}
+		initMounts := homeVolumeMounts(mounts)
+		if s.ScratchHost != "" {
+			cmds = append(cmds, fmt.Sprintf("chown %d:%d %s && chmod 700 %s", s.UID, s.UID, scratchMount, scratchMount))
+			initMounts = append(initMounts, corev1.VolumeMount{Name: "scratch", MountPath: scratchMount})
+		}
 		spec.InitContainers = []corev1.Container{{
-			Name:            "scratch-perms",
+			Name:            "session-prep",
 			Image:           s.Image,
-			Command:         []string{"sh", "-c", fmt.Sprintf("chown %d:%d %s && chmod 700 %s", s.UID, s.UID, scratchMount, scratchMount)},
+			Command:         []string{"sh", "-c", strings.Join(cmds, " && ")},
 			SecurityContext: &corev1.SecurityContext{RunAsUser: &root},
-			VolumeMounts:    []corev1.VolumeMount{{Name: "scratch", MountPath: scratchMount}},
+			VolumeMounts:    initMounts,
 		}}
 	}
 	return &corev1.Pod{
@@ -107,12 +114,7 @@ func sshdSidecar(s SessionSpec, homeMounts []corev1.VolumeMount) corev1.Containe
 	// 홈 트리(/home/work 및 그 하위: ~/nfs·~/scratch·데이터셋 등)를 세션 컨테이너와 동일하게 마운트한다.
 	// 그래야 SSH 로 보는 파일과 VSCode/Jupyter 로 보는 파일이 같다. 볼륨 이름은 상황마다 다르므로(공유홈=home,
 	//   임시홈=vol-0) 이름이 아니라 마운트 '경로'로 고른다. serviceaccount 토큰 등은 제외.
-	var mounts []corev1.VolumeMount
-	for _, m := range homeMounts {
-		if m.MountPath == homeMount || strings.HasPrefix(m.MountPath, homeMount+"/") {
-			mounts = append(mounts, m)
-		}
-	}
+	mounts := homeTreeMounts(homeMounts)
 	// 사용자 등록 공개키(Secret)를 read-only 로 마운트한다. sshd_config 의 AuthorizedKeysFile 두 번째 경로다.
 	if s.UserKeysSecret != "" {
 		mounts = append(mounts, corev1.VolumeMount{Name: userKeysVolume, MountPath: userKeysMount, ReadOnly: true})
@@ -135,6 +137,30 @@ func sshdSidecar(s SessionSpec, homeMounts []corev1.VolumeMount) corev1.Containe
 	}
 }
 
+// homeTreeMounts는 홈과 그 하위 마운트만 고른다(serviceaccount 토큰 등 제외).
+// 볼륨 이름은 상황마다 다르므로(공유홈=home, 임시홈=vol-0) 이름이 아니라 경로로 고른다.
+func homeTreeMounts(all []corev1.VolumeMount) []corev1.VolumeMount {
+	var out []corev1.VolumeMount
+	for _, m := range all {
+		if m.MountPath == homeMount || strings.HasPrefix(m.MountPath, homeMount+"/") {
+			out = append(out, m)
+		}
+	}
+	return out
+}
+
+// homeVolumeMounts는 홈 자체만 고른다. 준비 작업은 홈에만 쓰므로 하위 마운트(데이터셋 FUSE 등)를
+// 끌어들일 이유가 없다.
+func homeVolumeMounts(all []corev1.VolumeMount) []corev1.VolumeMount {
+	var out []corev1.VolumeMount
+	for _, m := range all {
+		if m.MountPath == homeMount {
+			out = append(out, m)
+		}
+	}
+	return out
+}
+
 // itoa는 작은 정수 문자열 변환(외부 의존 없이).
 func itoa(n int) string { return fmt.Sprintf("%d", n) }
 
@@ -152,9 +178,35 @@ const (
 // (물리노드도 ~/scratch 심링크로 동일 관례). 홈 볼륨 위에 하위경로로 겹쳐 마운트된다.
 const scratchMount = homeMount + "/scratch"
 
-// homeEnv는 HOME/USERPROFILE 을 마운트 홈으로 강제한다(이미지 기본 HOME=/home/coder 등 무시).
+// homeEnv는 HOME 을 마운트 홈으로 강제하고(이미지 기본 HOME=/home/coder 등 무시), 임시 파일과
+// 패키지 캐시도 홈 안으로 돌린다.
+//
+// 왜 돌리는가. 컨테이너 쓰기 레이어(overlay)는 노드 디스크를 그대로 쓰고, 컨테이너 단위로
+// 크기를 강제할 방법이 런타임에 없다(containerd 의 overlayfs 스냅샷터에는 크기 옵션이 없다).
+// 남은 수단은 ephemeral-storage 상한인데 그 집행은 파드 축출이라, 작업하던 세션이 통째로
+// 죽는다. 반면 홈은 이미지 기반이라 넘기면 커널이 ENOSPC 로 막는다. 큰 쓰기는 대부분
+// 임시 파일과 pip/conda/HuggingFace 캐시라, 그것들을 홈으로 보내면 축출이 아니라 정직한
+// "용량 부족"으로 끝나고 사용자가 스스로 지울 수 있다. 홈 용량에서 세어지는 것도 맞다.
+//
+// 각 도구가 보는 표준 변수만 쓴다. 경로는 세션 시작 시 미리 만들어 둔다(prepareHome).
 func homeEnv(home string) []corev1.EnvVar {
-	return []corev1.EnvVar{{Name: "HOME", Value: home}}
+	cache := home + "/.cache"
+	return []corev1.EnvVar{
+		{Name: "HOME", Value: home},
+		{Name: "TMPDIR", Value: home + "/.tmp"},
+		{Name: "XDG_CACHE_HOME", Value: cache},
+		{Name: "PIP_CACHE_DIR", Value: cache + "/pip"},
+		{Name: "CONDA_PKGS_DIRS", Value: cache + "/conda"},
+		{Name: "HF_HOME", Value: cache + "/huggingface"},
+		{Name: "TORCH_HOME", Value: cache + "/torch"},
+	}
+}
+
+// homeDirsCmd는 위 환경변수가 가리키는 디렉터리를 만드는 셸 명령이다. 없는 TMPDIR 을 주면
+// 임시 파일을 쓰는 프로그램이 그냥 실패하므로 세션이 뜨기 전에 만들어 둬야 한다.
+func homeDirsCmd(home string, uid int) string {
+	dirs := home + "/.tmp " + home + "/.cache"
+	return fmt.Sprintf("mkdir -p %s && chown %d:%d %s && chmod 700 %s", dirs, uid, uid, dirs, home+"/.tmp")
 }
 
 // channelEnv는 활성 웹 채널의 인증 시크릿을 컨테이너 EnvVar 로 변환한다(채널 순서 유지).
@@ -341,9 +393,13 @@ func gpuLimits(s SessionSpec) corev1.ResourceList {
 			limits[resGPUCores] = *resource.NewQuantity(int64(s.CorePercent), resource.DecimalSI)
 		}
 	}
-	// ephemeral-storage 상한. 이 limit 의 강제 수단은 kubelet 의 "eviction"(초과 시 세션 파드 강제 종료)이다.
-	// 기본으로 걸면 임시 디스크를 넘긴 사용자의 세션이 갑자기 죽는 위험이 있어, 정책(MaxEphemeralGiB)이
-	// 명시로 값을 준 경우(>0)에만 건다. 0(무제한)=미설정이면 걸지 않는다(다른 하드리밋과 동일: 0=무제한).
+	// ephemeral-storage 상한(컨테이너 쓰기 레이어 + emptyDir + 로그).
+	//
+	// 컨테이너 쓰기 레이어는 노드 디스크를 그대로 쓴다. containerd 의 overlayfs 스냅샷터에는
+	// 컨테이너별 크기 옵션이 없어서 커널이 막아 주는 하드 리밋을 걸 수단이 없다. 남은 것은 이
+	// limit 뿐이고, 집행은 kubelet 의 축출(세션 파드 강제 종료)이다. 그래서 큰 쓰기가 여기로
+	// 오지 않도록 임시 파일과 캐시를 홈으로 돌려 두었다(homeEnv). 그 위에서 이 값은 폭주를
+	// 막는 마지막 방어선이다. 0(미설정)이면 걸지 않는다.
 	if s.EphemeralGiB > 0 {
 		limits[corev1.ResourceEphemeralStorage] = resource.MustParse(fmt.Sprintf("%dGi", s.EphemeralGiB))
 	}
@@ -368,6 +424,11 @@ func cpuRequests(s SessionSpec) corev1.ResourceList {
 	}
 	if s.MemGB > 0 {
 		req[corev1.ResourceMemory] = resource.MustParse(fmt.Sprintf("%dGi", s.MemGB))
+	}
+	// ephemeral-storage 는 request 도 같이 건다. limit 만 걸면 스케줄러가 이 소비를 모르고
+	// 노드에 세션을 계속 얹어, 합계가 노드 디스크를 넘긴 뒤 kubelet 이 축출로 뒷수습한다.
+	if s.EphemeralGiB > 0 {
+		req[corev1.ResourceEphemeralStorage] = resource.MustParse(fmt.Sprintf("%dGi", s.EphemeralGiB))
 	}
 	if len(req) == 0 {
 		return nil
