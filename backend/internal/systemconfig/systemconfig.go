@@ -79,7 +79,6 @@ func (h *Handler) Config(c *gin.Context) {
 		// stoppedTtlDays=0 이면 자동 회수 없음(개수 상한·스토리지 과금만으로 억제).
 		"reclaim": gin.H{
 			"stoppedTtlDays": atoiOr(rt[KeyStoppedTTLDays], cfg.Quota.StoppedTTLDays),
-			"homeReapPct":    atoiOr(rt[KeyHomeReapPct], cfg.Quota.HomeReapPct),
 		},
 		"lease": gin.H{"extensionHours": cfg.Billing.Dynamic.ExtensionHours, "maxExtensions": cfg.Billing.Dynamic.MaxExtensions},
 		"features": gin.H{
@@ -99,6 +98,9 @@ func (h *Handler) Config(c *gin.Context) {
 		},
 		"storage": gin.H{
 			"pricePerGiBMonth": storagePrice, // 스토리지 크레딧 단가(GiB·월). 런타임 조정 가능. 0=무료
+			// 세션 홈 기본 용량(GiB). 사용자가 세션마다 조정할 수 있고, 이 값이 그 기본이다.
+			// 홈은 이미지 기반이라 이 숫자가 실제 파일시스템 크기이자 볼륨 쿼터 차감분이다.
+			"sessionHomeGib": cfg.Storage.SessionHomeGiB,
 		},
 	})
 }
@@ -125,7 +127,6 @@ type UpdateReq struct {
 	} `json:"storage"`
 	Reclaim *struct {
 		StoppedTtlDays *int `json:"stoppedTtlDays"`
-		HomeReapPct    *int `json:"homeReapPct"`
 	} `json:"reclaim"`
 	Features map[string]bool `json:"features"`
 }
@@ -158,9 +159,6 @@ func (h *Handler) Update(c *gin.Context) {
 			_ = h.store.Set(KeyStoppedTTLDays, itoa(*req.Reclaim.StoppedTtlDays))
 		}
 		// 임계는 50~99%만. 너무 낮으면 상시 회수가 돌고, 100%는 이미 kubelet DiskPressure 라 늦다.
-		if p := req.Reclaim.HomeReapPct; p != nil && *p >= 50 && *p <= 99 {
-			_ = h.store.Set(KeyHomeReapPct, itoa(*p))
-		}
 	}
 	if req.Recharge != nil {
 		if req.Recharge.Enabled != nil {

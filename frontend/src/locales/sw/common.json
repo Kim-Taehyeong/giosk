@@ -517,9 +517,6 @@
     "reclaim": {
       "stoppedTtl": "Muda wa kuhifadhi vipindi vilivyosimamishwa",
       "stoppedTtlHint": "Vipindi vilivyosimamishwa bado vinatumia diski yao ya nyumbani. Baada ya muda huu vinakuwa vinaweza kurejeshwa. 0 = kamwe usirejeshe kiotomatiki.",
-      "diskThreshold": "Matumizi ya diski yanayoanzisha urejeshaji",
-      "diskThresholdHint": "Urejeshaji hufanyika tu kwenye nodi zilizo juu ya matumizi haya ya diski. Nafasi ikitosha, hata vipindi vya zamani vilivyosimamishwa huachwa.",
-      "note": "Urejeshaji huanza na vipindi vilivyokaa bila kutumika kwa muda mrefu zaidi vya watumiaji wenye vipindi vingi zaidi vilivyosimamishwa, na husimama mara tu nodi inaporudi chini ya kizingiti.",
       "exemptNote": "Kipindi cha karibuni zaidi kilichosimamishwa cha kila mtumiaji hakirejeshwi kamwe. Vipindi vinavyoendeshwa haviguswi kamwe.",
       "offNote": "Urejeshaji wa kiotomatiki umezimwa. Vipindi vilivyosimamishwa vinadhibitiwa tu na kikomo cha idadi na gharama za hifadhi; diski zikijaa, wasimamizi watalazimika kusafisha wenyewe."
     }

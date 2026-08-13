@@ -491,9 +491,7 @@
     "reclaim": {
       "stoppedTtl": "Stopped session retention",
       "stoppedTtlHint": "Stopped sessions still hold their home disk. Past this age they become reclaim candidates. 0 = never reclaim automatically.",
-      "diskThreshold": "Disk usage to start reclaiming",
-      "diskThresholdHint": "Reclaim only runs on nodes above this disk usage. With room to spare, old stopped sessions are left alone.",
-      "note": "Reclaim starts with the longest-idle sessions of users holding the most stopped sessions, and stops once the node is back under the threshold.",
+      "note": "Reclaim is based on idle time alone. A stopped session past the configured period has its home removed, regardless of node disk usage.",
       "exemptNote": "Each user's most recent stopped session is never reclaimed. Running sessions are never touched.",
       "offNote": "Automatic reclaim is off. Stopped sessions are held back only by the count limit and storage charges; admins must clean up manually when disks fill."
     },

@@ -50,7 +50,7 @@ func (g *GC) Run(ctx context.Context) {
 		case <-t.C:
 			if err := g.sweep(ctx); err != nil {
 				// 실패는 다음 주기에 다시 시도한다. 실패한 채로 지우는 일은 없다.
-				log.Printf("[csi] 고아 이미지 회수 실패: %v", err)
+				log.Printf("고아 이미지 회수 실패: %v", err)
 			}
 		}
 	}
@@ -87,11 +87,11 @@ func (g *GC) sweep(ctx context.Context) error {
 			continue
 		}
 		if err := g.Store.Delete(ctx, id); err != nil {
-			log.Printf("[csi] 이미지 %s 회수 실패: %v", id, err)
+			log.Printf("이미지 %s 회수 실패: %v", id, err)
 			next[id] = true // 다음 주기에 재시도
 			continue
 		}
-		log.Printf("[csi] 고아 이미지 회수: %s (PV 없음)", id)
+		log.Printf("고아 이미지 회수: %s (PV 없음)", id)
 	}
 	g.suspects = next
 	return nil

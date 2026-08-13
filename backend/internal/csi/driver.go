@@ -259,7 +259,7 @@ func Serve(endpoint string, d *Driver) error {
 	if d.NodeID != "" {
 		csi.RegisterNodeServer(s, d)
 	}
-	log.Printf("[csi] %s 기동 (endpoint=%s node=%q)", DriverName, endpoint, d.NodeID)
+	log.Printf("%s 기동 (endpoint=%s node=%q)", DriverName, endpoint, d.NodeID)
 	return s.Serve(lis)
 }
 
@@ -268,7 +268,7 @@ func Serve(endpoint string, d *Driver) error {
 func logInterceptor(ctx context.Context, req any, info *grpc.UnaryServerInfo, h grpc.UnaryHandler) (any, error) {
 	resp, err := h(ctx, req)
 	if err != nil {
-		log.Printf("[csi] %s 실패: %v", info.FullMethod, err)
+		log.Printf("%s 실패: %v", info.FullMethod, err)
 	}
 	return resp, err
 }

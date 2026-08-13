@@ -17,6 +17,10 @@ type Session struct {
 	CorePercent int       `gorm:"column:core_percent" json:"corePercent"`
 	CPUCores    int       `gorm:"column:cpu_cores" json:"cpuCores"`
 	MemGB       int       `gorm:"column:mem_gb" json:"memGb"`
+	// HomeGiB는 세션 홈(/home/work)의 용량이다. 홈이 이미지 기반이 되면서 이 값이 실제
+	// 파일시스템 크기가 되므로 세션마다 따로 남긴다(재시작 때 같은 크기로 다시 올린다).
+	// nil 은 이 컬럼 이전에 만들어진 세션이며 전역 기본값으로 해석한다. 물리 임대는 nil.
+	HomeGiB *int `gorm:"column:home_gib" json:"homeGib,omitempty"`
 	GpuCount    int       `gorm:"column:gpu_count" json:"gpuCount"`
 	GpuType     string    `gorm:"column:gpu_type" json:"gpuType"`
 	Node        string    `gorm:"column:node" json:"node"`
@@ -86,6 +90,9 @@ type CreateReq struct {
 	Volumes       []VolMount `json:"volumes"`
 	Datasets      []int64    `json:"datasets"`
 	LocalHomeNode string     `json:"localHomeNode"` // 선택 시 그 물리노드 로컬 디스크 home 을 /home/work 로 hostPath 마운트 + 노드 핀(기본은 emptyDir 로컬 home)
+	// HomeGiB는 세션 홈(/home/work) 용량. 0 이면 설치 기본값을 쓴다.
+	// 계정 볼륨 쿼터에서 함께 센다(홈이 이미지 기반이라 실제로 디스크를 예약하므로).
+	HomeGiB int `json:"homeGib"`
 }
 
 // ReconfigureReq는 중단된 컨테이너 세션의 계산자원 재구성 요청("데이터 준비는 CPU로, 학습은 GPU로").

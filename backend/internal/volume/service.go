@@ -91,6 +91,13 @@ func (s *Service) price() int {
 // monthlyCost는 볼륨 1개의 월 크레딧 비용(용량×단가).
 func (s *Service) monthlyCost(sizeGiB int) int { return sizeGiB * s.price() }
 
+// AllocatedGiB는 사용자가 이미 잡아 둔 볼륨 용량 합이다.
+// 세션 홈이 같은 쿼터에서 세어지므로 세션 쪽에서 이 값을 참조한다.
+func (s *Service) AllocatedGiB(userID int64) int {
+	n, _ := s.repo.AllocatedGiB(userID)
+	return n
+}
+
 // quotaFor는 사용자에게 적용되는 볼륨 GiB 하드 상한을 반환한다(계층 미주입/0이면 전역 totalGiB).
 func (s *Service) quotaFor(userID int64) int {
 	if s.limits != nil {

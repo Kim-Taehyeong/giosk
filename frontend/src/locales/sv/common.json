@@ -517,9 +517,6 @@
     "reclaim": {
       "stoppedTtl": "Lagringstid för stoppade sessioner",
       "stoppedTtlHint": "Stoppade sessioner upptar fortfarande sin hemdisk. Efter denna tid blir de kandidater för återtagning. 0 = återta aldrig automatiskt.",
-      "diskThreshold": "Diskanvändning som startar återtagning",
-      "diskThresholdHint": "Återtagning körs bara på noder över denna diskanvändning. Finns det gott om utrymme lämnas även gamla stoppade sessioner ifred.",
-      "note": "Återtagningen börjar med de längst inaktiva sessionerna hos de användare som samlat på sig flest stoppade sessioner, och slutar så snart noden är under tröskeln igen.",
       "exemptNote": "Varje användares senast stoppade session återtas aldrig. Körande sessioner rörs aldrig.",
       "offNote": "Automatisk återtagning är avstängd. Stoppade sessioner hålls tillbaka enbart av antalsgränsen och lagringsavgifterna; när diskarna fylls måste administratörer städa manuellt."
     }

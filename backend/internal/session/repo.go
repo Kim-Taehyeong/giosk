@@ -17,6 +17,10 @@ var ErrSessionLimit = errors.New("session limit reached")
 // 무한정 쌓이면 안 된다. 새 세션을 만들려면 기존 중단 세션을 삭제해야 한다.
 var ErrStoppedLimit = errors.New("stopped session limit reached")
 
+// ErrHomeQuota는 세션 홈이 계정 볼륨 쿼터를 넘길 때다. 홈이 이미지 기반이라 실제로
+// 디스크를 예약하므로 볼륨과 같은 쿼터에서 센다.
+var ErrHomeQuota = errors.New("session home exceeds volume quota")
+
 // 물리(SSH) 세션 관련 오류.
 var (
 	ErrLeaseUnavailable     = errors.New("physical lease unavailable")
@@ -93,6 +97,10 @@ type Repository interface {
 	ListActiveContainer() ([]Session, error)       // 컨테이너 활성(provisioning|running) 세션. phase 리컨실용
 	CountActive(userID int64) int                  // 활성(provisioning|running) 세션 수
 	CountStopped(userID int64) int                 // 중단(stopped) 세션 수. 로컬 홈 PVC 점유로 상한 대상
+	// AllocatedHomeGiB는 이 사용자의 살아있는 세션 홈 용량 합이다(삭제된 세션 제외).
+	// 홈이 이미지 기반이 되면서 실제로 디스크를 예약하므로 볼륨과 같은 쿼터에서 센다.
+	// defaultGiB 는 home_gib 가 NULL 인 옛 세션에 적용할 값이다.
+	AllocatedHomeGiB(userID int64, defaultGiB int) int
 	IsGroupMember(userID, groupID int64) bool      // 사용자가 그 팀의 활성 멤버인지(세션 팀 귀속 검증)
 	UserLeasedNode(userID int64, node string) bool // 사용자가 그 물리노드를 대여한 적 있는지(로컬 Home 접근 검증)
 	SetUserSSHKey(userID int64, key string) error
@@ -389,6 +397,18 @@ func (r *gormRepo) CountStopped(userID int64) int {
 	var n int64
 	r.db.Model(&Session{}).Where("user_id = ? AND phase = ?", userID, PhaseStopped).Count(&n)
 	return int(n)
+}
+
+// AllocatedHomeGiB는 살아있는 세션들의 홈 용량 합이다.
+//
+// 물리(SSH) 임대는 노드를 통째로 쓰는 것이라 홈 용량 개념이 없어 제외한다.
+// phase 로는 거르지 않는다. 중단(stopped)과 강제종료(terminated)는 홈을 그대로 물고 있고,
+// 홈이 실제로 지워지는 것은 세션 삭제뿐인데 그때는 행 자체가 사라지기 때문이다.
+func (r *gormRepo) AllocatedHomeGiB(userID int64, defaultGiB int) int {
+	var sum int
+	r.db.Raw(`SELECT COALESCE(SUM(COALESCE(home_gib, ?)),0) FROM sessions
+	          WHERE user_id = ? AND env <> 'ssh'`, defaultGiB, userID).Scan(&sum)
+	return sum
 }
 
 // IsGroupMember는 사용자가 그 팀의 활성 멤버인지 확인한다(세션이 임의 팀에 귀속·과금되는 것 방지).

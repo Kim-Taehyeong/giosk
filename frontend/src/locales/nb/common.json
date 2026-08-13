@@ -517,9 +517,6 @@
     "reclaim": {
       "stoppedTtl": "Oppbevaringstid for stoppede økter",
       "stoppedTtlHint": "Stoppede økter opptar fortsatt hjemmedisken sin. Etter denne perioden blir de kandidater for gjenvinning. 0 = aldri gjenvinn automatisk.",
-      "diskThreshold": "Diskbruk som starter gjenvinning",
-      "diskThresholdHint": "Gjenvinning kjører bare på noder over denne diskbruken. Er det god plass, får også gamle stoppede økter være i fred.",
-      "note": "Gjenvinningen starter med de lengst inaktive øktene til brukerne som har flest stoppede økter, og stopper så snart noden er under terskelen igjen.",
       "exemptNote": "Hver brukers sist stoppede økt blir aldri gjenvunnet. Kjørende økter røres aldri.",
       "offNote": "Automatisk gjenvinning er av. Stoppede økter begrenses bare av antallsgrensen og lagringskostnadene; når diskene fylles, må administratorer rydde manuelt."
     }

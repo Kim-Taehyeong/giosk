@@ -317,7 +317,12 @@
     "notEnough": "Not enough credit — 1 hour minimum required",
     "tsSlotN": "1 of {{n}} slots",
     "sshKeyChange": "Change",
-    "sshCacheCount": "{{n}} cached"
+    "sshCacheCount": "{{n}} cached",
+    "homeSize": "Home size (GiB)",
+    "homeSizeHint": "Size of the session home (~). Leave empty for the default. It counts against your storage allowance; {{remain}}GiB remaining.",
+    "homeSizeHintNoQuota": "Size of the session home (~). Leave empty for the default.",
+    "homeSizeOver": "Exceeds your remaining storage ({{remain}}GiB). Reduce the size, or remove volumes or sessions you no longer need.",
+    "homeSizeLocalHome": "Local Home uses that physical node's disk directly, so this value does not apply."
   },
   "session": {
     "title": "Sessions",

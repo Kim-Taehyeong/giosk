@@ -129,9 +129,14 @@ type Service struct {
 	storagePrice func() int // 스토리지 GiB·월 단가(런타임 라이브 read). nil/0 이면 중단 세션 과금 없음.
 	// 홈 회수(T1) 조건: (방치 일수, 노드 디스크 사용률 임계%). 유휴 타임아웃과 마찬가지로
 	// 운영 중 조정되는 정책이라 매 틱 라이브 read 한다(nil=회수 비활성).
-	homeReap func() (ttlDays, thresholdPct int)
+	homeReap func() (ttlDays int)
 
 	memBurst int // 메모리 limit 배수(limit = 보장 request × 배수). 1 이하 = 상한 없음.
+
+	// volumeUsedFn은 사용자가 이미 쓰고 있는 볼륨 용량(GiB)을 돌려준다(nil 이면 0).
+	// 세션 홈을 볼륨과 같은 쿼터에서 세려면 볼륨 쪽 합이 필요한데, 세션 패키지가
+	// 볼륨 저장소를 직접 알면 순환 의존이 되므로 함수로 주입받는다.
+	volumeUsedFn func(userID int64) int
 
 	datasetCache DatasetCacheReader // 데이터셋 노드 로컬 캐시 배치 조회(nil=항상 NFS)
 
@@ -393,7 +398,36 @@ func (s *Service) checkHardLimits(userID int64, sess *Session) error {
 	if lim.MaxConcurrentSessions > 0 && s.repo.CountActive(userID) >= lim.MaxConcurrentSessions {
 		return ErrSessionLimit
 	}
+	if err := s.checkHomeQuota(userID, sess, lim.MaxVolumeGiB); err != nil {
+		return err
+	}
 	return s.checkResourceLimits(userID, sess)
+}
+
+// checkHomeQuota는 이 세션의 홈이 계정 볼륨 쿼터 안에 들어가는지 본다.
+//
+// 홈이 이미지 기반이 되면서 PVC 에 적은 용량이 실제로 노드 디스크를 예약한다. 볼륨과
+// 성격이 같아졌으므로 같은 쿼터에서 센다. 그러지 않으면 사용자가 세션만 계속 만들어
+// 볼륨 쿼터를 우회할 수 있다.
+//
+// 물리(SSH) 임대는 노드를 통째로 빌려주는 것이라 홈 용량 개념이 없어 제외한다.
+// 쿼터가 0(미설정)이면 제한하지 않는다. 다른 하드리밋과 같은 규칙이다.
+func (s *Service) checkHomeQuota(userID int64, sess *Session, quotaGiB int) error {
+	if sess.Env == "ssh" || quotaGiB <= 0 {
+		return nil
+	}
+	want := s.sessionHomeGiB
+	if sess.HomeGiB != nil {
+		want = *sess.HomeGiB
+	}
+	used := s.repo.AllocatedHomeGiB(userID, s.sessionHomeGiB)
+	if s.volumeUsedFn != nil {
+		used += s.volumeUsedFn(userID)
+	}
+	if used+want > quotaGiB {
+		return ErrHomeQuota
+	}
+	return nil
 }
 
 // checkResourceLimits는 사양 자체의 상한(GPU 개수·VRAM)만 본다. 세션 수(동시·중단) 상한은 제외.
@@ -468,10 +502,17 @@ func (s *Service) WithStoragePrice(f func() int) *Service { s.storagePrice = f; 
 // request 는 GPU 지분 비례 최소 보장이고, limit 은 그 배수까지만 버스트를 허용하는 천장이다.
 func (s *Service) WithMemBurst(n int) *Service { s.memBurst = n; return s }
 
-// WithHomeReap는 중단 세션 홈 회수(T1) 조건을 라이브 getter 로 주입한다.
+// WithVolumeUsage는 사용자의 볼륨 사용량 조회를 주입한다. 세션 홈을 볼륨과 같은
+// 쿼터에서 세기 위한 것으로, 미주입이면 홈만 세고 볼륨은 세지 않는다.
+func (s *Service) WithVolumeUsage(fn func(userID int64) int) *Service {
+	s.volumeUsedFn = fn
+	return s
+}
+
+// WithHomeReap는 중단 세션 홈 회수(T1)의 방치 일수를 라이브 getter 로 주입한다.
 // 매 틱 다시 읽으므로 관리자가 운영 중 바꾼 값이 다음 틱부터 반영된다(재배포 불필요).
-// getter 가 (0, _) 를 주면 그 틱은 회수하지 않는다.
-func (s *Service) WithHomeReap(f func() (ttlDays, thresholdPct int)) *Service {
+// getter 가 0 을 주면 그 틱은 회수하지 않는다.
+func (s *Service) WithHomeReap(f func() (ttlDays int)) *Service {
 	s.homeReap = f
 	return s
 }
@@ -564,7 +605,7 @@ func (s *Service) Create(ctx context.Context, userID int64, username string, req
 		requireNode = req.LocalHomeNode
 	} else {
 		// 세션 전용 영속 홈: 중단해도 데이터 유지, 삭제 시 함께 제거. (예전 emptyDir=중단 시 유실이었음)
-		homePVC, err := s.ensureSessionHome(ctx, ns, sess.InstanceID)
+		homePVC, err := s.ensureSessionHome(ctx, ns, sess)
 		if err != nil {
 			return nil, s.rollback(ctx, sess, err)
 		}
@@ -687,15 +728,24 @@ func sessionHomePVC(instanceID string) string { return homePVCPrefix + instanceI
 // 중단(Stop)해도 유지되고 재개하면 그대로 복원된다. 삭제(Delete)할 때만 함께 제거한다.
 // 로컬 스토리지클래스(local-path, RWO·WFFC): 노드 로컬 디스크라 빠르다(홈 I/O 를 NFS 로 보내면 느림).
 // WFFC 라 Pod 스케줄 시점에 그 노드에 바인딩되고, 이후 PV 노드 어피니티가 재시작을 같은 노드로 되돌린다.
-func (s *Service) ensureSessionHome(ctx context.Context, ns, instanceID string) (string, error) {
-	name := sessionHomePVC(instanceID)
+func (s *Service) ensureSessionHome(ctx context.Context, ns string, sess *Session) (string, error) {
+	name := sessionHomePVC(sess.InstanceID)
 	if err := s.prov.CreatePVC(ctx, k8s.PVCSpec{
-		Namespace: ns, Name: name, SizeGiB: s.sessionHomeGiB,
+		Namespace: ns, Name: name, SizeGiB: s.homeGiBOf(sess),
 		StorageClass: s.localClass, AccessMode: "RWO",
 	}); err != nil {
 		return "", err
 	}
 	return name, nil
+}
+
+// homeGiBOf는 이 세션의 홈 용량이다. 세션에 기록된 값이 없으면(이 기능 이전에 만들어진
+// 세션) 설치 기본값으로 본다.
+func (s *Service) homeGiBOf(sess *Session) int {
+	if sess != nil && sess.HomeGiB != nil && *sess.HomeGiB > 0 {
+		return *sess.HomeGiB
+	}
+	return s.sessionHomeGiB
 }
 
 // ensureHome은 사용자 홈 PVC(/home/work 영속)를 멱등 생성하고 이름을 반환한다.
@@ -1124,6 +1174,14 @@ func (s *Service) buildSession(ctx context.Context, userID int64, req CreateReq)
 		GpuCount:    req.GpuCount,
 		GpuType:     req.GpuType,
 		Phase:       PhaseProvisioning,
+	}
+	// 홈 용량은 세션마다 기록한다. 재시작 때 같은 크기로 다시 올려야 하고, 나중에
+	// 기본값을 바꿔도 이미 만든 세션의 홈이 달라지면 안 되기 때문이다.
+	if req.HomeGiB > 0 {
+		sess.HomeGiB = &req.HomeGiB
+	} else {
+		def := s.sessionHomeGiB
+		sess.HomeGiB = &def
 	}
 	if req.OfferingID != nil {
 		if err := s.applyOffering(sess, *req.OfferingID); err != nil {
@@ -1808,7 +1866,7 @@ func (s *Service) Start(ctx context.Context, instanceID string, userID int64) er
 	ns := s.namespaceOf(sess)
 	// 재시작도 동일: 세션 전용 영속 홈 재마운트(중단 전 데이터 그대로 복원) + (sharedHome 시) ~/nfs 영속.
 	mounts := s.restartMounts(ctx, ns, sess.UserID, sess.ID)
-	homePVC, err := s.ensureSessionHome(ctx, ns, sess.InstanceID)
+	homePVC, err := s.ensureSessionHome(ctx, ns, sess)
 	if err != nil {
 		return resume(err)
 	}

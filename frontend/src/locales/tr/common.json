@@ -517,9 +517,6 @@
     "reclaim": {
       "stoppedTtl": "Durdurulmuş oturumların saklanma süresi",
       "stoppedTtlHint": "Durdurulmuş oturumlar ana disklerini işgal etmeye devam eder. Bu süreyi aşınca geri kazanım adayı olurlar. 0 = asla otomatik geri kazanma.",
-      "diskThreshold": "Geri kazanımı başlatan disk kullanımı",
-      "diskThresholdHint": "Geri kazanım yalnızca bu disk kullanımının üzerindeki düğümlerde çalışır. Yeterli yer varsa eski durdurulmuş oturumlara da dokunulmaz.",
-      "note": "Geri kazanım, en çok durdurulmuş oturum biriktiren kullanıcıların en uzun süredir boşta duran oturumlarından başlar ve düğüm eşiğin altına iner inmez durur.",
       "exemptNote": "Her kullanıcının en son durdurduğu oturum asla geri kazanılmaz. Çalışan oturumlara asla dokunulmaz.",
       "offNote": "Otomatik geri kazanım kapalı. Durdurulmuş oturumlar yalnızca adet sınırı ve depolama ücretiyle sınırlanır; diskler dolduğunda yöneticilerin elle temizlemesi gerekir."
     }

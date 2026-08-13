@@ -9,7 +9,6 @@ const (
 	// 중단 세션 홈 회수는 유휴 타임아웃과 같은 성격의 회수 정책이라 함께 런타임에서 조정한다.
 	// 운영하며 "며칠이 적당한가"가 바뀌는 값이고, 바꾸는 데 재배포가 필요할 이유가 없다.
 	KeyStoppedTTLDays       = "stopped_ttl_days"              // 중단 세션이 회수 후보가 되는 방치 일수(0=회수 비활성)
-	KeyHomeReapPct          = "home_reap_pct"                 // 노드 디스크 사용률 임계(%). 이 이상인 노드에서만 집행한다
 	KeyRechargeEnabled      = "credit_recharge_enabled"       // 크레딧 정기 재충전 on/off
 	KeyRechargeAmount       = "credit_recharge_amount"        // 재충전 크레딧 양
 	KeyRechargeIntervalDays = "credit_recharge_interval_days" // 재충전 주기(일)

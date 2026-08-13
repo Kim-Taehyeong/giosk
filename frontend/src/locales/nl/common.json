@@ -517,9 +517,6 @@
     "reclaim": {
       "stoppedTtl": "Bewaartermijn gestopte sessies",
       "stoppedTtlHint": "Gestopte sessies bezetten nog steeds hun home-schijf. Na deze termijn worden ze kandidaat voor terugvordering. 0 = nooit automatisch terugvorderen.",
-      "diskThreshold": "Schijfgebruik waarbij terugvordering start",
-      "diskThresholdHint": "Terugvordering draait alleen op nodes boven dit schijfgebruik. Is er ruimte genoeg, dan blijven ook oude gestopte sessies onaangeroerd.",
-      "note": "Terugvordering begint bij de langst inactieve sessies van gebruikers met de meeste gestopte sessies, en stopt zodra de node weer onder de drempel zit.",
       "exemptNote": "De meest recent gestopte sessie van elke gebruiker wordt nooit teruggevorderd. Actieve sessies worden nooit aangeraakt.",
       "offNote": "Automatische terugvordering staat uit. Gestopte sessies worden alleen beperkt door de aantallimiet en de opslagkosten; bij volle schijven moeten beheerders handmatig opruimen."
     }
