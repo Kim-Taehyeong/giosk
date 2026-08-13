@@ -759,6 +759,12 @@ export default function NewSession() {
                   <div className="row"><span>{t('newSession.resource')}</span><span>{resourceText}</span></div>
                   <div className="row"><span>{t('newSession.image')}</span><span>{image.name}</span></div>
                   <div className="row"><span>{t('newSession.conn')}</span><span>{image.conns.join(' · ')}</span></div>
+                  {/* 홈 용량은 저장공간 할당량에서 차감되므로 시작 전에 확인할 수 있어야 한다.
+                      로컬 Home(물리노드)을 고른 경우에는 노드 디스크를 직접 쓰므로 해당 없음. */}
+                  <div className="row"><span>{t('newSession.homeSize')}</span>
+                    <span>{localHomeNode
+                      ? t('newSession.homeSizeLocalHomeShort')
+                      : `${Number(homeGib) > 0 ? Number(homeGib) : (config.storage?.sessionHomeGib ?? '')} GiB`}</span></div>
                   <div className="row"><span>{t('newSession.volumes')}</span><span>{selVols.length ? selVols.map((v) => v.name).join(', ') : t('newSession.noAttach')}</span></div>
                   {wtype !== 'cpu' && <div className="row"><span>{t('newSession.nodeLabel')}</span><span>{nodeText}{selDs.length ? ` · ${t('newSession.dsCountN', { n: selDs.length })}` : ''}</span></div>}
                   <div className="row"><span>{t('newSession.idleReclaim')}</span><span>{t('newSession.minN', { n: idle.timeoutMin })}</span></div>
